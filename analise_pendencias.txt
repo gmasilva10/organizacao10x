@@ -1,0 +1,158 @@
+## Pendências do Dashboard e Decisões da Reunião
+
+---
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-01
+Prioridade: Baixa (Revisar propósito do Dashboard inicial)
+Categoria: Dashboard - Geral
+Status: A Revisar
+Descrição: Dashboard inicial (com métricas de faturamento, etc.) será movido/integrado ao módulo de Análise. Onboarding é a nova página inicial.
+Notas: `useDashboardMetrics.ts` foi corrigido. Dashboard carrega. Validação da exatidão dos dados para o módulo de Análise.
+---
+Data: 2025-05-30 (Original)
+Prioridade: Média (quando o módulo de Análise for desenvolvido)
+Categoria: Dashboard - Gráficos
+Status: A Verificar
+Descrição: Testar se o gráfico "Produtividade do Relacionamento" usa dados dinâmicos e se filtros funcionam.
+---
+Data: 2025-05-30 (Original)
+Prioridade: Média (quando o módulo de Análise for implementado com estas seções)
+Categoria: Dashboard - Funcionalidade
+Status: A Verificar
+Descrição: Verificar interatividade dos filtros de período/status nas seções "Produtividade do Relacionamento", "Tarefas Pendentes" e "Notificações" (se mantidas no módulo de Análise).
+---
+Data: 2025-05-30 (Original)
+Prioridade: Média (quando o módulo de Análise for implementado com estas seções)
+Categoria: Dashboard - Funcionalidade
+Status: A Verificar
+Descrição: Avaliar comportamento dos botões "Ver todas" (se mantidos no módulo de Análise).
+---
+Data: 2025-05-30 (Original)
+Prioridade: Média
+Categoria: Navegação Geral
+Status: **Concluído** (Onboarding é a inicial, outras principais parecem OK)
+Descrição: Confirmar se todos os links no menu de navegação principal (Dashboard, Cadastros, Onboarding, etc.) estão funcionais e se as páginas carregam.
+---
+
+## Novas Pendências / Tarefas Prioritárias (Pós-Reunião e Sessão Atual)
+
+---
+Prioridade: **Concluído**
+Categoria: Navegação / Estrutura da Aplicação
+Status: **Concluído**
+Descrição: Implementar Onboarding como a página inicial da aplicação após login.
+---
+Prioridade: **Concluído**
+Categoria: Cadastro de Clientes / Serviços
+Status: **Concluído**
+Descrição: Testar completamente a criação de cliente COM serviço, incluindo a lógica "on-the-fly" no `service_catalog`.
+Notas: `ClientForm.tsx` cria entrada em `service_catalog` e `client_services`.
+---
+Prioridade: **Concluído**
+Categoria: Cadastro de Clientes / Serviços
+Status: **Concluído**
+Descrição: Refinar lógica de `serviceDetailsMap` no `ClientForm.tsx`. Substituir mapa estático por busca dinâmica no `service_catalog` para popular o dropdown de "Serviço contratado" e preencher campos relacionados (nome, preço, duração) ao selecionar um serviço existente. Permitir também a definição de um novo tipo de serviço (ID textual) que seria adicionado ao catálogo.
+---
+Prioridade: Alta
+Categoria: Cadastro de Clientes / Serviços
+Status: **Em Teste** (Aguardando feedback do último teste com criação de serviço)
+Descrição: Testar completamente a criação de cliente COM serviço, incluindo a lógica "on-the-fly" no `service_catalog`.
+Notas: Verificar se `ClientForm.tsx` cria entrada em `service_catalog` e `client_services`.
+---
+Prioridade: Alta
+Categoria: Onboarding
+Status: A Fazer
+Descrição: Desenvolver a funcionalidade de **Templates de Onboarding**: um padrão automatizado e opção para fluxo personalizado (não automatizado).
+Notas: Definir estrutura do Kanban, etapas padrão.
+---
+Prioridade: Média
+Categoria: Tipagem / Frontend
+Status: **Concluído** (Revisar se necessário após refatoração do ClientForm)
+Descrição: Ajustar Interface `Service` em `@/types/index.ts` para corresponder às colunas reais da tabela `service_catalog`.
+---
+Prioridade: Média
+Categoria: Configurações de Usuário / Perfil
+Status: **Concluído** (Verificado pelo usuário)
+Descrição: Validar a exibição e edição de dados na tela de Perfil (`src/components/configuracoes/ProfileTab.tsx`) após correções (nome, email, telefone, organização).
+---
+Prioridade: Média
+Categoria: Lógica de Negócio / Serviços
+Status: A Fazer
+Descrição: Implementar lógica de **Renovação vs. Retorno** de planos.
+Notas: Se um aluno compra novo plano >30 dias após o término do anterior, é "Retorno". Definir como armazenar/exibir essa distinção.
+---
+Prioridade: Média
+Categoria: Cadastro de Alunos / UI
+Status: A Fazer
+Descrição: Implementar **personalização da tabela de cadastro de alunos** (permitir ao usuário escolher colunas visíveis).
+---
+Prioridade: Média
+Categoria: Relacionamento / Conteúdo
+Status: A Fazer
+Descrição: Criar funcionalidade para **Modelos de Mensagem Padrão** (semanas 1-4 de treino) e permitir que o personal crie/customize os seus.
+---
+Prioridade: Média (Longo Prazo)
+Categoria: Cadastro / Integrações
+Status: A Fazer
+Descrição: Investigar e implementar **integração com Eduzz** para importar automaticamente dados de novos alunos após pagamento.
+---
+Prioridade: Média (Longo Prazo)
+Categoria: Colaboradores / Acesso
+Status: A Fazer
+Descrição: Desenvolver funcionalidade para **cadastro e gerenciamento de Colaboradores** dentro de uma Organização, com controle de permissões.
+Notas: Estrutura de banco (`organization_members` com roles) já é um começo.
+---
+Prioridade: Baixa
+Categoria: Configurações da Organização
+Status: A Fazer
+Descrição: Adicionar configuração `default_m0_reference` em `organization_settings` para novas organizações para limpar erro 406 no console do `ClientForm.tsx`.
+---
+Prioridade: Baixa
+Categoria: Performance / Refatoração
+Status: A Fazer (Pós-Estabilização)
+Descrição: Avaliar e possivelmente remover atraso de diagnóstico de 2s no `authService.ts` se a estabilidade for confirmada.
+---
+Prioridade: Média
+Categoria: Segurança / Configurações de Usuário
+Status: A Fazer
+Descrição: Implementar a chamada real ao Supabase para atualização de senha no `ProfileTab.tsx`.
+---
+Prioridade: Baixa
+Categoria: Acessibilidade / UI
+Status: A Fazer
+Descrição: Corrigir warnings "Missing `Description` or `aria-describedby={undefined}` for {DialogContent}" para melhorar acessibilidade dos modais.
+---
+Prioridade: Baixa (Longo Prazo)
+Categoria: Relacionamento / Integrações
+Status: A Fazer
+Descrição: Investigar e implementar integração com WhatsApp para comunicação com alunos.
+---
+
+## Pendências do Dashboard (Verificação Original)
+
+---
+Data: 2025-05-30 (Original)
+Prioridade: Alta
+Categoria: Dashboard - Métricas
+Status: Parcialmente Verificado/A Fazer
+Descrição: Confirmar se os valores nos cards de métricas (Alunos Ativos, Faturamento, etc.) são dinâmicos e refletem dados reais do backend.
+Notas: Hook `useDashboardMetrics.ts` corrigido para usar `created_at`. Dashboard carrega. Exatidão e dinamismo dos valores (especialmente faturamento, renovações, cancelamentos) ainda precisam ser validados com dados reais.
+---
+Data: 2025-05-30 (Original)
+Prioridade: Média
+Categoria: Dashboard - Navegação
+Status: Parcialmente Verificado
+Descrição: Confirmar se todos os links no menu de navegação principal (Dashboard, Cadastros, Onboarding, etc.) estão funcionais.
+Notas: "Cadastros" e acesso a "Configurações" (via menu do usuário) parecem OK. Outros links a testar.
+---
+Data: 2025-05-30 (Original)
+Prioridade: Baixa
+Categoria: Dashboard - Consistência de Dados
+Status: A Verificar
+Descrição: Analisar diferença entre contador de notificações no header e total na seção "Notificações".
+---
+Data: 2025-05-30 (Original)
+Prioridade: Média
+Categoria: Dashboard - Tarefas
+Status: A Verificar
+Descrição: Verificar se a mensagem "Não há tarefas para os filtros selecionados" em "Tarefas Pendentes" é correta.
+--- 
