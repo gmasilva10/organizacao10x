@@ -54,12 +54,21 @@ export const useRealClients = () => {
           }
         };
 
-        // Garantir que attentionLevel seja um valor válido
-        const getAttentionLevel = (level: string): AttentionLevel => {
-          if (level === 'high' || level === 'medium' || level === 'low') {
-            return level;
+        // Garantir que attentionLevel seja um valor válido e mapeado para o tipo AttentionLevel
+        const getAttentionLevel = (level: string | undefined | null): AttentionLevel => {
+          const lowerLevel = String(level).toLowerCase();
+          switch (lowerLevel) {
+            case "alto":
+              return "high";
+            case "médio": // Corrigido para lidar com acento
+            case "medio":
+              return "medium";
+            case "baixo":
+              return "low";
+            default:
+              console.warn(`[useRealClients] Nível de atenção não reconhecido: '${level}', usando 'medium' como padrão.`);
+              return "medium"; // valor padrão se não reconhecido
           }
-          return 'medium'; // valor padrão
         };
 
         // Garantir que status seja um valor válido
@@ -88,7 +97,7 @@ export const useRealClients = () => {
           state: client.client_state || '',
           country: client.client_country || 'Brasil',
           birthDate: client.client_birth_date || '',
-          attentionLevel: getAttentionLevel(client.client_attention_level || 'medium'),
+          attentionLevel: getAttentionLevel(client.client_attention_level),
           status: getClientStatus(client.client_status || 'active'),
           serviceType: service ? getServiceType(service.service_id) : 'monthly',
           campaignId: '1', // Implementar quando tivermos campanhas reais

@@ -93,7 +93,12 @@ const ClientForm = ({ onClose }: ClientFormProps) => {
 
   const onSubmit = async () => {
     const data = methods.getValues();
-    console.log("Form data:", data);
+    // Logs para depurar os dados do serviço na submissão
+    // console.log("[ClientForm] onSubmit - All form data:", data);
+    // console.log("[ClientForm] onSubmit - data.service (ID do serviço selecionado):", data.service);
+    // console.log("[ClientForm] onSubmit - data.serviceValue (Valor do serviço):", data.serviceValue);
+    // console.log("[ClientForm] onSubmit - data.serviceDurationMonths (Duração em meses):", data.serviceDurationMonths);
+
     setIsSubmitting(true);
     
     try {
@@ -150,11 +155,16 @@ const ClientForm = ({ onClose }: ClientFormProps) => {
         throw new Error("Não foi possível obter o ID do cliente após cadastro");
       }
 
+      // Adicionado log para verificar a condição de salvar o serviço
+      console.log(`[ClientForm] Checando condição para salvar serviço: data.service='${data.service}', data.serviceValue=${data.serviceValue}, data.serviceDurationMonths=${data.serviceDurationMonths}`);
+
       if (data.service && data.serviceValue > 0 && data.serviceDurationMonths && data.serviceDurationMonths > 0) {
-        const startDate = new Date();
+        // console.log("[ClientForm] Condição para salvar serviço ATENDIDA. Entrando no bloco if.");
+        const startDate = new Date(); // TODO: Considerar usar data.paymentDate se apropriado
         const endDate = new Date(startDate);
         
-        endDate.setMonth(endDate.getMonth() + data.serviceDurationMonths);
+        // Corrigido para usar data.serviceDurationMonths que é um número
+        endDate.setMonth(endDate.getMonth() + Number(data.serviceDurationMonths));
 
         const serviceData = {
           client_id: insertedClient.client_id,
@@ -167,17 +177,19 @@ const ClientForm = ({ onClose }: ClientFormProps) => {
           created_by: user.id
         };
 
-        console.log("Enviando dados de serviço (com service_id do catálogo):", serviceData);
+        // console.log("[ClientForm] Enviando dados de serviço para Supabase (client_services):", serviceData);
 
         const { error: serviceError } = await supabase
           .from('client_services')
           .insert([serviceData]);
 
         if (serviceError) {
-          console.error("Erro ao salvar serviço do cliente:", serviceError);
+          // console.error("[ClientForm] Erro ao SALVAR serviço do cliente na tabela client_services:", serviceError);
           toast.warning("Cliente cadastrado, mas houve um erro ao salvar o serviço", {
             description: serviceError.message
           });
+        } else {
+          // console.log("[ClientForm] Serviço do cliente SALVO COM SUCESSO para client_id:", insertedClient.client_id, "com service_id:", data.service);
         }
 
         // Atualizar M0 date se o marco padrão for payment
@@ -191,6 +203,10 @@ const ClientForm = ({ onClose }: ClientFormProps) => {
             console.error("Erro ao definir data M0:", m0Error);
           }
         }
+      }
+      else {
+        // Log se a condição para salvar o serviço não for atendida
+        // console.warn("[ClientForm] onSubmit - Condição para salvar serviço NÃO atendida. Valores atuais -> data.service:", data.service, "data.serviceValue:", data.serviceValue, "data.serviceDurationMonths:", data.serviceDurationMonths);
       }
 
       toast.success("Cliente cadastrado com sucesso!");

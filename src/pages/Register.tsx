@@ -72,9 +72,17 @@ const Register = () => {
     } catch (error: any) {
       console.error("Erro detalhado de registro no componente:", error);
       let errorMessage = "Erro ao criar conta. Tente novamente.";
-      if (error.message?.includes("already registered")) {
-        errorMessage = "Este email já está cadastrado.";
-      } else if (error.message?.includes("weak password")) {
+      const msg = error.message?.toLowerCase() || "";
+      if (
+        msg.includes("already registered") ||
+        msg.includes("user already exists") ||
+        msg.includes("email address is already registered") ||
+        msg.includes("duplicate key value") ||
+        msg.includes("perfil não encontrado para o usuário") ||
+        msg.includes("trigger de criação de perfil")
+      ) {
+        errorMessage = "Este e-mail já está cadastrado. Tente fazer login ou use outro e-mail.";
+      } else if (msg.includes("weak password") || msg.includes("senha deve ter pelo menos")) {
         errorMessage = "A senha deve ter pelo menos 6 caracteres.";
       } else if (error.message) {
         errorMessage = error.message;

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Client } from "@/types";
 import { 
@@ -15,19 +14,38 @@ interface ClientGeneralViewProps {
 }
 
 const ClientGeneralView = ({ client }: ClientGeneralViewProps) => {
-  const getAttentionLevelLabel = (level: "high" | "medium" | "low") => {
-    switch(level) {
-      case "high": return "Alta";
-      case "medium": return "Média";
-      case "low": return "Baixa";
+  const getAttentionLevelLabel = (level: string | undefined | null) => {
+    const lowerLevel = String(level).toLowerCase();
+    switch(lowerLevel) {
+      case "alto":
+      case "high": 
+        return "Alta";
+      case "médio":
+      case "medium":
+        return "Média";
+      case "baixo":
+      case "low": 
+        return "Baixa";
+      default: 
+        console.log("[ClientGeneralView] Nível de atenção não reconhecido ou indefinido:", level, "(lowerLevel:", lowerLevel, ")");
+        return "Não definido";
     }
   };
 
-  const getAttentionLevelColor = (level: "high" | "medium" | "low") => {
-    switch(level) {
-      case "high": return "bg-attention-high";
-      case "medium": return "bg-attention-medium";
-      case "low": return "bg-attention-low";
+  const getAttentionLevelColor = (level: string | undefined | null) => {
+    const lowerLevel = String(level).toLowerCase();
+    switch(lowerLevel) {
+      case "alto":
+      case "high": 
+        return "bg-attention-high";
+      case "médio":
+      case "medium":
+        return "bg-attention-medium";
+      case "baixo":
+      case "low": 
+        return "bg-attention-low";
+      default: 
+        return "bg-gray-200";
     }
   };
 

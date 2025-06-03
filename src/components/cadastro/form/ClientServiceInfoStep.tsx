@@ -13,23 +13,28 @@ interface ClientServiceInfoStepProps {
 }
 
 const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProps) => {
-  const { control, watch, setValue } = useFormContext();
+  const { control, watch, setValue, getValues } = useFormContext();
   const selectedServiceId = watch("service");
   const { services, loading: servicesLoading, error: servicesError } = useRealServices();
 
   useEffect(() => {
+    // console.log("[ClientServiceInfoStep] useEffect triggered. selectedServiceId:", selectedServiceId);
     if (selectedServiceId) {
       const service = services.find(s => s.service_id === selectedServiceId);
+      // console.log("[ClientServiceInfoStep] useEffect - Service found in services array (using service_id for find):", service);
       if (service) {
         setValue("serviceValue", service.price || 0);
         setValue("serviceDurationMonths", service.duration_months || 0);
+        // console.log(`[ClientServiceInfoStep] useEffect - Setting serviceValue: ${service.price || 0}, serviceDurationMonths: ${service.duration_months || 0}`);
       } else {
         setValue("serviceValue", 0);
         setValue("serviceDurationMonths", 0);
+        // console.log("[ClientServiceInfoStep] useEffect - Service not found (using service_id for find), resetting values");
       }
     } else {
       setValue("serviceValue", 0);
       setValue("serviceDurationMonths", 0);
+      // console.log("[ClientServiceInfoStep] useEffect - No selectedServiceId, resetting values");
     }
   }, [selectedServiceId, services, setValue]);
 
@@ -98,26 +103,43 @@ const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProp
           <FormField
             control={control}
             name="service"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700">Serviço contratado</FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger className="h-12 text-base">
-                      <SelectValue placeholder="Escolha uma opção" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {services.map((service) => (
-                        <SelectItem key={service.id} value={service.id}>
-                          {service.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const currentSelectedServiceObj = services.find(s => s.service_id === field.value);
+              // console.log("[ClientServiceInfoStep] render field service - field.value (selectedServiceId):", field.value);
+              // console.log("[ClientServiceInfoStep] render field service - currentSelectedServiceObj (using service_id for find):", currentSelectedServiceObj);
+
+              return (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">Serviço contratado</FormLabel>
+                  <FormControl>
+                    <Select 
+                      onValueChange={(value) => {
+                        // console.log("[ClientServiceInfoStep] Select onValueChange - value:", value);
+                        field.onChange(value);
+                      }} 
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="h-12 text-base">
+                        <SelectValue placeholder="Escolha uma opção">
+                          {currentSelectedServiceObj ? currentSelectedServiceObj.name : "Escolha uma opção"}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {services.map((service, index) => {
+                          // console.log(`[ClientServiceInfoStep] Mapping service for SelectItem #${index} - Service Object:`, service, `Using service_id: ${service.service_id} as value and key.`);
+                          return (
+                            <SelectItem key={service.service_id} value={String(service.service_id)}>
+                              {service.name}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
           
           <FormField

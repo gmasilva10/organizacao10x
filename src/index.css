@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -100,5 +99,89 @@
   
   .kanban-card {
     @apply bg-white rounded-md shadow-sm p-3 my-2 cursor-move border border-gray-100;
+  }
+}
+
+@layer utilities {
+  @keyframes logo-move {
+    0% {
+      transform: translate(-10%, -10%) scale(1) rotate(0deg);
+    }
+    50% {
+      transform: translate(10%, 10%) scale(1.05) rotate(8deg);
+    }
+    100% {
+      transform: translate(-10%, -10%) scale(1) rotate(0deg);
+    }
+  }
+  .animate-logo-move {
+    animation: logo-move 18s ease-in-out infinite;
+  }
+  @keyframes geom-move1 {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(30px) scale(1.08); }
+    100% { transform: translateY(0) scale(1); }
+  }
+  .animate-geom-move1 {
+    animation: geom-move1 12s ease-in-out infinite;
+  }
+  @keyframes geom-move2 {
+    0% { transform: translateX(0) rotate(0deg); }
+    50% { transform: translateX(-40px) rotate(8deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+  }
+  .animate-geom-move2 {
+    animation: geom-move2 16s ease-in-out infinite;
+  }
+  @keyframes geom-move3 {
+    0% { transform: translateY(0) scale(1) rotate(0deg); }
+    50% { transform: translateY(-30px) scale(1.07) rotate(-6deg); }
+    100% { transform: translateY(0) scale(1) rotate(0deg); }
+  }
+  .animate-geom-move3 {
+    animation: geom-move3 18s ease-in-out infinite;
+  }
+  @keyframes geom-move4 {
+    0% { transform: translateX(0) scale(1); }
+    50% { transform: translateX(25px) scale(1.12); }
+    100% { transform: translateX(0) scale(1); }
+  }
+  .animate-geom-move4 {
+    animation: geom-move4 14s ease-in-out infinite;
+  }
+  @keyframes geom-move5 {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(20px) rotate(12deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+  }
+  .animate-geom-move5 {
+    animation: geom-move5 15s ease-in-out infinite;
+  }
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+    100% { transform: translateX(0); }
+  }
+  .animate-shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  input, button {
+    transition: box-shadow 0.2s, border-color 0.2s, background 0.2s, color 0.2s, transform 0.1s;
+  }
+  input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px #2563eb33;
+    background: #f8fafc;
+  }
+  button:active {
+    transform: scale(0.97);
+  }
+  button:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
   }
 }

@@ -1,62 +1,58 @@
 ## Pendências do Dashboard e Decisões da Reunião
 
 ---
-Data: 2025-05-30 (Original) / Atualizado: 2025-06-01
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Baixa (Revisar propósito do Dashboard inicial)
 Categoria: Dashboard - Geral
 Status: A Revisar
 Descrição: Dashboard inicial (com métricas de faturamento, etc.) será movido/integrado ao módulo de Análise. Onboarding é a nova página inicial.
 Notas: `useDashboardMetrics.ts` foi corrigido. Dashboard carrega. Validação da exatidão dos dados para o módulo de Análise.
 ---
-Data: 2025-05-30 (Original)
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Média (quando o módulo de Análise for desenvolvido)
 Categoria: Dashboard - Gráficos
 Status: A Verificar
 Descrição: Testar se o gráfico "Produtividade do Relacionamento" usa dados dinâmicos e se filtros funcionam.
 ---
-Data: 2025-05-30 (Original)
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Média (quando o módulo de Análise for implementado com estas seções)
 Categoria: Dashboard - Funcionalidade
 Status: A Verificar
 Descrição: Verificar interatividade dos filtros de período/status nas seções "Produtividade do Relacionamento", "Tarefas Pendentes" e "Notificações" (se mantidas no módulo de Análise).
 ---
-Data: 2025-05-30 (Original)
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Média (quando o módulo de Análise for implementado com estas seções)
 Categoria: Dashboard - Funcionalidade
 Status: A Verificar
 Descrição: Avaliar comportamento dos botões "Ver todas" (se mantidos no módulo de Análise).
 ---
-Data: 2025-05-30 (Original)
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Média
 Categoria: Navegação Geral
-Status: **Concluído** (Onboarding é a inicial, outras principais parecem OK)
+Status: **Concluído** 
 Descrição: Confirmar se todos os links no menu de navegação principal (Dashboard, Cadastros, Onboarding, etc.) estão funcionais e se as páginas carregam.
+Notas: Navegação principal testada e funcional. Onboarding é a inicial.
 ---
 
 ## Novas Pendências / Tarefas Prioritárias (Pós-Reunião e Sessão Atual)
 
 ---
-Prioridade: **Concluído**
+Prioridade: Alta
 Categoria: Navegação / Estrutura da Aplicação
 Status: **Concluído**
 Descrição: Implementar Onboarding como a página inicial da aplicação após login.
 ---
-Prioridade: **Concluído**
+Prioridade: Alta
 Categoria: Cadastro de Clientes / Serviços
 Status: **Concluído**
 Descrição: Testar completamente a criação de cliente COM serviço, incluindo a lógica "on-the-fly" no `service_catalog`.
-Notas: `ClientForm.tsx` cria entrada em `service_catalog` e `client_services`.
----
-Prioridade: **Concluído**
-Categoria: Cadastro de Clientes / Serviços
-Status: **Concluído**
-Descrição: Refinar lógica de `serviceDetailsMap` no `ClientForm.tsx`. Substituir mapa estático por busca dinâmica no `service_catalog` para popular o dropdown de "Serviço contratado" e preencher campos relacionados (nome, preço, duração) ao selecionar um serviço existente. Permitir também a definição de um novo tipo de serviço (ID textual) que seria adicionado ao catálogo.
+Notas: `ClientForm.tsx` cria entrada em `service_catalog` e `client_services`. Seleção de serviço, atualização de valor e nome na UI do formulário, e salvamento no banco foram corrigidos e validados.
 ---
 Prioridade: Alta
 Categoria: Cadastro de Clientes / Serviços
-Status: **Em Teste** (Aguardando feedback do último teste com criação de serviço)
-Descrição: Testar completamente a criação de cliente COM serviço, incluindo a lógica "on-the-fly" no `service_catalog`.
-Notas: Verificar se `ClientForm.tsx` cria entrada em `service_catalog` e `client_services`.
+Status: **Concluído** 
+Descrição: Refinar lógica de `serviceDetailsMap` no `ClientForm.tsx`. Substituir mapa estático por busca dinâmica no `service_catalog` para popular o dropdown de "Serviço contratado" e preencher campos relacionados (nome, preço, duração) ao selecionar um serviço existente. Permitir também a definição de um novo tipo de serviço (ID textual) que seria adicionado ao catálogo.
+Notas: Busca dinâmica e preenchimento de campos relacionados implementados em `ClientServiceInfoStep.tsx`.
 ---
 Prioridade: Alta
 Categoria: Onboarding
@@ -66,13 +62,32 @@ Notas: Definir estrutura do Kanban, etapas padrão.
 ---
 Prioridade: Média
 Categoria: Tipagem / Frontend
-Status: **Concluído** (Revisar se necessário após refatoração do ClientForm)
+Status: **Concluído**
 Descrição: Ajustar Interface `Service` em `@/types/index.ts` para corresponder às colunas reais da tabela `service_catalog`.
+Notas: Verificado implicitamente durante correções de busca de serviço.
 ---
 Prioridade: Média
 Categoria: Configurações de Usuário / Perfil
-Status: **Concluído** (Verificado pelo usuário)
+Status: **Concluído** 
 Descrição: Validar a exibição e edição de dados na tela de Perfil (`src/components/configuracoes/ProfileTab.tsx`) após correções (nome, email, telefone, organização).
+---
+Prioridade: Alta
+Categoria: Cadastro de Clientes / Perfil do Cliente
+Status: **Concluído**
+Descrição: Implementar a exclusão de cliente com diálogo de confirmação, chamada ao Supabase para deletar da tabela `clients` (com `ON DELETE CASCADE` para registros relacionados), feedback ao usuário e redirecionamento.
+Notas: Implementado em `ClientProfile.tsx` e `ConfirmDeleteClientDialog.tsx`. Funcionalidade validada.
+---
+Prioridade: Alta
+Categoria: Cadastro de Clientes / Perfil do Cliente
+Status: **Concluído**
+Descrição: Implementar a edição das informações pessoais do cliente (Nome, Email, Telefone, Data Nasc., Cidade, Estado, Nível de Atenção, Observações; CPF não editável) através de um modal, com pré-preenchimento, chamada `update` ao Supabase, feedback e atualização automática da UI no perfil.
+Notas: Implementado em `ClientProfile.tsx` e `EditClientDialog.tsx`. Atualização automática da UI no perfil após edição (incluindo Nível de Atenção) foi corrigida e validada.
+---
+Prioridade: Média
+Categoria: Cadastro de Clientes / UI
+Status: **Concluído**
+Descrição: Garantir que o indicador visual (quadradinho colorido) na lista de alunos (`ClientsTable.tsx` / `ClientNameLink.tsx`) reflita corretamente o Nível de Atenção do cliente e atualize após a edição.
+Notas: Corrigida a lógica em `getAttentionLevelColor/Label` em `ClientNameLink.tsx` e em `getAttentionLevel` no hook `useRealClients.ts`. Atualização na lista validada.
 ---
 Prioridade: Média
 Categoria: Lógica de Negócio / Serviços
@@ -101,10 +116,11 @@ Status: A Fazer
 Descrição: Desenvolver funcionalidade para **cadastro e gerenciamento de Colaboradores** dentro de uma Organização, com controle de permissões.
 Notas: Estrutura de banco (`organization_members` com roles) já é um começo.
 ---
-Prioridade: Baixa
-Categoria: Configurações da Organização
+Prioridade: Baixa 
+Categoria: Cadastro de Clientes / Backend
 Status: A Fazer
-Descrição: Adicionar configuração `default_m0_reference` em `organization_settings` para novas organizações para limpar erro 406 no console do `ClientForm.tsx`.
+Descrição: A query `GET .../rest/v1/organization_settings?...setting_key=eq.default_m0_reference` está retornando 406 (Not Acceptable) durante o `onSubmit` do `ClientForm.tsx`. Investigar causa (RLS, PostgREST config) e corrigir.
+Notas: O `ClientForm.tsx` tem um fallback para `defaultM0Reference = 'payment'`. Erro observado durante testes de cadastro.
 ---
 Prioridade: Baixa
 Categoria: Performance / Refatoração
@@ -126,31 +142,41 @@ Categoria: Relacionamento / Integrações
 Status: A Fazer
 Descrição: Investigar e implementar integração com WhatsApp para comunicação com alunos.
 ---
+Prioridade: Baixa
+Categoria: UI / Serviços
+Status: A Fazer
+Descrição: Corrigir warning de `key` duplicada em `ServicesTable.tsx`. Provavelmente precisa usar `service_id` como chave ao mapear os serviços na tabela de listagem de serviços.
+---
+Prioridade: Média
+Categoria: Cadastro de Clientes / Lógica de Negócio
+Status: A Fazer
+Descrição: A data de início (`client_service_start_date`) do serviço no cadastro do cliente é sempre a data atual (`new Date()`), e não utiliza a "Data do Pagamento" inserida no formulário. Revisar e alinhar essa lógica para que a data de início do serviço possa ser definida ou baseada na data de pagamento.
+---
 
 ## Pendências do Dashboard (Verificação Original)
 
 ---
-Data: 2025-05-30 (Original)
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Alta
 Categoria: Dashboard - Métricas
 Status: Parcialmente Verificado/A Fazer
 Descrição: Confirmar se os valores nos cards de métricas (Alunos Ativos, Faturamento, etc.) são dinâmicos e refletem dados reais do backend.
 Notas: Hook `useDashboardMetrics.ts` corrigido para usar `created_at`. Dashboard carrega. Exatidão e dinamismo dos valores (especialmente faturamento, renovações, cancelamentos) ainda precisam ser validados com dados reais.
 ---
-Data: 2025-05-30 (Original)
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Média
 Categoria: Dashboard - Navegação
-Status: Parcialmente Verificado
+Status: **Concluído** 
 Descrição: Confirmar se todos os links no menu de navegação principal (Dashboard, Cadastros, Onboarding, etc.) estão funcionais.
-Notas: "Cadastros" e acesso a "Configurações" (via menu do usuário) parecem OK. Outros links a testar.
+Notas: Navegação principal testada e funcional.
 ---
-Data: 2025-05-30 (Original)
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Baixa
 Categoria: Dashboard - Consistência de Dados
 Status: A Verificar
 Descrição: Analisar diferença entre contador de notificações no header e total na seção "Notificações".
 ---
-Data: 2025-05-30 (Original)
+Data: 2025-05-30 (Original) / Atualizado: 2025-06-03
 Prioridade: Média
 Categoria: Dashboard - Tarefas
 Status: A Verificar

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AttentionLevel } from "@/types";
@@ -14,21 +13,37 @@ interface ClientNameLinkProps {
 const ClientNameLink = ({ clientId, clientName, attentionLevel, className }: ClientNameLinkProps) => {
   const navigate = useNavigate();
 
-  const getAttentionLevelColor = (level: AttentionLevel) => {
-    switch(level) {
-      case "high": return "bg-attention-high";
-      case "medium": return "bg-attention-medium";
-      case "low": return "bg-attention-low";
-      default: return "bg-gray-400";
+  const getAttentionLevelColor = (level: AttentionLevel | string | undefined | null) => {
+    switch(String(level).toLowerCase()) {
+      case "alto":
+      case "high": 
+        return "bg-attention-high";
+      case "médio":
+      case "medio":
+      case "medium":
+        return "bg-attention-medium";
+      case "baixo":
+      case "low": 
+        return "bg-attention-low";
+      default: 
+        return "bg-gray-400";
     }
   };
 
-  const getAttentionLevelLabel = (level: AttentionLevel) => {
-    switch(level) {
-      case "high": return "Alta atenção";
-      case "medium": return "Média atenção";
-      case "low": return "Baixa atenção";
-      default: return "Sem classificação";
+  const getAttentionLevelLabel = (level: AttentionLevel | string | undefined | null) => {
+    switch(String(level).toLowerCase()) {
+      case "alto":
+      case "high": 
+        return "Alta atenção";
+      case "médio":
+      case "medio":
+      case "medium":
+        return "Média atenção";
+      case "baixo":
+      case "low": 
+        return "Baixa atenção";
+      default: 
+        return "Sem classificação";
     }
   };
 

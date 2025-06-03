@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/cadastro/ClientsTable";
@@ -29,31 +28,31 @@ const Cadastro = () => {
         <TabsList className="border-b w-full justify-start rounded-none h-auto p-0 bg-transparent">
           <TabsTrigger 
             value="alunos" 
-            className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent py-3 px-6"
+            className="rounded-none py-3 px-6 text-gray-500 hover:text-gray-700 data-[state=active]:bg-gray-100 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:rounded-t-md"
           >
             Alunos
           </TabsTrigger>
           <TabsTrigger 
             value="servicos" 
-            className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent py-3 px-6"
+            className="rounded-none py-3 px-6 text-gray-500 hover:text-gray-700 data-[state=active]:bg-gray-100 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:rounded-t-md"
           >
             Serviços
           </TabsTrigger>
           <TabsTrigger 
             value="campanhas" 
-            className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent py-3 px-6"
+            className="rounded-none py-3 px-6 text-gray-500 hover:text-gray-700 data-[state=active]:bg-gray-100 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:rounded-t-md"
           >
             Campanhas
           </TabsTrigger>
           <TabsTrigger 
             value="colaboradores" 
-            className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent py-3 px-6"
+            className="rounded-none py-3 px-6 text-gray-500 hover:text-gray-700 data-[state=active]:bg-gray-100 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:rounded-t-md"
           >
             Colaboradores
           </TabsTrigger>
           <TabsTrigger 
             value="scripts" 
-            className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent py-3 px-6"
+            className="rounded-none py-3 px-6 text-gray-500 hover:text-gray-700 data-[state=active]:bg-gray-100 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:rounded-t-md"
           >
             Script de Vendas
           </TabsTrigger>
