@@ -106,7 +106,7 @@ const ClientGeneralView = ({ client }: ClientGeneralViewProps) => {
               <div>
                 <div className="font-medium">Data de Nascimento</div>
                 <div className="text-gray-600">
-                  {client.birthDate ? new Date(client.birthDate).toLocaleDateString("pt-BR") : "Não informado"}
+                  {client.birthDate ? new Date(client.birthDate).toLocaleDateString("pt-BR", { timeZone: "UTC" }) : "Não informado"}
                 </div>
               </div>
             </div>
