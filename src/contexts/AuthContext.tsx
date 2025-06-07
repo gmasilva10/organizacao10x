@@ -53,14 +53,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [organization, setOrganization] = useState<any | null>(null);
   const [organizationLoading, setOrganizationLoading] = useState(true);
 
-  useEffect(() => {
-    console.log(`%c[AuthTracker] loading state changed: ${loading}`, 'color: orange');
-  }, [loading]);
-
-  useEffect(() => {
-    console.log(`%c[AuthTracker] organizationLoading state changed: ${organizationLoading}`, 'color: purple');
-  }, [organizationLoading]);
-
   const cleanupAuthState = () => {
     localStorage.removeItem('supabase.auth.token');
     
@@ -211,7 +203,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setOrganization(null);
       }
       
-      console.log('[AuthTracker] Initial auth check finished. Setting loading states to false.');
       setOrganizationLoading(false);
       setLoading(false);
     };
@@ -220,7 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, currentSession) => {
-        console.log(`%c[AuthTracker] onAuthStateChange triggered. Event: ${_event}`, 'color: blue', currentSession);
+        console.log("Auth state changed in AuthContext:", _event, currentSession);
         
         const currentUser = currentSession?.user ?? null;
         const previousUser = user;
@@ -230,15 +221,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(currentUser);
 
           if (currentUser) {
-            console.log('[AuthTracker] User found in onAuthStateChange, fetching organization.');
             await fetchOrganization(currentUser.id);
           } else {
-            console.log('[AuthTracker] No user in onAuthStateChange, clearing organization.');
             setOrganization(null);
             setOrganizationLoading(false);
           }
         }
-        console.log('[AuthTracker] onAuthStateChange finished. Setting loading to false.');
         setLoading(false);
       }
     );
