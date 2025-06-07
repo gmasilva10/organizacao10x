@@ -10,82 +10,84 @@ interface RegisterUserData {
 }
 
 export const registerUser = async (userData: RegisterUserData) => {
-  const { name, email, password, organizationName, documentType, document } = userData;
+  const { name, email, password, organizationName } = userData;
   
-  console.log("Iniciando processo de registro no authService");
+  console.log("Iniciando processo de registro no authService (lógica refatorada)");
+
+  // 1. Criar o usuário no Auth
+  console.log("Tentando criar usuário no Supabase Auth");
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: name, // Mapeando para 'full_name' no profiles
+      }
+    }
+  });
+  
+  if (authError) {
+    console.error("Erro na criação do usuário no Auth:", authError);
+    throw authError;
+  }
+  if (!authData.user) {
+    console.error("Não foi possível obter dados do usuário após registro");
+    throw new Error("Falha no registro: usuário não retornado");
+  }
+  const userId = authData.user.id;
+  console.log("Usuário criado com sucesso no Auth:", userId);
+
+  // O trigger 'on_auth_user_created' ainda cuidará da criação do perfil básico.
+  // A lógica a seguir garante a criação e associação da organização de forma explícita.
+
+  let organizationId: string | null = null;
 
   try {
-    // Sign up the user
-    console.log("Tentando criar usuário no Supabase Auth");
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          organization_name: organizationName,
-          document_type: documentType,
-          document: document
-        }
-      }
-    });
-    
-    if (error) {
-      console.error("Erro na criação do usuário:", error);
-      throw error;
-    }
-    
-    if (!data.user) {
-      console.error("Não foi possível obter dados do usuário após registro");
-      throw new Error("Falha no registro: usuário não retornado");
-    }
-    
-    console.log("Usuário criado com sucesso:", data.user.id);
-    
-    // The trigger 'on_auth_user_created' and function 'handle_new_user' 
-    // will now automatically create a profile entry in public.profiles.
+    // 2. Criar a Organização
+    console.log("Criando organização explicitamente:", organizationName);
+    const { data: orgData, error: orgError } = await supabase
+      .from('organizations')
+      .insert({
+        name: organizationName,
+        owner_id: userId,
+      })
+      .select('organization_id')
+      .single();
 
-    // Re-adding a short delay to allow the profile creation trigger to complete and commit
-    console.log("Perfil deve ter sido criado pelo trigger. Aguardando 2 segundos para consistência transacional...");
-    await new Promise(resolve => setTimeout(resolve, 2000)); // 2-second delay
-    console.log("Atraso para consistência do perfil concluído.");
+    if (orgError) {
+      console.error("Erro ao inserir na tabela 'organizations':", orgError);
+      throw orgError;
+    }
+    if (!orgData?.organization_id) {
+      throw new Error("Falha ao criar organização: ID não retornado.");
+    }
+    organizationId = orgData.organization_id;
+    console.log("Organização criada com sucesso:", organizationId);
 
-    // Create the organization using an RPC function
-    console.log("Criando organização via RPC:", organizationName);
-    const { data: rpcOrgData, error: rpcOrgError } = await supabase
-      .rpc('create_new_organization', { 
-        org_name: organizationName,
-        user_id_input: data.user.id
+    // 3. Associar o usuário à organização como admin
+    console.log("Associando usuário à organização como admin...");
+    const { error: memberError } = await supabase
+      .from('organization_members')
+      .insert({
+        organization_id: organizationId,
+        user_id: userId,
+        role: 'admin' // Definindo o criador como admin
       });
 
-    if (rpcOrgError) {
-      console.error("Erro ao criar organização via RPC:", rpcOrgError);
-      throw rpcOrgError;
+    if (memberError) {
+      console.error("Erro ao inserir na tabela 'organization_members':", memberError);
+      throw memberError;
     }
-
-    if (!rpcOrgData) { // RPC pode retornar null ou o ID diretamente dependendo da definição
-      console.error("Não foi possível obter o ID da organização após chamada RPC.");
-      throw new Error("Falha ao criar organização: ID não retornado pela RPC.");
-    }
-    const newOrganizationId = rpcOrgData; // Assumindo que a RPC retorna o UUID diretamente
-    console.log("Organização criada com sucesso via RPC, ID:", newOrganizationId);
+    console.log("Usuário associado à organização com sucesso.");
     
     return {
-      user: data.user,
-      organization: { organization_id: newOrganizationId }
+      user: authData.user,
+      organization: { organization_id: organizationId }
     };
   } catch (err) {
-    console.error("Erro no processo de criação de organização/perfil:", err);
-    
-    // Se ocorrer um erro após a criação do usuário, tentamos limpá-lo
-    try {
-      console.log("Tentando excluir o usuário criado devido a erro no processo");
-      // Infelizmente não podemos deletar usuários via API cliente, então vamos apenas registrar o erro
-      console.log("Nota: O usuário foi criado, mas ocorreu um erro ao configurar a organização");
-    } catch (cleanupError) {
-      console.error("Erro ao limpar usuário após falha:", cleanupError);
-    }
-    
+    console.error("Erro no processo de criação de organização/associação:", err);
+    // TODO: Adicionar lógica de cleanup se necessário (ex: deletar a organização se a associação falhar)
+    // No momento, o RLS impediria a deleção do usuário do Auth por aqui, o que é o comportamento esperado.
     throw err;
   }
 };

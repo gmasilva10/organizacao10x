@@ -1,4 +1,16 @@
-## Sessão de Desenvolvimento e Análise Completa (2025-06-15)
+## Status Geral das Pendências (Atualizado em 2025-06-15)
+
+---
+
+### Bloco Zero: Usabilidade Crítica e Fluxo do Usuário
+
+---
+**1. Usuário sem Organização Fica Bloqueado**
+- **Prioridade:** CRÍTICA
+- **Categoria:** Onboarding / Usabilidade
+- **Status:** PENDENTE (INVESTIGAÇÃO INICIADA)
+- **Descrição:** Um usuário que, por qualquer motivo, não está associado a uma organização, recebe o aviso "Associação de organização não encontrada" ao tentar usar funcionalidades essenciais (como "Novo Cliente"), mas não recebe nenhuma orientação sobre como resolver o problema (criar ou entrar em uma organização). Isso representa um beco sem saída no fluxo do usuário.
+- **Próximo Passo:** Iniciar análise do fluxo de registro e login para identificar a causa raiz e propor uma solução (ex: um modal de criação de organização, redirecionamento para uma página de "Complete seu perfil", etc.).
 
 ---
 
