@@ -183,50 +183,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      setLoading(true);
-      setOrganizationLoading(true);
-
-      const { data: { session: existingSession }, error: sessionError } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        console.error("Error getting initial session:", sessionError);
-      }
-
-      if (existingSession?.user) {
-        console.log("AuthContext: Initial session found.");
-        setSession(existingSession);
-        setUser(existingSession.user);
-        await fetchOrganization(existingSession.user.id);
-      } else {
-        console.log("AuthContext: No initial session found.");
-        setOrganization(null);
-      }
-      
-      setOrganizationLoading(false);
-      setLoading(false);
-    };
-
-    initializeAuth();
+    setLoading(true);
+    setOrganizationLoading(true);
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, currentSession) => {
         console.log("Auth state changed in AuthContext:", _event, currentSession);
         
+        setSession(currentSession);
         const currentUser = currentSession?.user ?? null;
-        const previousUser = user;
+        setUser(currentUser);
 
-        if (currentUser?.id !== previousUser?.id) {
-          setSession(currentSession);
-          setUser(currentUser);
-
-          if (currentUser) {
-            await fetchOrganization(currentUser.id);
-          } else {
-            setOrganization(null);
-            setOrganizationLoading(false);
-          }
+        if (currentUser) {
+          await fetchOrganization(currentUser.id);
+        } else {
+          setOrganization(null);
         }
+
+        setOrganizationLoading(false);
         setLoading(false);
       }
     );
