@@ -10,31 +10,27 @@ import StepCard from "./StepCard";
 interface ClientServiceInfoStepProps {
   onPrevious: () => void;
   onNext: () => void;
+  onClose: () => void;
 }
 
-const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProps) => {
+const ClientServiceInfoStep = ({ onPrevious, onNext, onClose }: ClientServiceInfoStepProps) => {
   const { control, watch, setValue, getValues } = useFormContext();
-  const selectedServiceId = watch("service");
+  const selectedServiceId = watch("service_id");
   const { services, loading: servicesLoading, error: servicesError } = useRealServices();
 
   useEffect(() => {
-    // console.log("[ClientServiceInfoStep] useEffect triggered. selectedServiceId:", selectedServiceId);
     if (selectedServiceId) {
       const service = services.find(s => s.service_id === selectedServiceId);
-      // console.log("[ClientServiceInfoStep] useEffect - Service found in services array (using service_id for find):", service);
       if (service) {
         setValue("serviceValue", service.price || 0);
-        setValue("serviceDurationMonths", service.duration_months || 0);
-        // console.log(`[ClientServiceInfoStep] useEffect - Setting serviceValue: ${service.price || 0}, serviceDurationMonths: ${service.duration_months || 0}`);
+        setValue("serviceDurationDays", service.duration_days || 0);
       } else {
         setValue("serviceValue", 0);
-        setValue("serviceDurationMonths", 0);
-        // console.log("[ClientServiceInfoStep] useEffect - Service not found (using service_id for find), resetting values");
+        setValue("serviceDurationDays", 0);
       }
     } else {
       setValue("serviceValue", 0);
-      setValue("serviceDurationMonths", 0);
-      // console.log("[ClientServiceInfoStep] useEffect - No selectedServiceId, resetting values");
+      setValue("serviceDurationDays", 0);
     }
   }, [selectedServiceId, services, setValue]);
 
@@ -99,14 +95,12 @@ const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProp
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <FormField
             control={control}
-            name="service"
+            name="service_id"
             render={({ field }) => {
               const currentSelectedServiceObj = services.find(s => s.service_id === field.value);
-              // console.log("[ClientServiceInfoStep] render field service - field.value (selectedServiceId):", field.value);
-              // console.log("[ClientServiceInfoStep] render field service - currentSelectedServiceObj (using service_id for find):", currentSelectedServiceObj);
 
               return (
                 <FormItem>
@@ -114,7 +108,6 @@ const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProp
                   <FormControl>
                     <Select 
                       onValueChange={(value) => {
-                        // console.log("[ClientServiceInfoStep] Select onValueChange - value:", value);
                         field.onChange(value);
                       }} 
                       defaultValue={field.value}
@@ -126,7 +119,6 @@ const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProp
                       </SelectTrigger>
                       <SelectContent>
                         {services.map((service, index) => {
-                          // console.log(`[ClientServiceInfoStep] Mapping service for SelectItem #${index} - Service Object:`, service, `Using service_id: ${service.service_id} as value and key.`);
                           return (
                             <SelectItem key={service.service_id} value={String(service.service_id)}>
                               {service.name}
@@ -151,7 +143,6 @@ const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProp
                 <FormControl>
                   <Input 
                     type="number" 
-                    readOnly 
                     className="bg-gray-50 h-12 text-base"
                     placeholder="R$ 100"
                     {...field}
@@ -163,6 +154,29 @@ const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProp
               </FormItem>
             )}
           />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            <FormField
+              control={control}
+              name="serviceDurationDays"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">Duração do Serviço (dias)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      className="h-12 text-base"
+                      placeholder="Ex: 30"
+                      {...field}
+                      value={field.value || ''}
+                      onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -247,14 +261,25 @@ const ClientServiceInfoStep = ({ onPrevious, onNext }: ClientServiceInfoStepProp
           >
             Voltar
           </Button>
-          <Button 
-            type="button"
-            onClick={onNext}
-            className="px-8 py-3 text-base font-medium"
-            size="lg"
-          >
-            Continuar
-          </Button>
+          <div className="flex gap-4">
+            <Button 
+              type="button"
+              variant="destructive"
+              onClick={onClose}
+              className="px-8 py-3 text-base font-medium"
+              size="lg"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="button"
+              onClick={onNext}
+              className="px-8 py-3 text-base font-medium"
+              size="lg"
+            >
+              Continuar
+            </Button>
+          </div>
         </div>
       </div>
     </StepCard>

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
@@ -10,9 +9,10 @@ import StepCard from "./StepCard";
 
 interface ClientPersonalInfoStepProps {
   onNext: () => void;
+  onClose: () => void;
 }
 
-const ClientPersonalInfoStep = ({ onNext }: ClientPersonalInfoStepProps) => {
+const ClientPersonalInfoStep = ({ onNext, onClose }: ClientPersonalInfoStepProps) => {
   const { control, watch } = useFormContext();
   
   const name = watch("name");
@@ -133,7 +133,7 @@ const ClientPersonalInfoStep = ({ onNext }: ClientPersonalInfoStepProps) => {
           )}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <FormField
             control={control}
             name="city"
@@ -165,8 +165,8 @@ const ClientPersonalInfoStep = ({ onNext }: ClientPersonalInfoStepProps) => {
                     </SelectTrigger>
                     <SelectContent>
                       {states.map((state) => (
-                        <SelectItem key={state} value={state}>
-                          {state}
+                        <SelectItem key={state.value} value={state.value}>
+                          {state.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -176,9 +176,36 @@ const ClientPersonalInfoStep = ({ onNext }: ClientPersonalInfoStepProps) => {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">País</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="País" 
+                    className="h-12 text-base"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
-        <div className="flex justify-end pt-6">
+        <div className="flex justify-end pt-6 gap-4">
+           <Button 
+            type="button"
+            variant="destructive"
+            onClick={onClose}
+            className="px-8 py-3 text-base font-medium"
+            size="lg"
+          >
+            Cancelar
+          </Button>
           <Button 
             type="button"
             onClick={onNext}

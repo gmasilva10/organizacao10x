@@ -35,7 +35,6 @@ export const useRealServices = () => {
         organization_id: service.organization_id,
         name: service.name,
         price: Number(service.price),
-        duration_months: service.duration_months,
         description: service.description || '',
         is_active: service.is_active,
         created_at: service.created_at,
@@ -62,7 +61,6 @@ export const useRealServices = () => {
         name: serviceDataInput.name,
         description: serviceDataInput.description,
         price: serviceDataInput.price,
-        duration_months: serviceDataInput.duration_months,
         organization_id: organization.organization_id,
         is_active: true
       };
@@ -92,7 +90,6 @@ export const useRealServices = () => {
       const updatePayload: { [key: string]: any } = {};
       if (serviceDataInput.name !== undefined) updatePayload.name = serviceDataInput.name;
       if (serviceDataInput.price !== undefined) updatePayload.price = serviceDataInput.price;
-      if (serviceDataInput.duration_months !== undefined) updatePayload.duration_months = serviceDataInput.duration_months;
       if (serviceDataInput.description !== undefined) updatePayload.description = serviceDataInput.description;
       if (serviceDataInput.is_active !== undefined) updatePayload.is_active = serviceDataInput.is_active;
 

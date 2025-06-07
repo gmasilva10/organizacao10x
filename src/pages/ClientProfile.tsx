@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useClientData } from "@/components/client-profile/useClientData";
+import { useRealClients } from "@/hooks/useRealClients";
 import ClientHeader from "@/components/client-profile/ClientHeader";
 import ClientProfileTabs from "@/components/client-profile/ClientProfileTabs";
 import LoadingState from "@/components/client-profile/LoadingState";
@@ -9,28 +9,31 @@ import ConfirmDeleteClientDialog from "@/components/client-profile/ConfirmDelete
 import EditClientDialog from "@/components/client-profile/EditClientDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Client } from "@/types";
 
 const ClientProfile = () => {
   const { clientId } = useParams<{ clientId: string }>();
   const [activeTab, setActiveTab] = useState("general");
   const navigate = useNavigate();
-  const { client, isLoading, refetchData } = useClientData(clientId);
+  const { clients, loading: isLoading, error, refetch } = useRealClients();
+  const [client, setClient] = useState<Client | null>(null);
   
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useState(false);
   const [isDeletingClient, setIsDeletingClient] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   useEffect(() => {
-    if (!isLoading && client) {
-      console.log("[ClientProfile] Loaded client data:", JSON.stringify(client, null, 2));
+    if (clients.length > 0 && clientId) {
+      const currentClient = clients.find(c => c.id === clientId);
+      setClient(currentClient || null);
     }
-  }, [client, isLoading]);
+  }, [clients, clientId]);
   
   if (isLoading) {
     return <LoadingState />;
   }
   
-  if (!client) {
+  if (error || (!isLoading && !client)) {
     return <ErrorState />;
   }
 
@@ -84,11 +87,11 @@ const ClientProfile = () => {
   };
 
   const handleClientUpdated = () => {
-    if (refetchData) {
-      console.log("[ClientProfile] Calling refetchData after client update...");
-      refetchData();
+    if (refetch) {
+      console.log("[ClientProfile] Calling refetch after client update...");
+      refetch();
     } else {
-      console.warn("[ClientProfile] refetchData function is not available from useClientData. Page may not update immediately.");
+      console.warn("[ClientProfile] refetch function is not available. Page may not update immediately.");
     }
   };
 

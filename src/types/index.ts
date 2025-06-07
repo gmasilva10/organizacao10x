@@ -8,26 +8,38 @@ export type M0ReferenceType = "payment" | "anamnesis" | "workout";
 
 export interface Client {
   id: string;
+  organizationId: string;
   name: string;
   email: string;
   phone: string;
-  cpf?: string;
+  cpf: string;
+  birthDate: string;
+  status: string;
+  notes?: string;
+  attentionLevel?: 'low' | 'medium' | 'high';
   city?: string;
   state?: string;
   country?: string;
-  birthDate?: string;
-  attentionLevel: AttentionLevel;
-  status: ClientStatus;
-  serviceType: ServiceType;
   campaignId: string;
-  startDate: string;
-  endDate: string;
-  value?: number;
-  notes?: string;
-  anamnesisDate?: string | null;
-  workoutDeliveryDate?: string | null;
-  m0ReferenceType?: M0ReferenceType;
-  m0Date?: string | null;
+  serviceType: string;
+  m0Type?: string;
+  m0Date?: string;
+  createdAt: string;
+  updatedAt: string;
+  services?: any[];
+  last_sale?: {
+    client_service_id: string;
+    service_id: string;
+    service_name: string;
+    price: number;
+    start_date: string;
+    end_date: string;
+    payment_method?: string | null;
+    installments?: string | null;
+    collaborator_id?: string | null;
+    payment_date?: string | null;
+    status: string;
+  };
 }
 
 export interface Service {
@@ -35,7 +47,6 @@ export interface Service {
   organization_id: string;
   name: string;
   description?: string | null;
-  duration_months?: number | null;
   price?: number | null;
   is_active: boolean;
   created_at?: string;
@@ -143,4 +154,9 @@ export interface MessageSchedule {
     dayOffset: number;
     description?: string;
   }[];
+}
+
+export type ServiceData = {
+  name: string;
+  // ... existing code ...
 }

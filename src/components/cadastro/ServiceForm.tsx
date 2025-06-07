@@ -20,7 +20,6 @@ const ServiceForm = ({ onClose, service }: ServiceFormProps) => {
   const [serviceName, setServiceName] = useState("");
   const [serviceDescription, setServiceDescription] = useState("");
   const [servicePrice, setServicePrice] = useState("");
-  const [serviceDurationMonths, setServiceDurationMonths] = useState("1");
   const [isActive, setIsActive] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
 
@@ -30,7 +29,6 @@ const ServiceForm = ({ onClose, service }: ServiceFormProps) => {
       setServiceName(service.name);
       setServiceDescription(service.description || "");
       setServicePrice(service.price?.toString() || "");
-      setServiceDurationMonths(service.duration_months?.toString() || "1");
       setIsActive(service.is_active);
     }
   }, [service]);
@@ -57,7 +55,6 @@ const ServiceForm = ({ onClose, service }: ServiceFormProps) => {
       name: serviceName,
       description: serviceDescription,
       price: parseFloat(servicePrice) || 0,
-      duration_months: parseInt(serviceDurationMonths, 10) || 1,
       is_active: isActive,
       organization_id: organization.organization_id,
     };    
@@ -68,7 +65,6 @@ const ServiceForm = ({ onClose, service }: ServiceFormProps) => {
           name: serviceName,
           description: serviceDescription,
           price: parseFloat(servicePrice) || undefined,
-          duration_months: parseInt(serviceDurationMonths, 10) || undefined,
           is_active: isActive,
         };
         await updateService(service.service_id, updatePayload);
@@ -79,7 +75,6 @@ const ServiceForm = ({ onClose, service }: ServiceFormProps) => {
           name: serviceName,
           description: serviceDescription,
           price: parseFloat(servicePrice) || 0,
-          duration_months: parseInt(serviceDurationMonths, 10) || 1,
         };
         await createService(createPayload as Omit<Service, 'organization_id' | 'created_at' | 'updated_at' | 'is_active'>);
         toast.success("Serviço criado com sucesso!");
@@ -131,33 +126,18 @@ const ServiceForm = ({ onClose, service }: ServiceFormProps) => {
         />
       </div>
       
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="servicePrice">Valor (R$)</Label>
-          <Input 
-            id="servicePrice" 
-            type="number" 
-            step="0.01" 
-            min="0" 
-            placeholder="0,00" 
-            value={servicePrice}
-            onChange={(e) => setServicePrice(e.target.value)}
-            required
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="serviceDurationMonths">Duração (meses)</Label>
-          <Input 
-            id="serviceDurationMonths" 
-            type="number" 
-            min="1" 
-            placeholder="1" 
-            value={serviceDurationMonths}
-            onChange={(e) => setServiceDurationMonths(e.target.value)}
-            required
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="servicePrice">Valor (R$)</Label>
+        <Input
+          id="servicePrice"
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="0,00"
+          value={servicePrice}
+          onChange={(e) => setServicePrice(e.target.value)}
+          required
+        />
       </div>
 
       <div className="flex justify-end gap-3 pt-4">

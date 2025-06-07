@@ -8,6 +8,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -24,6 +25,36 @@ interface SaleDisplayData {
 interface ClientSalesViewProps {
   clientId: string;
 }
+
+const getStatusVariant = (status: string | undefined | null) => {
+  switch (status) {
+    case 'active':
+      return 'default';
+    case 'expired':
+      return 'destructive';
+    case 'canceled':
+      return 'outline';
+    case 'pending':
+      return 'secondary';
+    default:
+      return 'outline';
+  }
+};
+
+const getStatusLabel = (status: string | undefined | null) => {
+  switch (status) {
+    case 'active':
+      return 'Ativo';
+    case 'expired':
+      return 'Expirado';
+    case 'canceled':
+      return 'Cancelado';
+    case 'pending':
+      return 'Pendente';
+    default:
+      return 'N/A';
+  }
+};
 
 const ClientSalesView = ({ clientId }: ClientSalesViewProps) => {
   const [sales, setSales] = useState<SaleDisplayData[]>([]);
@@ -65,11 +96,7 @@ const ClientSalesView = ({ clientId }: ClientSalesViewProps) => {
             endDate: cs.client_service_end_date,
             serviceName: cs.service_catalog?.name || "Serviço não especificado",
             value: cs.client_service_value,
-            status: cs.client_service_status === "active" ? "Ativo" : 
-                    cs.client_service_status === "pending" ? "Pendente" :
-                    cs.client_service_status === "cancelled" ? "Cancelado" :
-                    cs.client_service_status === "inactive" ? "Inativo" :
-                    cs.client_service_status
+            status: cs.client_service_status
           }));
           setSales(formattedSales);
         } else {
@@ -127,22 +154,14 @@ const ClientSalesView = ({ clientId }: ClientSalesViewProps) => {
             ) : (
               sales.map(sale => (
                 <TableRow key={sale.id}>
-                  <TableCell>{new Date(sale.startDate).toLocaleDateString("pt-BR")}</TableCell>
-                  <TableCell>{new Date(sale.endDate).toLocaleDateString("pt-BR")}</TableCell>
+                  <TableCell>{new Date(sale.startDate).toLocaleDateString("pt-BR", { timeZone: "UTC" })}</TableCell>
+                  <TableCell>{new Date(sale.endDate).toLocaleDateString("pt-BR", { timeZone: "UTC" })}</TableCell>
                   <TableCell>{sale.serviceName}</TableCell>
                   <TableCell>R$ {sale.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                   <TableCell>
-                    <span 
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        sale.status === "Ativo" ? "bg-green-100 text-green-700" : 
-                        sale.status === "Pendente" ? "bg-yellow-100 text-yellow-700" :
-                        sale.status === "Cancelado" ? "bg-red-100 text-red-700" :
-                        sale.status === "Inativo" ? "bg-gray-100 text-gray-700" :
-                        "bg-purple-100 text-purple-700"
-                      }`}
-                    >
-                      {sale.status}
-                    </span>
+                    <Badge variant={getStatusVariant(sale.status)}>
+                      {getStatusLabel(sale.status)}
+                    </Badge>
                   </TableCell>
                 </TableRow>
               ))

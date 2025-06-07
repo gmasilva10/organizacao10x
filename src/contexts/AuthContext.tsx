@@ -179,11 +179,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(currentUser);
         
         if (currentUser) {
-          if (_event === 'SIGNED_IN' || (_event === 'INITIAL_SESSION' && currentUser)) {
-            console.log(`AuthContext: Event ${_event} with user, delaying fetchOrganization slightly.`);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            console.log("AuthContext: Delay finished, fetching organization.");
-          }
           fetchOrganization(currentUser.id);
         } else {
           setOrganization(null);
@@ -194,12 +189,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
       if (!user && !session && existingSession?.user) { 
-        console.log("AuthContext: Initial getSession with user (and no user/session from onAuthStateChange yet), delaying fetchOrganization.");
+        console.log("AuthContext: Initial getSession with user (and no user/session from onAuthStateChange yet), fetching organization.");
         setSession(existingSession);
         const currentUser = existingSession.user;
         setUser(currentUser);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        console.log("AuthContext: Delay finished for getSession, fetching organization.");
         fetchOrganization(currentUser.id);
       } else if (!user && !session && !existingSession?.user) {
         console.log("AuthContext: Initial getSession - no user.")

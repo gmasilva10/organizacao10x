@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -35,11 +34,19 @@ const ServicesTable = () => {
   };
 
   const confirmDelete = async () => {
+    if (!serviceToDelete?.service_id) {
+      toast.error("Erro Crítico", { description: "Não foi possível identificar o serviço para exclusão."});
+      setIsDeleteDialogOpen(false);
+      return;
+    }
+
     try {
-      await deleteService(serviceToDelete.id);
+      await deleteService(serviceToDelete.service_id);
       toast.success(`Serviço "${serviceToDelete.name}" excluído com sucesso.`);
-    } catch (error) {
-      toast.error('Erro ao excluir serviço');
+    } catch (error: any) {
+      toast.error('Erro ao excluir serviço', {
+        description: error.message || "Ocorreu um erro inesperado."
+      });
     }
     setIsDeleteDialogOpen(false);
     setServiceToDelete(null);
@@ -58,11 +65,26 @@ const ServicesTable = () => {
     }).format(value);
   };
 
-  const formatDuration = (months: number) => {
-    if (months === 1) return '1 mês';
-    if (months < 12) return `${months} meses`;
-    const years = months / 12;
-    return years === 1 ? '1 ano' : `${years} anos`;
+  const formatDuration = (days: number | null | undefined) => {
+    if (days === null || days === undefined || isNaN(days) || days <= 0) {
+      return 'N/A';
+    }
+    if (days === 1) return '1 dia';
+
+    // Conversão para anos
+    if (days % 365 === 0) {
+      const years = days / 365;
+      return years === 1 ? '1 ano' : `${years} anos`;
+    }
+    
+    // Conversão para meses (aproximado)
+    if (days % 30 === 0) {
+      const months = days / 30;
+      return months === 1 ? '1 mês' : `${months} meses`;
+    }
+
+    // Padrão para dias
+    return `${days} dias`;
   };
 
   return (
@@ -90,17 +112,15 @@ const ServicesTable = () => {
                 <TableHead>Nome</TableHead>
                 <TableHead>Descrição</TableHead>
                 <TableHead>Preço</TableHead>
-                <TableHead>Duração</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {services.map((service) => (
-                <TableRow key={service.id}>
+                <TableRow key={service.service_id}>
                   <TableCell className="font-medium">{service.name}</TableCell>
                   <TableCell>{service.description}</TableCell>
                   <TableCell>{formatCurrency(service.price)}</TableCell>
-                  <TableCell>{formatDuration(service.duration)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button 

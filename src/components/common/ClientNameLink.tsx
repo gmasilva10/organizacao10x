@@ -13,16 +13,12 @@ interface ClientNameLinkProps {
 const ClientNameLink = ({ clientId, clientName, attentionLevel, className }: ClientNameLinkProps) => {
   const navigate = useNavigate();
 
-  const getAttentionLevelColor = (level: AttentionLevel | string | undefined | null) => {
-    switch(String(level).toLowerCase()) {
-      case "alto":
+  const getAttentionLevelColor = (level: AttentionLevel) => {
+    switch(level) {
       case "high": 
         return "bg-attention-high";
-      case "médio":
-      case "medio":
       case "medium":
         return "bg-attention-medium";
-      case "baixo":
       case "low": 
         return "bg-attention-low";
       default: 
@@ -30,16 +26,12 @@ const ClientNameLink = ({ clientId, clientName, attentionLevel, className }: Cli
     }
   };
 
-  const getAttentionLevelLabel = (level: AttentionLevel | string | undefined | null) => {
-    switch(String(level).toLowerCase()) {
-      case "alto":
+  const getAttentionLevelLabel = (level: AttentionLevel) => {
+    switch(level) {
       case "high": 
         return "Alta atenção";
-      case "médio":
-      case "medio":
       case "medium":
         return "Média atenção";
-      case "baixo":
       case "low": 
         return "Baixa atenção";
       default: 

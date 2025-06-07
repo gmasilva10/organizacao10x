@@ -14,6 +14,18 @@ interface ClientGeneralViewProps {
 }
 
 const ClientGeneralView = ({ client }: ClientGeneralViewProps) => {
+  const latestService = client.services?.[0];
+
+  const formatDate = (dateString: string | undefined | null) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+  };
+
+  const formatCurrency = (value: number | undefined | null) => {
+    if (value === null || value === undefined) return "R$ 0,00";
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  };
+
   const getAttentionLevelLabel = (level: string | undefined | null) => {
     const lowerLevel = String(level).toLowerCase();
     switch(lowerLevel) {
@@ -49,27 +61,20 @@ const ClientGeneralView = ({ client }: ClientGeneralViewProps) => {
     }
   };
 
-  // Get latest purchase (mock data - in real app would come from client_services table)
-  const getLatestPurchase = () => {
-    // Mock data for latest purchase
-    return {
-      serviceName: (() => {
-        switch(client.serviceType) {
-          case "monthly": return "Plano Mensal";
-          case "quarterly": return "Plano Trimestral";
-          case "biannual": return "Plano Semestral";
-          case "annual": return "Plano Anual";
-          default: return "Não especificado";
-        }
-      })(),
-      value: client.value || 0,
-      startDate: client.startDate,
-      endDate: client.endDate,
-      status: client.status === "active" ? "Ativo" : "Inativo"
-    };
+  const getServiceStatusLabel = (status: string | undefined | null) => {
+    switch (status) {
+      case 'active':
+        return 'Ativo';
+      case 'expired':
+        return 'Expirado';
+      case 'canceled':
+        return 'Cancelado';
+      case 'pending':
+        return 'Pendente';
+      default:
+        return 'N/A';
+    }
   };
-
-  const latestPurchase = getLatestPurchase();
 
   return (
     <div className="p-6">
@@ -116,9 +121,9 @@ const ClientGeneralView = ({ client }: ClientGeneralViewProps) => {
               <div>
                 <div className="font-medium">Localização</div>
                 <div className="text-gray-600">
-                  {client.city && client.state
-                    ? `${client.city}, ${client.state}, ${client.country}`
-                    : client.country || "Não informado"}
+                  {[client.city, client.state, client.country]
+                    .filter(Boolean)
+                    .join(', ') || "Não informado"}
                 </div>
               </div>
             </div>
@@ -143,24 +148,24 @@ const ClientGeneralView = ({ client }: ClientGeneralViewProps) => {
           <div className="space-y-4">
             <div className="p-4 bg-blue-50 rounded-md">
               <div className="text-sm text-gray-600">Serviço</div>
-              <div className="font-medium text-lg">{latestPurchase.serviceName}</div>
+              <div className="font-medium text-lg">{latestService?.service_catalog?.name || "Não especificado"}</div>
             </div>
             
             <div className="p-4 bg-green-50 rounded-md">
               <div className="text-sm text-gray-600">Valor</div>
-              <div className="font-medium text-lg">R$ {latestPurchase.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+              <div className="font-medium text-lg">{formatCurrency(latestService?.client_service_value)}</div>
             </div>
             
             <div className="p-4 bg-purple-50 rounded-md">
               <div className="text-sm text-gray-600">Período</div>
               <div className="font-medium text-lg">
-                {new Date(latestPurchase.startDate).toLocaleDateString("pt-BR")} até {new Date(latestPurchase.endDate).toLocaleDateString("pt-BR")}
+                {formatDate(latestService?.client_service_start_date)} até {formatDate(latestService?.client_service_end_date)}
               </div>
             </div>
             
             <div className="p-4 bg-yellow-50 rounded-md">
               <div className="text-sm text-gray-600">Status</div>
-              <div className="font-medium text-lg">{latestPurchase.status}</div>
+              <div className="font-medium text-lg">{getServiceStatusLabel(latestService?.client_service_status)}</div>
             </div>
           </div>
           

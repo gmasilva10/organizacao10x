@@ -27,64 +27,55 @@ export const useRealClients = () => {
         .select(`
           *,
           client_services (
-            client_service_start_date,
-            client_service_end_date,
-            client_service_value,
-            service_id
+            *,
+            service_catalog (
+              name
+            )
           )
         `)
         .eq('organization_id', organization.organization_id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .order('client_service_start_date', { foreignTable: 'client_services', ascending: false });
 
       if (clientsError) throw clientsError;
 
-      // Transformar dados do Supabase para o formato esperado pela aplicação
       const transformedClients: Client[] = (clientsData || []).map(client => {
-        const service = client.client_services?.[0]; // Pegar o primeiro serviço
+        const lastService = client.client_services?.[0];
         
-        // Mapear service_id para serviceType
-        const getServiceType = (serviceId: string) => {
-          // Esta lógica pode ser melhorada com uma query para a tabela services
-          switch (serviceId) {
-            case '1': return 'monthly';
-            case '2': return 'quarterly';
-            case '3': return 'biannual';
-            case '4': return 'annual';
-            default: return 'monthly';
-          }
-        };
-
-        // Garantir que attentionLevel seja um valor válido e mapeado para o tipo AttentionLevel
         const getAttentionLevel = (level: string | undefined | null): AttentionLevel => {
           const lowerLevel = String(level).toLowerCase();
           switch (lowerLevel) {
             case "alto":
+            case "alta":
               return "high";
-            case "médio": // Corrigido para lidar com acento
+            case "médio":
             case "medio":
+            case "media":
               return "medium";
             case "baixo":
+            case "baixa":
               return "low";
             default:
-              console.warn(`[useRealClients] Nível de atenção não reconhecido: '${level}', usando 'medium' como padrão.`);
-              return "medium"; // valor padrão se não reconhecido
+              return "low"; 
           }
         };
 
-        // Garantir que status seja um valor válido
         const getClientStatus = (status: string): ClientStatus => {
-          if (status === 'active' || status === 'inactive') {
-            return status;
-          }
-          return 'active'; // valor padrão
+          if (status === 'active' || status === 'inactive') return status;
+          return 'active';
         };
 
-        // Garantir que m0ReferenceType seja um valor válido
         const getM0ReferenceType = (type: string): M0ReferenceType => {
-          if (type === 'payment' || type === 'anamnesis' || type === 'workout') {
-            return type;
+          if (type === 'payment' || type === 'anamnesis' || type === 'workout') return type;
+          return 'payment';
+        };
+
+        const getServiceStatus = (status: string | undefined | null): ServiceStatus => {
+          const lowerStatus = String(status).toLowerCase();
+          if (lowerStatus === 'active' || lowerStatus === 'inactive' || lowerStatus === 'canceled') {
+            return lowerStatus as ServiceStatus;
           }
-          return 'payment'; // valor padrão
+          return 'inactive';
         };
 
         return {
@@ -99,16 +90,27 @@ export const useRealClients = () => {
           birthDate: client.client_birth_date || '',
           attentionLevel: getAttentionLevel(client.client_attention_level),
           status: getClientStatus(client.client_status || 'active'),
-          serviceType: service ? getServiceType(service.service_id) : 'monthly',
-          campaignId: '1', // Implementar quando tivermos campanhas reais
-          startDate: service?.client_service_start_date || '',
-          endDate: service?.client_service_end_date || '',
-          value: service ? Number(service.client_service_value) : 0,
           notes: client.client_notes || '',
           anamnesisDate: client.client_anamnesis_date,
           workoutDeliveryDate: client.client_workout_delivery_date,
           m0ReferenceType: getM0ReferenceType(client.client_m0_reference_type || 'payment'),
-          m0Date: client.client_m0_date
+          m0Date: client.client_m0_date,
+          services: client.client_services || [],
+          last_sale: lastService ? {
+            client_service_id: lastService.client_service_id,
+            service_id: lastService.service_id,
+            service_name: lastService.service_catalog?.name || 'N/A',
+            price: Number(lastService.client_service_value),
+            duration_days: lastService.duration_days,
+            start_date: lastService.client_service_start_date,
+            end_date: lastService.client_service_end_date,
+            payment_method: lastService.client_service_payment_method,
+            installments: lastService.client_service_installments,
+            collaborator_id: lastService.collaborator_id,
+            payment_date: lastService.client_service_payment_date,
+            status: getServiceStatus(lastService.client_service_status),
+          } : undefined,
+          campaignId: client.campaign_id || '',
         };
       });
 

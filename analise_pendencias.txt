@@ -1,3 +1,160 @@
+## Sessão de Desenvolvimento e Análise Completa (2025-06-15)
+
+---
+
+Nesta sessão, uma tarefa aparentemente simples de ajustar a lógica de período de um serviço desencadeou uma análise profunda e uma série de correções críticas em toda a aplicação, resultando em um sistema significativamente mais robusto, seguro e consistente.
+
+### Funcionalidade Implementada:
+
+- **Recálculo do Período de Serviço:** Implementada a lógica no formulário de edição para que, ao alterar a "Data de Pagamento" ou a "Duração do Serviço (em dias)", o período completo do serviço (`client_service_start_date` e `client_service_end_date`) seja recalculado e atualizado corretamente no banco de dados.
+
+### Análise e Correções Críticas (Fase 1 - Banco de Dados):
+
+1.  **Vulnerabilidade de Segurança Resolvida (CRÍTICA):**
+    - **Diagnóstico:** A Row-Level Security (RLS) estava desabilitada em todas as tabelas principais, permitindo que usuários de uma organização pudessem, teoricamente, acessar dados de outras.
+    - **Correção:** A RLS foi ativada em todas as tabelas sensíveis (`clients`, `organizations`, `client_services`, etc.) e foram criadas políticas de segurança granulares para garantir que um usuário só possa ler/escrever dados pertencentes à sua própria organização.
+
+2.  **Falha de Design de Dados Resolvida (GRAVE):**
+    - **Diagnóstico:** A coluna `client_email` possuía uma restrição de unicidade global, impedindo que duas organizações diferentes cadastrassem um cliente com o mesmo e-mail.
+    - **Correção:** A constraint foi substituída por um índice único composto por `(organization_id, client_email)`, garantindo a unicidade do e-mail apenas no escopo de uma mesma organização.
+
+3.  **Limpeza de Schema (MENOR):**
+    - **Diagnóstico:** A coluna `duration_months` na tabela `service_catalog` estava obsoleta.
+    - **Correção:** A coluna foi removida do banco de dados para manter a consistência do schema.
+
+### Análise e Correções (Fase 2 - Código Frontend):
+
+1.  **Validação da Configuração do Cliente Supabase:**
+    - **Análise:** Foi confirmado que o cliente Supabase (`src/integrations/supabase/client.ts`) está configurado corretamente para persistir a sessão de autenticação, o que é essencial para o funcionamento da RLS.
+
+2.  **Limpeza de Código Legado:**
+    - **Análise:** Foram encontradas múltiplas referências à coluna `duration_months` no código do frontend, o que causaria erros.
+    - **Correção:** Todas as menções e lógicas associadas a `duration_months` foram removidas dos seguintes arquivos, sincronizando o frontend com o banco de dados:
+        - `src/hooks/useRealServices.ts`
+        - `src/components/cadastro/ServicesTable.tsx`
+        - `src/components/cadastro/ServiceForm.tsx`
+
+---
+
+## Status Geral das Pendências (Atualizado em 2025-06-14)
+
+---
+Este documento foi revisado e validado para refletir o estado atual do projeto. As tarefas foram reclassificadas e re-priorizadas com base em validações recentes.
+
+## Bloco 1: Correções e Funcionalidades Essenciais (Prioridade Alta)
+
+---
+**1. Salvar Edição de Serviço do Cliente (Colaborador/Data Pgto)**
+- **Prioridade:** CRÍTICA
+- **Categoria:** Cadastro de Clientes / Edição
+- **Status:** CONCLUÍDO (VALIDADO EM 15/06)
+- **Descrição:** A funcionalidade de edição do serviço foi o foco principal desta sessão. A lógica para salvar a data de pagamento e recalcular o período do serviço com base na nova duração em dias foi totalmente implementada, depurada e validada.
+- **Notas:** A causa raiz de múltiplos problemas foi rastreada até colunas inexistentes (`duration_days`) e dados ausentes no hook (`useRealClients`), ambos corrigidos.
+
+---
+**2. Erro 406 na Busca de Configurações da Organização**
+- **Prioridade:** Alta
+- **Categoria:** Cadastro de Clientes / Backend
+- **Status:** PENDENTE (CONFIRMADO)
+- **Descrição:** Durante o `onSubmit` do formulário de criação de cliente, a query `GET .../rest/v1/organization_settings?...setting_key=eq.default_m0_reference` retorna um erro 406 (Not Acceptable).
+- **Notas:** Embora o formulário tenha um fallback que impede o crash, o erro de requisição precisa ser investigado e corrigido (provavelmente relacionado a RLS ou configuração do PostgREST).
+
+---
+**3. Data de Início do Serviço no Cadastro**
+- **Prioridade:** Média
+- **Categoria:** Cadastro de Clientes / Lógica de Negócio
+- **Status:** PENDENTE (A VERIFICAR MANUALMENTE)
+- **Descrição:** A lógica de cadastro de um novo serviço para um cliente parece usar sempre a data atual (`new Date()`) como data de início, ignorando a "Data do Pagamento" inserida no formulário.
+- **Próximo Passo:** Requer inspeção do código na função `onSubmit` do `ClientForm.tsx` ou verificação direta no banco de dados para confirmar qual data está sendo persistida em `client_service_start_date`.
+
+---
+**4. Warnings de Acessibilidade nos Modais (Dialogs)**
+- **Prioridade:** Baixa
+- **Categoria:** Acessibilidade / UI
+- **Status:** PENDENTE (CONFIRMADO)
+- **Descrição:** Vários componentes de diálogo (`DialogContent`) na aplicação estão gerando o warning "Missing `Description` or `aria-describedby={undefined}`", o que prejudica a acessibilidade.
+- **Próximo Passo:** Revisar os componentes de diálogo (ex: `ClientForm`, `EditClientDialog`) e adicionar os componentes `<DialogDescription>` ou as `props` `aria-describedby` necessárias.
+
+---
+
+## Bloco 2: Funcionalidades Futuras e Melhorias (Prioridade Média/Baixa)
+
+---
+**5. Implementar Módulo de Análise (Antigo Dashboard)**
+- **Prioridade:** Média
+- **Categoria:** Análise / Dashboard
+- **Status:** PENDENTE (EM DESENVOLVIMENTO INICIAL)
+- **Descrição:** A tela `/analise` foi criada, mas as métricas principais (LTV, Retenção) estão quebradas (exibindo `NaN`), e funcionalidades essenciais como filtros de período, gráficos dinâmicos e seções de tarefas/notificações estão ausentes.
+- **Próximo Passo:** Desenvolver a lógica de cálculo para as métricas, implementar os filtros e conectar os componentes visuais aos dados reais.
+
+---
+**6. Implementar Lógica de Renovação vs. Retorno**
+- **Prioridade:** Média
+- **Categoria:** Lógica de Negócio / Serviços
+- **Status:** PENDENTE
+- **Descrição:** Definir e implementar a lógica de negócio para diferenciar uma "Renovação" de um "Retorno" de plano.
+- **Notas:** A regra sugerida é: se um aluno compra um novo plano >30 dias após o término do anterior, é "Retorno". É preciso definir como armazenar e exibir essa informação.
+
+---
+**7. Atualização de Senha do Usuário**
+- **Prioridade:** Média
+- **Categoria:** Segurança / Configurações de Usuário
+- **Status:** PENDENTE
+- **Descrição:** A funcionalidade de atualização de senha na tela de perfil (`ProfileTab.tsx`) precisa ser conectada ao backend (Supabase Auth).
+
+---
+**8. Templates de Onboarding**
+- **Prioridade:** Alta (Feature Principal)
+- **Categoria:** Onboarding
+- **Status:** PENDENTE
+- **Descrição:** Desenvolver a funcionalidade de templates de onboarding, permitindo a criação de fluxos de tarefas padronizados para novos clientes.
+
+---
+**9. Modelos de Mensagem Padrão (Relacionamento)**
+- **Prioridade:** Média
+- **Categoria:** Relacionamento / Conteúdo
+- **Status:** PENDENTE
+- **Descrição:** Criar uma funcionalidade para que o personal trainer possa salvar e reutilizar modelos de mensagem para se comunicar com os alunos em diferentes estágios.
+
+---
+**10. Gestão de Colaboradores**
+- **Prioridade:** Média (Longo Prazo)
+- **Categoria:** Colaboradores / Acesso
+- **Status:** PENDENTE
+- **Descrição:** Desenvolver a interface para cadastro e gerenciamento de colaboradores, associando-os a uma organização e definindo suas permissões.
+
+---
+**11. Melhoria: Reforçar Tipagem de Dados (last_sale)**
+- **Prioridade:** Baixa
+- **Categoria:** Refatoração / Manutenibilidade
+- **Status:** PENDENTE (NOVA TAREFA)
+- **Descrição:** O objeto `last_sale` no hook `useRealClients` e o `client` no `ClientForm` dependem de uma estrutura implícita. Para evitar bugs futuros, criar uma interface explícita para `last_sale` em `src/types/index.ts` e usá-la em todo o fluxo de dados (hooks, componentes) pode aumentar a robustez.
+
+---
+
+## Bloco 3: Tarefas Concluídas ou em Revisão
+
+---
+**12. Personalização da Tabela de Alunos**
+- **Prioridade:** Média
+- **Categoria:** Cadastro de Alunos / UI
+- **Status:** CONCLUÍDO (VALIDADO EM 14/06)
+- **Descrição:** A funcionalidade de escolher colunas visíveis na tabela de clientes (`/cadastro`) foi implementada e está funcionando.
+
+---
+**13. Warning de `key` duplicada em `ServicesTable.tsx`**
+- **Prioridade:** Baixa
+- **Categoria:** UI / Serviços
+- **Status:** A REVISAR (Não Reproduzido)
+- **Descrição:** O warning de `key` duplicada não foi observado durante a navegação recente. Pode ter sido corrigido indiretamente. Manter em observação.
+
+---
+**14. Atraso de diagnóstico no `authService.ts`**
+- **Prioridade:** Baixa
+- **Categoria:** Performance / Refatoração
+- **Status:** PENDENTE (Pós-Estabilização)
+- **Descrição:** Avaliar a remoção do `setTimeout` de 2 segundos usado para diagnóstico no serviço de autenticação.
+
 ## Pendências do Dashboard e Decisões da Reunião
 
 ---
