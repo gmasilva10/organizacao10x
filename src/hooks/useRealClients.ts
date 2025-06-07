@@ -19,8 +19,15 @@ export const useRealClients = () => {
   }, [organization?.organization_id]);
 
   const fetchClients = async () => {
+    if (!organization?.organization_id) {
+      setError("Organização não identificada. Não é possível carregar os clientes.");
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null);
       
       const { data: clientsData, error: clientsError } = await supabase
         .from('clients')
