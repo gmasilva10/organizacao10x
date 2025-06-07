@@ -234,7 +234,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [user]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, session, loading, isAuthenticating, organization, organizationLoading, login, signUp, signOut, refreshOrganization }}>
