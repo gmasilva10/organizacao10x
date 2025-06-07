@@ -183,42 +183,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    setLoading(true);
+    const initializeAuth = async () => {
+      setLoading(true);
+      setOrganizationLoading(true);
+
+      const { data: { session: existingSession }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error("Error getting initial session:", sessionError);
+      }
+
+      if (existingSession?.user) {
+        console.log("AuthContext: Initial session found.");
+        setSession(existingSession);
+        setUser(existingSession.user);
+        await fetchOrganization(existingSession.user.id);
+      } else {
+        console.log("AuthContext: No initial session found.");
+        setOrganization(null);
+      }
+      
+      setOrganizationLoading(false);
+      setLoading(false);
+    };
+
+    initializeAuth();
+
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, currentSession) => {
         console.log("Auth state changed in AuthContext:", _event, currentSession);
-        setSession(currentSession);
-        const currentUser = currentSession?.user ?? null;
-        setUser(currentUser);
         
-        if (currentUser) {
-          await fetchOrganization(currentUser.id);
-        } else {
-          setOrganization(null);
-          setOrganizationLoading(false);
+        const currentUser = currentSession?.user ?? null;
+        const previousUser = user;
+
+        if (currentUser?.id !== previousUser?.id) {
+          setSession(currentSession);
+          setUser(currentUser);
+
+          if (currentUser) {
+            await fetchOrganization(currentUser.id);
+          } else {
+            setOrganization(null);
+            setOrganizationLoading(false);
+          }
         }
         setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
-      if (!user && !session && existingSession?.user) { 
-        console.log("AuthContext: Initial getSession with user (and no user/session from onAuthStateChange yet), fetching organization.");
-        setSession(existingSession);
-        const currentUser = existingSession.user;
-        setUser(currentUser);
-        await fetchOrganization(currentUser.id);
-      } else if (!user && !session && !existingSession?.user) {
-        console.log("AuthContext: Initial getSession - no user.")
-        setOrganizationLoading(false);
-      }
-      setLoading(false);
-    });
-
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ user, session, loading, isAuthenticating, organization, organizationLoading, login, signUp, signOut, refreshOrganization }}>
