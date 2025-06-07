@@ -23,6 +23,7 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticating: boolean;
   organization: any | null;
+  organizationLoading: boolean;
   login: (email: string, password: string) => Promise<any>;
   signUp: (userData: RegisterUserData) => Promise<any>;
   signOut: () => Promise<void>;
@@ -35,6 +36,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isAuthenticating: false,
   organization: null,
+  organizationLoading: true,
   login: async () => { throw new Error("Login function not implemented"); },
   signUp: async () => { throw new Error("SignUp function not implemented"); },
   signOut: async () => {},
@@ -49,6 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [organization, setOrganization] = useState<any | null>(null);
+  const [organizationLoading, setOrganizationLoading] = useState(true);
 
   const cleanupAuthState = () => {
     localStorage.removeItem('supabase.auth.token');
@@ -67,6 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const fetchOrganization = async (userId: string) => {
+    setOrganizationLoading(true);
     try {
       const { data: memberData, error: memberError } = await supabase
         .from('organization_members')
@@ -99,12 +103,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error("Error in fetchOrganization:", error);
       setOrganization(null);
+    } finally {
+      setOrganizationLoading(false);
     }
   };
 
   const refreshOrganization = async () => {
     if (user) {
       await fetchOrganization(user.id);
+    } else {
+      setOrganization(null);
+      setOrganizationLoading(false);
+      setLoading(false);
     }
   };
 
@@ -149,6 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
         setSession(null);
         setOrganization(null);
+        setOrganizationLoading(false);
         toast.success("Sessão local limpa (nenhuma sessão ativa no Supabase para invalidar).");
         return;
       }
@@ -158,6 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setSession(null);
       setOrganization(null);
+      setOrganizationLoading(false);
       toast.success("Logout realizado com sucesso!");
     } catch (error) {
       console.error("Error signing out:", error); 
@@ -166,6 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setSession(null);
       setOrganization(null);
+      setOrganizationLoading(false);
     }
   };
 
@@ -179,9 +192,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(currentUser);
         
         if (currentUser) {
-          fetchOrganization(currentUser.id);
+          await fetchOrganization(currentUser.id);
         } else {
           setOrganization(null);
+          setOrganizationLoading(false);
         }
         setLoading(false);
       }
@@ -193,9 +207,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(existingSession);
         const currentUser = existingSession.user;
         setUser(currentUser);
-        fetchOrganization(currentUser.id);
+        await fetchOrganization(currentUser.id);
       } else if (!user && !session && !existingSession?.user) {
         console.log("AuthContext: Initial getSession - no user.")
+        setOrganizationLoading(false);
       }
       setLoading(false);
     });
@@ -206,7 +221,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAuthenticating, organization, login, signUp, signOut, refreshOrganization }}>
+    <AuthContext.Provider value={{ user, session, loading, isAuthenticating, organization, organizationLoading, login, signUp, signOut, refreshOrganization }}>
       {children}
     </AuthContext.Provider>
   );

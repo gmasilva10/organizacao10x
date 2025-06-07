@@ -7,16 +7,21 @@ export const useRealClients = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { organization } = useAuth();
+  const { organization, loading: authLoading, organizationLoading } = useAuth();
 
   useEffect(() => {
+    if (authLoading || organizationLoading) {
+      setLoading(true);
+      return;
+    }
+    
     if (!organization?.organization_id) {
       setLoading(false);
       return;
     }
 
     fetchClients();
-  }, [organization?.organization_id]);
+  }, [organization?.organization_id, authLoading, organizationLoading]);
 
   const fetchClients = async () => {
     if (!organization?.organization_id) {
