@@ -1,6 +1,5 @@
 
 import { useState, useCallback } from "react";
-import * as XLSX from 'xlsx';
 import { toast } from "sonner";
 import { ImportStats } from "../types";
 import { 
@@ -9,6 +8,7 @@ import {
   validateStateCode,
   importClientToDatabase
 } from "../utils";
+import { readExcelFile, sheetToJson } from "@/utils/xlsxUtils";
 
 export const useImportClients = (
   file: File | null,
@@ -32,7 +32,7 @@ export const useImportClients = (
           }
           
           const data = new Uint8Array(e.target.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
+          const workbook = await readExcelFile(data);
           
           if (workbook.SheetNames.length === 0) {
             toast.error("Arquivo inválido: A planilha não contém nenhuma página");
@@ -41,7 +41,7 @@ export const useImportClients = (
           }
           
           const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          const jsonData = await sheetToJson(worksheet);
           
           const stats = {
             total: jsonData.length,

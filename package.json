@@ -7,8 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "build:analyze": "npm run build && npx vite-bundle-analyzer dist",
+    "preview": "vite preview",
+    "preview:dist": "npm run build && npm run preview",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "optimize:images": "node scripts/optimize-images.js",
+    "analyze:performance": "npm run build && echo 'Check console for performance analysis'"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -2,10 +2,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
-import * as XLSX from 'xlsx';
+import { createWorkbook, arrayToSheet, appendSheet, writeFile } from "@/utils/xlsxUtils";
 
 const TemplateTab: React.FC = () => {
-  const generateTemplate = () => {
+  const generateTemplate = async () => {
     // Create the template data with column headers
     const templateData = [
       [
@@ -22,15 +22,19 @@ const TemplateTab: React.FC = () => {
       ]
     ];
 
-    // Create a new workbook and add the data
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet(templateData);
-    
-    // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Template Alunos");
-    
-    // Generate the XLSX file
-    XLSX.writeFile(workbook, "template_importacao_alunos.xlsx");
+    try {
+      // Create a new workbook and add the data
+      const workbook = await createWorkbook();
+      const worksheet = await arrayToSheet(templateData);
+      
+      // Add the worksheet to the workbook
+      await appendSheet(workbook, worksheet, "Template Alunos");
+      
+      // Generate the XLSX file
+      await writeFile(workbook, "template_importacao_alunos.xlsx");
+    } catch (error) {
+      console.error("Erro ao gerar template:", error);
+    }
   };
 
   return (

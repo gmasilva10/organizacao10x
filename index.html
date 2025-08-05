@@ -7,6 +7,19 @@
     <meta name="description" content="Sistema de Coach Online" />
     <meta name="author" content="Equipe de Desenvolvimento" />
 
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    
+    <!-- Preload critical resources -->
+    <link rel="modulepreload" href="/src/main.tsx">
+    
+    <!-- Meta tags for better performance -->
+    <meta name="theme-color" content="#ffffff">
+    <meta name="color-scheme" content="light dark">
+
     <meta property="og:title" content="online-coach-system" />
     <meta property="og:description" content="Sistema de Coach Online" />
     <meta property="og:type" content="website" />
@@ -15,10 +28,50 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@seu_twitter_handle" />
     <meta name="twitter:image" content="/src/assets/new-logo-actual.png" />
+    
+    <!-- Inline critical CSS for faster rendering -->
+    <style>
+      /* Critical loading styles */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Hide loading screen when app loads */
+      #root:not(:empty) ~ .loading-screen {
+        display: none;
+      }
+    </style>
   </head>
 
   <body>
     <div id="root"></div>
+    <!-- Fallback loading screen -->
+    <div class="loading-screen">
+      <div class="loading-spinner"></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -8,6 +8,7 @@ export default {
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
 		"./src/**/*.{ts,tsx}",
+		"./index.html",
 	],
 	prefix: "",
 	theme: {
@@ -108,4 +109,32 @@ export default {
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
+	// Additional optimizations for production
+	corePlugins: {
+		// Disable unused utilities to reduce bundle size
+		preflight: true,
+	},
+	// Safelist important dynamic classes
+	safelist: [
+		'kanban-blue',
+		'kanban-purple', 
+		'kanban-pink',
+		'kanban-orange',
+		'kanban-yellow',
+		'kanban-green',
+		'kanban-red',
+		'attention-high',
+		'attention-medium',
+		'attention-low',
+		// Add other dynamic classes that might be used
+		{
+			pattern: /bg-(kanban|attention)-(blue|purple|pink|orange|yellow|green|red|high|medium|low)/,
+		},
+		{
+			pattern: /text-(kanban|attention)-(blue|purple|pink|orange|yellow|green|red|high|medium|low)/,
+		},
+		{
+			pattern: /border-(kanban|attention)-(blue|purple|pink|orange|yellow|green|red|high|medium|low)/,
+		}
+	]
 } satisfies Config;
