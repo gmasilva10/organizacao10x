@@ -18,13 +18,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install
+      - name: Install (web)
+        working-directory: web
         run: npm ci
 
       - name: Lint (web)
-        run: npm run lint:web
+        working-directory: web
+        run: npm run lint
 
       - name: Build (web)
-        run: npm run build:web
+        working-directory: web
+        run: npm run build
 
 
