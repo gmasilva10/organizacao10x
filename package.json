@@ -1,4 +1,14 @@
 {
+  "name": "organizacao10x",
+  "private": true,
+  "workspaces": [
+    "web"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w web",
+    "build:web": "npm run build -w web",
+    "lint:web": "npm run lint -w web"
+  },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.55.0",
