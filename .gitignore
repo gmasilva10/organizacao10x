@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Coverage
 coverage/
+ 
+# Local artifacts (offline bundles/zips)
+artifacts/
