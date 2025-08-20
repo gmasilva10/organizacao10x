@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.55.0",
+    "three-globe": "^2.44.0"
+  }
+}
