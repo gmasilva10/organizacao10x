@@ -20,14 +20,14 @@ jobs:
 
       - name: Install (web)
         working-directory: web
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Lint (web)
         working-directory: web
-        run: npm run lint
+        run: npx next lint
 
       - name: Build (web)
         working-directory: web
-        run: npm run build
+        run: npx next build
 
 
