@@ -30,3 +30,5 @@ CI (GitHub Actions)
 - Workflow em `.github/workflows/ci.yml` roda install + build + lint no push/PR para `main`.
 
 
+
+
