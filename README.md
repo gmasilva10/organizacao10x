@@ -1,5 +1,7 @@
 Organizacao10x — baseline
 
+[![Node CI](https://github.com/gmasilva10/organizacao10x/actions/workflows/ci.yml/badge.svg)](https://github.com/gmasilva10/organizacao10x/actions/workflows/ci.yml)
+
 Visão
 - Plataforma Personal Global (MVP): Students V2 + Onboarding/Kanban persistente, com governança em `web/Estrutura` e gate de qualidade via checklist.
 
