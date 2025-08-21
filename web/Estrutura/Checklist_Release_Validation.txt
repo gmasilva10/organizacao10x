@@ -133,7 +133,7 @@ Evidências esperadas
 ## ACC — Cadastro de Conta & Guardas de Menu
 [ACC01] Wizard (Personal | Player): PASS — evid.: Estrutura/account/wizard_choice.json
 [ACC02] Personal: PASS — evid.: Estrutura/account/personal_upsert.json
-[ACC03] Player: PASS — evid.: Estrutura/account/player_org_created.json
+[ACC03] Player: PASS — evid.: Estrutura/account/player_org_created.json (hotfix em 21/08: service-role + payload mínimo; evid.: Estrutura/account/player_org_created_fix.json)
 [ACC04] Guardas: PASS — evid.: Estrutura/account/menu_guard_state.json
 [ACC02] Personal: upsert de profiles (full_name min 2) + toast + volta ao /app — EM ANDAMENTO
 [ACC03] Player: cria organization + membership(admin) + ativa organization_id + toast — EM ANDAMENTO
