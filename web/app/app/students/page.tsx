@@ -186,7 +186,7 @@ export default function StudentsPage() {
                 <td className="px-3 py-2">
                   <AssignTrainerSelect value={s.trainer?.id || null} trainers={trainers.map(t => ({ user_id: t.id, email: t.name }))} onChange={(v)=>onAssign(s.id, v)} />
                 </td>
-                <td className="px-3 py-2">{new Date(s.created_at).toLocaleDateString()}</td>
+                <td className="px-3 py-2">{new Date(s.created_at).toLocaleString(undefined, { hour12: false })}</td>
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-2">
                     <button onClick={()=>setEditing(s)} className="rounded-md border px-2 py-1 text-xs">Editar</button>
