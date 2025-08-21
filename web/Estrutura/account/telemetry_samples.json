@@ -1,0 +1,7 @@
+[
+  { "case": "personal_success", "emitted": ["account.created:personal"] },
+  { "case": "player_success",   "emitted": ["account.created:player", "membership.created:admin"] },
+  { "case": "invalid_payload",  "emitted": [] }
+]
+
+

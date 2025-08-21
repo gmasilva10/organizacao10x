@@ -1,0 +1,37 @@
+Relatório Diário de Diretrizes – 19/08/2025
+Projeto: Personal Global – MVP
+
+Objetivo do dia: Encerramento do Bloco 2 (Students) e consolidação do Primeiro Corte do Kanban (Bloco 3).
+
+Tarefas Prioritárias:
+
+1. Encerramento do Bloco 2 (Students)
+- Consolidar no Atividades.txt a linha final:
+  “Students — DONE (evidências manuais) — [timestamp]”
+- Registrar os prints manuais finais (editar/excluir/erro) que já foram capturados.
+
+2. Kanban — Primeiro Corte (Finalização P1)
+- Validar RBAC no endpoint /api/kanban/move (admin|manager|trainer OK; seller|support → 403 + rbac.denied).
+- Estruturar evento student.stage.moved conforme schema definido; persistir em events.
+- Anexar logs JSON em Estrutura/kanban_events_sample.json.
+- Atualizar Atividades.txt com timestamp da execução.
+- Expandir Checklist_Release_Validation.txt com fluxos testados (200 OK, 403 denied, histórico funcionando).
+
+3. Governança e Documentação
+- Atualizar Padronizacao.txt:
+  • Confirmação do uso do @dnd-kit/core.
+  • Schema do evento student.stage.moved.
+  • Regras de RBAC aplicadas no endpoint.
+- Atualizar Pendencias_Agosto2025.txt:
+  • Marcar /api/kanban/move como DONE.
+  • Manter abertos os itens do segundo corte: árvore lateral, menu recolhível, persistência real.
+
+4. Refinos Students (P2, rápidos, se houver tempo hoje)
+- Validar barra de busca/filtro e contadores (já citados no relatório do DEV).
+- Se possível, iniciar estrutura simples do Histórico (página/modal com filtro básico). Caso não caiba hoje, backlogar.
+
+5. Regra de Ouro
+- Se qualquer tarefa travar > 30 minutos, parar e reportar com opções objetivas (insistir/contornar/repriorizar).
+
+Resumo: Finalizar Bloco 2, fechar telemetria do Kanban com RBAC + eventos, atualizar todos os arquivos em Estrutura/, depois avançar para refinamentos.
+Prints/evidências visuais serão tratados pelo GP.

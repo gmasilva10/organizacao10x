@@ -1,0 +1,620 @@
+{
+  "steps": [
+    {
+      "id": "get-basic-admin",
+      "status": 200,
+      "total": 299,
+      "items": 20
+    },
+    {
+      "id": "get-basic-trainer",
+      "status": 200,
+      "total": 0,
+      "items": 0
+    },
+    {
+      "id": "get-q",
+      "status": 200,
+      "items": 1
+    },
+    {
+      "id": "get-status",
+      "status": 200,
+      "items": 20
+    },
+    {
+      "id": "post-seller",
+      "status": 200
+    },
+    {
+      "id": "post-299",
+      "status": 422,
+      "body": {
+        "error": "limit_reached",
+        "details": {
+          "limit": "students",
+          "value": 300,
+          "max": 300
+        }
+      }
+    },
+    {
+      "id": "post-300",
+      "status": 422,
+      "body": {
+        "error": "limit_reached",
+        "details": {
+          "limit": "students",
+          "value": 300,
+          "max": 300
+        }
+      }
+    },
+    {
+      "id": "post-301-limit",
+      "status": 422,
+      "body": {
+        "error": "limit_reached",
+        "details": {
+          "limit": "students",
+          "value": 300,
+          "max": 300
+        }
+      }
+    },
+    {
+      "id": "post-trainer",
+      "status": 403,
+      "body": {
+        "error": "forbidden"
+      }
+    },
+    {
+      "id": "patch-assign",
+      "status": 200
+    },
+    {
+      "id": "patch-trainer-status",
+      "note": "sem aluno onboarding do trainer para testar"
+    },
+    {
+      "id": "delete-soft",
+      "status": 200
+    }
+  ],
+  "events": {
+    "f203156c-ed09-42d1-9593-86f4b2ee0c81": [
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "88567336-319f-4615-b6cd-b72338020567",
+        "event_type": "rbac.denied",
+        "payload": {
+          "action": "students.create"
+        },
+        "created_at": "2025-08-18T14:13:23.13288+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 300,
+          "limit": "students",
+          "value": 300
+        },
+        "created_at": "2025-08-18T14:13:22.937193+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 300,
+          "limit": "students",
+          "value": 300
+        },
+        "created_at": "2025-08-18T14:13:22.689855+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 300,
+          "limit": "students",
+          "value": 300
+        },
+        "created_at": "2025-08-18T14:13:22.445283+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "1a7a334a-4e0e-4db7-b3b6-0142b5710d1d",
+        "event_type": "feature.used",
+        "payload": {
+          "id": "5ed2f91c-a5ab-4b85-bbef-0aee9610ba29",
+          "feature": "students.create"
+        },
+        "created_at": "2025-08-18T14:13:22.199873+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "feature.used",
+        "payload": {
+          "id": "19a3fa91-c199-486a-ab0f-02f515af7226",
+          "feature": "students.delete"
+        },
+        "created_at": "2025-08-18T14:00:44.243119+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "88567336-319f-4615-b6cd-b72338020567",
+        "event_type": "rbac.denied",
+        "payload": {
+          "action": "students.create"
+        },
+        "created_at": "2025-08-18T14:00:42.574027+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "1a7a334a-4e0e-4db7-b3b6-0142b5710d1d",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 300,
+          "limit": "students",
+          "value": 300
+        },
+        "created_at": "2025-08-18T14:00:42.390362+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "feature.used",
+        "payload": {
+          "id": "19a3fa91-c199-486a-ab0f-02f515af7226",
+          "feature": "students.create"
+        },
+        "created_at": "2025-08-18T14:00:42.066785+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "feature.used",
+        "payload": {
+          "id": "9e0f2aee-2e2e-4825-9709-ec073188b028",
+          "feature": "students.create"
+        },
+        "created_at": "2025-08-18T14:00:41.695209+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:10:04.201565+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:27.380371+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:26.963665+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:26.55178+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:26.115054+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:25.677925+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:25.241214+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:24.829778+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:24.410375+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:23.987916+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:23.558636+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:09:23.097985+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:08:14.994683+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:07:55.378796+00:00"
+      },
+      {
+        "tenant_id": "f203156c-ed09-42d1-9593-86f4b2ee0c81",
+        "user_id": "180a08f7-b414-4d8e-8e06-3242cafba1b5",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 1,
+          "limit": "trainers",
+          "value": 1
+        },
+        "created_at": "2025-08-17T16:05:00.190796+00:00"
+      }
+    ],
+    "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f": [
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "27982ec8-37d3-4e3f-8351-91b92239a271",
+        "event_type": "feature.used",
+        "payload": {
+          "id": "cecb3836-4e07-4546-9f13-1712ee6ae873",
+          "feature": "students.assign_trainer"
+        },
+        "created_at": "2025-08-18T14:13:23.623306+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:29:25.793446+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer10.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:25.369102+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer09.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:24.86499+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer08.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:24.313946+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer07.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:23.77176+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer06.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:23.228781+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer05.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:22.711154+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer04.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:22.184672+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer03.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:21.693584+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer02.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:21.191665+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "feature.used",
+        "payload": {
+          "email": "trainer01.ent@qa.local",
+          "feature": "users.create_trainer"
+        },
+        "created_at": "2025-08-17T16:29:20.667875+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:10.714928+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:10.222259+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:09.744655+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:09.278087+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:08.783958+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:08.313028+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:07.826551+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:07.355952+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:06.877429+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:06.416355+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "5e757468-56e0-4078-b237-3a13c6ea9815",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-17T16:10:05.894337+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "44eaea48-bd86-4c0b-ba5c-1ed1056ad8ac",
+        "event_type": "rbac.denied",
+        "payload": {
+          "action": "users.create_trainer"
+        },
+        "created_at": "2025-08-16T21:36:22.169062+00:00"
+      },
+      {
+        "tenant_id": "0f3ec75c-6eb9-4443-8c48-49eca6e6d00f",
+        "user_id": "27982ec8-37d3-4e3f-8351-91b92239a271",
+        "event_type": "limit.hit",
+        "payload": {
+          "max": 10,
+          "limit": "trainers",
+          "value": 10
+        },
+        "created_at": "2025-08-16T21:36:21.79055+00:00"
+      }
+    ]
+  }
+}

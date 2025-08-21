@@ -1,0 +1,32 @@
+# CREDENCIAIS QA — SUPABASE
+# Última atualização: 2025-08-16 15:30
+
+Objetivo
+- Centralizar usuários seed (QA) e chaves do Supabase para testes do MVP.
+
+Usuários seed (Supabase Auth)
+- Tenant A — Basic
+  - admin.basic@pg.local   | senha: Teste@123
+  - manager.basic@pg.local | senha: Teste@123
+  - trainer.basic@pg.local | senha: Teste@123
+  - seller.basic@pg.local  | senha: Teste@123
+  - support.basic@pg.local | senha: Teste@123
+
+- Tenant B — Enterprise
+  - admin.ent@pg.local     | senha: Teste@123
+  - manager.ent@pg.local   | senha: Teste@123
+  - trainer.ent@pg.local   | senha: Teste@123
+  - seller.ent@pg.local    | senha: Teste@123
+  - support.ent@pg.local   | senha: Teste@123
+
+Chaves Supabase (Projeto kkxlztopdmipldncduvj)
+- NEXT_PUBLIC_SUPABASE_URL=https://kkxlztopdmipldncduvj.supabase.co
+- NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreGx6dG9wZG1pcGxkbmNkdXZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3NzM0NTMsImV4cCI6MjA2NDM0OTQ1M30.s443KF6W-W9ojzyraQ5v4YHYruqO9F08AkFHr0n3WxQ
+- SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreGx6dG9wZG1pcGxkbmNkdXZqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODc3MzQ1MywiZXhwIjoyMDY0MzQ5NDUzfQ.LusYmC4FJ-i9aZXEkUH5THmC1DYG7SPuS0cjLK0wxvU
+
+Observações
+- A chave service_role é estritamente para ambiente seguro/server-side. Nunca expor no client ou em logs.
+- Manter este arquivo sincronizado com `ControleDataMock.txt` quando houver alterações de usuários QA.
+
+
+

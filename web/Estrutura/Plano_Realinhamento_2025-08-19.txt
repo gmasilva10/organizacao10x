@@ -1,0 +1,37 @@
+# Plano de Realinhamento — 19/08/2025
+# Patrocinador + Consultor Externo + GP + DEV
+
+1) Jornada ponta-a-ponta (atual)
+- Login → /app (hub) → /(app)/onboarding (Kanban)
+- Mover card (DnD com highlight + rollback em falha) → persistência + telemetria
+- Ver Histórico: /(app)/onboarding/history (últimos 7 dias, filtros from/to/trainerId, paginação)
+- Sidebar: colapso persistente, navegação por teclado, aria-current no nó ativo, contadores vivos
+
+2) Critérios de aceite UX (reais)
+- Sem crashes do app; erros de rede mostram feedback amigável
+- DnD funcional e acessível (foco devolvido, highlight claro, rollback em erro)
+- Layout consistente (sem barras de scroll indesejadas, responsivo)
+- Navegação clara (link de Histórico na sidebar; ação de voltar via navegador/UX óbvia)
+- Histórico: carrega 7 dias (desc), filtros consistentes, RBAC server-first
+
+3) Roteiro da reunião (2h)
+- 0:00–0:15 — Contexto do patrocinador e objetivos de realinhamento
+- 0:15–0:35 — Mapa da jornada (demo guiada: login → kanban → mover → histórico)
+- 0:35–1:00 — Kanban real: DnD, contadores, histórico; discussão dos erros KAN/UI/UX e mitigação
+- 1:00–1:25 — Proposta de novos módulos: Cadastro de Alunos e Cadastro de Serviços (escopo, RBAC, telemetria)
+- 1:25–1:45 — Definição de critérios de sucesso, métricas e próximos incrementos
+- 1:45–2:00 — Encaminhamentos, responsáveis e prazos
+
+4) Próximos passos (pós-reunião)
+- Consolidar backlog priorizado para Bloco 4 (após liberação do patrocinador)
+- Manter checklists centrados em experiência, não só em endpoints
+- Executar sprints curtas com validações de UX a cada entrega
+
+Anexo — Script de Demo (5 minutos)
+00:00–01:00 — Login → Hub → clicar em “Onboarding” (FeatureGate ativo)
+01:00–02:00 — DnD: mover um aluno de “Novo Aluno” para coluna intermediária (highlight, toasts em erro, rollback se simulado)
+02:00–03:00 — CRUD de coluna intermediária: criar “Avaliação” (mín. 2 chars), renomear e remover; verificar contadores e reorder 10/20/30 no drop
+03:00–04:00 — Histórico: abrir pela sidebar, conferir período padrão 7 dias, filtrar por from/to, usar “Voltar” para retornar ao Kanban
+04:00–05:00 — Sidebar: recolher/expandir (persistência pg.nav.collapsed), navegar por teclado (↑/↓/Enter), confirmar aria-current no nó ativo; encerrar com próximos passos
+
+

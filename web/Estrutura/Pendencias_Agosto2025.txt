@@ -1,0 +1,71 @@
+[P1][RESOLVIDO] SHELL — Navegação e Menu
+[P1][RESOLVIDO] ACC — Cadastro de Conta + Guardas + Telemetria
+# PENDÊNCIAS — Agosto/2025
+
+[P1][EM ANDAMENTO][2025-08-20] BLOCO 3 — DnD: card desaparece após drop — Resp.: DEV — Prazo: 22/08
+[P1][EM ANDAMENTO][2025-08-20] BLOCO 3 — Histórico: runtime TypeError (items.map) — Resp.: DEV — Prazo: 22/08
+[P1][RESOLVIDO] BLOCO 3 — Colunas (VAL03): CRUD intermediárias (mesmo vazias) sem efeitos colaterais; fixas preservadas; reorder persistente — Resp.: DEV
+[P1][EM ANDAMENTO] BLOCO 3 — Sidebar/Árvore (VAL04): contadores vivos, filtro por trainer e colapso persistente — Resp.: DEV
+[P1][EM ANDAMENTO][2025-08-20] BLOCO 3 — Layout/UX: CTA duplicado + “Recolher” — Resp.: DEV — Prazo: 22/08
+[P1][AGUARDANDO][2025-08-20] BLOCO 3 — Telemetria: validar após base estável — Resp.: DEV — Prazo: 22/08
+
+
+[P1][ABERTO][2025-08-20 10:40] KAN-0004 — DnD: mover retorna 500; card some após drop; sem rollback visual — Owner: DEV — Prazo: 22/08 — Dependências: validar SUPABASE_URL/KEY; corrigir persistência em /api/kanban/move e restringir reorder a sucesso — Observações: evidências na reunião 20/08
+
+
+[P1][DONE][2025-08-19] BLOCO 3 — API: /api/kanban/move (telemetria + RBAC) — Responsável: DEV
+[P1][DONE][2025-08-19] BLOCO 3 — Checklist & Evidências (prints + JSON de eventos) — Responsável: DEV
+[P2][ABERTO][2025-08-18] BLOCO 3 — UX: barra de busca/filtro por aluno — Responsável: DEV
+[P2][DONE][2025-08-19] BLOCO 3 — Contadores por coluna (cards) — Responsável: DEV
+[P2][DONE][2025-08-19] BLOCO 3 — Histórico: página/modal de listagem — Responsável: DEV
+
+[P1][DONE][2025-08-19] BLOCO 3 — Kanban (Segundo Corte): Árvore lateral por trainer + menu principal recolhível — Responsável: DEV
+[P1][DONE][2025-08-19] BLOCO 3 — Persistência real: onboarding_columns/onboarding_cards + endpoints board/move/tree — Responsável: DEV
+
+# Bloco 3 — Terceiro corte (final da V1)
+[P1][ABERTO][2025-08-19] Árvore Enterprise completa (Basic com nó único + CTA Convidar equipe)
+[P1][ABERTO][2025-08-19] Persistência CRUD de colunas intermediárias (criar/renomear/remover) com sort e restrições nas colunas fixas
+[P1][ABERTO][2025-08-19] Ordem estável de cards (append no fim; opcional reordenação por posição)
+[P1][ABERTO][2025-08-19] Checklist + telemetria ampliadas (columns CRUD + columns_version)
+
+
+[P1][DONE][2025-08-19] FIX: Corrigir warning de acessibilidade em DrawerContent (DialogContent) — Responsável: Desenvolvedor
+[P2][DONE][2025-08-19] HIGIENE: Documentar e categorizar logs irrelevantes (DevTools/extensões) em Atividades.txt — Responsável: Desenvolvedor
+[P1][DONE][2025-08-19] FIX: Unificar lockfiles (manter apenas na raiz) — Responsável: Desenvolvedor
+
+# Última atualização: 2025-08-19 10:20
+
+[Landing v1.0] — Prazo: 15/08/2025
+1) About: micro-animações on-scroll — Owner: DEV — DOD: anima igual Features/Stats.
+2) COBE: ajustar glow sutil + pausar no login — Owner: DEV — DOD: comparativo antes/depois.
+3) Logos: gerar .webp (preta/branca) + trocar src — Owner: DEV — DOD: Lighthouse Perf ≥ 0.90.
+4) Contraste WCAG AA: varrer hovers/disabled — Owner: DEV — DOD: A11y ≥ 1.00 em dev.
+5) Favicon/apple-touch final (32/180) — Owner: DEV — DOD: ícones carregam no Lighthouse.
+6) SEO: manter og.png provisório; og final entra na v1.1 — Owner: GP/Marketing.
+7) OAuth Google: manter “dummy” — Owner: GP — DOD: rótulo “em breve” no botão.
+
+Landing v1.0 – Lighthouse (prod local, desktop)
+Status: CONCLUÍDO (13/08/2025)
+Antes: Performance X.XX | Acessibilidade X.XX | SEO X.XX | LCP XXXX ms
+Depois: Performance X.XX | Acessibilidade X.XX | SEO X.XX | LCP XXXX ms
+Notas finais: critérios atingidos e validados; sem pendências bloqueantes para o escopo atual
+
+Observações
+- Itens de médio/longo prazo manter em Pendencias.txt (geral).
+
+[Fase 1 — Bloco 1]
+- Etapa 1/3 — Migrações + Seeds + RLS: DONE (2025-08-16 12:55)
+- Etapa 2/3 — Endpoint /api/capabilities + Auth/RBAC + Limits: DONE (2025-08-16 18:40)
+  Notas: 9/9 smoke tests aprovados — capabilities 200/401; criação de trainer (Basic: 1º 200, 2º 422); Enterprise (1..10 200, 11º 422); perfis seller/support 403. Eventos persistidos: feature.used, limit.hit, rbac.denied.
+- Etapa 3/3 — Hooks/Guards + Modal Upgrade (Front): TeamAdmin (parte 1) DONE (2025-08-16 19:24); Kanban placeholder DONE; Header guards DONE (2025-08-16 19:44); pendente: integração nas telas finais e refinamento de UX
+Bloco 1 — STATUS: CLOSED (2025-08-17 13:45)
+Bloco 2 — STATUS PARCIAL
+- Tarefa 1 (Contratos/Permissões): DONE (17/08)
+- Tarefa 2 (Endpoints server-first): DONE (17/08)
+- Tarefa 3 (Seeds + QA Students): DONE (18/08)
+- Tarefa 4 (UI /students): DONE — lista/filtros/criar/atribuir/excluir/erro implementados; prints manuais anexados
+  - Etapa 3/3 — Hooks/Guards + Modal Upgrade (Front): DONE (2025-08-17 13:29)
+  - Consolidação /app → /(app) + redirect (commit registrado em Atividades)
+  - Notas finais: Enterprise 200×10 + 422 no 11º; Basic 2º = 422; Header/Onboarding conforme flag; Logout 204 e capabilities 401.
+
+[P1][EM ANDAMENTO] STUDENTS — STU01..STU06 conforme checklist (WIP=1 ativo em STU01)

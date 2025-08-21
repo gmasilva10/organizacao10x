@@ -1,0 +1,59 @@
+Plano de Realinhamento — 20/08/2025 (rascunho)
+Projeto: Organização10x – Personal Global
+Participantes: Patrocinador, Consultor Externo, GP, DEV
+
+Diretrizes confirmadas
+- Critério de sucesso: fluxo ponta-a-ponta (Aluno + Serviço → Kanban → Conclusão).
+- Excelência de UX como gate de aceite.
+- Tolerância zero: nada “pronto” sem Checklist_Release_Validation assinado + evidências.
+
+Validações em reunião (20/08)
+- DnD: FAIL — card desaparece após soltar; erros 500 em /api/kanban/move e /api/kanban/reorder. Pendência P1 até 22/08.
+- Histórico: FAIL — Runtime TypeError “items.map is not a function” ao abrir /(app)/onboarding/history. Pendência P1 até 22/08.
+- Colunas: FAIL — Erros de CRUD (validação, renomear, excluir, reorder). Pendência P1 até 22/08.
+- Sidebar/Árvore: FAIL — Contadores não atualizam; criar coluna exclui cards; filtro/colapso não testáveis por falta de integração. Pendência P1 até 22/08.
+- Layout/UX: FAIL — CTA “Nova coluna” duplicado e toggle “Recolher” sem colapso real/persistência. P1 até 22/08.
+- Telemetria: BLOCKED/FAIL — Emissão condicionada a 2xx/204; sem validação enquanto DnD/Histórico/CRUD estiverem quebrados.
+- Rotas: PASS — `/(app)/onboarding` oficial; alias `/(app)/kanban` não exposto em produção.
+
+Decisões estratégicas (20/08 11:24)
+1) Bloco 3 (Onboarding/Kanban)
+- Decisão: NÃO ENCERRAR hoje.
+- Motivo: falhas críticas validadas ao vivo (DnD, Histórico, Colunas, Sidebar, UX; Telemetria bloqueada).
+- Encaminhamento: Todos os FAILs registrados como P1 com prazo 22/08; GP revalidará antes de nova tentativa; DEV anexará evidências de correção (prints/logs JSON). Registros: Atividades.txt e este plano.
+
+2) Bloco 4 (Pagamentos Manuais)
+- Decisão: MANTER PAUSADO.
+- Motivo: iniciar pagamentos sem fluxos ponta‑a‑ponta estáveis (Alunos V2 + Serviços integrados ao Kanban) não agrega valor.
+- Encaminhamento: Retomar somente após entrega estável de Students V2 e Cadastro de Serviços. GP incluir no novo roadmap V1 até 22/08.
+
+3) Novo Roadmap V1
+- Responsável: GP.
+- Entrega: até sexta-feira, 22/08/2025.
+- Conteúdo mínimo: Fluxo alvo (Aluno + Serviço → Kanban → Conclusão); Módulos (Alunos V2 — campos completos; Serviços — catálogo/compra; Integração Kanban — gatilhos + telemetria); Critérios de sucesso (UX premium, Checklist obrigatório, métricas de adoção/telemetria).
+
+Pré-condições para revalidação em 22/08 (DEV)
+- Move/Reorder e rollback: validar res.ok no POST /api/kanban/move; chamar /api/kanban/reorder somente após 204; rollback visual em qualquer !=2xx.
+- Histórico (contrato e shape): padronizar resposta e consumo (array garantido) antes do reteste.
+- Colunas (efeitos colaterais): criar coluna não pode apagar cards; revisar endpoints de columns e recarregamento do board.
+- Sidebar/árvore (fixtures/seeds reais): preparar seeds de trainers/alunos vinculados para contadores, filtro e colapso.
+- Variáveis de ambiente (SUPABASE*): checar SUPABASE_URL e SERVICE_ROLE_KEY/ANON_KEY.
+- Lockfiles duplicados: remover web/package-lock.json; manter apenas o da raiz.
+- Checklist e rastreabilidade (IDs VAL01..VAL06): amarrar cada PASS futuro ao respectivo ID no checklist.
+- A11y e padrões: confirmar DrawerDescription + aria-describedby em novos Dialogs.
+- Segurança/escopo: sem wallet/crypto; somente email/senha.
+
+Encaminhamentos gerais
+- DEV (até 22/08): corrigir P1s e anexar evidências em Estrutura/.
+- GP: registrar decisões em Atividades.txt e atualizar Checklist_Release_Validation.txt.
+- Todos: gate único do checklist antes de comunicar “pronto”.
+
+=== ADENDO — Diretriz Estratégica (Consultor Externo, 20/08/2025) ===
+Princípio: abandonar “camadas horizontais” e adotar “fatias verticais”: construir um andar 100% pronto (backend + frontend polido + UX premium + telemetria + checklist assinado) antes de iniciar o próximo.
+Roadmap V1 orientado por fatias:
+  • Fase “App Shell”: /app (dashboard), header padrão, menu lateral com recolher persistente.
+  • Módulo Alunos V2: listagem + criar/editar completos (campos definitivos, UX premium, A11y).
+  • Módulo Serviços: catálogo/gestão de planos/mentorias (RBAC, UX/A11y).
+  • Kanban Final: aluno + serviço aparecem automaticamente; fluxo completo até conclusão; telemetria e RBAC válidos.
+Qualidade: Checklist_Release_Validation como gate único; Regra dos 30 min; sem “acelera e arruma depois”.
+(Conteúdo integral do texto do Consultor arquivado em /Estrutura/Consultor_Adendo_2025-08-20.txt)

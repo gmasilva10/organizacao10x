@@ -1,0 +1,76 @@
+Reunião de Alinhamento — Registro ao Vivo
+Projeto: Organização10x – Personal Global
+Data/Hora: 2025-08-20 10:33:36 -03:00
+Participantes: Patrocinador, Consultor Externo, GP, DEV
+
+1) Abertura (tom sério, direto)
+Texto adotado conforme pauta do patrocinador. Validação ao vivo é soberana.
+
+2) Validação ao vivo — Checklist (PASS/FAIL)
+Fonte: Estrutura/Checklist_Release_Validation.txt
+Regra: PASS = fechado. FAIL = abrir P1 imediato em Erros.txt + Pendencias_Agosto2025.txt (prazo 22/08, owner DEV).
+
+- DnD (mover cartão; rollback em falha; sem erro de app): FAIL — Evidência: card sumiu após drop; /api/kanban/move 500; /api/kanban/reorder 500; sem rollback visual
+- Histórico (7 dias; filtros ok; voltar retorna ao board): FAIL — Evidência: runtime TypeError (items.map) bloqueia renderização
+- Colunas (CRUD intermediárias; fixas bloqueadas; reorder 10/20/30): FAIL — Evidência: validação incômoda; renomear/excluir/reorder não funcionam (sem cards)
+- Sidebar/Árvore (contadores vivos; filtro por trainer no board): FAIL — Evidência: contadores não atualizam; criar coluna exclui cards; filtro/colapso não testáveis
+- Layout/UX (sem duplicação de botões; sem scroll indevido; “Recolher” persiste): FAIL — Evidência: CTA “Nova coluna” duplicado; toggle “Recolher” não colapsa/persiste
+- Telemetria (student.stage.moved + CRUD colunas registrados): BLOCKED — Evidência: emissão condicionada a 2xx/204; base falhando (DnD/Histórico/CRUD)
+
+3) Confronto de percepções
+- Histórico de 19/08 reportou PASS em vários itens.
+- Decisão: prevalece o resultado desta validação ao vivo.
+
+4) Diretrizes (confirmadas)
+- Critério de sucesso: fluxo ponta-a-ponta (Aluno + Serviço → Kanban → Conclusão).
+- Excelência de UX como gate de aceite.
+- Tolerância zero: nada “pronto” sem Checklist assinado + evidências anexas.
+
+5) Decisões de hoje
+- Bloco 3 (Onboarding/Kanban): [Encerrar V1.0 | Manter aberto até correções]
+- P1 até 22/08 (owner DEV): Árvore Enterprise completa; ordem estável (decisão sobre reordenação); telemetria ampliada.
+- Busca/filtro por aluno (P2): [Agora | Próxima iteração]
+- Rotas: `/(app)/onboarding` oficial; `/(app)/kanban` apenas em dev.
+- Bloco 4 (Pagamentos): [Pausado até Students V2 + Serviços | Redefinir escopo mínimo]
+
+6) Encaminhamentos
+- GP: registrar decisões em Atividades.txt + atualizar Checklist_Release_Validation.txt com o resultado ao vivo.
+- DEV: anexar evidências (JSON/logs) e corrigir FAILs P1 até 22/08.
+- Todos: gate único do checklist antes de comunicar “pronto”.
+
+7) Próximos passos / Deliverables
+- Plano_V1_NovoRoadmap (GP até 22/08): diretrizes, fluxo alvo, módulos (Students V2, Serviços, Integração Kanban), roadmap com marcos/owners/datas, métricas.
+
+Anexos previstos
+- Evidências: JSON/logs de validação (kanban_events_results, etc.)
+- Prints (se necessário) — a serem tratados pelo GP.
+
+Ata Parcial — Reunião de Alinhamento (GP)
+Data/Hora registro: 2025-08-20 11:21:03 -03:00
+Participantes: Patrocinador, GP, DEV
+Objetivo: Validação ao vivo do Bloco 3 (Onboarding/Kanban) + rotas oficiais.
+
+Resultados
+- DnD: FAIL — card desaparece; P1 22/08.
+- Histórico: FAIL — TypeError items.map; P1 22/08.
+- Colunas: FAIL — validação incômoda; sem rename/remove/reorder; P1 22/08.
+- Sidebar/Árvore: FAIL — contadores não atualizam; criar coluna apaga cards; filtro/colapso bloqueados; P1 22/08.
+- Layout/UX: FAIL — CTA “Nova coluna” duplicado; toggle “Recolher” sem colapso/persistência; P1 22/08.
+- Telemetria: BLOCKED/FAIL — depende de 2xx/204 nos fluxos base; P1 pós-correção até 22/08.
+- Rotas: PASS — `/(app)/onboarding` oficial; alias `/(app)/kanban` não exposto em produção.
+
+Status Bloco 3
+- Não pode ser encerrado hoje devido aos FAILs críticos. Manter aberto com P1 atribuídas ao DEV até 22/08.
+
+Próximo ponto de pauta
+- Confirmação oficial: Bloco 3 não será encerrado hoje.
+- Deliberação Bloco 4 (Pagamentos): manter pausado / retomar / redefinir escopo mínimo.
+
+Atualizações em tempo real
+- [2025-08-20 10:40:14 -03:00] DnD: FAIL — ver evidência acima; abrir P1 em Erros.txt + Pendencias_Agosto2025.txt (prazo 22/08, owner DEV).
+- [2025-08-20 11:17:36 -03:00] Histórico: FAIL — runtime TypeError; P1 lançada.
+- [2025-08-20 11:17:36 -03:00] Colunas: FAIL — CRUD/reorder com falhas; P1 lançada.
+- [2025-08-20 11:17:36 -03:00] Sidebar/Árvore: FAIL — contadores/filtro/colapso; P1 lançada.
+- [2025-08-20 11:17:36 -03:00] Layout/UX: FAIL — CTA duplicado e toggle “Recolher”; P1 lançada.
+- [2025-08-20 11:17:36 -03:00] Telemetria: BLOCKED — dependente de correção dos FAILs acima.
+

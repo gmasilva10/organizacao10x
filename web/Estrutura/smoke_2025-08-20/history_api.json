@@ -1,0 +1,23 @@
+{
+  "status": 200,
+  "ok": true,
+  "headers": {
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "date": "Wed, 20 Aug 2025 15:24:32 GMT",
+    "keep-alive": "timeout=5",
+    "transfer-encoding": "chunked",
+    "vary": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch"
+  },
+  "body": {
+    "items": {
+      "code": "PGRST100",
+      "details": "unexpected \"o\" expecting null or trilean value (unknown, true, false)",
+      "hint": null,
+      "message": "\"failed to parse filter (is.not.null)\" (line 1, column 5)"
+    },
+    "page": 1,
+    "pageSize": 20,
+    "total": 0
+  }
+}

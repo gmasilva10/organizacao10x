@@ -1,0 +1,9 @@
+{
+  "no_org":   { "enabled": ["Dashboard","Team Admin","Configurações"], "disabled": ["Alunos","Serviços","Onboarding/Kanban","Histórico","Financeiro"] },
+  "admin":    { "enabled": ["Dashboard","Alunos","Serviços","Onboarding/Kanban","Histórico","Team Admin","Configurações"], "disabled": ["Financeiro"] },
+  "manager":  { "enabled": ["Dashboard","Alunos","Serviços","Onboarding/Kanban","Histórico","Configurações"], "disabled": ["Team Admin","Financeiro"] },
+  "trainer":  { "enabled": ["Dashboard","Onboarding/Kanban","Histórico"], "disabled": ["Alunos","Serviços","Team Admin","Configurações","Financeiro"] },
+  "support":  { "enabled": ["Dashboard","Histórico"], "disabled": ["Alunos","Serviços","Onboarding/Kanban","Team Admin","Configurações","Financeiro"] }
+}
+
+

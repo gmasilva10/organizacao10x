@@ -1,0 +1,154 @@
+[ACC06] Telemetria: PASS — evid.: Estrutura/account/telemetry_samples.json
+# Checklist de Liberação para Validação (v1)
+
+## Kanban — Fluxos críticos
+- First Run template visível (colunas iniciais configuradas)
+- Criar card em “Novo Aluno”
+- Drag para coluna intermediária → evento student.stage.moved registrado
+- Drag para “Entrega do Treino” → card some do board e aparece no Histórico
+- RBAC: seller/support bloqueados no move (403 + rbac.denied)
+- Contadores por coluna atualizam após drops
+- Busca rápida por nome filtra cards renderizados
+- Build/lint verdes; console limpo (janela anônima)
+
+Validações executadas em 2025-08-19 10:20
+- 200 OK: admin/manager/trainer conseguem mover cards.
+- 403 denied: seller/support bloqueados; evento rbac.denied registrado.
+- Histórico: cards concluídos aparecem em "Histórico" e somem do board.
+- Amostras de eventos anexadas em Estrutura/kanban_events_sample.json.
+
+Kanban — Persistência (Segundo Corte)
+- GET /api/kanban/board retorna {columns,cards} do banco (Supabase).
+- GET /api/kanban/board?trainerId=... filtra cards por trainer (server-first)
+- POST /api/kanban/move atualiza column_id do card e emite telemetria.
+- GET /api/kanban/tree retorna árvore (organização → trainers → alunos) com contagens.
+- RBAC na árvore: admin/manager veem todos; trainer vê apenas seus cartões.
+- Menu recolhível: estado em localStorage (pg.nav.collapsed), ARIA (aria-pressed), foco preservado.
+- DnD com rollback: falha → reverte UI + toast informativo.
+
+PASS (Segundo Corte)
+- Filtro por trainer via árvore (UI → API ?trainerId).
+- DnD falha → rollback + toast; telemetria somente em sucesso.
+- Histórico default últimos 7 dias + paginação; RBAC preservado.
+- Build/lint verdes.
+
+Histórico (MVP)
+- /onboarding/history abre com últimos 7 dias.
+- Filtro por período (from/to) e por trainerId.
+- Paginação (page/pageSize) com ordenação por completed_at desc.
+
+PASS — Histórico (2025-08-19 17:42)
+- Carrega dados dos últimos 7 dias em ordem desc (completed_at)
+- Filtros from/to/trainerId aplicados (server-first)
+- RBAC: quando trainerId ausente e usuário for trainer, restringe a seus registros
+- Falhas 4xx/5xx exibem feedback e não disparam telemetria
+
+Kanban — Terceiro Corte (parcial)
+- CRUD de colunas persistente (restrições nas colunas fixas).
+- Reorder estável (sort sequencial) após DnD; refetch leve mantém contadores em sincronia.
+PASS — CRUD/Ordenação (2025-08-19 17:42)
+- Colunas fixas não podem ser renomeadas/removidas (client + server)
+- Reorder mantém sort 10/20/30 e faz rollback em erro
+
+PASS — Terceiro Corte consolidado em 2025-08-19 18:04
+
+Validações adicionais (pós-realinhamento 2025-08-19 19:51)
+- DnD funcional (Draggable+Droppable), highlight claro e rollback em erro
+- Histórico acessível pela sidebar e com ação de voltar; filtros/paginação/estados refinados
+- Colunas fixas bloqueadas; intermediárias com CRUD liberado; reorder estável 10/20/30
+- Layout sem barras de scroll indesejadas; toggle de sidebar persistente
+
+PASS — E2E 2025-08-19 20:05
+
+Próxima execução de QA (22/08)
+- Referenciar IDs de erros VAL01..VAL06 em cada item validado (DnD, Histórico, Colunas, Sidebar, UX, Telemetria).
+- Marcar explicitamente PASS/FAIL por ID (ex.: VAL01 PASS, VAL02 FAIL, ...), anexando evidências.
+
+[VAL01] DnD — FAIL (20/08). Status: EM CORREÇÃO — Fix aplicado: validar res.ok; rollback !=2xx; reorder somente após 204. Evidência: web/app/(app)/kanban/page.tsx. Próximo: revalidar 22/08.
+[VAL02] Histórico — FAIL (20/08). Status: EM CORREÇÃO — Fix aplicado: garantir items[]; consumir shape padronizado. Evidência: web/app/(app)/onboarding/history/page.tsx. Próximo: revalidar 22/08.
+[VAL03] Colunas — PASS — evidências: Estrutura/val03/*
+[VAL04] Sidebar/Árvore — EM ANDAMENTO — Seeds/fixtures criados; árvore `{ root, nodes }` conta apenas não concluídos; evento `pg:kanban:refetchTree` integrado após DnD/CRUD; filtro por trainer aplicado. Evid.: Estrutura/val04/*
+[VAL05] Layout/UX — FAIL (20/08). Status: EM CORREÇÃO — Fix aplicado: remoção do CTA duplicado; persistência “Recolher”. Próximo: revalidar 22/08.
+[VAL06] Telemetria — BLOCKED (20/08). Status: AGUARDANDO BASE ESTÁVEL — Próximo: validar 204 + eventos (student.stage.moved; CRUD colunas com columns_version) após VAL01–VAL05 PASS.
+
+- Jornada ponta-a-ponta validada (Login → Onboarding → DnD/CRUD/Reorder → Histórico → Voltar → Sidebar)
+- Telemetria: student.stage.moved com columns_version; eventos de colunas (create/rename/delete) com {columnId, action, timestamp, columns_version}; checklist ampliado para CRUD de colunas.
+
+Adições validadas em 2025-08-19 17:36
+- Reorder com sort sequencial (10/20/30) aplicado corretamente após mover cards.
+- Rollback em falha de persistência mantido (UI revertida + toast informativo; sem telemetria em erro).
+- Topbar com validação mínima em prompts (≥2 chars) e badge “filtro aplicado” funcionando.
+
+
+Fluxos obrigatórios
+1) Login (Basic e Enterprise)
+   - Preencher email/senha válidos
+   - Enviar
+   - POST /api/auth/sync deve responder 204
+   - Redirecionar para /app e renderizar hub
+   - GET /api/capabilities na mesma aba: 200 com tenant/plan/role/limits/features
+
+2) Verificação de redirects
+   - Acessar /app diretamente (autenticado): renderiza hub
+   - Acessar /app (anônimo): bloqueio/middleware conforme política (401/redirect)
+   - Não existir redirect /app → /
+
+3) Console limpo (ambiente anônimo)
+   - Abrir janela anônima sem extensões
+   - Navegar: login → /app
+   - Console sem erros críticos do app (ruídos de extensões/DevTools não se aplicam aqui)
+
+4) Build estável
+   - npm run build sem avisos de lockfiles duplicados
+   - Lint sem warnings críticos bloqueantes
+
+Evidências esperadas
+- Screenshot /app autenticado
+- JSON de /api/capabilities (200)
+- Log do build salvo em Estrutura/ (ex.: build_YYYY-MM-DD.log)
+
+## SHELL — App Shell (/app) pós-login
+[SHELL01] Menu colapsável com persistência (pg.nav.collapsed) — PASS (2025-08-20 17:02)
+[SHELL02] Cabeçalho padrão (logo, user menu, badge ambiente) — PASS (2025-08-20 17:02)  
+[SHELL03] Breadcrumb/Voltar funcional — PASS (2025-08-20 17:02)
+[SHELL04] Estados de loading/empty/error presentes — PASS (2025-08-20 17:02)
+[SHELL05] A11y mínima (teclado, foco, aria) — PASS (2025-08-20 17:02)
+[SHELL06] Sem scroll indevido; sem CTAs duplicados — PASS (2025-08-20 17:02)
+
+## REFINAMENTO V2 — Cabeçalho, Sidebar, Dashboard (mock)
+[HEADER01] Branding "Organização10x" (logo/título), user menu, badge ambiente, toggle de tema — EM VALIDAÇÃO
+[HEADER02] A11y/UX do cabeçalho (aria-*, foco, navegação por teclado; sem scroll indevido) — EM VALIDAÇÃO
+[SIDEBAR01] Sidebar moderna (ícones, tooltips, grupos, active/hover claros) — EM VALIDAÇÃO
+[SIDEBAR02] Colapso com persistência (pg.nav.collapsed) e acessibilidade — EM VALIDAÇÃO
+[SIDEBAR03] Microinterações suaves (sem jitter; 60fps) — EM VALIDAÇÃO
+[DASH-MOCK01] KPIs/Gráficos com mock data (skeleton → valores; empty/error) — EM VALIDAÇÃO
+[DASH-MOCK02] Filtros visuais (range 7/30d; trainer) atuando sobre mock — EM VALIDAÇÃO
+
+## SHELL — Navegação e Breadcrumb (Novo bloco)
+[SHELL-NAV01] Dashboard como landing e 1º item do menu — PASS
+[SHELL-NAV02] Ordem e grupos do menu conforme especificação — PASS
+[SHELL-NAV03] Sidebar premium (estados/tooltip/microinterações/A11y) — PASS
+[SHELL-NAV04] Breadcrumb padrão “Dashboard › {Seção}” — PASS
+
+## ACC — Cadastro de Conta & Guardas de Menu
+[ACC01] Wizard (Personal | Player): PASS — evid.: Estrutura/account/wizard_choice.json
+[ACC02] Personal: PASS — evid.: Estrutura/account/personal_upsert.json
+[ACC03] Player: PASS — evid.: Estrutura/account/player_org_created.json
+[ACC04] Guardas: PASS — evid.: Estrutura/account/menu_guard_state.json
+[ACC02] Personal: upsert de profiles (full_name min 2) + toast + volta ao /app — EM ANDAMENTO
+[ACC03] Player: cria organization + membership(admin) + ativa organization_id + toast — EM ANDAMENTO
+[ACC04] Guardas: sem org -> itens do menu desabilitados + CTA “Criar organização”; com org -> habilita por role — EM ANDAMENTO
+[ACC05] UX/A11y: validação inline, DrawerDescription + aria-describedby, foco/teclado; zero scroll indevido — EM ANDAMENTO
+[ACC06] Telemetria: account.created(type) e membership.created(org_id,role,source,ts) — AGUARDANDO base estável
+
+Notas de governança
+- Todo novo Dialog deve incluir DrawerDescription + aria-describedby
+- Qualquer mudança em next.config.ts que afete redirects deve ser validada por este checklist antes do release
+
+## STUDENTS — Alunos V2
+[STU01] Listagem com busca/filtros/paginação — EM ANDAMENTO
+[STU02] Criar aluno (validação inline, toasts) — AGUARDANDO
+[STU03] Editar aluno — AGUARDANDO
+[STU04] RBAC/guards (alunos) — EM ANDAMENTO (leitura)
+[STU05] UX/A11y premium — EM ANDAMENTO
+[STU06] Telemetria (created/updated/assigned_trainer, 2xx only) — AGUARDANDO

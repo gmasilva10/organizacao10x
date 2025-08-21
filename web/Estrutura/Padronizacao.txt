@@ -1,0 +1,141 @@
+## Forms ACC (Cadastro de Conta)
+- Botão primário à direita
+- Erro inline abaixo do campo
+- Mínimo 2 caracteres para campos obrigatórios
+- aria-invalid e aria-describedby nos inputs inválidos
+- Enter = submit; Esc = cancelar em dialogs
+# Padronização — Kanban (D&D)
+
+Biblioteca
+- @dnd-kit/core (sensores PointerSensor; estratégia de colisão padrão)
+
+Acessibilidade
+- Card com tabIndex=0 e aria-label: “Mover aluno: <Nome>”
+- Foco devolvido ao card após drop
+- Áreas droppable identificáveis visualmente (borda/gradação) — aplicado no Terceiro Corte
+
+Telemetria
+- Evento: student.stage.moved (append-only)
+- Schema (detalhes em events payload):
+  {
+    type: "student.stage.moved",
+    details: {
+      studentId: string,
+      from: string,
+      to: string,
+      columns_version: 1,
+      source: "kanban.ui",
+      ts: ISO8601
+    },
+    route: "/(app)/kanban"
+  }
+
+RBAC
+- admin|manager|trainer: permitido
+- seller|support: 403 + rbac.denied
+
+ROTAS
+- Rota oficial: /(app)/onboarding (renderiza o Kanban)
+- Alias de desenvolvimento: /(app)/kanban (não expor no app; pode redirecionar para /(app)/onboarding)
+
+[Persistência — Kanban]
+- Tabelas: onboarding_columns (id, tenant_id, title, sort, created_at); onboarding_cards (id, tenant_id, student_id, column_id, trainer_id, sort, created_at)
+- Endpoint board: GET /api/kanban/board → { columns, cards }
+- Filtro trainerId: GET /api/kanban/board?trainerId=... (server-first)
+[UX de rollback (DnD)]
+- Em falha (401/403/5xx), reverter posição do card localmente, logar {studentId, from, to, status} no console e exibir toast orientando o usuário.
+- Telemetria student.stage.moved somente quando 2xx/204.
+- Endpoint move: POST /api/kanban/move (persiste movimentação + telemetria student.stage.moved)
+- Endpoint tree: GET /api/kanban/tree (raiz organização; nós filhos por trainer com contagem)
+- Endpoints colunas: POST /api/kanban/columns | PATCH/DELETE /api/kanban/columns/:id (restrições: não renomear/remover colunas fixas “Novo Aluno” e “Entrega do Treino”)
+
+[Menu recolhível]
+- Chave localStorage: pg.nav.collapsed (boolean)
+- Acessibilidade: botão com aria-pressed e rótulo claro; foco preservado ao alternar
+- Persistência: estado preservado após reload
+
+[Árvore lateral (Enterprise)]
+- RBAC: admin|manager veem todos; trainer vê apenas seus cards
+- Cada nó de trainer exibe contador de cards e permite filtrar o board
+- Atualização: contadores atualizam após DnD (persistência concluída)
+- A11y: nó ativo com aria-current="page"; navegação por teclado (↑/↓ para navegar, Enter para selecionar); nomes longos com truncate + title (tooltip nativo)
+- Persistência: colapso em localStorage (pg.nav.collapsed), restauro no reload; evento `pg:kanban:refetchTree` após DnD/CRUD/reorder mantém contadores vivos
+
+Confirmações (2025-08-19 10:20)
+- Uso de @dnd-kit/core confirmado no primeiro corte do Kanban.
+- Schema do evento student.stage.moved aplicado no endpoint /api/kanban/move (payload dentro de feature.used).
+- Regras de RBAC aplicadas no endpoint: admin|manager|trainer liberados; seller|support recebem 403 e evento rbac.denied.
+# PADRONIZAÇÃO (Código, UI/UX, Conteúdo)
+# Última atualização: 13/08/2025
+
+CÓDIGO
+- Stack: Next.js + TS + App Router + Tailwind v4 + shadcn/ui + framer-motion + lucide-react.
+- Padrão de imports: absolutos com alias quando aplicável; remover não usados.
+- Componentização: seções da landing em components/ (Header, Hero, Features, Stats, About, Footer, LoginDrawer, GlobeBackground).
+- Animações: framer-motion (stagger on-scroll; transitions suaves); evitar excesso no LCP.
+
+Commits (Conventional Commits)
+- feat(landing): ...
+- fix(contrast): ...
+- chore(build): ...
+PRs: título = escopo claro + label (landing, a11y, perf); descrição com “antes/depois” (prints).
+
+UI/UX
+- Paleta (light): primary #5B7CFA, accent #22D3EE, background #F8FAFC, foreground #0F172A.
+- Dark mode: alternar logo (preta/branca) automaticamente.
+- Hero: globo dotted 3D à esquerda; logo grande à direita; CTA primário com gradiente.
+- Login: drawer lateral direito, overlay com blur; inputs com ícones; acessibilidade (aria-labels).
+- Toggle de tema: sempre visível no topo à direita.
+- Tamanhos: Header logo 32px; Drawer logo 56px; Hero logo ~42–48vw em desktop.
+
+ACESSIBILIDADE
+- Contraste mínimo AA: 4.5:1 texto normal, 3:1 texto grande.
+- Foco visível em botões/links; labels em inputs; aria-atributos em controles.
+
+PERFORMANCE
+- next/image com sizes/priority no LCP.
+- Evitar animações custosas no caminho inicial; lazy onde não for LCP.
+
+[RBAC & Flags]
+- Perfis fixos: admin | manager | trainer | seller | support (MVP)
+- Flags congeladas (v1.0): features.onboarding.kanban, features.payments.manual, features.reports.advanced, limits.students, limits.trainers
+- Server-first: autorização e limites no backend; front apenas UX/indicativos
+
+Mapa de ações (RBAC → roles permitidos)
+- manage_users: admin, manager
+- create_trainer: admin, manager
+- read_users: admin, manager, support
+- move_onboarding: admin, manager, trainer, seller
+- read_payments: admin, manager, seller
+- update_payment: admin, manager
+
+[RBAC — Students]
+- students.read: admin, manager, seller, support; trainer (somente alunos com seu trainer_id)
+- students.create: admin, manager, seller
+- students.update: admin, manager (full)
+- students.update_status (trainer): permitido apenas onboarding→active e somente nos seus alunos
+- students.assign_trainer: admin, manager
+- students.delete (soft): admin, manager
+
+[Telemetria — Upsell e Students]
+- upgrade_modal.shown | upgrade_modal.clicked — quando modal é exibido/clicado (Header/TeamAdmin/Students)
+- students.create | students.update | students.assign_trainer — sucesso (200)
+- limit.hit — quando limits.students é atingido (422)
+- rbac.denied — operações bloqueadas (403)
+
+Exemplo payload `/api/capabilities`:
+{
+  "plan": "basic",
+  "role": "manager",
+  "limits": { "students": 300, "trainers": 1 },
+  "features": {
+    "onboarding": { "kanban": true },
+    "payments": { "manual": true },
+    "reports": { "advanced": false }
+  }
+}
+
+AUTH / SESSÃO (App Router)
+- Server-first: o client do Supabase no server deve usar interface de cookies { get, set, remove } via `next/headers`.
+- Sync pós-login: chamar `POST /api/auth/sync` com `credentials: 'include'` e `cache: 'no-store'` e, após 204, `router.replace('/app')` + `router.refresh()`.
+- Middleware: manter somente refresh de sessão; não criar cookies se envs ausentes.

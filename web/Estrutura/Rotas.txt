@@ -1,0 +1,104 @@
+# ROTAS — LANDING Personal Global
+# Última atualização: 13/08/2025
+# Atualização: 2025-08-17 13:45
+
+PÚBLICAS
+/                → Landing (Hero + Globo 3D, Features, Stats, About, Footer)
+/login           → (Plano futuro) Página de login dedicada (hoje drawer no Header)
+
+Âncoras na Landing
+#features, #stats, #about, #contact
+
+PRIVADAS (Bloco 1 — concluído)
+/(app)/team        [auth] — TeamAdmin (adicionar treinador; UX de upgrade)
+/(app)/onboarding  [auth] — Rota oficial do processo de Onboarding; renderiza o Kanban (colunas fixas “Novo Aluno”, “Entrega do Treino” + intermediárias customizáveis). Histórico movido automaticamente. Menu recolhível com árvore (Enterprise).
+/(app)/onboarding/history [auth] — Histórico de alunos concluídos (default últimos 7 dias; filtros from/to/trainerId; paginação; RBAC server-first)
+/app (redirect → /) — consolidado: rotas privadas residem em /(app)
+
+APIs protegidas (Bloco 1)
+/api/capabilities [auth] → snapshot { plan, role, limits, features }
+/api/users/trainers [auth][RBAC: manage_users+create_trainer][limit: limits.trainers]
+  - POST { email }
+  - 200 { ok:true } → events.feature.used: users.create_trainer
+  - 403 { error:"forbidden" } → events.rbac.denied
+  - 422 { error:"limit_reached", details:{ limit:"trainers", value, max } } → events.limit.hit
+
+[Histórico Bloco 1 — Etapa 3/3]
+/(app)/team [auth] — TeamAdmin mínimo (form de e-mail + adicionar treinador; UX de upgrade)
+/(app)/onboarding [auth] — Kanban com FeatureGate (features.onboarding.kanban)
+Menu Header:
+- "Onboarding" sempre visível; quando feature off → abre Modal Upgrade e não navega; quando on → navega para /onboarding.
+
+Regras
+- Nav do Header aponta para âncoras (#) e CTA “Começar agora” pode levar para /login (quando existir) ou scroll para o formulário de captura (futuro).
+- Toggle de tema permanece fixo no topo (não muda rota).
+
+[Histórico de mudanças]
+[13/08/2025] Landing Page v1.0 — Rotas públicas implementadas:
+[17/08/2025] Consolidação de rotas privadas em /(app) e redirect /app → /
+ - TeamAdmin e Onboarding estáveis sob /(app)
+ - Middleware mantendo refresh de sessão; auth server-first
+
+[Bloco 2 — Students]
+/(app)/students [auth] — Lista + filtros + novo aluno + atribuição de treinador
+/api/students* [auth] — GET/POST/PATCH/DELETE com RBAC + RLS + limits
+
+Contratos (server-first)
+- GET /api/students?q=&status=&page=&pageSize=
+  - Request: query { q?: string; status?: 'onboarding'|'active'|'paused'; page?: number; pageSize?: number }
+  - Response 200: {
+      items: Array<{ id, tenant_id, name, email, phone, status, trainer_id, created_at, updated_at }>,
+      page: number, pageSize: number, total: number
+    }
+  - RBAC: admin|manager|seller|support (read); trainer vê somente trainer_id = auth.uid()
+
+- POST /api/students
+  - Body: { name: string; email: string; phone?: string; status?: 'onboarding'|'active'|'paused'; trainer_id?: uuid }
+  - 200: { ok: true, id }
+  - 422: { error: 'limit_reached', details:{ limit:'students', value, max } }
+  - RBAC: admin|manager|seller
+  - Events: feature.used: students.create | limit.hit
+
+- PATCH /api/students/:id
+  - Body: { name?, email?, phone?, status?, trainer_id? }
+  - 200: { ok: true }
+  - 403: { error:'forbidden' } (trainer só pode alterar status onboarding→active do próprio)
+  - RBAC: admin|manager (full); trainer (restrito); seller/support (read-only)
+  - Events: feature.used: students.update | students.assign_trainer
+
+- DELETE /api/students/:id
+  - Soft delete: marca deleted_at
+  - 200: { ok: true }
+  - RBAC: admin|manager
+- `/` → Página inicial com Hero + Globo + LoginDrawer
+- `/login` → Drawer lateral com autenticação visual (UI)
+/               -> redirect -> /app
+/app            -> Dashboard (App Shell)
+/app/students   -> Alunos V2
+/app/services   -> Serviços
+/app/onboarding -> Kanban (oficial; sem alias /kanban)
+/app/onboarding/history -> Histórico
+/app/team-admin -> Administração de Equipe
+/app/settings   -> Configurações
+# /app/payments -> Pagamentos (pausado: oculto ou disabled)
+
+Observações:
+- Rotas futuras privadas dependem da integração Supabase
+- Modo dark/light aplicado globalmente
+- A rota /(app)/kanban não deve ser exposta ao usuário final; pode ser usada como alias temporário em dev ou redirecionada para /(app)/onboarding
+
+APIs Kanban
+- GET /api/kanban/board[?trainerId=uuid] -> { columns:[{id,title,sort}], cards:[{id,student_id,column_id,trainer_id,sort,created_at,completed_at?}] }
+- POST /api/kanban/move -> 204; body { studentId, from, to } (telemetria student.stage.moved)
+- GET /api/kanban/tree -> { root:{id,title,count}, nodes:[{id,type(title),count,items[]}]} (RBAC: admin|manager agregados; trainer somente seus)
+- GET /api/kanban/history?from&to&trainerId&page&pageSize -> lista cards concluídos (completed_at desc); quando trainerId ausente e usuário for trainer, restringe trainer_id=ctx.userId
+
+# ACC — Cadastro de Conta
+/onboarding/account              -> Wizard (Personal | Player)
+/onboarding/account/personal     -> Form de Conta Pessoal
+/onboarding/account/player       -> Form de Organização (Player)
+
+[2025-08-13] Sprint Landing v1.0 concluída
+- Rotas da landing revisadas e otimizadas
+- Nenhuma rota adicional criada nesta entrega
+- Próximas rotas a definir no escopo do sistema

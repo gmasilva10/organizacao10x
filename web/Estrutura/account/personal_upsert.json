@@ -1,0 +1,6 @@
+{
+  "request": { "full_name": "Nome Sobrenome" },
+  "response": { "ok": true, "profile": { "user_id": "u_...", "full_name": "Nome Sobrenome" } }
+}
+
+

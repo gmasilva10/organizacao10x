@@ -1,0 +1,18 @@
+{
+  "ts": "2025-08-19T23:01:15.830Z",
+  "baseUrl": "http://localhost:3000",
+  "results": [
+    {
+      "role": "manager",
+      "status": 500,
+      "ok": false,
+      "body": ""
+    },
+    {
+      "role": "seller",
+      "status": 403,
+      "ok": false,
+      "body": "{\"error\":\"forbidden\"}"
+    }
+  ]
+}
