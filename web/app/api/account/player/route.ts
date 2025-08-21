@@ -37,6 +37,9 @@ export async function POST(request: Request) {
     }
 
     // Tentar criar tenant via PostgREST (service-role) para evitar conflitos de RLS
+    const tenantInsert: Record<string, any> = { name: orgName, plan }
+    // Evitar enviar doc_id quando não existir/for vazio (alguns esquemas não possuem a coluna)
+    if (docId !== null) tenantInsert.doc_id = docId
     const orgResp = await fetch(`${serviceUrl}/rest/v1/tenants`, {
       method: "POST",
       headers: {
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
         Prefer: "return=representation",
       },
-      body: JSON.stringify({ name: orgName, doc_id: docId, plan }),
+      body: JSON.stringify(tenantInsert),
       cache: "no-store",
     })
     let org: { id: string; name: string; plan: string } | null = null
@@ -76,14 +79,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, code: "unexpected_error" }, { status: 500 })
     }
 
-    if (orgErr) {
-      const msg = String(orgErr?.message || "")
-      const code = String((orgErr as { code?: string } | null)?.code || "")
-      if (code === "23505" || msg.toLowerCase().includes("duplicate")) {
-        return NextResponse.json({ ok: false, code: "org_name_conflict" }, { status: 409 })
-      }
-      return NextResponse.json({ ok: false, code: "unexpected_error" }, { status: 500 })
-    }
 
     const tenantId = org!.id as string
 
