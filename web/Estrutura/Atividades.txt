@@ -150,7 +150,7 @@ Incluídos exemplos práticos e padronizações para registro de atividades, pen
 Status: Estrutura aprovada pelo GP como fonte única de verdade para o projeto.
 
 Template para novos itens:
-[AAAA-MM-DD HH:MM] <Autor> — <TIPO: PLANEJAMENTO|IMPLEMENTAÇÃO|REVIEW|QA|PERF|BUGFIX|DOC> — <Módulo/Área> — <Título curto> — (#tarefa/issue opcional) — evidência:<commit/PR/link>
+[AAAA-MM-DD HH:MM] <Autor> — <TIPO: PLANEJAMENTO|IMPLEMENTAÇÃO|REVIEW|QA|PERF|BUGFIX|DOC> — <Módulo/Área> — <Título curto> — (#issue?) — evidência:<commit/PR/link>
 
 Notas do dia:
 - Itens bloqueados migrar para Pendencias_Agosto2025.txt.
@@ -161,3 +161,5 @@ Notas do dia:
 
 [2025-08-21 12:45] GP — DIRETRIZ — STU01 padrão premium: contratos de resposta, filtros, paginação, RBAC leitura e critérios de aceite definidos (ver Checklist).
 [2025-08-21 12:45] GP — QA — Autorizar QA varredura SHELL/ACC contínua e entrada em /app/students quando STU01 marcar EM VALIDAÇÃO.
+
+[2025-08-21 12:45] GP — DIRETRIZ — STU01 pronto para evidências finais (list_default, filters_status_trainer, pagination_page2) e passagem para EM VALIDAÇÃO.
