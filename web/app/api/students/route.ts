@@ -42,13 +42,32 @@ export async function GET(request: Request) {
     headers: { apikey: key, Authorization: `Bearer ${key}`, Range: `${rangeStart}-${rangeEnd}`, Prefer: "count=exact" },
     cache: "no-store",
   })
-  const items = await resp.json().catch(() => [])
+  const items = (await resp.json().catch(() => [])) as Array<{
+    id: string
+    name: string
+    status: string
+    trainer_id?: string | null
+    created_at: string
+  }>
   const contentRange = resp.headers.get("content-range") || `0-0/0`
   const total = Number(contentRange.split("/").pop() || 0)
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   // STU01 response shape
+  const meta = {
+    query: q || "",
+    status: status || null,
+    trainer_id: trainerIdFilter || null,
+  }
+  const data = items.map((it) => ({
+    id: it.id,
+    full_name: it.name,
+    status: it.status,
+    trainer: it.trainer_id ? { id: it.trainer_id, name: null as string | null } : null,
+    created_at: it.created_at,
+  }))
   return NextResponse.json({
-    data: items,
+    meta,
+    data,
     pagination: { page, page_size: pageSize, total, total_pages: totalPages },
   })
 }

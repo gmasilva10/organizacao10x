@@ -9,17 +9,18 @@ import { AssignTrainerSelect } from "@/components/students/AssignTrainerSelect"
 import { StudentCreateModal } from "@/components/students/StudentCreateModal"
 import { StudentEditModal } from "@/components/students/StudentEditModal"
 
-type Student = { id: string; name: string; email: string; phone?: string | null; status: string; trainer_id?: string | null }
-type Trainer = { user_id: string; email: string }
+type StudentRow = { id: string; full_name: string; status: string; trainer: { id: string | null; name: string | null } | null; created_at: string }
+type Trainer = { id: string; name: string }
 
 export default function StudentsPage() {
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [items, setItems] = useState<Student[]>([])
+  const [items, setItems] = useState<StudentRow[]>([])
   const [total, setTotal] = useState<number>(0)
   const [counts, setCounts] = useState<{ onboarding: number; active: number; paused: number; total: number } | null>(null)
   const [q, setQ] = useState("")
   const [status, setStatus] = useState("")
+  const [trainerId, setTrainerId] = useState("")
   const [page, setPage] = useState(1)
   const pageSize = 20
   const qDebounceRef = useRef<number | null>(null)
@@ -36,20 +37,22 @@ export default function StudentsPage() {
       const params = new URLSearchParams({ page: String(page), page_size: String(pageSize) })
       if (q) params.set('query', q)
       if (status) params.set('status', status)
+      if (trainerId) params.set('trainer_id', trainerId)
       const res = await fetch(`/api/students?${params.toString()}`, { cache: 'no-store' })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
-      setItems(data?.data || [])
+      setItems((data?.data || []) as StudentRow[])
       setTotal(Number(data?.pagination?.total || 0))
     } catch {
       setError('Falha ao carregar dados. Tente novamente.')
     } finally { setLoading(false) }
-  }, [page, pageSize, q, status])
+  }, [page, pageSize, q, status, trainerId])
 
   async function fetchTrainers() {
     const res = await fetch('/api/users/trainers', { cache: 'no-store' })
     const data = await res.json()
-    setTrainers(data?.items || [])
+    const mapped = (data?.items || []).map((x: any) => ({ id: x.user_id, name: x.email })) as Trainer[]
+    setTrainers(mapped)
   }
 
   async function fetchSummary() {
@@ -153,7 +156,7 @@ export default function StudentsPage() {
         </div>
       )}
       <div className="mt-4 flex items-center gap-3">
-        <StudentsFilters q={q} status={status} onQ={setQ} onStatus={setStatus} />
+        <StudentsFilters q={q} status={status} trainerId={trainerId} trainers={trainers} onQ={setQ} onStatus={setStatus} onTrainer={setTrainerId} />
         <button onClick={()=>setShowCreate(true)} className="ml-auto rounded-md bg-primary px-4 py-2 text-sm text-white">Novo aluno</button>
       </div>
 
@@ -168,9 +171,9 @@ export default function StudentsPage() {
           <thead className="bg-muted/50">
             <tr>
               <th className="px-3 py-2 text-left">Nome</th>
-              <th className="px-3 py-2 text-left">E-mail</th>
               <th className="px-3 py-2 text-left">Status</th>
               <th className="px-3 py-2 text-left">Treinador</th>
+              <th className="px-3 py-2 text-left">Criado em</th>
               <th className="px-3 py-2 text-left">Ações</th>
             </tr>
           </thead>
@@ -178,12 +181,12 @@ export default function StudentsPage() {
           <tbody hidden={loading}>
             {items.map(s => (
               <tr key={s.id} className="border-t">
-                <td className="px-3 py-2">{s.name}</td>
-                <td className="px-3 py-2">{s.email}</td>
+                <td className="px-3 py-2">{s.full_name}</td>
                 <td className="px-3 py-2 capitalize">{s.status}</td>
                 <td className="px-3 py-2">
-                  <AssignTrainerSelect value={s.trainer_id} trainers={trainers} onChange={(v)=>onAssign(s.id, v)} />
+                  <AssignTrainerSelect value={s.trainer?.id || null} trainers={trainers.map(t => ({ user_id: t.id, email: t.name }))} onChange={(v)=>onAssign(s.id, v)} />
                 </td>
+                <td className="px-3 py-2">{new Date(s.created_at).toLocaleDateString()}</td>
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-2">
                     <button onClick={()=>setEditing(s)} className="rounded-md border px-2 py-1 text-xs">Editar</button>
