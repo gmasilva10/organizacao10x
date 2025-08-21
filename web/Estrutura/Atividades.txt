@@ -167,5 +167,6 @@ Notas do dia:
 [2025-08-21 13:47] DEV — QA — ACC03 acionado para validação por evidência — evid.: Estrutura/account/player_org_created_fix.json
 [2025-08-21 14:00] GP — QA — PR aberto a partir do branch qa/qa-suggested/acc-a11y-types-fixes (a11y/typing ACC/SHELL) — link: https://github.com/gmasilva10/organizacao10x/pull/3
 [2025-08-21 14:00] GP — QA — Issues criadas: CI env (ACC) #4; exhaustive-deps (history) #5; limpeza no-unused (shell/kanban) #6
+[2025-08-21 14:05] GP — QA — PR #3 (qa-suggested ACC/SHELL) e issues #4/#5/#6 registrados; revisão/merge condicionados a checks verdes e sem regressão visual.
 
 [2025-08-21 12:45] GP — QA — STU01 (listagem/busca/filtros/paginação) APROVADO por evidência — evid.: web/Estrutura/students/*
