@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "profile": {
+    "user_id": "u_example",
+    "full_name": "Nome Atual",
+    "email": "admin.basic@pg.local",
+    "memberships": [
+      { "organization_id": "org_example", "organization_name": "Organização QA", "role": "admin" }
+    ]
+  }
+}

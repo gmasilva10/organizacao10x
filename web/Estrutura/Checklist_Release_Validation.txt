@@ -157,8 +157,8 @@ Notas de governança
 [STU06] Telemetria (created/updated/assigned_trainer, 2xx only) — AGUARDANDO
 
 ## USER — Perfil
-[USER01] Ver perfil — EM ANDAMENTO
-[USER02] Editar nome — EM ANDAMENTO
-[USER03] Segurança (link trocar senha) — EM ANDAMENTO
-[USER04] UX/A11y — EM ANDAMENTO
+[USER01] Ver perfil — EM VALIDAÇÃO — evid.: Estrutura/profile/view.json
+[USER02] Editar nome — EM VALIDAÇÃO — evid.: Estrutura/profile/edit_success.json
+[USER03] Segurança (link trocar senha) — EM VALIDAÇÃO
+[USER04] UX/A11y — EM VALIDAÇÃO
 [USER05] Telemetria — AGUARDANDO

@@ -1,0 +1,7 @@
+{
+  "request": { "full_name": "Novo Nome" },
+  "response": {
+    "ok": true,
+    "profile": { "user_id": "u_example", "full_name": "Novo Nome", "email": "admin.basic@pg.local" }
+  }
+}
