@@ -146,7 +146,7 @@ Notas de governança
 - Qualquer mudança em next.config.ts que afete redirects deve ser validada por este checklist antes do release
 
 ## STUDENTS — Alunos V2
-[STU01] Listagem com busca/filtros/paginação — EM VALIDAÇÃO — evid.: Estrutura/students/*
+[STU01] PASS — evid.: web/Estrutura/students/*
 [STU02] Criar aluno (validação inline, toasts) — AGUARDANDO
 [STU03] Editar aluno — AGUARDANDO
 [STU04] RBAC/guards (alunos) — EM ANDAMENTO (leitura)

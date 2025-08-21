@@ -68,4 +68,4 @@ Bloco 2 — STATUS PARCIAL
   - Consolidação /app → /(app) + redirect (commit registrado em Atividades)
   - Notas finais: Enterprise 200×10 + 422 no 11º; Basic 2º = 422; Header/Onboarding conforme flag; Logout 204 e capabilities 401.
 
-[P1][EM ANDAMENTO] STUDENTS — STU01..STU06 conforme checklist (WIP=1 ativo em STU01)
+[P1][RESOLVIDO] STU01 — Listagem/filtros/paginação
