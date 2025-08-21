@@ -1,6 +1,14 @@
 # Registro de Erros e Ocorrências — Personal Global
 # Última atualização: 2025-08-20 17:25
 
+[ACC03-ORG-FAIL-2025-08-21] 2025-08-21 — dev — POST /api/account/player — falha ao criar org — S1 — Aberto — DEV
+Passos: preencher formulário em /onboarding/account/player e enviar.
+Esperado: 200 com organização criada e cookie pg.active_org definido.
+Obtido: toast genérico “Não foi possível criar a organização. Tente novamente.”
+Logs/Evidências: web/Estrutura/account/player_org_created_error_500.json
+Ação: investigar 409 vs 500; corrigir RLS/env e idempotência; mapear mensagens na UI.
+Confirmação QA: pendente.
+
 [RED-001] 2025-08-20 — dev — Landing page inacessível — S1 — Resolvido — DEV
 Passos: acessar http://localhost:3000 
 Esperado: landing page com Header, Hero, Features, Stats, About, Footer

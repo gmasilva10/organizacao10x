@@ -162,5 +162,6 @@ Notas do dia:
 [2025-08-21 12:45] GP — QA — Autorizar QA varredura SHELL/ACC contínua e entrada em /app/students quando STU01 marcar EM VALIDAÇÃO.
 
 [2025-08-21 12:45] GP — DIRETRIZ — STU01 pronto para evidências finais (list_default, filters_status_trainer, pagination_page2) e passagem para EM VALIDAÇÃO.
+[2025-08-21 13:10] GP — SUPORTE — Bloqueio ACC03 na criação de organização pelo patrocinador (toast genérico). Orientado workaround imediato e emitidas ordens de correção para DEV.
 
 [2025-08-21 12:45] GP — QA — STU01 (listagem/busca/filtros/paginação) APROVADO por evidência — evid.: web/Estrutura/students/*

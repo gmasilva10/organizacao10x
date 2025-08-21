@@ -1,0 +1,12 @@
+{
+  "request": {
+    "organization_name": "GUSMORE LTDA",
+    "doc_id": null,
+    "plan": "basic"
+  },
+  "response": {
+    "status": 500,
+    "body": { "ok": false, "code": "unexpected_error" }
+  },
+  "note": "Captura representativa do erro observado na criação de organização (toast genérico)."
+}
