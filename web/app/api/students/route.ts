@@ -9,10 +9,14 @@ export async function GET(request: Request) {
   if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
 
   const { searchParams } = new URL(request.url)
-  const q = (searchParams.get("q") || "").trim()
-  const status = (searchParams.get("status") || "").trim()
+  // Param names per STU01: query, status, trainer_id, page, page_size
+  const q = (searchParams.get("query") ?? searchParams.get("q") ?? "").trim()
+  const status = (searchParams.get("status") ?? "").trim()
+  const trainerIdFilter = (searchParams.get("trainer_id") ?? "").trim()
   const page = Math.max(1, Number(searchParams.get("page") || 1))
-  const pageSize = Math.min(100, Math.max(1, Number(searchParams.get("pageSize") || 20)))
+  const reqPageSize = Number(searchParams.get("page_size") ?? searchParams.get("pageSize") ?? 20)
+  // Clamp page_size between 10 and 50; default 20
+  const pageSize = Math.min(50, Math.max(10, Number.isFinite(reqPageSize) ? reqPageSize : 20))
 
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
@@ -23,7 +27,9 @@ export async function GET(request: Request) {
     `deleted_at=is.null`,
   ]
   if (status) filters.push(`status=eq.${status}`)
-  // Busca simples por name/email (ilike)
+  // Optional explicit trainer filter from query params
+  if (trainerIdFilter) filters.push(`trainer_id=eq.${encodeURIComponent(trainerIdFilter)}`)
+  // Busca simples por nome/email (ilike). Tabela usa campo "name"
   const search = q ? `&or=(name.ilike.*${encodeURIComponent(q)}*,email.ilike.*${encodeURIComponent(q)}*)` : ""
 
   // Trainer enxerga apenas seus alunos
@@ -39,7 +45,12 @@ export async function GET(request: Request) {
   const items = await resp.json().catch(() => [])
   const contentRange = resp.headers.get("content-range") || `0-0/0`
   const total = Number(contentRange.split("/").pop() || 0)
-  return NextResponse.json({ items, page, pageSize, total })
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  // STU01 response shape
+  return NextResponse.json({
+    data: items,
+    pagination: { page, page_size: pageSize, total, total_pages: totalPages },
+  })
 }
 
 // POST /api/students

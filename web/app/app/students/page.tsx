@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useToast } from "@/components/ui/toast"
 import { UpgradeModal } from "@/components/UpgradeModal"
 import { StudentsSkeleton } from "@/components/students/StudentsSkeleton"
@@ -22,6 +22,7 @@ export default function StudentsPage() {
   const [status, setStatus] = useState("")
   const [page, setPage] = useState(1)
   const pageSize = 20
+  const qDebounceRef = useRef<number | null>(null)
   const [trainers, setTrainers] = useState<Trainer[]>([])
   const [showCreate, setShowCreate] = useState(false)
   const [error, setError] = useState<string>("")
@@ -32,14 +33,14 @@ export default function StudentsPage() {
     setLoading(true)
     setError("")
     try {
-      const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) })
-      if (q) params.set('q', q)
+      const params = new URLSearchParams({ page: String(page), page_size: String(pageSize) })
+      if (q) params.set('query', q)
       if (status) params.set('status', status)
       const res = await fetch(`/api/students?${params.toString()}`, { cache: 'no-store' })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
-      setItems(data?.items || [])
-      setTotal(Number(data?.total || 0))
+      setItems(data?.data || [])
+      setTotal(Number(data?.pagination?.total || 0))
     } catch {
       setError('Falha ao carregar dados. Tente novamente.')
     } finally { setLoading(false) }
@@ -59,6 +60,20 @@ export default function StudentsPage() {
 
   useEffect(() => { fetchTrainers() }, [])
   useEffect(() => { fetchList() }, [fetchList])
+  // debounce para query (300ms)
+  useEffect(() => {
+    if (qDebounceRef.current) {
+      clearTimeout(qDebounceRef.current)
+    }
+    qDebounceRef.current = window.setTimeout(() => {
+      setPage(1)
+      fetchList()
+    }, 300)
+    return () => {
+      if (qDebounceRef.current) clearTimeout(qDebounceRef.current)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q])
   useEffect(() => { fetchSummary() }, [])
 
   async function onCreate(payload: { name: string; email: string }) {
