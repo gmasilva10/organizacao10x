@@ -11,16 +11,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, code: "unauthorized" }, { status: 401 })
     }
 
-    let body: any
+    let body: unknown
     try {
       body = await request.json()
     } catch {
       return NextResponse.json({ ok: false, code: "invalid_payload" }, { status: 400 })
     }
 
-    const orgName = (body?.organization_name ?? "").toString().trim()
-    const docId = body?.doc_id == null || body?.doc_id === "" ? null : String(body.doc_id)
-    const plan = (body?.plan ?? "basic").toString()
+    const orgName = ((): string => {
+      if (body && typeof body === "object" && body !== null && "organization_name" in body) {
+        const v = (body as Record<string, unknown>)["organization_name"]
+        return typeof v === "string" ? v.trim() : ""
+      }
+      return ""
+    })()
+    const docId = ((): string | null => {
+      if (body && typeof body === "object" && body !== null && "doc_id" in body) {
+        const v = (body as Record<string, unknown>)["doc_id"]
+        if (v == null || v === "") return null
+        return String(v)
+      }
+      return null
+    })()
+    const plan = ((): string => {
+      if (body && typeof body === "object" && body !== null && "plan" in body) {
+        const v = (body as Record<string, unknown>)["plan"]
+        return typeof v === "string" ? v : "basic"
+      }
+      return "basic"
+    })()
 
     if (orgName.length < 2) {
       return NextResponse.json({ ok: false, code: "invalid_payload" }, { status: 400 })
@@ -35,7 +54,7 @@ export async function POST(request: Request) {
 
     if (orgErr) {
       const msg = String(orgErr?.message || "")
-      const code = String((orgErr as any)?.code || "")
+      const code = String((orgErr as { code?: string } | null)?.code || "")
       if (code === "23505" || msg.toLowerCase().includes("duplicate")) {
         return NextResponse.json({ ok: false, code: "org_name_conflict" }, { status: 409 })
       }

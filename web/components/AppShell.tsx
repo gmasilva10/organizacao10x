@@ -232,7 +232,6 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
             onClick={toggleSidebar}
             aria-pressed={sidebarCollapsed}
             aria-label={sidebarCollapsed ? "Expandir menu de navegação" : "Recolher menu de navegação"}
-            aria-expanded={!sidebarCollapsed}
             aria-controls="sidebar-navigation"
             title={sidebarCollapsed ? "Expandir menu" : "Recolher menu"}
             className="hover:bg-accent focus:ring-2 focus:ring-primary focus:ring-offset-2"
@@ -291,7 +290,7 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
               size="sm"
               onClick={handleLogout}
               aria-label="Sair da conta"
-              className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-400 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               title="Sair da conta"
             >
               <LogOut className="h-4 w-4" />
@@ -309,11 +308,10 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
             sidebarCollapsed ? 'w-16' : 'w-64'
           }`}
           aria-label="Menu de navegação principal"
-          aria-expanded={!sidebarCollapsed}
           role="navigation"
           style={{ 
             willChange: sidebarCollapsed ? 'width' : 'auto',
-            transform: 'translateZ(0)' // Force GPU acceleration
+            transform: 'translateZ(0)'
           }}
         >
           <nav className="flex flex-col gap-4 p-3" aria-label="Menu de navegação">

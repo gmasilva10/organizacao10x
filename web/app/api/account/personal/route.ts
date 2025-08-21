@@ -11,14 +11,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, code: "unauthorized" }, { status: 401 })
     }
 
-    let body: any
+    let body: unknown
     try {
       body = await request.json()
     } catch {
       return NextResponse.json({ ok: false, code: "invalid_payload", message: "json" }, { status: 400 })
     }
 
-    const fullName = (body?.full_name ?? "").toString().trim()
+    const fullName = ((): string => {
+      if (body && typeof body === "object" && body !== null && "full_name" in body) {
+        const v = (body as Record<string, unknown>)["full_name"]
+        return typeof v === "string" ? v.trim() : ""
+      }
+      return ""
+    })()
     if (fullName.length < 2) {
       return NextResponse.json({ ok: false, code: "invalid_payload", message: "full_name min 2" }, { status: 400 })
     }
