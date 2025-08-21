@@ -122,7 +122,6 @@ Hoje — 13/08/2025
 [2025-08-16 12:55] DEV — IMPLEMENTAÇÃO — Fase 1/Bloco 1 — Alinhamento multi-tenant no legado (tenant_id + RLS + índices) — evidência: migração b1_legacy_tenant_alignment
 [2025-08-16 12:55] DEV — IMPLEMENTAÇÃO — Fase 1/Bloco 1 — Endpoint /api/capabilities (snapshot de policy) — evidência: app/api/capabilities/route.ts
 [2025-08-16 15:18] DEV — IMPLEMENTAÇÃO — Fase 1/Bloco 1 — Sessão Supabase (App Router): utils supabase (server/middleware) + middleware.ts — evidência: utils/supabase/*, middleware.ts
-[2025-08-16 15:46] DEV — DOCUMENTAÇÃO — Criação do documento de credenciais QA — evidência: Estrutura/Credenciais_QA_Supabase.txt
 
 [2025-08-16 18:40] DEV — QA — Seeds QA aplicados (Auth + memberships) — evidência: scripts/seed-qa.ts
 [2025-08-16 18:40] QA — Smoke tests RBAC/Limits/Capabilities — evidências: Estrutura/QA_SmokeTests_Bloco1_Etapa2_results.json (responses + snapshot events)
@@ -151,7 +150,7 @@ Incluídos exemplos práticos e padronizações para registro de atividades, pen
 Status: Estrutura aprovada pelo GP como fonte única de verdade para o projeto.
 
 Template para novos itens:
-[AAAA-MM-DD HH:MM] <Autor> — <TIPO: PLANEJAMENTO|IMPLEMENTAÇÃO|REVIEW|QA|PERF|BUGFIX|DOC> — <Módulo/Área> — <Título curto> — (#issue?) — evidência:<commit/PR/link>
+[AAAA-MM-DD HH:MM] <Autor> — <TIPO: PLANEJAMENTO|IMPLEMENTAÇÃO|REVIEW|QA|PERF|BUGFIX|DOC> — <Módulo/Área> — <Título curto> — (#tarefa/issue opcional) — evidência:<commit/PR/link>
 
 Notas do dia:
 - Itens bloqueados migrar para Pendencias_Agosto2025.txt.
@@ -160,5 +159,5 @@ Notas do dia:
 [2025-08-21 11:52] GP — COMUNICAÇÃO — QA integrada ao projeto (21/08/2025); adoção do BugBot (Cursor) para apoio de QA (varredura leve, relatórios com reprodução mínima, sugestões sem merge em main).
 [2025-08-21 11:52] GP — DIRETRIZ — Dia focado em Alunos V2: STU01 (listagem/busca/filtros/paginação) EM VALIDAÇÃO por evidência; STU02 (esqueleto) somente se STU01 estiver estável.
 
-[2025-08-21 12:45] GP — DIRETRIZ — STU01 (listagem/busca/filtros/paginação) em WIP=1 com padrões: page_size=20 (clamp 10..50), debounce=300ms, org-scope obrigatório, RBAC leitura por role.
+[2025-08-21 12:45] GP — DIRETRIZ — STU01 padrão premium: contratos de resposta, filtros, paginação, RBAC leitura e critérios de aceite definidos (ver Checklist).
 [2025-08-21 12:45] GP — QA — Autorizar QA varredura SHELL/ACC contínua e entrada em /app/students quando STU01 marcar EM VALIDAÇÃO.
