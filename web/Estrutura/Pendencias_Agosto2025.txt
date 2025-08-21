@@ -5,6 +5,8 @@
 [P1][EM ANDAMENTO][2025-08-20] BLOCO 3 — DnD: card desaparece após drop — Resp.: DEV — Prazo: 22/08
 [P1][EM ANDAMENTO][2025-08-20] BLOCO 3 — Histórico: runtime TypeError (items.map) — Resp.: DEV — Prazo: 22/08
 [P1][RESOLVIDO][2025-08-21] ACC03 — Falha na criação de organização (hotfix aplicado; evid.: Estrutura/account/player_org_created_fix.json)
+[P3][EM ANDAMENTO] QA — PR qa-suggested (ACC/SHELL) — aguardando review/merge (PR #3)
+[P3][EM ANDAMENTO] QA — Issues CI env / exhaustive-deps / limpeza lint (#4, #5, #6)
 [P1][RESOLVIDO] BLOCO 3 — Colunas (VAL03): CRUD intermediárias (mesmo vazias) sem efeitos colaterais; fixas preservadas; reorder persistente — Resp.: DEV
 [P1][EM ANDAMENTO] BLOCO 3 — Sidebar/Árvore (VAL04): contadores vivos, filtro por trainer e colapso persistente — Resp.: DEV
 [P1][EM ANDAMENTO][2025-08-20] BLOCO 3 — Layout/UX: CTA duplicado + “Recolher” — Resp.: DEV — Prazo: 22/08

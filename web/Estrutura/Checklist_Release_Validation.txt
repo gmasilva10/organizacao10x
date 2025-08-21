@@ -145,6 +145,9 @@ Notas de governança
 - Todo novo Dialog deve incluir DrawerDescription + aria-describedby
 - Qualquer mudança em next.config.ts que afete redirects deve ser validada por este checklist antes do release
 
+[QA01] Fluxo QA (PRs qa-suggested sem merge direto) — ATIVO
+[QA02] Triagem por severidade (SEV-1 bloqueia; SEV-2/3 sob triagem) — ATIVO
+
 ## STUDENTS — Alunos V2
 [STU01] PASS — evid.: web/Estrutura/students/*
 [STU02] Criar aluno (validação inline, toasts) — AGUARDANDO
