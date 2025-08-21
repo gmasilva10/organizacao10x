@@ -37,9 +37,9 @@ export async function POST(request: Request) {
     }
 
     // Tentar criar tenant via PostgREST (service-role) para evitar conflitos de RLS
-    const tenantInsert: Record<string, any> = { name: orgName, plan }
-    // Evitar enviar doc_id quando não existir/for vazio (alguns esquemas não possuem a coluna)
-    if (docId !== null) tenantInsert.doc_id = docId
+    // Inserção mínima e compatível com esquemas sem colunas opcionais
+    const tenantInsert: Record<string, any> = { name: orgName }
+    // Nota: alguns esquemas não possuem doc_id/plan. Evitamos enviá-los para garantir compatibilidade
     const orgResp = await fetch(`${serviceUrl}/rest/v1/tenants`, {
       method: "POST",
       headers: {
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: false, code: "unexpected_error" }, { status: 500 })
       }
       // Idempotência: se nome já existe, buscar e reutilizar
-      const getResp = await fetch(`${serviceUrl}/rest/v1/tenants?name=eq.${encodeURIComponent(orgName)}&select=id,name,plan&limit=1`, {
+      const getResp = await fetch(`${serviceUrl}/rest/v1/tenants?name=eq.${encodeURIComponent(orgName)}&select=id,name&limit=1`, {
         headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
         cache: "no-store",
       })
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       if (!Array.isArray(rows) || rows.length === 0) {
         return NextResponse.json({ ok: false, code: "org_name_conflict" }, { status: 409 })
       }
-      org = rows[0] as { id: string; name: string; plan: string }
+      org = rows[0] as { id: string; name: string; plan?: string }
     } else {
       const rows = await orgResp.json().catch(() => [])
       org = Array.isArray(rows) && rows.length > 0 ? rows[0] : null
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
 
     const res = NextResponse.json({
       ok: true,
-      organization: { id: tenantId, name: org!.name, plan: org!.plan },
+      organization: { id: tenantId, name: org!.name, plan: (org as any)?.plan ?? "basic" },
       membership: { user_id: membership!.user_id as string, organization_id: tenantId, role: membership!.role as string },
       active_org_id: tenantId,
     })
