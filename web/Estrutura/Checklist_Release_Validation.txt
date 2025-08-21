@@ -155,3 +155,10 @@ Notas de governança
 [STU04] RBAC/guards (alunos) — EM ANDAMENTO (leitura)
 [STU05] UX/A11y premium — EM ANDAMENTO
 [STU06] Telemetria (created/updated/assigned_trainer, 2xx only) — AGUARDANDO
+
+## USER — Perfil
+[USER01] Ver perfil — EM ANDAMENTO
+[USER02] Editar nome — EM ANDAMENTO
+[USER03] Segurança (link trocar senha) — EM ANDAMENTO
+[USER04] UX/A11y — EM ANDAMENTO
+[USER05] Telemetria — AGUARDANDO
