@@ -1,0 +1,16 @@
+{
+  "note": "Sample of trainer-scoped list (no sensitive data)",
+  "request": {
+    "method": "GET",
+    "path": "/api/students",
+    "query": {
+      "page": 1,
+      "page_size": 20
+    },
+    "role": "trainer"
+  },
+  "response": {
+    "pagination": { "page": 1, "page_size": 20, "total": 0, "total_pages": 1 },
+    "data_length": 0
+  }
+}

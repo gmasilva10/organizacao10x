@@ -159,3 +159,6 @@ Notas do dia:
 
 [2025-08-21 11:52] GP — COMUNICAÇÃO — QA integrada ao projeto (21/08/2025); adoção do BugBot (Cursor) para apoio de QA (varredura leve, relatórios com reprodução mínima, sugestões sem merge em main).
 [2025-08-21 11:52] GP — DIRETRIZ — Dia focado em Alunos V2: STU01 (listagem/busca/filtros/paginação) EM VALIDAÇÃO por evidência; STU02 (esqueleto) somente se STU01 estiver estável.
+
+[2025-08-21 12:45] GP — DIRETRIZ — STU01 (listagem/busca/filtros/paginação) em WIP=1 com padrões: page_size=20 (clamp 10..50), debounce=300ms, org-scope obrigatório, RBAC leitura por role.
+[2025-08-21 12:45] GP — QA — Autorizar QA varredura SHELL/ACC contínua e entrada em /app/students quando STU01 marcar EM VALIDAÇÃO.
