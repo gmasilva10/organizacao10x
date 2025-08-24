@@ -9,7 +9,7 @@ import { AssignTrainerSelect } from "@/components/students/AssignTrainerSelect"
 import { StudentCreateModal } from "@/components/students/StudentCreateModal"
 import { StudentEditModal } from "@/components/students/StudentEditModal"
 
-type StudentRow = { id: string; full_name: string; status: string; trainer: { id: string | null; name: string | null } | null; created_at: string }
+type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; trainer: { id: string | null; name: string | null } | null; created_at: string }
 type Trainer = { id: string; name: string }
 
 export default function StudentsPage() {
@@ -79,9 +79,10 @@ export default function StudentsPage() {
   }, [q])
   useEffect(() => { fetchSummary() }, [])
 
-  async function onCreate(payload: { name: string; email: string }) {
+  async function onCreate(payload: { name: string; email: string; phone?: string | null; status?: 'onboarding'|'active'|'paused'; trainer_id?: string | null }) {
     setLoading(true)
     try {
+      toast.info('Criando aluno...')
       const res = await fetch('/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       if (res.status === 200) {
         toast.success('Aluno criado com sucesso.')
@@ -94,6 +95,8 @@ export default function StudentsPage() {
       } else {
         toast.error(`Falha ao criar aluno (${res.status}).`)
       }
+    } catch {
+      toast.error('Erro de rede ao criar aluno.')
     } finally { setLoading(false) }
   }
 
@@ -112,10 +115,11 @@ export default function StudentsPage() {
     } finally { setLoading(false) }
   }
 
-  async function onUpdate(payload: { id: string; name: string; email: string }) {
+  async function onUpdate(payload: { id: string; name: string; email: string; phone?: string | null; status?: 'onboarding'|'active'|'paused'; trainer_id?: string | null }) {
     setLoading(true)
     try {
-      const res = await fetch(`/api/students/${payload.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: payload.name, email: payload.email }) })
+      const { id, ...rest } = payload
+      const res = await fetch(`/api/students/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rest) })
       if (res.status === 200) {
         toast.success('Aluno atualizado.')
         fetchList(); fetchSummary()
@@ -144,8 +148,8 @@ export default function StudentsPage() {
   return (
     <div className="container py-8">
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} title="Limite do seu plano foi atingido" description="Para adicionar mais alunos, faça upgrade para o plano Enterprise." primaryHref="/contact" secondaryHref="/planos" />
-      <StudentCreateModal open={showCreate} onClose={()=>setShowCreate(false)} onCreate={onCreate} />
-      <StudentEditModal open={!!editing} student={editing} onClose={()=>setEditing(null)} onSave={onUpdate} />
+      <StudentCreateModal open={showCreate} onClose={()=>setShowCreate(false)} onCreate={onCreate} trainers={trainers} />
+      <StudentEditModal open={!!editing} student={editing} trainers={trainers} onClose={()=>setEditing(null)} onSave={onUpdate} />
       <h1 className="text-2xl font-semibold">Alunos</h1>
       {counts && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
@@ -171,6 +175,7 @@ export default function StudentsPage() {
           <thead className="bg-muted/50">
             <tr>
               <th className="px-3 py-2 text-left">Nome</th>
+              <th className="px-3 py-2 text-left">Telefone</th>
               <th className="px-3 py-2 text-left">Status</th>
               <th className="px-3 py-2 text-left">Treinador</th>
               <th className="px-3 py-2 text-left">Criado em</th>
@@ -182,6 +187,7 @@ export default function StudentsPage() {
             {items.map(s => (
               <tr key={s.id} className="border-t">
                 <td className="px-3 py-2">{s.full_name}</td>
+                <td className="px-3 py-2">{s.phone || '—'}</td>
                 <td className="px-3 py-2 capitalize">{s.status}</td>
                 <td className="px-3 py-2">
                   <AssignTrainerSelect value={s.trainer?.id || null} trainers={trainers.map(t => ({ user_id: t.id, email: t.name }))} onChange={(v)=>onAssign(s.id, v)} />

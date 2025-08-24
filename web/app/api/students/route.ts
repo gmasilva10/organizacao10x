@@ -12,6 +12,7 @@ export async function GET(request: Request) {
   // Param names per STU01: query, status, trainer_id, page, page_size
   const q = (searchParams.get("query") ?? searchParams.get("q") ?? "").trim()
   const status = (searchParams.get("status") ?? "").trim()
+  const idFilter = (searchParams.get("id") ?? "").trim()
   const trainerIdFilter = (searchParams.get("trainer_id") ?? "").trim()
   const page = Math.max(1, Number(searchParams.get("page") || 1))
   const reqPageSize = Number(searchParams.get("page_size") ?? searchParams.get("pageSize") ?? 20)
@@ -27,6 +28,7 @@ export async function GET(request: Request) {
     `deleted_at=is.null`,
   ]
   if (status) filters.push(`status=eq.${status}`)
+  if (idFilter) filters.push(`id=eq.${encodeURIComponent(idFilter)}`)
   // Optional explicit trainer filter from query params
   if (trainerIdFilter) filters.push(`trainer_id=eq.${encodeURIComponent(trainerIdFilter)}`)
   // Busca simples por nome/email (ilike). Tabela usa campo "name"
@@ -45,6 +47,8 @@ export async function GET(request: Request) {
   const items = (await resp.json().catch(() => [])) as Array<{
     id: string
     name: string
+    email?: string | null
+    phone?: string | null
     status: string
     trainer_id?: string | null
     created_at: string
@@ -61,6 +65,8 @@ export async function GET(request: Request) {
   const data = items.map((it) => ({
     id: it.id,
     full_name: it.name,
+    email: it.email ?? null,
+    phone: it.phone ?? null,
     status: it.status,
     trainer: it.trainer_id ? { id: it.trainer_id, name: null as string | null } : null,
     created_at: it.created_at,

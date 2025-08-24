@@ -1,0 +1,1 @@
+[2025-08-24 14:30] DEV — IMPLEMENTAÇÃO — Students — STU-A Dados Gerais (phone/status/trainer) — (#issue opcional) — evidência: screenshot_modal_aluno.png, payload_POST.json
