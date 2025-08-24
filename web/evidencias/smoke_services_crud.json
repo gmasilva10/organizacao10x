@@ -1,0 +1,6 @@
+{
+  "create": {"status": 200},
+  "update": {"status": 200},
+  "try_xor_violation": {"status": 400, "error": "invalid_discount"},
+  "activate_second": {"status": 200, "note": "regra 1 ativo garantida via unique parcial"}
+}

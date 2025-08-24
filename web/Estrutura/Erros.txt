@@ -1,3 +1,19 @@
+[2025-08-24] BUILD — Import inválido de sanitizeAddress
+- Sintoma: "Export sanitizeAddress doesn't exist in target module" em web/app/api/students/[id]/route.ts
+- Causa: import de ../route (rota não exporta utilitários)
+- Fix: mover sanitizeAddress para web/app/api/students/_utils.ts e importar em route.ts e [id]/route.ts
+- Confirmação: build verde; DELETE /api/students/:id retornando 200 { ok:true }
+
+[2025-08-24] UX/422 — Criação de aluno
+- Causas mapeadas:
+  - 422 limit_reached (limits.students)
+  - 422 unique_email (e-mail duplicado por tenant)
+  - 422 validation (campos inválidos: CEP curto/UF inválida/etc.)
+- Tratamento: Toasts específicos no StudentFullModal
+  - limit_reached → "Limite de alunos do plano atingido."
+  - unique_email → "Este e‑mail já está cadastrado."
+  - validation → exibir primeira mensagem legível
+- Evidências: web/evidencias/smoke_students_422_body.json
 # Registro de Erros e Ocorrências — Personal Global
 # Última atualização: 2025-08-20 17:25
 

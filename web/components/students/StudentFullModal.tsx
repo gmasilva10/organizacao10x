@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useToast } from "@/components/ui/toast"
 
 type Trainer = { id: string; name: string }
@@ -35,6 +35,8 @@ export function StudentFullModal({
   const [customerStage, setCustomerStage] = useState<'new'|'renewal'|'canceled'>("new")
   const [trainerId, setTrainerId] = useState<string>("")
   const [address, setAddress] = useState<Address>({})
+  const nameRef = useRef<HTMLInputElement | null>(null)
+  const emailRef = useRef<HTMLInputElement | null>(null)
 
   // Serviços
   const [services, setServices] = useState<any[]>([])
@@ -70,11 +72,45 @@ export function StudentFullModal({
 
   const canSubmit = Boolean(name && /.+@.+\..+/.test(email))
 
+  const financialSummary = useMemo(() => {
+    const active = services.find((s:any) => !!s.is_active) || null
+    function addMonths(dateStr?: string|null, months?: string|null) {
+      if (!dateStr || !months) return null
+      const d = new Date(dateStr)
+      const m = months === 'monthly' ? 1 : months === 'quarterly' ? 3 : months === 'semiannual' ? 6 : months === 'annual' ? 12 : 0
+      if (m === 0) return null
+      d.setMonth(d.getMonth() + m)
+      return d.toISOString().slice(0,10)
+    }
+    function netPriceCents(s:any) {
+      const base = Number(s.price_cents || 0)
+      const hasPct = s.discount_pct != null
+      const hasAmt = s.discount_amount_cents != null
+      if (hasPct) return Math.max(0, Math.round(base * (1 - Number(s.discount_pct)/100)))
+      if (hasAmt) return Math.max(0, base - Number(s.discount_amount_cents))
+      return base
+    }
+    const nextCharge = active ? addMonths(active.last_payment_at, active.billing_cycle) : null
+    const totalMonthly = services
+      .filter((s:any) => !!s.is_active && s.billing_cycle === 'monthly')
+      .reduce((acc:number, s:any) => acc + netPriceCents(s), 0)
+    return {
+      activeTitle: active ? `${active.name} (${active.billing_cycle || '—'})` : '—',
+      nextCharge: nextCharge || '—',
+      totalMonthlyBRL: (totalMonthly/100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    }
+  }, [services])
+
   if (!open) return null
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    if (!canSubmit) return
+    if (!name) {
+      setTab('general'); nameRef.current?.focus(); return
+    }
+    if (!/.+@.+\..+/.test(email)) {
+      setTab('general'); emailRef.current?.focus(); return
+    }
     setLoading(true)
     try {
       const payload: any = {
@@ -99,7 +135,11 @@ export function StudentFullModal({
           const body = await res.json().catch(()=>({}))
           if (body?.error === 'limit_reached' && body?.details?.limit === 'students') toast.error('Limite de alunos do plano atingido.')
           else if (body?.code === 'unique_email') toast.error('Este e‑mail já está cadastrado.')
-          else if (body?.code === 'validation' && body?.message) toast.error(String(body.message))
+          else if (body?.code === 'validation' && body?.message) {
+            toast.error(String(body.message))
+            if (String(body.message).toLowerCase().includes('cep')) { setTab('address') }
+            if (String(body.message).toLowerCase().includes('uf')) { setTab('address') }
+          }
           else toast.error('Erro de validação ao salvar aluno.')
         } else {
           toast.error(`Falha ao ${mode==='create'?'criar':'salvar'} (${res.status})`)
@@ -150,11 +190,11 @@ export function StudentFullModal({
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
                 <label htmlFor="f-name" className="mb-1 block text-sm">Nome</label>
-                <input id="f-name" value={name} onChange={(e)=>setName(e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm" required aria-required="true" />
+                <input id="f-name" ref={nameRef} value={name} onChange={(e)=>setName(e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm" required aria-required="true" />
               </div>
               <div>
                 <label htmlFor="f-email" className="mb-1 block text-sm">E-mail</label>
-                <input id="f-email" type="email" value={email} onChange={(e)=>setEmail(e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm" required aria-required="true" />
+                <input id="f-email" ref={emailRef} type="email" value={email} onChange={(e)=>setEmail(e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm" required aria-required="true" />
               </div>
               <div>
                 <label htmlFor="f-phone" className="mb-1 block text-sm">Telefone</label>
@@ -233,7 +273,18 @@ export function StudentFullModal({
 
           {tab === 'services' && (
             <div className="space-y-3">
-              <ServicesGrid studentId={student!.id} services={services} onChanged={async()=>{ const d = await (await fetch(`/api/students/${student!.id}/services`)).json(); setServices(d?.items||[]) }} onAdd={addService} />
+              <div className="rounded-md border p-3 text-sm">
+                <div className="flex flex-wrap gap-4">
+                  <div><span className="text-muted-foreground">Serviço ativo:</span> <b>{financialSummary.activeTitle}</b></div>
+                  <div><span className="text-muted-foreground">Próxima cobrança:</span> <b>{financialSummary.nextCharge}</b></div>
+                  <div><span className="text-muted-foreground">Total mensal estimado:</span> <b>{financialSummary.totalMonthlyBRL}</b></div>
+                </div>
+              </div>
+              {student?.id ? (
+                <ServicesGrid studentId={student.id} services={services} onChanged={async()=>{ const d = await (await fetch(`/api/students/${student.id}/services`)).json(); setServices(d?.items||[]) }} onAdd={addService} />
+              ) : (
+                <div className="rounded-md border p-4 text-sm text-muted-foreground">Salve o aluno para gerenciar serviços.</div>
+              )}
             </div>
           )}
 

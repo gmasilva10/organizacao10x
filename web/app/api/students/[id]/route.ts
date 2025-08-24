@@ -22,7 +22,16 @@ export async function PATCH(_request: Request, ctxParam: { params: Promise<{ id:
     if (!['onboarding','active','paused'].includes(v)) delete (body as any).status
   }
   if (Object.prototype.hasOwnProperty.call(body, 'address')) {
-    (body as any).address = sanitizeAddress((body as any).address)
+    const raw = (body as any).address
+    const rawZip = String(raw?.zip || "").replace(/\D/g, "")
+    if (rawZip && rawZip.length !== 8) {
+      return NextResponse.json({ code: 'validation', message: 'CEP deve ter 8 dígitos.' }, { status: 422 })
+    }
+    const rawState = String(raw?.state || "")
+    if (rawState && rawState.trim().length !== 2) {
+      return NextResponse.json({ code: 'validation', message: 'UF deve ter 2 letras.' }, { status: 422 })
+    }
+    (body as any).address = sanitizeAddress(raw)
   }
 
   const url = process.env.SUPABASE_URL!

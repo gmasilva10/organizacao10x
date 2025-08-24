@@ -43,6 +43,17 @@ Regras
 /(app)/students [auth] — Lista + filtros + novo aluno + atribuição de treinador
 /api/students* [auth] — GET/POST/PATCH/DELETE com RBAC + RLS + limits
 
+Abas do modal (STU-B):
+- Dados Gerais (Nome*, Email*, Telefone, CPF, Data de Nascimento, Status, Tipo de Cliente, Treinador)
+- Endereço (JSONB: zip, street, number, complement, district, city, state, country)
+- Financeiro → Serviços (CRUD local do aluno; sem pagamentos)
+
+Endpoints de serviços por aluno (STU-B):
+- GET /api/students/:id/services — lista serviços do aluno
+- POST /api/students/:id/services — cria serviço (XOR desconto; 1 ativo por aluno via unique parcial)
+- PATCH /api/students/:id/services/:serviceId — atualiza metadados de serviço
+- DELETE /api/students/:id/services/:serviceId — remove serviço
+
 Contratos (server-first)
 - GET /api/students?q=&status=&page=&pageSize=
   - Request: query { q?: string; status?: 'onboarding'|'active'|'paused'; page?: number; pageSize?: number }
@@ -75,12 +86,14 @@ Contratos (server-first)
 /               -> redirect -> /app
 /app            -> Dashboard (App Shell)
 /app/students   -> Alunos V2
+/app/relationship -> Relacionamento (placeholder)
+/app/relationship/templates -> Templates (placeholder)
 /app/services   -> Serviços
 /app/onboarding -> Kanban (oficial; sem alias /kanban)
 /app/onboarding/history -> Histórico
 /app/team-admin -> Administração de Equipe
 /app/settings   -> Configurações
-# /app/payments -> Pagamentos (pausado: oculto ou disabled)
+# /app/payments -> Pagamentos (pausado: oculto ou disabled — manter “Serviços” do menu como Em breve)
 
 Observações:
 - Rotas futuras privadas dependem da integração Supabase

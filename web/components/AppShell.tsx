@@ -62,12 +62,6 @@ const menuGroups: MenuGroup[] = [
         href: "/app/services",
         icon: PackageIcon,
         disabled: true
-      },
-      {
-        id: "relationship",
-        title: "Relacionamento",
-        href: "/app/relationship",
-        icon: MessageCircle
       }
     ]
   },
@@ -86,6 +80,12 @@ const menuGroups: MenuGroup[] = [
         title: "Histórico",
         href: "/app/onboarding/history",
         icon: History
+      },
+      {
+        id: "relationship",
+        title: "Relacionamento",
+        href: "/app/relationship",
+        icon: MessageCircle
       }
     ]
   },

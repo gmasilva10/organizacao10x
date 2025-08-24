@@ -108,6 +108,17 @@ export async function POST(request: Request) {
   const customerStage = body?.customer_stage && ["new","renewal","canceled"].includes(String(body.customer_stage)) ? String(body.customer_stage) : 'new'
   const rawAddress = (body?.address ?? null) as Record<string, unknown> | null
   const address = rawAddress ? sanitizeAddress(rawAddress) : null
+  // Basic validation for address (when provided): zip 8 digits; state 2 letters
+  if (rawAddress) {
+    const rawZip = String((rawAddress as any)?.zip || "").replace(/\D/g, "")
+    if (rawZip && rawZip.length !== 8) {
+      return NextResponse.json({ code: 'validation', message: 'CEP deve ter 8 dígitos.' }, { status: 422 })
+    }
+    const rawState = String((rawAddress as any)?.state || "")
+    if (rawState && rawState.trim().length !== 2) {
+      return NextResponse.json({ code: 'validation', message: 'UF deve ter 2 letras.' }, { status: 422 })
+    }
+  }
   const status = body?.status && ["onboarding", "active", "paused"].includes(body.status as string) ? String(body.status) : "onboarding"
   const trainerId = body?.trainer_id ? String(body.trainer_id) : null
   if (!name || !email) return NextResponse.json({ error: "invalid_input" }, { status: 400 })

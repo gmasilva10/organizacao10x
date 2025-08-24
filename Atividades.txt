@@ -1,4 +1,1 @@
-[2025-08-24 17:08] DEV — HOTFIX — sanitizeAddress util e imports corrigidos; DELETE testado — evidências: web/evidencias/delete_student_200.json
-[2025-08-24 17:10] DEV — TOASTS 422 — mapeados (limit/unique/validation) — evidências: web/evidencias/smoke_students_422_body.json
-[2025-08-24 17:12] DEV — UI — Aba Serviços liberada e atalhos funcionando — evidências: web/evidencias/screenshot_services_grid.png
-[2025-08-24 17:15] DEV — MENU — Relacionamento adicionado (pages placeholders) — evidências: web/evidencias/screenshot_relationship_menu.png, web/evidencias/screenshot_relationship_placeholder.png
+[2025-08-24 18:25] DEV — RELACIONAMENTO — Migração MVP aplicada; APIs templates/messages/timeline criadas — evidências: web/evidencias/relationship_templates_crud.json, web/evidencias/relationship_message_post.json, web/evidencias/screenshot_relationship_timeline.png
