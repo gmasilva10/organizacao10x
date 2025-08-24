@@ -8,6 +8,7 @@ import { StudentsFilters } from "@/components/students/StudentsFilters"
 import { AssignTrainerSelect } from "@/components/students/AssignTrainerSelect"
 import { StudentCreateModal } from "@/components/students/StudentCreateModal"
 import { StudentEditModal } from "@/components/students/StudentEditModal"
+import { StudentFullModal } from "@/components/students/StudentFullModal"
 
 type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; trainer: { id: string | null; name: string | null } | null; created_at: string }
 type Trainer = { id: string; name: string }
@@ -26,6 +27,7 @@ export default function StudentsPage() {
   const qDebounceRef = useRef<number | null>(null)
   const [trainers, setTrainers] = useState<Trainer[]>([])
   const [showCreate, setShowCreate] = useState(false)
+  const [showFull, setShowFull] = useState<false | 'create' | 'edit'>(false)
   const [error, setError] = useState<string>("")
   const [editing, setEditing] = useState<Student | null>(null)
   const toast = useToast()
@@ -149,7 +151,8 @@ export default function StudentsPage() {
     <div className="container py-8">
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} title="Limite do seu plano foi atingido" description="Para adicionar mais alunos, faça upgrade para o plano Enterprise." primaryHref="/contact" secondaryHref="/planos" />
       <StudentCreateModal open={showCreate} onClose={()=>setShowCreate(false)} onCreate={onCreate} trainers={trainers} />
-      <StudentEditModal open={!!editing} student={editing} trainers={trainers} onClose={()=>setEditing(null)} onSave={onUpdate} />
+      <StudentEditModal open={!!editing && showFull===false} student={editing} trainers={trainers} onClose={()=>setEditing(null)} onSave={onUpdate} />
+      <StudentFullModal open={showFull!==false} mode={showFull==='create'?'create':'edit'} student={showFull==='edit'? editing : null} trainers={trainers} onClose={()=>{ setShowFull(false); if (showFull==='create') setShowCreate(false) }} onSaved={()=>{ fetchList(); fetchSummary() }} />
       <h1 className="text-2xl font-semibold">Alunos</h1>
       {counts && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
@@ -161,7 +164,10 @@ export default function StudentsPage() {
       )}
       <div className="mt-4 flex items-center gap-3">
         <StudentsFilters q={q} status={status} trainerId={trainerId} trainers={trainers} onQ={setQ} onStatus={setStatus} onTrainer={setTrainerId} />
-        <button onClick={()=>setShowCreate(true)} className="ml-auto rounded-md bg-primary px-4 py-2 text-sm text-white">Novo aluno</button>
+        <div className="ml-auto flex gap-2">
+          <button onClick={()=>setShowCreate(true)} className="rounded-md border px-4 py-2 text-sm">Novo (rápido)</button>
+          <button onClick={()=>setShowFull('create')} className="rounded-md bg-primary px-4 py-2 text-sm text-white">Cadastro completo</button>
+        </div>
       </div>
 
       {error && (
@@ -195,7 +201,7 @@ export default function StudentsPage() {
                 <td className="px-3 py-2">{new Date(s.created_at).toLocaleString(undefined, { hour12: false })}</td>
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-2">
-                    <button onClick={()=>setEditing(s)} className="rounded-md border px-2 py-1 text-xs">Editar</button>
+                    <button onClick={()=>{ setEditing(s); setShowFull('edit') }} className="rounded-md border px-2 py-1 text-xs">Editar</button>
                     <button onClick={()=>onDelete(s.id)} className="rounded-md border px-2 py-1 text-xs text-red-600">Excluir</button>
                   </div>
                 </td>

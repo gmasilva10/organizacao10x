@@ -1,0 +1,19 @@
+{
+  "name": "Plano Premium",
+  "type": "plan",
+  "status": "active",
+  "price_cents": 29900,
+  "currency": "BRL",
+  "discount_pct": 10.00,
+  "purchase_status": "pending",
+  "payment_method": "card",
+  "installments": 6,
+  "billing_cycle": "monthly",
+  "start_date": "2025-09-01",
+  "delivery_date": "2025-09-10",
+  "end_date": null,
+  "last_payment_at": null,
+  "next_payment_at": null,
+  "is_active": true,
+  "notes": "Contrato 12 meses"
+}

@@ -3,6 +3,22 @@ import { resolveRequestContext } from "@/server/context"
 import { fetchPlanPolicyByTenant } from "@/server/plan-policy"
 import { logEvent } from "@/server/events"
 
+function sanitizeAddress(input: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {}
+  const zip = String(input.zip ?? "").replace(/\D/g, "")
+  if (zip) out.zip = zip.slice(0, 8)
+  const fields = [
+    'street','number','complement','district','city','state','country'
+  ] as const
+  for (const f of fields) {
+    const v = String((input as any)[f] ?? "").trim()
+    if (v) out[f] = v
+  }
+  if (out.state) out.state = out.state.toUpperCase().slice(0,2)
+  if (!out.country) out.country = 'BR'
+  return out
+}
+
 // GET /api/students?q=&status=&page=&pageSize=
 export async function GET(request: Request) {
   const ctx = await resolveRequestContext(request)
@@ -49,6 +65,10 @@ export async function GET(request: Request) {
     name: string
     email?: string | null
     phone?: string | null
+    cpf?: string | null
+    birth_date?: string | null
+    customer_stage?: string | null
+    address?: Record<string, unknown> | null
     status: string
     trainer_id?: string | null
     created_at: string
@@ -67,6 +87,10 @@ export async function GET(request: Request) {
     full_name: it.name,
     email: it.email ?? null,
     phone: it.phone ?? null,
+    cpf: it.cpf ?? null,
+    birth_date: it.birth_date ?? null,
+    customer_stage: it.customer_stage ?? 'new',
+    address: it.address ?? null,
     status: it.status,
     trainer: it.trainer_id ? { id: it.trainer_id, name: null as string | null } : null,
     created_at: it.created_at,
@@ -94,7 +118,12 @@ export async function POST(request: Request) {
   const name = String(body?.name || "").trim()
   const email = String(body?.email || "").trim()
   const phone = body?.phone ? String(body.phone) : null
-  const status = body?.status && ["onboarding", "active", "paused"].includes(body.status) ? body.status : "onboarding"
+  const cpf = body?.cpf ? String(body.cpf).trim() : null
+  const birthDate = body?.birth_date ? String(body.birth_date) : null
+  const customerStage = body?.customer_stage && ["new","renewal","canceled"].includes(String(body.customer_stage)) ? String(body.customer_stage) : 'new'
+  const rawAddress = (body?.address ?? null) as Record<string, unknown> | null
+  const address = rawAddress ? sanitizeAddress(rawAddress) : null
+  const status = body?.status && ["onboarding", "active", "paused"].includes(body.status as string) ? String(body.status) : "onboarding"
   const trainerId = body?.trainer_id ? String(body.trainer_id) : null
   if (!name || !email) return NextResponse.json({ error: "invalid_input" }, { status: 400 })
 
@@ -121,7 +150,7 @@ export async function POST(request: Request) {
   const insert = await fetch(`${url}/rest/v1/students`, {
     method: "POST",
     headers: { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json", Prefer: "return=representation" },
-    body: JSON.stringify({ tenant_id: ctx.tenantId, name, email, phone, status, trainer_id: trainerId }),
+    body: JSON.stringify({ tenant_id: ctx.tenantId, name, email, phone, cpf, birth_date: birthDate, customer_stage: customerStage, address, status, trainer_id: trainerId }),
   })
   if (!insert.ok) return NextResponse.json({ error: "insert_failed" }, { status: 500 })
   const row = await insert.json()

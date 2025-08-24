@@ -1,0 +1,20 @@
+{
+  "name": "Aluno Completo",
+  "email": "aluno.completo@example.com",
+  "phone": "11912345678",
+  "cpf": "12345678901",
+  "birth_date": "1999-05-12",
+  "customer_stage": "new",
+  "address": {
+    "zip": "01311000",
+    "street": "Av. Paulista",
+    "number": "1000",
+    "complement": "Conj. 101",
+    "district": "Bela Vista",
+    "city": "São Paulo",
+    "state": "SP",
+    "country": "BR"
+  },
+  "status": "onboarding",
+  "trainer_id": "00000000-0000-0000-0000-000000000000"
+}

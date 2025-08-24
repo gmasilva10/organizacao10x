@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { logEvent } from "@/server/events"
+import { sanitizeAddress } from "../route"
 
 // PATCH /api/students/:id — editar básicos + trainer_id (RBAC: admin|manager full; trainer restrito)
 export async function PATCH(_request: Request, ctxParam: { params: Promise<{ id: string }> }) {
@@ -11,6 +12,18 @@ export async function PATCH(_request: Request, ctxParam: { params: Promise<{ id:
 
   const allowedFull = new Set(["admin", "manager"]) as Set<string>
   const body = await _request.json().catch(() => ({} as Record<string, unknown>))
+  // Sanitizações leves para novos campos
+  if (Object.prototype.hasOwnProperty.call(body, 'customer_stage')) {
+    const v = String((body as any).customer_stage)
+    if (!['new','renewal','canceled'].includes(v)) delete (body as any).customer_stage
+  }
+  if (Object.prototype.hasOwnProperty.call(body, 'status')) {
+    const v = String((body as any).status)
+    if (!['onboarding','active','paused'].includes(v)) delete (body as any).status
+  }
+  if (Object.prototype.hasOwnProperty.call(body, 'address')) {
+    (body as any).address = sanitizeAddress((body as any).address)
+  }
 
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY

@@ -1,1 +1,1 @@
-[2025-08-24 14:30] DEV — IMPLEMENTAÇÃO — Students — STU-A Dados Gerais (phone/status/trainer) — (#issue opcional) — evidência: screenshot_modal_aluno.png, payload_POST.json
+[2025-08-24 16:10] DEV — IMPLEMENTAÇÃO — Students — STU-B Cadastro Completo (students + services) — evidência: payload_POST_student_full.json, payload_PATCH_student_full.json, payload_POST_service_full.json, screenshot_modal_aluno_tabs.png, screenshot_services_grid.png
