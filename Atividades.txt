@@ -1,1 +1,1 @@
-[2025-08-24 16:10] DEV — IMPLEMENTAÇÃO — Students — STU-B Cadastro Completo (students + services) — evidência: payload_POST_student_full.json, payload_PATCH_student_full.json, payload_POST_service_full.json, screenshot_modal_aluno_tabs.png, screenshot_services_grid.png
+[2025-08-24 16:40] DEV — SUPABASE — create_branch develop-stu-b — confirm_cost_id=STU-B-2025-08-24-A1 — owner=jiesbwfeaikpwduecgap project_ref=kkxlztopdmipldncduvj

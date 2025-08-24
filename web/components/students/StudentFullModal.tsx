@@ -59,8 +59,6 @@ export function StudentFullModal({
     }
   }, [open, mode, student])
 
-  if (!open) return null
-
   function formatPhone(value: string) {
     const digits = value.replace(/\D/g, "").slice(0, 11)
     if (digits.length <= 2) return digits
@@ -70,7 +68,9 @@ export function StudentFullModal({
   }
   function onlyDigits(v: string) { return v.replace(/\D/g, "") }
 
-  const canSubmit = useMemo(() => Boolean(name && /.+@.+\..+/.test(email)), [name, email])
+  const canSubmit = Boolean(name && /.+@.+\..+/.test(email))
+
+  if (!open) return null
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
