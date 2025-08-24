@@ -95,7 +95,15 @@ export function StudentFullModal({
         body: JSON.stringify(payload)
       })
       if (!res.ok) {
-        toast.error(`Falha ao ${mode==='create'?'criar':'salvar'} (${res.status})`)
+        if (res.status === 422) {
+          const body = await res.json().catch(()=>({}))
+          if (body?.error === 'limit_reached' && body?.details?.limit === 'students') toast.error('Limite de alunos do plano atingido.')
+          else if (body?.code === 'unique_email') toast.error('Este e‑mail já está cadastrado.')
+          else if (body?.code === 'validation' && body?.message) toast.error(String(body.message))
+          else toast.error('Erro de validação ao salvar aluno.')
+        } else {
+          toast.error(`Falha ao ${mode==='create'?'criar':'salvar'} (${res.status})`)
+        }
         return
       }
       toast.success(mode === 'create' ? 'Aluno criado.' : 'Aluno salvo.')
@@ -116,7 +124,15 @@ export function StudentFullModal({
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(row)
     })
     if (res.ok) { toast.success('Serviço adicionado.'); const d = await (await fetch(`/api/students/${student.id}/services`)).json(); setServices(d?.items||[]) }
-    else toast.error('Falha ao adicionar serviço.')
+    else {
+      if (res.status === 400) {
+        const body = await res.json().catch(()=>({}))
+        if (body?.error === 'invalid_discount') toast.error('Informe apenas um tipo de desconto (valor OU %).')
+        else toast.error('Falha ao adicionar serviço.')
+      } else {
+        toast.error('Falha ao adicionar serviço.')
+      }
+    }
   }
 
   return (
@@ -126,7 +142,7 @@ export function StudentFullModal({
         <div className="mt-4 flex gap-2 text-sm" role="tablist" aria-label="Abas do cadastro">
           <button role="tab" aria-selected={tab==='general'} className={`rounded-md border px-3 py-1 ${tab==='general'?'bg-muted':''}`} onClick={()=>setTab('general')}>Dados Gerais</button>
           <button role="tab" aria-selected={tab==='address'} className={`rounded-md border px-3 py-1 ${tab==='address'?'bg-muted':''}`} onClick={()=>setTab('address')}>Endereço</button>
-          <button role="tab" aria-selected={tab==='services'} className={`rounded-md border px-3 py-1 ${tab==='services'?'bg-muted':''}`} onClick={()=>setTab('services')} disabled={mode==='create'}>Financeiro → Serviços</button>
+          <button role="tab" aria-selected={tab==='services'} className={`rounded-md border px-3 py-1 ${tab==='services'?'bg-muted':''}`} onClick={()=>setTab('services')}>Financeiro → Serviços</button>
         </div>
 
         <form onSubmit={submit} onKeyDown={(e)=>{ if (e.ctrlKey && e.key==='Enter') submit(e as unknown as React.FormEvent) }} className="mt-4 space-y-4">

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { logEvent } from "@/server/events"
-import { sanitizeAddress } from "../route"
+import { sanitizeAddress } from "../_utils"
 
 // PATCH /api/students/:id — editar básicos + trainer_id (RBAC: admin|manager full; trainer restrito)
 export async function PATCH(_request: Request, ctxParam: { params: Promise<{ id: string }> }) {

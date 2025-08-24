@@ -17,7 +17,8 @@ import {
   ChevronDown,
   LogOut,
   User,
-  Badge as BadgeIcon
+  Badge as BadgeIcon,
+  MessageCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -61,6 +62,12 @@ const menuGroups: MenuGroup[] = [
         href: "/app/services",
         icon: PackageIcon,
         disabled: true
+      },
+      {
+        id: "relationship",
+        title: "Relacionamento",
+        href: "/app/relationship",
+        icon: MessageCircle
       }
     ]
   },

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
+import { logEvent } from "@/server/events"
 
 function isAllowedRead(role: string) {
   return role === 'admin' || role === 'manager' || role === 'seller' || role === 'trainer' || role === 'support'
@@ -67,6 +68,7 @@ export async function POST(request: Request, ctxParam: { params: Promise<{ id: s
   })
   if (!resp.ok) return NextResponse.json({ error: 'insert_failed' }, { status: 500 })
   const res = await resp.json()
+  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'students.service.created', student_id: id, service_id: res?.[0]?.id || null } })
   return NextResponse.json({ ok: true, id: res?.[0]?.id || null })
 }
 

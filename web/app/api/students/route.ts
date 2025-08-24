@@ -2,22 +2,7 @@ import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { fetchPlanPolicyByTenant } from "@/server/plan-policy"
 import { logEvent } from "@/server/events"
-
-function sanitizeAddress(input: Record<string, unknown>): Record<string, string> {
-  const out: Record<string, string> = {}
-  const zip = String(input.zip ?? "").replace(/\D/g, "")
-  if (zip) out.zip = zip.slice(0, 8)
-  const fields = [
-    'street','number','complement','district','city','state','country'
-  ] as const
-  for (const f of fields) {
-    const v = String((input as any)[f] ?? "").trim()
-    if (v) out[f] = v
-  }
-  if (out.state) out.state = out.state.toUpperCase().slice(0,2)
-  if (!out.country) out.country = 'BR'
-  return out
-}
+import { sanitizeAddress } from "./_utils"
 
 // GET /api/students?q=&status=&page=&pageSize=
 export async function GET(request: Request) {

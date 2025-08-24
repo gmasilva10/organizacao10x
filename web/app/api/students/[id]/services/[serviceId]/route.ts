@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
+import { logEvent } from "@/server/events"
 
 function isAllowedRead(role: string) {
   return role === 'admin' || role === 'manager' || role === 'seller' || role === 'trainer' || role === 'support'
@@ -30,6 +31,7 @@ export async function PATCH(request: Request, ctxParam: { params: Promise<{ id: 
     body: JSON.stringify(body)
   })
   if (!resp.ok) return NextResponse.json({ error: 'update_failed' }, { status: 500 })
+  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'students.service.updated', student_id: id, service_id: serviceId } })
   return NextResponse.json({ ok: true })
 }
 
