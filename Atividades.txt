@@ -1,1 +1,1 @@
-[2025-08-24 18:25] DEV — RELACIONAMENTO — Migração MVP aplicada; APIs templates/messages/timeline criadas — evidências: web/evidencias/relationship_templates_crud.json, web/evidencias/relationship_message_post.json, web/evidencias/screenshot_relationship_timeline.png
+[2025-08-24 19:05] DEV — CFG-ORG-P1 — migração aplicada; API GET/PATCH criada; página Organization entregue — evidências: web/evidencias/org_get.json, web/evidencias/org_patch.json, web/evidencias/screenshot_team_organization.png

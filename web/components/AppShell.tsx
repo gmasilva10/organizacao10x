@@ -215,6 +215,14 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
     return { enabled, reason: enabled ? undefined : "Sem permissão para acessar" }
   }
 
+  // Calcular o item mais específico que corresponde à rota para evitar múltiplos "ativos"
+  const allItemsForActive = getAllMenuItems()
+  const longestActiveHrefLen = allItemsForActive.reduce((best, it) => {
+    if (pathname === it.href) return Math.max(best, it.href.length)
+    if (pathname.startsWith(`${it.href}/`)) return Math.max(best, it.href.length)
+    return best
+  }, 0)
+
   return (
     <div className="min-h-screen bg-background">
       {/* Skip to content para a11y */}
@@ -328,10 +336,12 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
               <div key={group.id} className="flex flex-col gap-1">
                 {/* Group Title */}
                 {!sidebarCollapsed && (
-                  <div className="px-3 py-1 opacity-0 animate-fadeIn" style={{ animationDelay: '150ms', animationFillMode: 'forwards' }}>
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      {group.title}
-                    </h3>
+                  <div className="px-3 pt-3 opacity-0 animate-fadeIn" style={{ animationDelay: '150ms', animationFillMode: 'forwards' }}>
+                    <div className="rounded-md bg-muted/50 px-2 py-1 ring-1 ring-border">
+                      <h3 className="text-[11px] font-semibold uppercase tracking-wide text-foreground/70">
+                        {group.title}
+                      </h3>
+                    </div>
                   </div>
                 )}
                 
@@ -339,8 +349,8 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
                 <div className="flex flex-col gap-1">
                   {group.items.map((item) => {
                     const guard = isItemEnabled(item.id)
-                    const isActive = pathname === item.href || 
-                                  (pathname.startsWith(item.href) && item.href !== '/app')
+                    const isActive = (pathname === item.href) ||
+                      (pathname.startsWith(`${item.href}/`) && item.href.length === longestActiveHrefLen)
                     
                     const linkContent = (
                       <>
