@@ -1,0 +1,12 @@
+[
+  {
+    "step": "POST templates",
+    "status": 401,
+    "body": "{\"error\":\"unauthorized\"}"
+  },
+  {
+    "step": "GET templates",
+    "status": 401,
+    "body": "{\"error\":\"unauthorized\"}"
+  }
+]
