@@ -20,7 +20,8 @@ export async function POST(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  const body = await request.json().catch(()=>({})) as any
+  type Body = { title?: unknown; type?: unknown; content?: unknown }
+  const body: Body = await request.json().catch(()=>({}))
   const row = { tenant_id: ctx.tenantId, title: String(body.title||''), type: String(body.type||'nota'), content: String(body.content||'') }
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY

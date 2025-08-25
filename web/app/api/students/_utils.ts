@@ -4,7 +4,8 @@ export function sanitizeAddress(input: Record<string, unknown>): Record<string, 
   if (zip) out.zip = zip.slice(0, 8)
   const fields = ['street','number','complement','district','city','state','country'] as const
   for (const f of fields) {
-    const v = String((input as any)?.[f] ?? "").trim()
+    const value = (input as Record<string, unknown>)[f]
+    const v = String(value ?? "").trim()
     if (v) out[f] = v
   }
   if (out.state) out.state = out.state.toUpperCase().slice(0,2)

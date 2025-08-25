@@ -45,7 +45,7 @@ function SidebarTree() {
   const [collapsed, setCollapsed] = useState<boolean>(false)
   const [state, setState] = useState<{ rootCount: number; nodes: Array<{ id: string; title: string; count: number }> }>({ rootCount: 0, nodes: [] })
   const [selected, setSelected] = useState<string | 'org'>('org')
-  const [plan, setPlan] = useState<'basic'|'enterprise'|'unknown'>('unknown')
+  // plano não utilizado removido
   const [busy, setBusy] = useState(false)
 
   function reloadTree() {

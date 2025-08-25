@@ -18,11 +18,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, code: "invalid_payload" }, { status: 400 })
     }
 
-    const parsed = (body ?? {}) as { organization_name?: unknown; doc_id?: unknown; plan?: unknown }
+    const parsed = (body ?? {}) as { organization_name?: unknown }
     const orgName = String(parsed.organization_name ?? "").trim()
-    const rawDoc = parsed.doc_id
-    const docId = rawDoc == null || rawDoc === "" ? null : String(rawDoc)
-    const plan = String(parsed.plan ?? "basic")
 
     if (orgName.length < 2) {
       return NextResponse.json({ ok: false, code: "invalid_payload" }, { status: 400 })
@@ -38,7 +35,7 @@ export async function POST(request: Request) {
 
     // Tentar criar tenant via PostgREST (service-role) para evitar conflitos de RLS
     // Inserção mínima e compatível com esquemas sem colunas opcionais
-    const tenantInsert: Record<string, any> = { name: orgName }
+    const tenantInsert = { name: orgName }
     // Nota: alguns esquemas não possuem doc_id/plan. Evitamos enviá-los para garantir compatibilidade
     const orgResp = await fetch(`${serviceUrl}/rest/v1/tenants`, {
       method: "POST",
@@ -51,7 +48,7 @@ export async function POST(request: Request) {
       body: JSON.stringify(tenantInsert),
       cache: "no-store",
     })
-    let org: { id: string; name: string; plan: string } | null = null
+    let org: { id: string; name: string; plan?: string | null } | null = null
     if (!orgResp.ok) {
       const errText = await orgResp.text().catch(() => "")
       const isConflict = orgResp.status === 409 || /duplicate/i.test(errText)
@@ -68,7 +65,7 @@ export async function POST(request: Request) {
       if (!Array.isArray(rows) || rows.length === 0) {
         return NextResponse.json({ ok: false, code: "org_name_conflict" }, { status: 409 })
       }
-      org = rows[0] as { id: string; name: string; plan?: string }
+      org = rows[0] as { id: string; name: string; plan?: string | null }
     } else {
       const rows = await orgResp.json().catch(() => [])
       org = Array.isArray(rows) && rows.length > 0 ? rows[0] : null
@@ -143,7 +140,7 @@ export async function POST(request: Request) {
 
     const res = NextResponse.json({
       ok: true,
-      organization: { id: tenantId, name: org!.name, plan: (org as any)?.plan ?? "basic" },
+      organization: { id: tenantId, name: org!.name, plan: org?.plan ?? "basic" },
       membership: { user_id: membership!.user_id as string, organization_id: tenantId, role: membership!.role as string },
       active_org_id: tenantId,
     })

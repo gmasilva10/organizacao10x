@@ -29,7 +29,7 @@ export function StudentEditModal({
       setName(initialName)
       setEmail(student.email || "")
       setPhone(student.phone || "")
-      setStatus((student.status as any) || "onboarding")
+      setStatus((student.status as 'onboarding'|'active'|'paused') || "onboarding")
       setTrainerId(student.trainer?.id || "")
       // Buscar dados completos incluindo email/phone via id
       if (student.id) {
@@ -98,7 +98,7 @@ export function StudentEditModal({
           </div>
           <div>
             <label htmlFor="edit-status" className="mb-1 block text-sm">Status</label>
-            <select id="edit-status" value={status} onChange={(e)=>setStatus(e.target.value as any)} className="w-full rounded-md border px-3 py-2 text-sm">
+            <select id="edit-status" value={status} onChange={(e)=>setStatus(e.target.value as 'onboarding'|'active'|'paused')} className="w-full rounded-md border px-3 py-2 text-sm">
               <option value="onboarding">onboarding</option>
               <option value="active">active</option>
               <option value="paused">paused</option>

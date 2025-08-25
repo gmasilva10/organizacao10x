@@ -14,15 +14,15 @@ export async function PATCH(_request: Request, ctxParam: { params: Promise<{ id:
   const body = await _request.json().catch(() => ({} as Record<string, unknown>))
   // Sanitizações leves para novos campos
   if (Object.prototype.hasOwnProperty.call(body, 'customer_stage')) {
-    const v = String((body as any).customer_stage)
-    if (!['new','renewal','canceled'].includes(v)) delete (body as any).customer_stage
+    const v = String((body as Record<string, unknown>)['customer_stage'] as string)
+    if (!['new','renewal','canceled'].includes(v)) delete (body as Record<string, unknown>)['customer_stage']
   }
   if (Object.prototype.hasOwnProperty.call(body, 'status')) {
-    const v = String((body as any).status)
-    if (!['onboarding','active','paused'].includes(v)) delete (body as any).status
+    const v = String((body as Record<string, unknown>)['status'] as string)
+    if (!['onboarding','active','paused'].includes(v)) delete (body as Record<string, unknown>)['status']
   }
   if (Object.prototype.hasOwnProperty.call(body, 'address')) {
-    const raw = (body as any).address
+    const raw = (body as Record<string, unknown>).address as Record<string, unknown>
     const rawZip = String(raw?.zip || "").replace(/\D/g, "")
     if (rawZip && rawZip.length !== 8) {
       return NextResponse.json({ code: 'validation', message: 'CEP deve ter 8 dígitos.' }, { status: 422 })
@@ -31,7 +31,7 @@ export async function PATCH(_request: Request, ctxParam: { params: Promise<{ id:
     if (rawState && rawState.trim().length !== 2) {
       return NextResponse.json({ code: 'validation', message: 'UF deve ter 2 letras.' }, { status: 422 })
     }
-    (body as any).address = sanitizeAddress(raw)
+    ;(body as Record<string, unknown>)['address'] = sanitizeAddress(raw)
   }
 
   const url = process.env.SUPABASE_URL!

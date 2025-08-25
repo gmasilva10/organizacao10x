@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 type HistoryItem = { id: string; student_id: string; trainer_id?: string | null; completed_at?: string | null }
 
@@ -14,7 +14,7 @@ export default function OnboardingHistoryPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function fetchHistory() {
+  const fetchHistory = useCallback(async () => {
     const params = new URLSearchParams()
     if (from) params.set('from', from)
     if (to) params.set('to', to)
@@ -39,19 +39,22 @@ export default function OnboardingHistoryPage() {
     } finally {
       setLoading(false)
     }
-  }
-  useEffect(() => { fetchHistory() }, [from, to, trainerId, page])
+  }, [from, to, trainerId, page])
+  useEffect(() => { fetchHistory() }, [fetchHistory])
 
   // default últimos 7 dias
+  const didInitRef = useRef(false)
   useEffect(() => {
+    if (didInitRef.current) return
     if (!from && !to) {
       const now = new Date()
       const past = new Date(now.getTime() - 6*24*60*60*1000)
       const f = past.toISOString().slice(0,10)
       const t = now.toISOString().slice(0,10)
       setFrom(f); setTo(t)
+      didInitRef.current = true
     }
-  }, [])
+  }, [from, to])
 
   return (
     <div className="container py-8">

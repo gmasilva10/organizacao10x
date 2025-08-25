@@ -99,7 +99,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 })
   }
 
-  const body = await request.json().catch(() => ({} as Record<string, unknown>))
+  const body: Record<string, unknown> = await request.json().catch(() => ({} as Record<string, unknown>))
   const name = String(body?.name || "").trim()
   const email = String(body?.email || "").trim()
   const phone = body?.phone ? String(body.phone) : null
@@ -110,11 +110,11 @@ export async function POST(request: Request) {
   const address = rawAddress ? sanitizeAddress(rawAddress) : null
   // Basic validation for address (when provided): zip 8 digits; state 2 letters
   if (rawAddress) {
-    const rawZip = String((rawAddress as any)?.zip || "").replace(/\D/g, "")
+    const rawZip = String((rawAddress as Record<string, unknown>)?.zip || "").replace(/\D/g, "")
     if (rawZip && rawZip.length !== 8) {
       return NextResponse.json({ code: 'validation', message: 'CEP deve ter 8 dígitos.' }, { status: 422 })
     }
-    const rawState = String((rawAddress as any)?.state || "")
+    const rawState = String((rawAddress as Record<string, unknown>)?.state || "")
     if (rawState && rawState.trim().length !== 2) {
       return NextResponse.json({ code: 'validation', message: 'UF deve ter 2 letras.' }, { status: 422 })
     }

@@ -54,6 +54,22 @@ Endpoints de serviços por aluno (STU-B):
 - PATCH /api/students/:id/services/:serviceId — atualiza metadados de serviço
 - DELETE /api/students/:id/services/:serviceId — remove serviço
 
+Endpoints de responsáveis por aluno (CFG-RESP-P1):
+- GET /api/students/:id/responsibles — lista owner/primary/support
+- POST /api/students/:id/responsibles — vincula responsável (valida plano + unicidade)
+- DELETE /api/students/:id/responsibles/:id — remove vínculo
+Regras:
+- Unicidade condicional: 1 owner e 1 trainer_primary por aluno
+- Basic: trainer_support = 0..1; Enterprise: 0..N (conforme limits.trainers)
+- RBAC: admin|manager podem alterar; demais leitura
+UI:
+- `StudentFullModal` → Dados Gerais → seção “Responsáveis” (Proprietário, Treinador Principal, Treinador de Apoio) com autocomplete de colaboradores ativos
+
+RBAC — Roles & Permissions
+- GET /api/settings/roles — obtém roles, permissions e role_permissions
+- PATCH /api/settings/roles/:id/permissions — atualiza matriz para um role (batch)
+- POST /api/settings/roles/restore-default — repõe a matriz para o seed default (tenant); audita em settings_audit
+
 Contratos (server-first)
 - GET /api/students?q=&status=&page=&pageSize=
   - Request: query { q?: string; status?: 'onboarding'|'active'|'paused'; page?: number; pageSize?: number }

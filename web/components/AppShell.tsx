@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import { 
   LayoutDashboard,
@@ -12,9 +11,7 @@ import {
   History, 
   Settings, 
   Shield, 
-  Menu, 
-  ChevronLeft, 
-  ChevronDown,
+  Menu,
   LogOut,
   User,
   Badge as BadgeIcon,
@@ -23,7 +20,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { useTheme } from "@/lib/use-theme"
+// import { useTheme } from "@/lib/use-theme"
 
 interface MenuItem {
   id: string
@@ -127,14 +124,11 @@ interface AppShellProps {
 
 export function AppShell({ children, user, activeOrgId }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const { theme } = useTheme()
   const router = useRouter()
   const pathname = usePathname()
-  const isDark = theme === "dark"
+  // tema não utilizado diretamente
   
   useEffect(() => {
-    setMounted(true)
     // Restaurar estado do sidebar do localStorage
     const saved = localStorage.getItem("pg.nav.collapsed")
     if (saved !== null) {
@@ -168,7 +162,7 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
     }
   }
 
-  const logoSrc = mounted ? (isDark ? "/logo_branca.png" : "/logo_preta.png") : "/logo_preta.png"
+  // logoSrc removido (não utilizado)
 
   // Breadcrumb simples baseado na rota atual
   const getBreadcrumb = () => {
@@ -190,9 +184,10 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
   const hasOrg = !!activeOrgId
 
   function isItemEnabled(itemId: string): { enabled: boolean; reason?: string } {
-    if (!hasOrg) {
-      // Sem organização: só Dashboard, Team Admin, Configurações habilitados
-      const enabledNoOrg = new Set(["dashboard", "team-admin", "settings"])
+    // Hotfix P1: item "students" deve seguir RBAC e não ser escondido pela ausência de organização
+    // Assim, não aplicamos o guard global de hasOrg para o item "students".
+    if (!hasOrg && itemId !== 'students') {
+      const enabledNoOrg = new Set(["dashboard", "team-admin", "settings", "students"]) // students liberado
       return { enabled: enabledNoOrg.has(itemId), reason: "Requer organização ativa" }
     }
     // Com org, aplicar matriz
@@ -324,7 +319,7 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
             sidebarCollapsed ? 'w-16' : 'w-64'
           }`}
           aria-label="Menu de navegação principal"
-          aria-expanded={!sidebarCollapsed}
+          // aria-expanded não é suportado em role=navigation
           role="navigation"
           style={{ 
             willChange: sidebarCollapsed ? 'width' : 'auto',

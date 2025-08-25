@@ -5,8 +5,11 @@ import { useToast } from "@/components/ui/toast"
 
 export default function TeamOrganizationPage() {
   const [loading, setLoading] = useState(false)
-  const [org, setOrg] = useState<any>({ display_name:"", legal_name:"", cnpj:"", address:{}, timezone:"America/Sao_Paulo", currency:"BRL" })
-  const [caps, setCaps] = useState<any>(null)
+  type Address = { zip?: string; street?: string; number?: string; complement?: string; district?: string; city?: string; state?: string; country?: string }
+  type Org = { display_name?: string; legal_name?: string; cnpj?: string; address?: Address; timezone?: string; currency?: string }
+  type Caps = { plan?: { name?: string; code?: string }; limits?: { members_total?: number; trainers?: number }; features?: { team_admin?: boolean; rbac_matrix?: boolean } }
+  const [org, setOrg] = useState<Org>({ display_name:"", legal_name:"", cnpj:"", address:{} as Address, timezone:"America/Sao_Paulo", currency:"BRL" })
+  const [caps, setCaps] = useState<Caps|null>(null)
   const toast = useToast()
   const nameRef = useRef<HTMLInputElement|null>(null)
 
@@ -14,8 +17,9 @@ export default function TeamOrganizationPage() {
     setLoading(true)
     try {
       const res = await fetch('/api/settings/organization', { cache:'no-store' })
-      const data = await res.json()
-      if (data?.organization) setOrg((prev:any) => ({ ...prev, ...data.organization }))
+      const data: { organization?: Org; capabilities?: Caps } = await res.json()
+      const orgData = data?.organization
+      if (orgData) setOrg((prev) => ({ ...prev, ...orgData, address: (orgData.address || {}) as Address }))
       if (data?.capabilities) setCaps(data.capabilities)
     } finally { setLoading(false) }
   })() }, [])

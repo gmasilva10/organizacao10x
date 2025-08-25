@@ -29,7 +29,7 @@ export default function StudentsPage() {
   const [showCreate, setShowCreate] = useState(false)
   const [showFull, setShowFull] = useState<false | 'create' | 'edit'>(false)
   const [error, setError] = useState<string>("")
-  const [editing, setEditing] = useState<Student | null>(null)
+  const [editing, setEditing] = useState<StudentRow | null>(null)
   const toast = useToast()
 
   const fetchList = useCallback(async () => {
@@ -42,8 +42,8 @@ export default function StudentsPage() {
       if (trainerId) params.set('trainer_id', trainerId)
       const res = await fetch(`/api/students?${params.toString()}`, { cache: 'no-store' })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      setItems((data?.data || []) as StudentRow[])
+      const data: { data?: StudentRow[]; pagination?: { total?: number } } = await res.json()
+      setItems(Array.isArray(data?.data) ? data.data : [])
       setTotal(Number(data?.pagination?.total || 0))
     } catch {
       setError('Falha ao carregar dados. Tente novamente.')
@@ -52,8 +52,8 @@ export default function StudentsPage() {
 
   async function fetchTrainers() {
     const res = await fetch('/api/users/trainers', { cache: 'no-store' })
-    const data = await res.json()
-    const mapped = (data?.items || []).map((x: any) => ({ id: x.user_id, name: x.email })) as Trainer[]
+    const data: { items?: Array<{ user_id: string; email: string|null }> } = await res.json()
+    const mapped = (data?.items || []).map((x) => ({ id: x.user_id, name: x.email || x.user_id })) as Trainer[]
     setTrainers(mapped)
   }
 
@@ -151,7 +151,13 @@ export default function StudentsPage() {
     <div className="container py-8">
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} title="Limite do seu plano foi atingido" description="Para adicionar mais alunos, faça upgrade para o plano Enterprise." primaryHref="/contact" secondaryHref="/planos" />
       <StudentCreateModal open={showCreate} onClose={()=>setShowCreate(false)} onCreate={onCreate} trainers={trainers} />
-      <StudentEditModal open={!!editing && showFull===false} student={editing} trainers={trainers} onClose={()=>setEditing(null)} onSave={onUpdate} />
+      <StudentEditModal
+        open={!!editing && showFull===false}
+        student={editing ? { id: editing.id, full_name: editing.full_name, email: null, phone: editing.phone ?? null, status: editing.status as 'onboarding'|'active'|'paused', trainer: editing.trainer ? { id: editing.trainer.id } : null } : null}
+        trainers={trainers}
+        onClose={()=>setEditing(null)}
+        onSave={onUpdate}
+      />
       <StudentFullModal open={showFull!==false} mode={showFull==='create'?'create':'edit'} student={showFull==='edit'? editing : null} trainers={trainers} onClose={()=>{ setShowFull(false); if (showFull==='create') setShowCreate(false) }} onSaved={()=>{ fetchList(); fetchSummary() }} />
       <h1 className="text-2xl font-semibold">Alunos</h1>
       {counts && (

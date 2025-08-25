@@ -1,1 +1,3 @@
 [2025-08-24 19:40] DEV — CFG-TEAM-P1 — API/UI entregues — evidências: web/evidencias/users_invite.json, web/evidencias/users_patch.json, web/evidencias/users_roles_assign.json
+[2025-08-25 15:40] DEV — HOTFIX P1 — Menu Alunos controlado por RBAC (students.read) — evidências: web/evidencias/caps_admin_basic.json, web/evidencias/qa_admin_basic_students_access.png
+[2025-08-25 15:55] DEV — CFG-RESP-P1 — Migração + APIs + UI Responsáveis — evidências: web/evidencias/responsibles_assign_basic.json, web/evidencias/responsibles_assign_enterprise.json, web/evidencias/screenshot_student_responsibles.png

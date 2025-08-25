@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 
 type Membership = { organization_id: string; organization_name: string; role: string }
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const { createClient } = await import("@/utils/supabase/server")
     const supabase = await createClient()

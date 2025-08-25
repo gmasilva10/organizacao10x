@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -115,7 +116,7 @@ export default function ProfilePage() {
             </ul>
           </div>
           <div className="flex justify-end gap-2">
-            <a href="/" className="text-sm underline" aria-label="Alterar senha (fluxo do provedor)">Alterar senha</a>
+            <Link href="/" className="text-sm underline" aria-label="Alterar senha (fluxo do provedor)">Alterar senha</Link>
             <Button type="submit" disabled={saving} aria-label="Salvar alterações">{saving ? "Salvando..." : "Salvar"}</Button>
           </div>
         </form>

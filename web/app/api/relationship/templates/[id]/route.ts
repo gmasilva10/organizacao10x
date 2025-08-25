@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { logEvent } from "@/server/events"
 
-function canRead(role: string) { return ['admin','manager','trainer','seller','support'].includes(role) }
 function canWrite(role: string) { return ['admin','manager','trainer'].includes(role) }
 
 export async function PATCH(request: Request, ctxParam: { params: Promise<{ id: string }> }) {

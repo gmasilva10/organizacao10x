@@ -16,7 +16,8 @@ export async function POST(request: Request, ctxParam: { params: Promise<{ id: s
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error:'unauthorized' }, { status: 401 })
   const { id } = await ctxParam.params
-  const body = await request.json().catch(()=>({})) as any
+  type Body = { role?: unknown }
+  const body: Body = await request.json().catch(()=>({}))
   const role = String(body.role||'')
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY

@@ -16,10 +16,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { 
-  mockKPIs, 
   mockTrainerWorkload, 
-  mockTimeSeries, 
-  mockRecentActivity,
   getFilteredData,
   type DashboardKPI,
   type TrainerWorkload,

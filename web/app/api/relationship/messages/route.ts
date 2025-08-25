@@ -9,15 +9,23 @@ export async function POST(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  const body = await request.json().catch(()=>({})) as any
+  type Body = {
+    student_id?: unknown
+    type?: unknown
+    channel?: unknown
+    body?: unknown
+    attachments?: unknown
+    links?: unknown
+  }
+  const body: Body = await request.json().catch(()=>({}))
   const row = {
     tenant_id: ctx.tenantId,
-    student_id: String(body.student_id||''),
-    type: String(body.type||'nota'),
-    channel: body.channel != null ? String(body.channel) : null,
-    body: String(body.body||''),
-    attachments: body.attachments ?? null,
-    links: body.links ?? null,
+    student_id: String((body as Body).student_id||''),
+    type: String((body as Body).type||'nota'),
+    channel: (body as Body).channel != null ? String((body as Body).channel) : null,
+    body: String((body as Body).body||''),
+    attachments: (body as Body).attachments ?? null,
+    links: (body as Body).links ?? null,
   }
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY

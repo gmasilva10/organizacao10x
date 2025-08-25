@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react"
 import { useToast } from "@/components/ui/toast"
 
+type Item = { user_id: string; email: string|null; status: string; last_login_at: string|null }
+
 export default function TeamUsersPage() {
-  const [items, setItems] = useState<any[]>([])
+  const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [role, setRole] = useState("trainer")
@@ -14,8 +16,8 @@ export default function TeamUsersPage() {
     setLoading(true)
     try {
       const res = await fetch('/api/settings/users', { cache:'no-store' })
-      const data = await res.json()
-      setItems(data?.items||[])
+      const data: { items?: Item[] } = await res.json()
+      setItems(Array.isArray(data?.items)? data.items : [])
     } finally { setLoading(false) }
   }
   useEffect(()=>{ load() },[])
@@ -34,7 +36,7 @@ export default function TeamUsersPage() {
     } finally { setLoading(false) }
   }
 
-  async function toggleStatus(u:any) {
+  async function toggleStatus(u: Item) {
     const next = u.status === 'paused' ? 'active' : 'paused'
     const res = await fetch(`/api/settings/users/${u.user_id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status: next }) })
     if (res.ok) { toast.success('Status atualizado.'); load() } else toast.error('Falha ao atualizar status.')

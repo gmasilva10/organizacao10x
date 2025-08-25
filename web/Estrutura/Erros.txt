@@ -70,6 +70,22 @@ Logs/Evidências: reunião 20/08; prints e erros anteriores (VAL01..VAL05).
 Fix/Workaround: depende de correção dos FAILs de base; não executar contornos por API nesta reunião.
 Confirmação QA: —
 
+[STU][S1] 2025-08-25 — dev — Menu Alunos invisível para admin.basic — S1 — Resolvido — DEV
+Passos:
+- Login como admin.basic@pg.local → não vê/acessa /(app)/students
+Esperado:
+- Admin deve ver e acessar o menu “Alunos” (RBAC students.read)
+Obtido:
+- Item oculto por guarda incorreta (dependência de flag inexistente)
+Fix/Workaround:
+- Hotfix: visibilidade do item “Alunos” passa a seguir RBAC (students.read) e não feature flag
+- Rota /(app)/students permanece sob RBAC server-first; limites seguem por toasts/empty-state
+Evidências:
+- web/evidencias/qa_admin_basic_students_access.png
+- web/evidencias/caps_admin_basic.json
+Confirmação QA:
+- Pendente (executar checklist e anexar prints/JSON)
+
 
 [2025-08-18 16:50] Categoria: Automação QA (browser)
 Título: Intermitência de sessão (401→200) ao automatizar Students

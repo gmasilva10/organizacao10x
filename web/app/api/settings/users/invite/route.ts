@@ -6,13 +6,15 @@ export async function POST(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
-  const body = await request.json().catch(()=>({})) as any
+  type Body = { email?: unknown; role?: unknown }
+  const body: Body = await request.json().catch(()=>({}))
   const email = String(body.email||'').trim().toLowerCase()
   const role = String(body.role||'trainer')
   if (!email) return NextResponse.json({ code:'validation', message:'E-mail é obrigatório.' }, { status: 422 })
 
   // Capabilities & limits
-  const caps = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/capabilities`, { headers: { cookie: (request as any).headers.get('cookie') || '' }}).then(r=>r.json()).catch(()=>null)
+  const cookieHeader = request.headers.get('cookie') || ''
+  const caps = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/capabilities`, { headers: { cookie: cookieHeader }}).then(r=>r.json()).catch(()=>null)
   const limitMembers = Number(caps?.limits?.members_total ?? 0)
   const limitTrainers = Number(caps?.limits?.trainers ?? 0)
 

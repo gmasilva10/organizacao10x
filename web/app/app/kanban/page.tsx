@@ -23,15 +23,14 @@ export default function KanbanPage() {
   const sensors = useSensors(useSensor(PointerSensor))
 
   const [columns, setColumns] = useState<Column[]>([])
-  const [showHistory, setShowHistory] = useState(false)
+  const [showHistory] = useState(false)
   const [history, setHistory] = useState<Card[]>([])
   const [boardCollapsed, setBoardCollapsed] = useState(false)
   const [query, setQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
   const lastMovedIdRef = useRef<string | null>(null)
   const [trainerScope, setTrainerScope] = useState<string | undefined>(undefined)
-  const [draggingId, setDraggingId] = useState<string | null>(null)
-  const [overColumnId, setOverColumnId] = useState<string | null>(null)
+  // estados de arraste não usados removidos para atender regras de lint
   const toast = useToast()
 
   async function loadBoard(trainerId?: string) {
@@ -188,8 +187,6 @@ export default function KanbanPage() {
 
   function onDragEnd(e: DragEndEvent) {
     const { active, over } = e
-    setOverColumnId(null)
-    setDraggingId(null)
     if (!over || active.id === over.id) return
 
     const fromCol = columns.find((c) => c.cards.some((k) => k.id === String(active.id)))
@@ -249,15 +246,9 @@ export default function KanbanPage() {
     }, 0)
   }
   
-  function onDragStart(e: { active?: { id?: string | number } }) {
-    const { active } = e
-    setDraggingId(String(active?.id || ''))
-  }
+  function onDragStart() {}
 
-  function onDragOver(e: { over?: { id?: string | number } | null }) {
-    const { over } = e
-    setOverColumnId(over ? String(over.id) : null)
-  }
+  function onDragOver() {}
 
   return (
     <div className="container py-8" data-alias="onboarding-kanban">

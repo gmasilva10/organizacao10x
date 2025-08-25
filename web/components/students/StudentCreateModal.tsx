@@ -76,7 +76,7 @@ export function StudentCreateModal({
 					</div>
 					<div>
 						<label className="mb-1 block text-sm">Status</label>
-						<select value={status} onChange={(e)=>setStatus(e.target.value as any)} className="w-full rounded-md border px-3 py-2 text-sm">
+						<select value={status} onChange={(e)=>setStatus(e.target.value as 'onboarding'|'active'|'paused')} className="w-full rounded-md border px-3 py-2 text-sm">
 							<option value="onboarding">onboarding</option>
 							<option value="active">active</option>
 							<option value="paused">paused</option>
