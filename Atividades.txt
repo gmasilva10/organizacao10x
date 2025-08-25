@@ -1,1 +1,1 @@
-[2025-08-24 19:05] DEV — CFG-ORG-P1 — migração aplicada; API GET/PATCH criada; página Organization entregue — evidências: web/evidencias/org_get.json, web/evidencias/org_patch.json, web/evidencias/screenshot_team_organization.png
+[2025-08-24 19:40] DEV — CFG-TEAM-P1 — API/UI entregues — evidências: web/evidencias/users_invite.json, web/evidencias/users_patch.json, web/evidencias/users_roles_assign.json
