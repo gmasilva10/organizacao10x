@@ -1,0 +1,48 @@
+Relatório de Progresso — 2025-08-26
+Produto: Personal Global (Organização10x)
+Responsável: DEV (com validação do QA e GP)
+
+Resumo Executivo
+- Documentação de Estrutura revisada (Rotas, Padronizacao, README, Erros, Credenciais) e sincronizada com evidências/QA.
+- Foco do QA: Navegação sem alias /kanban em produção; status dos P1 de Agosto; App Shell (sidebar, breadcrumb, tooltips).
+
+Progresso por Blocos/Módulos
+- SHELL/APP
+  - Rotas atualizadas: '/' permanece Landing; '/app' = Dashboard (sem redirect da raiz).
+  - App Shell: reforço na padronização de sidebar (traço 3px ativo), tooltips apenas em colapsado e breadcrumb padrão.
+- ACC (Cadastro de Conta)
+  - Itens ACC01..ACC04 e ACC06 aprovados por evidência.
+  - Hotfix em ACC03 documentado (service-role + payload mínimo + idempotência).
+- STUDENTS
+  - STU01 (listagem/filtros/paginação) marcado como RESOLVIDO.
+  - Correção de visibilidade do menu “Alunos” pelo RBAC (admin.basic) — QA pendente.
+- KANBAN/ONBOARDING
+  - Diretriz mantida: rota oficial /(app)/onboarding; alias /(app)/kanban não exposto.
+  - P1 ainda em andamento: DnD desaparecendo card; Histórico items.map; Sidebar/Árvore; Layout/UX CTA duplicado/Toggle Recolher.
+
+Pendências P1 (Agosto)
+- DnD card desaparece após drop — Em andamento — Resp.: DEV — Prazo: 22/08
+- Histórico: TypeError items.map — Em andamento — Resp.: DEV — Prazo: 22/08
+- Sidebar/Árvore (contadores/filtro/colapso) — Em andamento — Resp.: DEV — Prazo: 22/08
+- Layout/UX (CTA duplicado + Recolher) — Em andamento — Resp.: DEV — Prazo: 22/08
+- Telemetria (validar após base estável) — Aguardando — Resp.: DEV — Prazo: 22/08
+
+Riscos & Observações
+- Automação de QA para Students: intermitência 401→200 em runners; fallback manual adotado.
+- Dependência de envs Supabase: `.env.local` deve conter 5 variáveis; reiniciar server após alterações.
+
+Próximas Ações
+- DEV: Endereçar P1 Kanban e reexecutar QA.
+- QA: Validar rotas (sem alias /kanban em produção), revisar P1 em Pendencias_Agosto2025, e conferir App Shell conforme padronização.
+
+Referências (evidências)
+- web/evidencias/smoke_students_422_body.json
+- web/evidencias/smoke_students_full.json
+- web/evidencias/screenshot_services_grid.png
+- web/evidencias/screenshot_modal_aluno.png
+- web/evidencias/screenshot_modal_aluno_tabs.png
+- web/evidencias/screenshot_relationship_timeline.png
+- web/evidencias/users_roles_assign.json
+- web/Estrutura/QA_SmokeTests_Bloco1_Etapa2_results.json
+- web/Estrutura/QA_Students_results.json
+- web/Estrutura/QA_TeamAdmin_results.json

@@ -2,6 +2,9 @@
 # Última atualização: 2025-08-20 17:23
 # Formato: [AAAA-MM-DD HH:MM] Autor — Tipo — Módulo/Área — Título curto — (#tarefa/issue opcional) — Evidência (commit/PR/URL)
 
+Hoje — 26/08/2025
+[2025-08-26 09:35] DEV — DOC — Estrutura — Revisão ampla de documentos (Rotas, Padronizacao, README, Erros, Credenciais) + criação de Relatorio_Progresso_2025-08-26 — evidência: web/Estrutura/Relatorio_Progresso_2025-08-26.txt
+
 Hoje — 20/08/2025
 [2025-08-20 16:56] GP — COMUNICAÇÃO — Diretriz operacional explicitada ao DEV: construir App Shell (/app) pós-login (cabeçalho + menu lateral com persistência + navegação/breadcrumb/estados) e, em seguida, entregar cada módulo do menu em fatias verticais. DEV foca em código e atualização de documentos; prints sob GP/Consultor.
 [2025-08-20 17:02] DEV — IMPLEMENTAÇÃO — App Shell — Estrutura completa implementada: AppShell component com sidebar colapsável + persistência, cabeçalho com logo/user menu/badge ambiente, breadcrumb dinâmico, estados loading/empty/error, A11y (skip-to-content, aria-labels, navegação por teclado), proteção de rotas via layout — evidência: web/components/AppShell.tsx, web/app/(app)/layout.tsx
