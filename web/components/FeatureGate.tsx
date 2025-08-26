@@ -11,6 +11,10 @@ type Props = {
 
 export function FeatureGate({ feature, children, fallback }: Props) {
   const { enabled, loading } = useFeature(feature)
+  if (process.env.NODE_ENV === 'production' && feature === 'features.onboarding.kanban') {
+    // Bloquear alias/feature em produção se necessário (desabilita render)
+    return <>{fallback ?? null}</>
+  }
   if (loading) return null
   if (!enabled) return <>{fallback ?? null}</>
   return <>{children}</>
