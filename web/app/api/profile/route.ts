@@ -168,22 +168,9 @@ export async function PATCH(request: Request) {
     // Telemetria (somente em sucesso) + Audit
     ;(async () => {
       try {
-        const eurl = process.env.SUPABASE_URL
-        const ekey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-        if (eurl && ekey) {
-          await fetch(`${eurl}/rest/v1/events`, {
-            method: "POST",
-            headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-            body: JSON.stringify({ tenant_id: null, user_id: user.id, event_type: "profile.edit_success", payload: { source: "app.ui", ts: new Date().toISOString() } }),
-            cache: "no-store",
-          })
-          await fetch(`${eurl}/rest/v1/audit_log`, {
-            method: "POST",
-            headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-            body: JSON.stringify({ tenant_id: null, actor_id: user.id, entity_type: "profile", entity_id: user.id, action: "profile.updated", payload: { full_name: fullName, has_phone: !!phone }, created_at: new Date().toISOString() }),
-            cache: "no-store",
-          })
-        }
+        const { writeAudit, logEvent } = await import("@/server/events")
+        await logEvent({ tenantId: "", userId: user.id, eventType: "feature.used", payload: { type: "profile.edit_success", source: "app.ui" } })
+        await writeAudit({ orgId: "", actorId: user.id, entityType: "profile", entityId: user.id, action: "updated", payload: { full_name: fullName, has_phone: !!phone } })
       } catch {}
     })()
 

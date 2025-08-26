@@ -40,4 +40,23 @@ export async function logEvent(params: {
   })
 }
 
+export async function writeAudit(params: {
+  orgId: string
+  actorId: string
+  entityType: string
+  entityId: string
+  action: string
+  payload?: Record<string, unknown>
+}) {
+  const { orgId, actorId, entityType, entityId, action, payload } = params
+  await postgrestInsert("audit_log", {
+    org_id: orgId,
+    actor_id: actorId,
+    entity_type: entityType,
+    entity_id: entityId,
+    action,
+    payload: payload ?? {},
+  })
+}
+
 

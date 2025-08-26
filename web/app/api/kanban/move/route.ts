@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
-import { logEvent } from "@/server/events"
+import { logEvent, writeAudit } from "@/server/events"
 
-type MoveBody = {
-  studentId: string
-  from: string
-  to: string
-}
+type MoveBody = { itemId: string; toStageId: string; toIndex: number }
 
 const ALLOWED = new Set(["admin", "manager", "trainer"]) as Set<string>
 
-export async function POST(request: Request) {
+export async function PATCH(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
 
@@ -20,61 +16,50 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json().catch(() => ({}))) as Partial<MoveBody>
-  const studentId = String(body.studentId || "").trim()
-  const from = String(body.from || "").trim()
-  const to = String(body.to || "").trim()
-  if (!studentId || !from || !to) return NextResponse.json({ error: "invalid_payload" }, { status: 400 })
+  const itemId = String(body.itemId || "").trim()
+  const toStageId = String(body.toStageId || "").trim()
+  const toIndex = Number(body.toIndex)
+  if (!itemId || !toStageId || !Number.isFinite(toIndex) || toIndex < 0) return NextResponse.json({ error: "invalid_payload" }, { status: 400 })
 
   const now = new Date().toISOString()
 
-  // Persistir movimento no banco (MVP): atualizar column_id/sort do card
+  // Persistir movimento (fractional indexing) em kanban_items
   let persisted = false
   try {
     const url = process.env.SUPABASE_URL!
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-    // busca card por (tenant_id, student_id)
-    const search = await fetch(`${url}/rest/v1/onboarding_cards?tenant_id=eq.${ctx.tenantId}&student_id=eq.${encodeURIComponent(studentId)}&select=id,column_id,sort`, {
-      headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
+    // validar destino
+    const stageResp = await fetch(`${url}/rest/v1/kanban_stages?id=eq.${toStageId}&org_id=eq.${ctx.tenantId}&select=id,position&limit=1`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store' })
+    const stage = (await stageResp.json().catch(()=>[]))?.[0]
+    if (!stage) return NextResponse.json({ error: 'invalid_stage' }, { status: 400 })
+
+    // obter vizinhos no destino para calcular fractional position
+    const neighborResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&stage_id=eq.${toStageId}&select=id,position&order=position.asc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store' })
+    const neighbors: Array<{ id: string; position: number }> = await neighborResp.json().catch(()=>[])
+    const prev = neighbors[toIndex - 1]?.position
+    const next = neighbors[toIndex]?.position
+    let newPos: number
+    if (prev != null && next != null) newPos = (prev + next) / 2
+    else if (prev == null && next != null) newPos = Math.max(1, Math.floor(next) - 1) // topo
+    else if (prev != null && next == null) newPos = Math.floor(prev) + 1 // fim
+    else newPos = 1
+
+    // validar item pertence à org
+    const itemResp = await fetch(`${url}/rest/v1/kanban_items?id=eq.${itemId}&org_id=eq.${ctx.tenantId}&select=id,stage_id,student_id&limit=1`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store' })
+    const item = (await itemResp.json().catch(()=>[]))?.[0]
+    if (!item) return NextResponse.json({ error: 'invalid_item' }, { status: 400 })
+
+    const upd = await fetch(`${url}/rest/v1/kanban_items?id=eq.${itemId}&org_id=eq.${ctx.tenantId}`, {
+      method: 'PATCH',
+      headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stage_id: toStageId, position: newPos })
     })
-    const arr = await search.json().catch(()=>[])
-    const cardId = arr?.[0]?.id
-    if (cardId) {
-      // calcular nova ordenação simples: sort = epoch seconds
-      const newSort = Math.floor(Date.now() / 1000)
-      // detectar se coluna destino é "Entrega do Treino" para completed_at
-      const colResp = await fetch(`${url}/rest/v1/onboarding_columns?id=eq.${to}&tenant_id=eq.${ctx.tenantId}&select=title,sort&limit=1`, {
-        headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
-      })
-      const col = (await colResp.json().catch(()=>[]))?.[0]
-      const completedAt = col && String(col.title).toLowerCase().includes('entrega do treino') ? now : null
-      const upd = await fetch(`${url}/rest/v1/onboarding_cards?id=eq.${cardId}&tenant_id=eq.${ctx.tenantId}`, {
-        method: 'PATCH',
-        headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ column_id: to, sort: newSort, completed_at: completedAt })
-      })
-      persisted = upd.ok
-    }
+    persisted = upd.ok
   } catch {}
 
   if (persisted) {
-    // Telemetria somente em sucesso
-    await logEvent({
-      tenantId: ctx.tenantId,
-      userId: ctx.userId,
-      eventType: "feature.used",
-      payload: {
-        type: "student.stage.moved",
-        details: {
-          studentId,
-          from,
-          to,
-          columns_version: 1,
-          source: "kanban.ui",
-          ts: now,
-        },
-        route: "/(app)/onboarding",
-      },
-    })
+    await writeAudit({ orgId: ctx.tenantId, actorId: ctx.userId, entityType: 'kanban_item', entityId: itemId, action: 'moved', payload: { toStageId, toIndex } })
+    await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'feature.used', payload: { type: 'kanban_item.moved', toStageId, toIndex, ts: now } })
   }
 
   return new NextResponse(null, { status: persisted ? 204 : 500 })
