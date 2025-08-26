@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
+import { writeAudit, logEvent } from "@/server/events"
 
 function canWrite(role: string) { return ['admin','manager'].includes(role) }
 
@@ -14,6 +15,12 @@ export async function DELETE(request: Request, ctxParam: { params: Promise<{ id:
     method:'DELETE', headers: { apikey:key!, Authorization:`Bearer ${key}`! }
   })
   if (!del.ok) return NextResponse.json({ error:'delete_failed' }, { status: 500 })
+  ;(async () => {
+    try {
+      await writeAudit({ orgId: ctx.tenantId, actorId: ctx.userId, entityType: 'student_responsible', entityId: String(respid), action: 'removed', payload: { student_id: id } })
+      await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'feature.used', payload: { type: 'students.responsible.removed', student_id: id, responsible_id: respid } })
+    } catch {}
+  })()
   return NextResponse.json({ ok: true })
 }
 
