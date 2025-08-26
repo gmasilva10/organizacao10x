@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
+import { resolveRequestContext } from "@/server/context"
 
 type Membership = { organization_id: string; organization_name: string; role: string }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const { createClient } = await import("@/utils/supabase/server")
     const supabase = await createClient()
@@ -16,7 +17,7 @@ export async function GET() {
     // Perfil básico
     const { data: profile } = await supabase
       .from("profiles")
-      .select("user_id, full_name, email, updated_at")
+      .select("user_id, full_name, email, phone, updated_at")
       .eq("user_id", user.id)
       .maybeSingle()
 
@@ -70,12 +71,20 @@ export async function GET() {
       } catch {}
     })()
 
+    // Extrair org/role principal (primeira membership)
+    const ctx = await resolveRequestContext(request).catch(() => null)
+    const primaryOrgId = memberships[0]?.organization_id || ctx?.tenantId || null
+    const primaryRole = memberships[0]?.role || ctx?.role || null
+
     return NextResponse.json({
       ok: true,
       profile: {
         user_id: user.id,
         full_name: profile?.full_name ?? null,
         email: user.email ?? profile?.email ?? null,
+        phone: profile?.phone ?? null,
+        org_id: primaryOrgId,
+        role: primaryRole,
         memberships,
       },
     })
@@ -102,17 +111,53 @@ export async function PATCH(request: Request) {
     } catch {
       return NextResponse.json({ ok: false, code: "invalid_payload" }, { status: 400 })
     }
-    const parsed = (body ?? {}) as { full_name?: unknown }
+    const parsed = (body ?? {}) as { full_name?: unknown; phone?: unknown }
     const fullName = String(parsed.full_name ?? "").trim()
     if (fullName.length < 2) {
+      // Telemetria de erro (não bloqueante)
+      ;(async () => {
+        try {
+          const eurl = process.env.SUPABASE_URL
+          const ekey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+          if (eurl && ekey) {
+            await fetch(`${eurl}/rest/v1/events`, {
+              method: "POST",
+              headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+              body: JSON.stringify({ tenant_id: null, user_id: user.id, event_type: "profile.edit_error", payload: { reason: "invalid_full_name", ts: new Date().toISOString() } }),
+              cache: "no-store",
+            })
+          }
+        } catch {}
+      })()
       return NextResponse.json({ ok: false, code: "invalid_payload" }, { status: 400 })
     }
 
-    const upsertPayload = { user_id: user.id, full_name: fullName, email: user.email ?? null, updated_at: new Date().toISOString() }
+    // phone opcional (E.164)
+    const rawPhone = parsed.phone == null ? null : String(parsed.phone).trim()
+    const phone = rawPhone ? (rawPhone.match(/^\+?[1-9]\d{1,14}$/) ? rawPhone : null) : null
+    if (rawPhone && !phone) {
+      ;(async () => {
+        try {
+          const eurl = process.env.SUPABASE_URL
+          const ekey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+          if (eurl && ekey) {
+            await fetch(`${eurl}/rest/v1/events`, {
+              method: "POST",
+              headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+              body: JSON.stringify({ tenant_id: null, user_id: user.id, event_type: "profile.edit_error", payload: { reason: "invalid_phone", ts: new Date().toISOString() } }),
+              cache: "no-store",
+            })
+          }
+        } catch {}
+      })()
+      return NextResponse.json({ ok: false, code: "invalid_phone" }, { status: 400 })
+    }
+
+    const upsertPayload = { user_id: user.id, full_name: fullName, email: user.email ?? null, phone, updated_at: new Date().toISOString() }
     const { data, error } = await supabase
       .from("profiles")
       .upsert(upsertPayload, { onConflict: "user_id" })
-      .select("user_id, full_name, email")
+      .select("user_id, full_name, email, phone")
       .maybeSingle()
 
     if (error) {
@@ -120,7 +165,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ ok: false, code: "unexpected_error" }, { status: 500 })
     }
 
-    // Telemetria (somente em sucesso)
+    // Telemetria (somente em sucesso) + Audit
     ;(async () => {
       try {
         const eurl = process.env.SUPABASE_URL
@@ -129,14 +174,20 @@ export async function PATCH(request: Request) {
           await fetch(`${eurl}/rest/v1/events`, {
             method: "POST",
             headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-            body: JSON.stringify({ tenant_id: null, user_id: user.id, event_type: "profile.updated", payload: { source: "app.ui", ts: new Date().toISOString() } }),
+            body: JSON.stringify({ tenant_id: null, user_id: user.id, event_type: "profile.edit_success", payload: { source: "app.ui", ts: new Date().toISOString() } }),
+            cache: "no-store",
+          })
+          await fetch(`${eurl}/rest/v1/audit_log`, {
+            method: "POST",
+            headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+            body: JSON.stringify({ tenant_id: null, actor_id: user.id, entity_type: "profile", entity_id: user.id, action: "profile.updated", payload: { full_name: fullName, has_phone: !!phone }, created_at: new Date().toISOString() }),
             cache: "no-store",
           })
         }
       } catch {}
     })()
 
-    return NextResponse.json({ ok: true, profile: { user_id: data?.user_id ?? user.id, full_name: fullName, email: data?.email ?? user.email ?? null } })
+    return NextResponse.json({ ok: true, profile: { user_id: data?.user_id ?? user.id, full_name: fullName, email: data?.email ?? user.email ?? null, phone: data?.phone ?? phone ?? null } })
   } catch (err) {
     console.error("/api/profile PATCH unexpected_error", err)
     return NextResponse.json({ ok: false, code: "unexpected_error" }, { status: 500 })

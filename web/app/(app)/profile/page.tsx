@@ -73,6 +73,7 @@ export default function ProfilePage() {
     <div className="container mx-auto max-w-2xl px-4 py-8">
       <a href="#form" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md">Pular para o conteúdo</a>
       <header className="mb-8">
+        <nav className="mb-2 text-sm text-muted-foreground" aria-label="Breadcrumb"><ol className="flex items-center gap-2"><li><Link href="/app" className="underline">Início</Link></li><li aria-hidden> / </li><li aria-current="page">Perfil</li></ol></nav>
         <h1 className="text-2xl font-semibold tracking-tight">Perfil</h1>
         <p className="text-muted-foreground mt-1">Gerencie seu nome e visualize suas organizações.</p>
       </header>
@@ -100,6 +101,11 @@ export default function ProfilePage() {
           <div>
             <Label htmlFor="email">E-mail</Label>
             <Input id="email" value={email} readOnly aria-readonly className="bg-muted/50" />
+          </div>
+          <div>
+            <Label htmlFor="phone">Telefone (E.164)</Label>
+            <Input id="phone" placeholder="+5511999999999" aria-describedby="phone-help" onChange={(e)=>void setFullName(fullName)} readOnly className="bg-muted/50" />
+            <p id="phone-help" className="text-xs text-muted-foreground mt-1">Formato internacional, ex.: +5511999999999. Edição chega na próxima entrega.</p>
           </div>
           <div>
             <Label>Organizações</Label>
