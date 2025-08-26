@@ -16,6 +16,7 @@ export default function ServicesPage() {
   const [name, setName] = useState("")
   const [price, setPrice] = useState("0")
   const [desc, setDesc] = useState("")
+  const [editing, setEditing] = useState<Service | null>(null)
 
   const validName = useMemo(() => name.trim().length >= 2 && name.trim().length <= 80, [name])
   const validPrice = useMemo(() => {
@@ -101,15 +102,71 @@ export default function ServicesPage() {
       ) : (
         <ul className="divide-y">
           {items.map((s) => (
-            <li key={s.id} className="py-3 flex items-center justify-between">
-              <div>
+            <li key={s.id} className="py-3 grid grid-cols-6 gap-2 items-center">
+              <div className="col-span-2">
                 <p className="font-medium">{s.name}</p>
                 <p className="text-xs text-muted-foreground">{s.description || "—"}</p>
               </div>
               <div className="text-sm tabular-nums">R$ {(s.price_cents/100).toFixed(2)}</div>
+              <div className="text-xs">
+                <label className="inline-flex items-center gap-2">
+                  <input type="checkbox" defaultChecked={s.is_active} onChange={async (e)=>{
+                    const prev = items
+                    setItems(prev=>prev.map(x=>x.id===s.id?{...x,is_active:e.target.checked}:x))
+                    try {
+                      const resp = await fetch(`/api/services/${s.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ is_active: e.target.checked }) })
+                      if (!resp.ok) throw new Error('fail')
+                    } catch {
+                      setItems(prev)
+                    }
+                  }} /> Ativo
+                </label>
+              </div>
+              <div className="text-right col-span-2">
+                <Button size="sm" variant="outline" onClick={()=>{ setEditing(s); setName(s.name); setDesc(s.description||''); setPrice(String(s.price_cents)) }}>Editar</Button>
+              </div>
             </li>
           ))}
         </ul>
+      )}
+
+      {editing && (
+        <form className="fixed inset-0 bg-black/40 flex items-center justify-center" onSubmit={async (e)=>{
+          e.preventDefault()
+          if (!validName || !validPrice) return
+          const optimistic = { ...editing, name: name.trim(), description: desc || null, price_cents: Number(price) }
+          const prev = items
+          setItems(prev=>prev.map(x=>x.id===editing.id?optimistic:x))
+          try {
+            const resp = await fetch(`/api/services/${editing.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: optimistic.name, description: optimistic.description, price_cents: optimistic.price_cents }) })
+            if (!resp.ok) throw new Error('fail')
+            success('Serviço atualizado.')
+            setEditing(null)
+          } catch {
+            error('Falha ao atualizar serviço.')
+            setItems(prev)
+          }
+        }}>
+          <div className="bg-background rounded-md p-4 w-full max-w-md space-y-3">
+            <h2 className="text-lg font-medium">Editar serviço</h2>
+            <div>
+              <label className="text-sm">Nome</label>
+              <Input value={name} onChange={(e)=>setName(e.target.value)} aria-invalid={!validName} />
+            </div>
+            <div>
+              <label className="text-sm">Preço (centavos)</label>
+              <Input value={price} onChange={(e)=>setPrice(e.target.value)} inputMode="numeric" pattern="^[0-9]+$" aria-invalid={!validPrice} />
+            </div>
+            <div>
+              <label className="text-sm">Descrição</label>
+              <Input value={desc} onChange={(e)=>setDesc(e.target.value)} />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={()=>setEditing(null)}>Cancelar</Button>
+              <Button type="submit">Salvar</Button>
+            </div>
+          </div>
+        </form>
       )}
     </div>
   )
