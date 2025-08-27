@@ -14,10 +14,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ ok: false, code: "unauthorized" }, { status: 401 })
     }
 
-    // Perfil básico
+    // Perfil básico (incluindo avatar_url)
     const { data: profile } = await supabase
       .from("profiles")
-      .select("user_id, full_name, email, phone, updated_at")
+      .select("user_id, full_name, email, phone, avatar_url, updated_at")
       .eq("user_id", user.id)
       .maybeSingle()
 
@@ -83,6 +83,7 @@ export async function GET(request: Request) {
         full_name: profile?.full_name ?? null,
         email: user.email ?? profile?.email ?? null,
         phone: profile?.phone ?? null,
+        avatar_url: profile?.avatar_url ?? null,
         org_id: primaryOrgId,
         role: primaryRole,
         memberships,

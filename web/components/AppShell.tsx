@@ -15,11 +15,20 @@ import {
   LogOut,
   User,
   Badge as BadgeIcon,
-  MessageCircle
+  MessageCircle,
+  ChevronDown
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu"
 // import { useTheme } from "@/lib/use-theme"
 
 interface MenuItem {
@@ -118,6 +127,7 @@ interface AppShellProps {
     name?: string
     email?: string
     role?: string
+    avatar_url?: string | null
   }
   activeOrgId?: string | null
 }
@@ -182,6 +192,9 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
   // Guards por role e org
   const role = (user?.role || "support").toLowerCase()
   const hasOrg = !!activeOrgId
+
+  // Verificar se usuário tem acesso às configurações
+  const hasSettingsAccess = ["admin", "manager"].includes(role)
 
   function isItemEnabled(itemId: string): { enabled: boolean; reason?: string } {
     // Hotfix P1: item "students" deve seguir RBAC e não ser escondido pela ausência de organização
@@ -278,34 +291,76 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
             
             {/* User Menu */}
             {user && (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="flex flex-col items-end">
-                    <span className="font-medium">{user.name || user.email}</span>
-                    {user.role && (
-                      <span className="text-xs text-muted-foreground capitalize bg-muted px-1.5 py-0.5 rounded">
-                        {user.role}
-                      </span>
-                    )}
-                  </div>
-                  <div className="h-8 w-8 bg-gradient-to-br from-blue-500/20 to-blue-700/20 border border-blue-200 dark:border-blue-800 rounded-full flex items-center justify-center">
-                    <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                </div>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="flex items-center gap-2 px-3 py-2 h-auto hover:bg-accent focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    aria-label="Menu do usuário"
+                  >
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="flex flex-col items-end">
+                        <span className="font-medium text-foreground">{user.name || user.email}</span>
+                        {user.role && (
+                          <span className="text-xs text-muted-foreground capitalize bg-muted px-1.5 py-0.5 rounded">
+                            {user.role}
+                          </span>
+                        )}
+                      </div>
+                      <div className="h-8 w-8 rounded-full overflow-hidden bg-gradient-to-br from-blue-500/20 to-blue-700/20 border border-blue-200 dark:border-blue-800 flex items-center justify-center">
+                        {user.avatar_url ? (
+                          <img 
+                            src={user.avatar_url} 
+                            alt="Avatar" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        )}
+                      </div>
+                    </div>
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name || "Usuário"}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link 
+                      href="/app/profile" 
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <User className="h-4 w-4" />
+                      Meu Perfil
+                    </Link>
+                  </DropdownMenuItem>
+                  {hasSettingsAccess && (
+                    <DropdownMenuItem asChild>
+                      <Link 
+                        href="/app/settings" 
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <Settings className="h-4 w-4" />
+                        Configurações
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/20"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-
-            {/* Logout */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              aria-label="Sair da conta"
-              className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              title="Sair da conta"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </header>

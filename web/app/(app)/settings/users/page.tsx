@@ -10,6 +10,8 @@ export default function SettingsUsersPage() {
   const [items, setItems] = useState<UserRow[]>([])
   const [q, setQ] = useState("")
   const [loading, setLoading] = useState(true)
+  const [assigning, setAssigning] = useState<string | null>(null)
+  const [roleCode, setRoleCode] = useState("viewer")
 
   useEffect(() => {
     let cancelled = false
@@ -59,8 +61,23 @@ export default function SettingsUsersPage() {
                 <td className="py-2">{u.email || '—'}</td>
                 <td>{u.status}</td>
                 <td>{u.last_login_at || '—'}</td>
-                <td className="text-right">
-                  <Button size="sm" variant="outline" disabled aria-disabled="true">Atribuir Perfil</Button>
+                <td className="text-right space-x-2">
+                  <select className="border rounded px-2 py-1 text-sm" value={roleCode} onChange={(e)=>setRoleCode(e.target.value)} aria-label="Selecionar perfil">
+                    <option value="viewer">Viewer</option>
+                    <option value="trainer">Trainer</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <Button size="sm" variant="outline" disabled={assigning===u.user_id} onClick={async ()=>{
+                    setAssigning(u.user_id)
+                    const prev = items
+                    try {
+                      const resp = await fetch(`/api/settings/users/${u.user_id}/roles`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: roleCode }) })
+                      if (!resp.ok) throw new Error('fail')
+                    } catch {
+                      setItems(prev)
+                    } finally { setAssigning(null) }
+                  }}>Atribuir Perfil</Button>
                 </td>
               </tr>
             ))}
