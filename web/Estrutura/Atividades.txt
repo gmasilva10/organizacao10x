@@ -2,7 +2,7 @@
 # Última atualização: 2025-08-20 17:23
 # Formato: [AAAA-MM-DD HH:MM] Autor — Tipo — Módulo/Área — Título curto — (#tarefa/issue opcional) — Evidência (commit/PR/URL)
 
-Hoje — 26/08/2025
+Hoje — 27/08/2025
 [2025-08-26 09:35] DEV — DOC — Estrutura — Revisão ampla de documentos (Rotas, Padronizacao, README, Erros, Credenciais) + criação de Relatorio_Progresso_2025-08-26 — evidência: web/Estrutura/Relatorio_Progresso_2025-08-26.txt
 [2025-08-26 10:05] DEV — DB — Migrações criadas — services, audit_log, kanban_stages/items + seeds (idempotentes, RLS por org) — evid.: supabase/migrations/*(srv01_services.sql, his01_audit_log.sql, kan01_foundations.sql)
 [2025-08-26 10:20] DEV — API — Serviços — GET/POST /api/services com validações mínimas e RBAC — evid.: web/app/api/services/route.ts
