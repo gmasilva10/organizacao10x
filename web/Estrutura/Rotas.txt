@@ -105,6 +105,25 @@ APIs Kanban
 - GET /api/kanban/tree -> { root:{id,title,count}, nodes:[{id,type(title),count,items[]}]} (RBAC: admin|manager agregados; trainer somente seus)
 - GET /api/kanban/history?from&to&trainerId&page&pageSize -> lista cards concluídos (completed_at desc); quando trainerId ausente e usuário for trainer, restringe trainer_id=ctx.userId
 
+APIs Settings & RBAC (Release 26/08/2025)
+- POST /api/settings/rbac/restore_default -> repõe matriz role_permissions para seed default (tenant); audita em settings_audit
+- GET /api/settings/roles -> obtém roles, permissions e role_permissions do tenant
+- PATCH /api/settings/roles/:id/permissions -> atualiza matriz para um role (batch); audita em settings_audit  
+- PATCH /api/settings/users/[id]/roles -> atribui/remove papel de usuário; valida membership ativa
+- GET /api/settings/users -> listagem de usuários com papéis e busca; RBAC: admin|manager
+
+APIs Services (Release 26/08/2025)
+- GET /api/services -> listagem com paginação e filtros; RBAC: read para todos papéis
+- POST /api/services -> criação de serviço; RBAC: admin|manager; validação campos obrigatórios
+- PATCH /api/services/:id -> edição completa ou toggle ativo; RBAC: admin|manager
+- DELETE /api/services/:id -> soft delete (deleted_at); RBAC: admin
+
+Rotas Settings & Profile (Release 26/08/2025)
+/(app)/settings [auth] — Menu Configurações para admin/manager
+/(app)/settings/users [auth] — Listagem usuários + atribuição de papéis + busca
+/(app)/settings/roles [auth] — Gestão de papéis + botão Restaurar Padrão
+/(app)/profile [auth] — Perfil editável (nome, telefone) + breadcrumb + validações
+
 # ACC — Cadastro de Conta
 /onboarding/account              -> Wizard (Personal | Player)
 /onboarding/account/personal     -> Form de Conta Pessoal

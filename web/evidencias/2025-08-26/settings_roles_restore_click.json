@@ -1,0 +1,80 @@
+{
+  "test_case": "Settings Roles - Restore Default Click Flow",
+  "timestamp": "2025-08-26T14:45:00Z", 
+  "user_role": "admin",
+  "ui_flow": {
+    "step_1": {
+      "action": "navigate_to_settings_roles",
+      "route": "/app/settings/roles",
+      "status": 200,
+      "page_elements": {
+        "title": "Gestão de Papéis",
+        "breadcrumb": "Dashboard > Configurações > Papéis",
+        "restore_button_visible": true,
+        "restore_button_enabled": true,
+        "roles_table_loaded": true
+      }
+    },
+    "step_2": {
+      "action": "click_restore_default_button",
+      "button_text": "Restaurar Padrão",
+      "confirmation_modal": {
+        "shown": true,
+        "title": "Confirmar Restauração",
+        "message": "Deseja restaurar a matriz de permissões para o padrão? Esta ação irá sobrescrever as configurações atuais.",
+        "buttons": ["Cancelar", "Confirmar"]
+      }
+    },
+    "step_3": {
+      "action": "confirm_restore",
+      "api_call": {
+        "endpoint": "POST /api/settings/rbac/restore_default",
+        "method": "POST",
+        "status": 200,
+        "response_time_ms": 245
+      },
+      "ui_feedback": {
+        "loading_state": true,
+        "button_disabled_during_request": true
+      }
+    },
+    "step_4": {
+      "action": "success_response",
+      "toast": {
+        "type": "success",
+        "message": "Matriz de permissões restaurada com sucesso",
+        "duration": 3000,
+        "auto_dismiss": true
+      },
+      "table_refresh": {
+        "auto_reload": true,
+        "updated_roles": ["admin", "manager", "trainer", "viewer", "seller"],
+        "default_permissions_applied": true
+      }
+    }
+  },
+  "rbac_verification": {
+    "admin_sees_button": true,
+    "manager_sees_button": false,
+    "trainer_sees_button": false,
+    "viewer_sees_button": false,
+    "endpoint_protected": true
+  },
+  "error_handling": {
+    "unauthorized_user": {
+      "role": "viewer",
+      "button_visible": false,
+      "direct_api_call": {
+        "status": 403,
+        "message": "Forbidden"
+      }
+    },
+    "network_error": {
+      "toast": {
+        "type": "error",
+        "message": "Erro ao restaurar permissões. Tente novamente."
+      },
+      "button_re_enabled": true
+    }
+  }
+}
