@@ -100,9 +100,9 @@ const menuGroups: MenuGroup[] = [
     title: "Administração",
     items: [
       {
-        id: "team-admin",
-        title: "Team Admin", 
-        href: "/app/team-admin",
+        id: "team",
+        title: "Equipe", 
+        href: "/app/team",
         icon: Shield
       },
       {
