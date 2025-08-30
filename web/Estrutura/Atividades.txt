@@ -67,6 +67,9 @@ Hoje — 20/08/2025
 [2025-08-20 11:24] GP — ROTAS — Confirmado /(app)/onboarding como oficial; alias /(app)/kanban não exposto em produção — evidência: Estrutura/Rotas.txt; Estrutura/Dailys/Reuniao_Alinhamento_2025-08-20.txt
 [2025-08-20 11:45] DEV — PROPOSTA — Pré‑condições técnicas para revalidação em 22/08 (aprovado pelo GP): seção adicionada em Plano_Realinhamento_20082025.txt (Move/Reorder, Histórico, Colunas, Sidebar/Árvore, SUPABASE envs, lockfiles, checklist VAL01..VAL06, A11y, segurança)
 
+Hoje — 30/08/2025
+[2025-08-30 12:35] DEV — GOVERNANÇA — Kanban/Serviços — EM VALIDAÇÃO (KAN-REDIR-01): PR aberto para redirecionar “+ Nova coluna” do Kanban para Serviços (Onboarding) — evidência: PR #17, arquivo: web/evidencias/kanban_add_column_redirect_2025-08-30_092455.json
+
 
 Hoje — 19/08/2025
 [2025-08-19 10:20] DEV — QA — Students — DONE (evidências manuais)

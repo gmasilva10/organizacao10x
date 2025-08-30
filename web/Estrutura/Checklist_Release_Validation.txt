@@ -11,6 +11,9 @@
 - Busca rápida por nome filtra cards renderizados
 - Build/lint verdes; console limpo (janela anônima)
 
+Kanban — Governança
+- [EM VALIDAÇÃO] KAN-REDIR-01 — Redirecionar “+ Nova coluna” do Kanban para Serviços (Onboarding). Status: aguardando validação de GP/Patrocinador. PR #17 — Evid.: web/evidencias/kanban_add_column_redirect_2025-08-30_092455.json
+
 Validações executadas em 2025-08-19 10:20
 - 200 OK: admin/manager/trainer conseguem mover cards.
 - 403 denied: seller/support bloqueados; evento rbac.denied registrado.
