@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useToast } from "@/components/ui/toast"
 import { UpgradeModal } from "@/components/UpgradeModal"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { StudentsSkeleton } from "@/components/students/StudentsSkeleton"
 import { StudentsFilters } from "@/components/students/StudentsFilters"
 import { AssignTrainerSelect } from "@/components/students/AssignTrainerSelect"
@@ -10,7 +11,7 @@ import { StudentCreateModal } from "@/components/students/StudentCreateModal"
 import { StudentEditModal } from "@/components/students/StudentEditModal"
 import { StudentFullModal } from "@/components/students/StudentFullModal"
 
-type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; trainer: { id: string | null; name: string | null } | null; created_at: string }
+type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; onboard_opt?: 'nao_enviar'|'enviar'|'enviado'; trainer: { id: string | null; name: string | null } | null; created_at: string }
 type Trainer = { id: string; name: string }
 
 export default function StudentsPage() {
@@ -31,6 +32,17 @@ export default function StudentsPage() {
   const [error, setError] = useState<string>("")
   const [editing, setEditing] = useState<StudentRow | null>(null)
   const toast = useToast()
+  const [confirm, setConfirm] = useState<{ open: boolean; title: string; description?: string; onConfirm?: () => void }>({ open: false })
+
+  // Abrir cadastro completo quando vier ?new=true
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href)
+      if (url.searchParams.get('new') === 'true') {
+        setShowFull('create')
+      }
+    } catch {}
+  }, [])
 
   const fetchList = useCallback(async () => {
     setLoading(true)
@@ -117,6 +129,21 @@ export default function StudentsPage() {
     } finally { setLoading(false) }
   }
 
+  async function onSendToKanban(id: string) {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/students/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ onboard_opt: 'enviar' }) })
+      if (res.status === 200) {
+        toast.success('Enviado para o Kanban.')
+        fetchList(); fetchSummary()
+      } else if (res.status === 403) {
+        toast.error('Sem permissão para enviar para o Kanban.')
+      } else {
+        toast.error(`Falha ao enviar (${res.status}).`)
+      }
+    } finally { setLoading(false) }
+  }
+
   async function onUpdate(payload: { id: string; name: string; email: string; phone?: string | null; status?: 'onboarding'|'active'|'paused'; trainer_id?: string | null }) {
     setLoading(true)
     try {
@@ -131,18 +158,36 @@ export default function StudentsPage() {
     } finally { setLoading(false) }
   }
 
-  async function onDelete(id: string) {
-    if (!confirm('Excluir aluno? Esta ação é irreversível.')) return
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/students/${id}`, { method: 'DELETE' })
-      if (res.status === 200) {
-        toast.success('Aluno excluído.')
-        fetchList(); fetchSummary()
-      } else {
-        toast.error(`Falha ao excluir (${res.status}).`)
+  async function onDelete(id: string, name?: string) {
+    // Dialog destrutivo com confirmação "EXCLUIR"
+    const inputId = `confirm-${id}`
+    setConfirm({
+      open: true,
+      title: 'Excluir aluno',
+      description: (
+        <div className="space-y-2">
+          <p>Excluir o aluno <b>{name || 'selecionado'}</b> e todos os dados vinculados (cards, serviços, financeiro, histórico)? Esta ação é irreversível.</p>
+          <p>Para confirmar, digite <b>EXCLUIR</b> abaixo.</p>
+          <input id={inputId} className="mt-1 w-full rounded border px-2 py-1 text-sm" placeholder="EXCLUIR" />
+        </div>
+      ) as any,
+      onConfirm: async () => {
+        const el = document.getElementById(inputId) as HTMLInputElement | null
+        if (!el || el.value.trim().toUpperCase() !== 'EXCLUIR') { toast.error('Digite EXCLUIR para confirmar.'); return }
+        setLoading(true)
+        try {
+          const res = await fetch(`/api/students/${id}`, { method: 'DELETE' })
+          if (res.status === 204) {
+            toast.success('Aluno excluído.')
+            // Remover cards do board (otimista)
+            try { window.dispatchEvent(new Event('pg:kanban:refetchTree')); window.dispatchEvent(new Event('pg:kanban:refresh')) } catch {}
+            fetchList(); fetchSummary()
+          } else {
+            toast.error(`Falha ao excluir (${res.status}).`)
+          }
+        } finally { setLoading(false) }
       }
-    } finally { setLoading(false) }
+    })
   }
 
   const pages = useMemo(() => Math.max(1, Math.ceil(total / pageSize)), [total])
@@ -200,7 +245,14 @@ export default function StudentsPage() {
               <tr key={s.id} className="border-t">
                 <td className="px-3 py-2">{s.full_name}</td>
                 <td className="px-3 py-2">{s.phone || '—'}</td>
-                <td className="px-3 py-2 capitalize">{s.status}</td>
+                <td className="px-3 py-2 capitalize">
+                  <div className="flex items-center gap-2">
+                    <span>{s.status}</span>
+                    {s.onboard_opt === 'enviado' && (
+                      <span className="rounded-full bg-emerald-50 px-2 py-[2px] text-[10px] text-emerald-700 ring-1 ring-emerald-200">Enviado</span>
+                    )}
+                  </div>
+                </td>
                 <td className="px-3 py-2">
                   <AssignTrainerSelect value={s.trainer?.id || null} trainers={trainers.map(t => ({ user_id: t.id, email: t.name }))} onChange={(v)=>onAssign(s.id, v)} />
                 </td>
@@ -209,6 +261,9 @@ export default function StudentsPage() {
                   <div className="flex items-center gap-2">
                     <button onClick={()=>{ setEditing(s); setShowFull('edit') }} className="rounded-md border px-2 py-1 text-xs">Editar</button>
                     <button onClick={()=>onDelete(s.id)} className="rounded-md border px-2 py-1 text-xs text-red-600">Excluir</button>
+                    {s.onboard_opt !== 'enviado' && (
+                      <button onClick={()=>onSendToKanban(s.id)} className="rounded-md border px-2 py-1 text-xs">Enviar para Kanban</button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -228,6 +283,14 @@ export default function StudentsPage() {
           <button disabled={page>=pages} onClick={() => setPage(p => Math.min(pages, p+1))} className="rounded-md border px-3 py-1 disabled:opacity-60">Próxima</button>
         </div>
       </div>
+      <ConfirmDialog
+        open={confirm.open}
+        title={confirm.title || ''}
+        description={confirm.description}
+        destructive
+        onCancel={()=> setConfirm({ open:false, title:'' })}
+        onConfirm={()=>{ try { confirm.onConfirm?.() } finally { setConfirm({ open:false, title:'' }) } }}
+      />
     </div>
   )
 }

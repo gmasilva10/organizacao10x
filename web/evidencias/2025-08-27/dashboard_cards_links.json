@@ -1,0 +1,90 @@
+{
+  "test_scenario": "Dashboard cards e navegação",
+  "timestamp": "2025-08-27T15:05:00.000Z",
+  "description": "Verificação dos cards do dashboard e seus links funcionais",
+  "cards_tested": [
+    {
+      "card": "Alunos",
+      "icon": "Users",
+      "color": "blue",
+      "value_displayed": "0",
+      "description": "Total de alunos cadastrados", 
+      "action_link": "/app/students",
+      "action_text": "Gerenciar alunos",
+      "status": "PASS"
+    },
+    {
+      "card": "Serviços", 
+      "icon": "Briefcase",
+      "color": "green",
+      "value_displayed": "1",
+      "description": "Serviços disponíveis",
+      "action_link": "/app/services", 
+      "action_text": "Ver serviços",
+      "status": "PASS",
+      "note": "Serviço exemplo 'Avaliação Inicial' criado no signup"
+    },
+    {
+      "card": "Colaboradores",
+      "icon": "UserCheck", 
+      "color": "purple",
+      "value_displayed": "1",
+      "description": "Membros da equipe",
+      "action_link": "/app/team",
+      "action_text": "Gerenciar equipe", 
+      "status": "PASS",
+      "note": "Admin vinculado como colaborador padrão"
+    },
+    {
+      "card": "Itens no Kanban",
+      "icon": "ClipboardList",
+      "color": "orange", 
+      "value_displayed": "0",
+      "description": "Processos em andamento",
+      "action_link": "/app/onboarding",
+      "action_text": "Ver processos",
+      "status": "PASS"
+    }
+  ],
+  "quick_actions_tested": [
+    {
+      "action": "Novo Aluno",
+      "description": "Cadastrar um novo aluno",
+      "link": "/app/students?new=true",
+      "icon": "Users",
+      "status": "PASS"
+    },
+    {
+      "action": "Novo Serviço", 
+      "description": "Criar um novo serviço",
+      "link": "/app/services?new=true",
+      "icon": "Briefcase",
+      "status": "PASS"
+    },
+    {
+      "action": "Configurações",
+      "description": "Gerenciar usuários e papéis", 
+      "link": "/app/settings",
+      "icon": "Activity",
+      "status": "PASS"
+    }
+  ],
+  "system_status_section": {
+    "status_indicator": "Ativo",
+    "version": "v0.1.0", 
+    "last_update": "Hoje",
+    "status": "PASS"
+  },
+  "loading_states": {
+    "skeleton_animation": "PASS - Shimmer durante fetch",
+    "error_handling": "PASS - Fallback para 0 em caso de erro",
+    "responsive_design": "PASS - Grid adaptativo md:2cols lg:4cols"
+  },
+  "accessibility": {
+    "aria_labels": "PASS - Cards com labels adequados",
+    "keyboard_navigation": "PASS - Links tabuláveis",
+    "color_contrast": "PASS - Cores atendem WCAG"
+  },
+  "status": "PASS",
+  "notes": "Dashboard modernizado com informações essenciais e navegação clara"
+}

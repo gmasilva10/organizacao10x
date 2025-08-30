@@ -218,11 +218,11 @@ export async function POST(request: Request) {
     // Buscar plano da organização
     const { data: tenant } = await supabase
       .from("tenants")
-      .select("plan")
+      .select("plan_code")
       .eq("id", ctx.tenantId)
       .single()
 
-    const plan = tenant?.plan || "basic"
+    const plan = (tenant as any)?.plan_code || "basic"
     const limits = {
       basic: { collaborators: 3 },
       enterprise: { collaborators: 100 }

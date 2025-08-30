@@ -66,8 +66,7 @@ const menuGroups: MenuGroup[] = [
         id: "services", 
         title: "Serviços",
         href: "/app/services",
-        icon: PackageIcon,
-        disabled: true
+        icon: PackageIcon
       }
     ]
   },
@@ -109,8 +108,19 @@ const menuGroups: MenuGroup[] = [
         id: "settings",
         title: "Configurações",
         href: "/app/settings", 
-        icon: Settings,
-        disabled: true
+        icon: Settings
+      }
+    ]
+  },
+  {
+    id: "team",
+    title: "Equipe",
+    items: [
+      {
+        id: "team-management",
+        title: "Gerenciar Equipe",
+        href: "/app/team",
+        icon: Shield
       }
     ]
   }
@@ -165,29 +175,12 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/signout', { method: 'POST', credentials: 'include' })
-      router.push('/')
-    } catch (error) {
-      console.error('Logout error:', error)
-    }
+      await fetch('/api/auth/signout', { method: 'POST', credentials: 'include', cache: 'no-store' })
+    } catch {}
+    router.push('/')
   }
 
   // logoSrc removido (não utilizado)
-
-  // Breadcrumb simples baseado na rota atual
-  const getBreadcrumb = () => {
-    const segments = pathname.split('/').filter(Boolean)
-    if (segments.length === 0 || (segments.length === 1 && segments[0] === 'app')) {
-      return "Dashboard"
-    }
-    
-    const allItems = getAllMenuItems()
-    const currentItem = allItems.find(item => 
-      item.href === `/${segments.slice(-2).join('/')}` || 
-      item.href === `/${segments.slice(-1)[0]}`
-    )
-    return currentItem?.title || "Página"
-  }
 
   // Guards por role e org
   const role = (user?.role || "support").toLowerCase()
@@ -197,30 +190,24 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
   const hasSettingsAccess = ["admin", "manager"].includes(role)
 
   function isItemEnabled(itemId: string): { enabled: boolean; reason?: string } {
-    // Hotfix P1: item "students" deve seguir RBAC e não ser escondido pela ausência de organização
-    // Assim, não aplicamos o guard global de hasOrg para o item "students".
-    if (!hasOrg && itemId !== 'students') {
-      const enabledNoOrg = new Set(["dashboard", "team-admin", "settings", "students"]) // students liberado
-      return { enabled: enabledNoOrg.has(itemId), reason: "Requer organização ativa" }
+    // Política atual: nenhum item do menu deve ser bloqueado por ausência de organização ativa.
+    // O acesso a funcionalidades premium é controlado por limites de uso, não por ocultar menus.
+    if (!hasOrg) {
+      return { enabled: true }
     }
-    // Com org, aplicar matriz
-    const matrix: Record<string, Record<string, boolean>> = {
-      "admin": {
-        "dashboard": true, "students": true, "services": true, "onboarding": true, "history": true, "team-admin": true, "settings": true,
-      },
-      "manager": {
-        "dashboard": true, "students": true, "services": true, "onboarding": true, "history": true, "team-admin": false, "settings": true,
-      },
-      "trainer": {
-        "dashboard": true, "students": false, "services": false, "onboarding": true, "history": true, "team-admin": false, "settings": false,
-      },
-      "support": {
-        "dashboard": true, "students": false, "services": false, "onboarding": false, "history": true, "team-admin": false, "settings": false,
-      },
+    
+    // P1-01: Menu Equipe sempre visível para todos os planos
+    if (itemId === 'team-management') {
+      return { enabled: true, reason: undefined }
     }
-    const allowed = matrix[role as keyof typeof matrix] || matrix["support"]
-    const enabled = !!allowed[itemId as keyof typeof allowed]
-    return { enabled, reason: enabled ? undefined : "Sem permissão para acessar" }
+    
+    // P1-02: Menu Configurações sempre visível para todos os planos
+    if (itemId === 'settings') {
+      return { enabled: true, reason: undefined }
+    }
+    
+    // Política atual: menu sempre visível para todos os perfis.
+    return { enabled: true }
   }
 
   // Calcular o item mais específico que corresponde à rota para evitar múltiplos "ativos"
@@ -484,24 +471,6 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
 
         {/* Main Content */}
         <main className="flex-1 overflow-hidden">
-          {/* Breadcrumb */}
-          <div className="border-b bg-background/50 px-6 py-3">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Link 
-                href="/app" 
-                className="hover:text-foreground focus:text-foreground focus:outline-none"
-              >
-                Dashboard
-              </Link>
-              {pathname !== '/app' && (
-                <>
-                  <ChevronRight className="h-3 w-3" />
-                  <span className="text-foreground font-medium">{getBreadcrumb()}</span>
-                </>
-              )}
-            </div>
-          </div>
-
           {/* Page Content */}
           <div id="main-content" className="p-6">
             {children}
@@ -509,19 +478,5 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
         </main>
       </div>
     </div>
-  )
-}
-
-// Helper component para ícone ChevronRight usado no breadcrumb
-function ChevronRight({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m9 18 6-6-6-6" />
-    </svg>
   )
 }

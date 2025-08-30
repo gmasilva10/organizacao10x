@@ -55,6 +55,7 @@ export async function GET(request: Request) {
     customer_stage?: string | null
     address?: Record<string, unknown> | null
     status: string
+    onboard_opt?: 'nao_enviar'|'enviar'|'enviado'
     trainer_id?: string | null
     created_at: string
   }>
@@ -77,6 +78,7 @@ export async function GET(request: Request) {
     customer_stage: it.customer_stage ?? 'new',
     address: it.address ?? null,
     status: it.status,
+    onboard_opt: (it.onboard_opt as any) ?? 'nao_enviar',
     trainer: it.trainer_id ? { id: it.trainer_id, name: null as string | null } : null,
     created_at: it.created_at,
   }))
@@ -106,6 +108,10 @@ export async function POST(request: Request) {
   const cpf = body?.cpf ? String(body.cpf).trim() : null
   const birthDate = body?.birth_date ? String(body.birth_date) : null
   const customerStage = body?.customer_stage && ["new","renewal","canceled"].includes(String(body.customer_stage)) ? String(body.customer_stage) : 'new'
+  const onboardOpt = ((): 'nao_enviar'|'enviar'|'enviado' => {
+    const v = String(body?.onboard_opt || 'nao_enviar')
+    return (['nao_enviar','enviar','enviado'] as const).includes(v as any) ? (v as any) : 'nao_enviar'
+  })()
   const rawAddress = (body?.address ?? null) as Record<string, unknown> | null
   const address = rawAddress ? sanitizeAddress(rawAddress) : null
   // Basic validation for address (when provided): zip 8 digits; state 2 letters
@@ -119,7 +125,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ code: 'validation', message: 'UF deve ter 2 letras.' }, { status: 422 })
     }
   }
-  const status = body?.status && ["onboarding", "active", "paused"].includes(body.status as string) ? String(body.status) : "onboarding"
+  const rawStatus = String(body?.status || 'onboarding')
+  const status = ["onboarding","active","paused"].includes(rawStatus) ? rawStatus : "onboarding"
   const trainerId = body?.trainer_id ? String(body.trainer_id) : null
   if (!name || !email) return NextResponse.json({ error: "invalid_input" }, { status: 400 })
 
@@ -143,14 +150,149 @@ export async function POST(request: Request) {
 
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const insert = await fetch(`${url}/rest/v1/students`, {
+  // Garante seed de estágios do kanban (idempotente)
+  try {
+    await fetch(`${url}/rest/v1/rpc/seed_kanban_stages`, { method:'POST', headers:{ apikey:key!, Authorization:`Bearer ${key}`!, 'Content-Type':'application/json' }, body: JSON.stringify({ p_org: ctx.tenantId }) })
+  } catch {}
+
+  // Transação simples: criar aluno e card juntos; se card falhar, rollback do aluno
+  const commonHeaders = { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json", Prefer: "return=representation" }
+  let insert = await fetch(`${url}/rest/v1/students`, {
     method: "POST",
-    headers: { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json", Prefer: "return=representation" },
-    body: JSON.stringify({ tenant_id: ctx.tenantId, name, email, phone, cpf, birth_date: birthDate, customer_stage: customerStage, address, status, trainer_id: trainerId }),
+    headers: commonHeaders,
+    body: JSON.stringify({ tenant_id: ctx.tenantId, name, email, phone, cpf, birth_date: birthDate, customer_stage: customerStage, address, status, trainer_id: trainerId, onboard_opt: onboardOpt }),
   })
+  if (!insert.ok) {
+    const status = insert.status
+    const errText = await insert.text().catch(()=>"")
+    // Fallback: se coluna onboard_opt não existir ainda (migração pendente), reenvia sem o campo
+    if (/onboard_opt/i.test(errText) || /column/i.test(errText)) {
+      insert = await fetch(`${url}/rest/v1/students`, {
+        method: "POST",
+        headers: commonHeaders,
+        body: JSON.stringify({ tenant_id: ctx.tenantId, name, email, phone, cpf, birth_date: birthDate, customer_stage: customerStage, address, status, trainer_id: trainerId }),
+      })
+    }
+    // Erro de unicidade (e.g., e-mail duplicado)
+    if (!insert.ok) {
+      const text2 = await insert.text().catch(()=>"")
+      if (status === 409 || /duplicate key|unique/i.test(text2)) {
+        return NextResponse.json({ error: "validation", code: "unique_email" }, { status: 422 })
+      }
+      return NextResponse.json({ error: "insert_failed", details: text2 || errText || String(status) }, { status: 500 })
+    }
+  }
   if (!insert.ok) return NextResponse.json({ error: "insert_failed" }, { status: 500 })
   const row = await insert.json()
-  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: "feature.used", payload: { feature: "students.create", id: row?.[0]?.id } })
-  return NextResponse.json({ ok: true, id: row?.[0]?.id })
+  const newId = row?.[0]?.id as string | undefined
+  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: "feature.used", payload: { feature: "students.create", id: newId } })
+  // Criar card apenas quando o usuário opta por enviar para o Kanban
+  try {
+    if (newId && onboardOpt === 'enviar') {
+      const headers = { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json" }
+      // idempotência: não duplica
+      const exist = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&student_id=eq.${newId}&select=id&limit=1`, { headers, cache: 'no-store' })
+      const exists = (await exist.json().catch(()=>[]))?.[0]
+      if (!exists) {
+        // Prioriza a coluna fixa de posição 1
+        let stageResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&position=eq.1&select=id,position&limit=1`, { headers, cache: 'no-store' })
+        let stage = (await stageResp.json().catch(()=>[]))?.[0]
+        // Fallback: pega a primeira por posição
+        if (!stage?.id) {
+          stageResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&select=id,position&order=position.asc&limit=1`, { headers, cache: 'no-store' })
+          stage = (await stageResp.json().catch(()=>[]))?.[0]
+        }
+        if (!stage?.id) throw new Error('no_stage')
+        const posResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&stage_id=eq.${stage.id}&select=position&order=position.desc&limit=1`, { headers, cache: 'no-store' })
+        const top = (await posResp.json().catch(()=>[]))?.[0]
+        const nextPos = Number.isFinite(Number(top?.position)) ? Number(top.position) + 1 : 0
+        let ins = await fetch(`${url}/rest/v1/kanban_items`, { method:'POST', headers, body: JSON.stringify({ org_id: ctx.tenantId, student_id: newId, stage_id: stage.id, position: nextPos, meta: { pending_services: 0 } }) })
+        if (!ins.ok) {
+          const errText = await ins.text().catch(()=>"")
+          // Fallback: se coluna meta não existe no cache/DB, tenta sem meta
+          if (ins.status === 400 && /meta/i.test(errText)) {
+            ins = await fetch(`${url}/rest/v1/kanban_items`, { method:'POST', headers, body: JSON.stringify({ org_id: ctx.tenantId, student_id: newId, stage_id: stage.id, position: nextPos }) })
+          }
+          // Se foi conflito de unicidade, tratamos como sucesso idempotente
+          if (!ins.ok) {
+            const errText2 = await ins.text().catch(()=>"")
+            if (ins.status === 409 || /duplicate key|unique/i.test(errText2)) {
+              await fetch(`${url}/rest/v1/students?id=eq.${newId}&tenant_id=eq.${ctx.tenantId}`, { method:'PATCH', headers, body: JSON.stringify({ onboard_opt: 'enviado' }) }).catch(()=>{})
+            } else {
+              throw new Error(`card_failed|status=${ins.status}|body=${errText2 || errText}`)
+            }
+          }
+        }
+        // marca como enviado (após criar card com sucesso)
+        await fetch(`${url}/rest/v1/students?id=eq.${newId}&tenant_id=eq.${ctx.tenantId}`, { method:'PATCH', headers, body: JSON.stringify({ onboard_opt: 'enviado' }) })
+        
+        // Instanciar tarefas obrigatórias para o card
+        try {
+          // Buscar tarefas do estágio
+          const tasksResp = await fetch(`${url}/rest/v1/service_onboarding_tasks?stage_code=eq.novo_aluno&is_required=eq.true&select=id&order=order_index.asc`, { headers, cache: 'no-store' })
+          const tasks = await tasksResp.json().catch(() => [])
+          
+          if (tasks && tasks.length > 0) {
+            // Buscar o card criado para obter o ID
+            const cardResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&student_id=eq.${newId}&select=id&limit=1`, { headers, cache: 'no-store' })
+            const card = (await cardResp.json().catch(() => []))?.[0]
+            
+            if (card?.id) {
+              // Criar instâncias de tarefas para o card
+              const cardTasks = tasks.map((task: any) => ({
+                org_id: ctx.tenantId,
+                card_id: card.id,
+                task_id: task.id
+              }))
+              
+              await fetch(`${url}/rest/v1/card_tasks`, { 
+                method: 'POST', 
+                headers, 
+                body: JSON.stringify(cardTasks) 
+              }).catch(() => {}) // Não falha se as tarefas falharem
+              
+              // Log da criação do card com tarefas
+              try { 
+                await logEvent({ 
+                  tenantId: ctx.tenantId, 
+                  userId: ctx.userId, 
+                  eventType: 'aluno_to_kanban.created', 
+                  payload: { 
+                    studentId: newId, 
+                    stageId: stage.id, 
+                    position: nextPos, 
+                    source: 'api',
+                    tasksCount: tasks.length 
+                  } 
+                }) 
+              } catch {}
+            }
+          }
+        } catch (taskError) {
+          console.error('Erro ao instanciar tarefas:', taskError)
+          // Não falha a criação do aluno se as tarefas falharem
+        }
+        
+        try { await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'aluno_to_kanban.created', payload: { studentId: newId, stageId: stage.id, position: nextPos, source:'api' } }) } catch {}
+      }
+    }
+  } catch (e) {
+    // rollback do aluno para evitar órfão
+    if (newId) {
+      await fetch(`${url}/rest/v1/students?id=eq.${newId}&tenant_id=eq.${ctx.tenantId}`, { method:'DELETE', headers: { apikey: key!, Authorization: `Bearer ${key}`! } }).catch(()=>{})
+    }
+    const msg = String((e as Error)?.message || 'unknown')
+    // formata status e body quando disponível: card_failed|status=xxx|body=...
+    const m = /card_failed\|status=(\d+)\|body=(.*)/.exec(msg)
+    if (m) {
+      const status = Number(m[1])
+      const body = m[2]
+      return NextResponse.json({ error: 'kanban_card_failed', reason: 'card_failed', status, details: body || null }, { status: 500 })
+    }
+    return NextResponse.json({ error: 'kanban_card_failed', reason: msg || 'unknown' }, { status: 500 })
+  }
+
+  return NextResponse.json({ ok: true, id: newId })
 }
+
 

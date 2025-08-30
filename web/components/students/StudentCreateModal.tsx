@@ -8,7 +8,7 @@ export function StudentCreateModal({
 }: {
 	open: boolean
 	onClose: () => void
-	onCreate: (payload: { name: string; email: string; phone?: string | null; status?: 'onboarding' | 'active' | 'paused'; trainer_id?: string | null }) => Promise<void>
+	onCreate: (payload: { name: string; email: string; phone?: string | null; status?: 'onboarding' | 'active' | 'paused'; trainer_id?: string | null; onboard_opt?: 'nao_enviar'|'enviar'|'enviado' }) => Promise<void>
 	trainers: Array<{ id: string; name: string }>
 }) {
 	const [name, setName] = useState("")
@@ -16,6 +16,7 @@ export function StudentCreateModal({
 	const [phone, setPhone] = useState("")
 	const [status, setStatus] = useState<'onboarding' | 'active' | 'paused'>("onboarding")
 	const [trainerId, setTrainerId] = useState<string>("")
+	const [onboardOpt, setOnboardOpt] = useState<'nao_enviar'|'enviar'|'enviado'>("nao_enviar")
 	const [loading, setLoading] = useState(false)
 
 	if (!open) return null
@@ -46,12 +47,14 @@ export function StudentCreateModal({
 				phone: sanitizePhoneToDigits(phone) || null,
 				status,
 				trainer_id: trainerId || null,
+				onboard_opt: onboardOpt,
 			})
 			setName("")
 			setEmail("")
 			setPhone("")
 			setStatus("onboarding")
 			setTrainerId("")
+			setOnboardOpt("nao_enviar")
 			onClose()
 		} finally { setLoading(false) }
 	}
@@ -80,6 +83,14 @@ export function StudentCreateModal({
 							<option value="onboarding">onboarding</option>
 							<option value="active">active</option>
 							<option value="paused">paused</option>
+						</select>
+					</div>
+					<div>
+						<label className="mb-1 block text-sm">Onboarding</label>
+						<select value={onboardOpt} onChange={(e)=>setOnboardOpt(e.target.value as 'nao_enviar'|'enviar'|'enviado')} className="w-full rounded-md border px-3 py-2 text-sm">
+							<option value="nao_enviar">não enviar</option>
+							<option value="enviar">enviar</option>
+							<option value="enviado" disabled>enviado</option>
 						</select>
 					</div>
 					<div>

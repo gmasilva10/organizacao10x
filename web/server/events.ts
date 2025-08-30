@@ -1,11 +1,21 @@
 type EventType =
   | "auth.login.success"
   | "auth.login.fail"
+  | "auth.org_resolved"
+  | "auth.redirect_onboarding"
   | "rbac.denied"
   | "limit.hit"
   | "feature.used"
   | "account.created"
   | "membership.created"
+  | "onboarding.module_enabled"
+  | "onboarding.seed_applied"
+  | "kanban.filters.applied"
+  | "kanban.filters.cleared"
+  | "kanban.stage.edited"
+  | "kanban.stage.reordered"
+  | "kanban.stage.deleted"
+  | "kanban.card.moved"
 
 async function postgrestInsert(table: string, row: Record<string, unknown>) {
   const url = process.env.SUPABASE_URL

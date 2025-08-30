@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/toast"
+import { useCapabilities } from "@/lib/feature-flags"
+import { Badge } from "@/components/ui/badge"
 import { 
   Dialog, 
   DialogContent, 
@@ -55,6 +57,7 @@ type CreateFormData = {
 
 export default function TeamPage() {
   const { success, error } = useToast()
+  const { caps, loading: capsLoading } = useCapabilities()
   
   // Estado da lista
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
@@ -244,8 +247,31 @@ export default function TeamPage() {
             <li aria-current="page">Equipe</li>
           </ol>
         </nav>
-        <h1 className="text-2xl font-semibold tracking-tight">Equipe</h1>
-        <p className="text-muted-foreground mt-1">Gerencie os colaboradores da sua organização.</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Equipe</h1>
+            <p className="text-muted-foreground mt-1">Gerencie os colaboradores da sua organização.</p>
+          </div>
+          
+          {/* Informações do Plano */}
+          {!capsLoading && caps && (
+            <div className="text-right">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant={caps.plan === 'enterprise' ? 'default' : 'secondary'}>
+                  Plano {caps.plan === 'enterprise' ? 'Enterprise' : 'Basic'}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  {collaborators.filter(c => c.status === 'active').length} / {caps.limits.trainers} colaboradores
+                </span>
+              </div>
+              {caps.plan === 'basic' && (
+                <p className="text-xs text-muted-foreground">
+                  Plano Basic: limite de {caps.limits.trainers} colaborador
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </header>
 
       <div id="main-content" className="space-y-6">
@@ -287,17 +313,45 @@ export default function TeamPage() {
             </Select>
           </div>
 
-          <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Novo Colaborador
-              </Button>
-            </DialogTrigger>
+          <div className="flex flex-col sm:flex-row gap-2 items-center">
+            {/* Mensagem de limite do plano Basic */}
+            {!capsLoading && caps && caps.plan === 'basic' && 
+             collaborators.filter(c => c.status === 'active').length >= caps.limits.trainers && (
+              <div className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded">
+                Limite do plano Basic atingido
+              </div>
+            )}
+            
+            <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  className="flex items-center gap-2"
+                  disabled={!capsLoading && caps && caps.plan === 'basic' && 
+                           collaborators.filter(c => c.status === 'active').length >= caps.limits.trainers}
+                >
+                  <Plus className="h-4 w-4" />
+                  Novo Colaborador
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Novo Colaborador</DialogTitle>
               </DialogHeader>
+              
+              {/* Mensagem de upgrade para plano Basic */}
+              {!capsLoading && caps && caps.plan === 'basic' && (
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-700">
+                    <strong>Plano Basic:</strong> Você pode ter até {caps.limits.trainers} colaborador ativo.
+                    {collaborators.filter(c => c.status === 'active').length >= caps.limits.trainers && (
+                      <span className="block mt-1 text-orange-600">
+                        ⚠️ Limite atingido. Faça upgrade para o plano Enterprise para adicionar mais colaboradores.
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
+              
               <form onSubmit={handleCreate} className="space-y-4">
                 <div>
                   <Label htmlFor="create-name">Nome completo *</Label>

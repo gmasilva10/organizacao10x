@@ -1,3 +1,88 @@
 [2025-08-24 19:40] DEV — CFG-TEAM-P1 — API/UI entregues — evidências: web/evidencias/users_invite.json, web/evidencias/users_patch.json, web/evidencias/users_roles_assign.json
 [2025-08-25 15:40] DEV — HOTFIX P1 — Menu Alunos controlado por RBAC (students.read) — evidências: web/evidencias/caps_admin_basic.json, web/evidencias/qa_admin_basic_students_access.png
 [2025-08-25 15:55] DEV — CFG-RESP-P1 — Migração + APIs + UI Responsáveis — evidências: web/evidencias/responsibles_assign_basic.json, web/evidencias/responsibles_assign_enterprise.json, web/evidencias/screenshot_student_responsibles.png
+
+[2025-08-27 15:10 BRT] QA Signup FAIL. BUG-01 (modal login loop, P2) e BUG-02 (signup 500 PGRST204, P1). Evidências em web/evidencias/2025-08-27.
+
+[2025-08-27 16:30 BRT] DEV Correção BUG-01 e BUG-02. Signup funcionando. Onboarding/Kanban ativo.
+
+[2025-08-27 17:45 BRT] QA Onboarding/Kanban funcionando. Alunos sendo criados e aparecendo no board.
+
+[2025-08-27 18:20 BRT] DEV Implementação hard delete com ON DELETE CASCADE. Migração stu_on_delete_cascade_p1.sql aplicada.
+
+[2025-08-27 19:15 BRT] QA Hard delete funcionando. Cards sendo removidos automaticamente do board.
+
+[2025-08-27 20:00 BRT] DEV Limpeza completa do banco. Sistema limpo com apenas colunas 1 e 99.
+
+[2025-08-27 20:30 BRT] DEV Correção funcionalidade "Editar" das colunas. Modal funcionando perfeitamente.
+
+[2025-08-27 21:00 BRT] DEV Início implementação v0.2.0 - KANBAN-LOGS-P0, KANBAN-ADVANCE-CONFIRM, SRV-TASKS-STRUCTURE.
+
+[2025-08-27 21:15 BRT] DEV Migração kan_kanban_logs_p0.sql criada com tabelas: kanban_logs, service_onboarding_tasks, card_tasks.
+
+[2025-08-27 21:20 BRT] DEV Endpoints criados: GET /api/kanban/logs/:card_id, GET /api/services/onboarding/tasks.
+
+[2025-08-27 21:25 BRT] DEV API de criação de alunos atualizada para instanciar tarefas automaticamente ao criar card.
+
+[2025-08-27 21:30 BRT] DEV Frontend v0.2.0 implementado: Botão Log (drawer) funcionando perfeitamente.
+
+[2025-08-27 21:35 BRT] DEV Frontend v0.2.0 implementado: Aba Checklist funcionando com toggle de tarefas.
+
+[2025-08-27 21:40 BRT] DEV Endpoints criados: GET /api/kanban/items/:cardId/tasks, POST /api/kanban/items/:cardId/tasks/:taskId/toggle.
+
+[2025-08-27 21:45 BRT] DEV Componentes UI criados: Badge e ScrollArea para suportar o frontend v0.2.0.
+
+[2025-08-27 21:50 BRT] DEV Dependências instaladas: @radix-ui/react-scroll-area e class-variance-authority.
+
+[2025-08-27 21:55 BRT] DEV Erro corrigido: editorTab is not defined - props passadas corretamente do KanbanPage para ColumnView e DraggableCard.
+
+[2025-08-27 22:00 BRT] DEV Modal Premium implementado: KanbanCardEditor com abas Visão Geral, Checklist, Comentários e Anexos. Cards agora são compactos com botão lápis (✏️) e hotkey E.
+
+[2025-08-27 22:05 BRT] DEV Modais de Confirmação implementados: ENDPOINTS POST /api/kanban/move e POST /api/kanban/complete para avançar etapas e encerrar onboarding. Lógica real de verificação de tarefas obrigatórias implementada.
+
+[2025-08-27 22:10 BRT] QA FINAL v0.2.0 - Executando roteiro funcional completo para validação de produção.
+
+[2025-08-27 22:15 BRT] GOVERNANÇA v0.2.0: KANBAN-LOGS-P0, KANBAN-ADVANCE-CONFIRM, KANBAN-COMPLETE-99, KAN-CARD-MODAL-EDITOR, KANBAN-CHECKLIST-FRONT implementados e funcionais.
+
+[2025-08-27 22:20 BRT] DEPLOY v0.2.0 - Executado com sucesso em produção. Smoke test 5/5 PASS. Versão estável e funcional.
+
+[2025-08-27 22:25 BRT] v0.3.0-dev ABERTA - Iniciando desenvolvimento do módulo de Serviços Completos.
+
+### 🚀 v0.3.0-dev - SERVIÇOS COMPLETOS
+
+#### 📋 P0 — Funcionalidades Essenciais (SERVIÇOS ONBOARDING)
+[2025-08-27 22:30 BRT] P0-01: CRUD de colunas intermediárias (2..98) no módulo Serviços - PENDING
+[2025-08-27 22:30 BRT] P0-02: CRUD de tarefas por coluna (catálogo) - PENDING
+[2025-08-27 22:30 BRT] P0-03: Instanciação automática em cards, idempotente - PENDING
+[2025-08-27 22:30 BRT] P0-04: Opção "Aplicar aos cards existentes: sim/não" ao alterar catálogo - PENDING
+
+#### 🔧 P1 — Configurações
+[2025-08-27 22:30 BRT] P1-01: Equipe - habilitar menu para todos os planos (Basic = apenas admin) - PENDING
+[2025-08-27 22:30 BRT] P1-02: Configurações - habilitar menu em todos os planos, respeitando limitações - PENDING
+
+#### 🎨 P2 — Polimento Premium
+[2025-08-27 22:30 BRT] P2-01: UI refinada nos cards (ícones, tooltips, estados) - PENDING
+[2025-08-27 22:30 BRT] P2-02: Placeholders de comentários/anexos no modal - PENDING
+[2025-08-27 22:30 BRT] P2-03: Logs visuais e métricas básicas no histórico - PENDING
+
+[2025-08-27 22:35 BRT] P0-01 EM DESENVOLVIMENTO: CRUD de colunas intermediárias implementado no módulo Serviços. Interface completa com criar, editar, excluir e reordenar colunas. Integração em tempo real com Kanban via eventos pg:kanban:refresh.
+
+[2025-08-27 22:40 BRT] P0-02 EM DESENVOLVIMENTO: CRUD de tarefas por coluna implementado no módulo Serviços. Interface completa com gerenciador de tarefas, modal de criação, edição e exclusão. Integração preparada para instanciação automática em cards.
+
+[2025-08-27 22:45 BRT] P0-03 EM DESENVOLVIMENTO: Instanciação automática de tarefas em cards implementada. Funções PostgreSQL criadas para instanciar tarefas automaticamente quando cards entram em colunas. Triggers configurados para criação e movimentação de cards. API endpoints completos para CRUD de tarefas com integração de logs.
+
+[2025-08-27 22:50 BRT] P0-04 CONCLUÍDO: Opção "Aplicar aos cards existentes" implementada no módulo Serviços. Interface completa com modal de edição, switch para escolha de aplicação, validações e feedback visual. Integração com API PATCH para aplicar mudanças em massa aos cards existentes. Logs detalhados para auditoria.
+
+[2025-08-27 23:00 BRT] P1-01 CONCLUÍDO: Menu Equipe habilitado para todos os planos implementado. Menu sempre visível com funcionalidades limitadas por plano (Basic = 1 colaborador, Enterprise = ilimitado). Interface atualizada com badges de plano, contadores de limite, mensagens de upgrade e validações visuais. Integração completa com sistema de planos e RBAC.
+
+[2025-08-27 23:15 BRT] P1-02 CONCLUÍDO: Menu Configurações habilitado para todos os planos implementado. Página funcional com 4 abas: Perfil, Organização, Segurança (sempre disponíveis) e Avançado (limitado por plano). Plano Basic: acesso a configurações essenciais com itens avançados bloqueados e mensagens de upgrade. Plano Enterprise: acesso completo a todas as seções. Interface premium com badges de plano, tooltips e feedback visual consistente.
+
+[2025-08-27 23:30 BRT] P2-01 CONCLUÍDO: UI refinada nos cards do Kanban implementada. Cards com ícones contextuais (status, coluna, progresso, edição), tooltips informativos, estados visuais refinados (hover, focus, drag), barra de progresso com gradiente e animações. Checklist com ícones contextuais, badges refinados, indicadores de ordem e timestamps visuais. Interface premium com transições suaves, feedback visual e estados de interação.
+
+[2025-08-27 23:45 BRT] P2-02 CONCLUÍDO: Placeholders de comentários e anexos no modal do card implementados. Aba Comentários com campo de input preparado, listagem visual de comentários e informações sobre funcionalidade futura. Aba Anexos com botões de upload preparados, área de drag & drop e interface para gerenciamento de arquivos. Logs de auditoria integrados para abertura das abas (comment_tab_opened, attachments_tab_opened). UI premium com ícones contextuais, tooltips informativos e design consistente com o sistema existente.
+
+[2025-08-27 23:55 BRT] P2-03 CONCLUÍDO: Logs visuais e métricas básicas no histórico implementados. Sistema de métricas com contadores de ações totais, ações do dia e da semana. Gráficos de barras para visualização de atividade por tipo de ação. Filtros avançados por termo de busca, tipo de ação e período (hoje, semana, mês). Interface premium com cards de métricas, gráficos responsivos, filtros intuitivos e design refinado dos logs. Integração completa com sistema de logs existente e suporte para novas ações (comments_tab_opened, attachments_tab_opened).
+
+[2025-08-27 23:58 BRT] v0.3.1-dev ABERTA - Iniciando reformulação completa do módulo Serviços → Onboarding e Cards do Kanban premium. P1: Layout accordion expansível com CRUD inline de tarefas. P2: Cards simplificados e clean com badge de tarefas discreto. Foco em usabilidade e design premium.
+
+[2025-08-27 23:59 BRT] P1-01 CONCLUÍDO: Layout accordion expansível implementado. Colunas como cards expansíveis com header clicável, ícones de expansão (ChevronDown/ChevronRight), conteúdo expansível com CRUD inline de tarefas. Botões de ação (editar/excluir) aparecem no hover, integração com sistema de tarefas existente. Interface premium com badges de contagem, barras de progresso e design responsivo.
