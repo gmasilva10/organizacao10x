@@ -1,11 +1,21 @@
 type EventType =
   | "auth.login.success"
   | "auth.login.fail"
+  | "auth.org_resolved"
+  | "auth.redirect_onboarding"
   | "rbac.denied"
   | "limit.hit"
   | "feature.used"
   | "account.created"
   | "membership.created"
+  | "onboarding.module_enabled"
+  | "onboarding.seed_applied"
+  | "kanban.filters.applied"
+  | "kanban.filters.cleared"
+  | "kanban.stage.edited"
+  | "kanban.stage.reordered"
+  | "kanban.stage.deleted"
+  | "kanban.card.moved"
 
 async function postgrestInsert(table: string, row: Record<string, unknown>) {
   const url = process.env.SUPABASE_URL
@@ -37,6 +47,25 @@ export async function logEvent(params: {
     user_id: userId,
     event_type: eventType,
     payload: payload ?? null,
+  })
+}
+
+export async function writeAudit(params: {
+  orgId: string
+  actorId: string
+  entityType: string
+  entityId: string
+  action: string
+  payload?: Record<string, unknown>
+}) {
+  const { orgId, actorId, entityType, entityId, action, payload } = params
+  await postgrestInsert("audit_log", {
+    org_id: orgId,
+    actor_id: actorId,
+    entity_type: entityType,
+    entity_id: entityId,
+    action,
+    payload: payload ?? {},
   })
 }
 

@@ -22,10 +22,12 @@ import { useTheme } from "@/lib/use-theme"
 import { useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { useToast } from "@/components/ui/toast"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export function LoginDrawer() {
     const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
     const { open, setOpen } = useLoginUI()
     const [show, setShow] = useState(false)
     const { theme } = useTheme()
@@ -145,9 +147,21 @@ export function LoginDrawer() {
 					</div>
 				</div>
 				<DrawerFooter>
-					<DrawerClose asChild>
-						<Button variant="outline">Cancelar</Button>
-					</DrawerClose>
+					<Button
+						variant="outline"
+						onClick={() => {
+							const from = searchParams?.get("from") || "/"
+							// Fecha o drawer e navega sem reabrir via histórico
+							if (pathname === "/login") {
+								setOpen(false)
+								router.replace(from)
+							} else {
+								setOpen(false)
+							}
+						}}
+					>
+						Cancelar
+					</Button>
 				</DrawerFooter>
 			</DrawerContent>
 		</Drawer>

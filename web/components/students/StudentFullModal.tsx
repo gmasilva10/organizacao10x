@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/toast"
 
 type Trainer = { id: string; name: string }
 type Address = { zip?: string; street?: string; number?: string; complement?: string; district?: string; city?: string; state?: string; country?: string }
-type StudentRow = { id: string; full_name: string; email?: string | null; phone?: string | null; cpf?: string | null; birth_date?: string | null; customer_stage?: string | null; address?: Address | null; status: string; trainer?: { id: string | null } | null }
+type StudentRow = { id: string; full_name: string; email?: string | null; phone?: string | null; cpf?: string | null; birth_date?: string | null; customer_stage?: string | null; address?: Address | null; status: string; onboard_opt?: 'nao_enviar'|'enviar'|'enviado'; trainer?: { id: string | null } | null }
 
 // Tipos de serviço usados dentro e fora do componente
 type Service = {
@@ -68,6 +68,7 @@ export function StudentFullModal({
   const [customerStage, setCustomerStage] = useState<'new'|'renewal'|'canceled'>("new")
   const [trainerId, setTrainerId] = useState<string>("")
   const [address, setAddress] = useState<Address>({})
+  const [onboardOpt, setOnboardOpt] = useState<'nao_enviar'|'enviar'|'enviado'>("nao_enviar")
   const [ownerId, setOwnerId] = useState<string>("")
   const [primaryId, setPrimaryId] = useState<string>("")
   const [supportId, setSupportId] = useState<string>("")
@@ -89,6 +90,7 @@ export function StudentFullModal({
       setCustomerStage((student.customer_stage as 'new'|'renewal'|'canceled') || 'new')
       setTrainerId(student.trainer?.id || "")
       setAddress(student.address || {})
+      setOnboardOpt((student as any)?.onboard_opt || 'nao_enviar')
       // carregar responsibles
       fetch(`/api/students/${student.id}/responsibles`, { cache: 'no-store' })
         .then(r=>r.json())
@@ -102,7 +104,7 @@ export function StudentFullModal({
       // carregar serviços
       fetch(`/api/students/${student.id}/services`, { cache: 'no-store' }).then(r=>r.json()).then(d => setServices(d?.items || [])).catch(()=>setServices([]))
     } else if (mode === 'create') {
-      setName(""); setEmail(""); setPhone(""); setCpf(""); setBirthDate(""); setStatus('onboarding'); setCustomerStage('new'); setTrainerId(""); setAddress({}); setServices([]); setTab('general')
+      setName(""); setEmail(""); setPhone(""); setCpf(""); setBirthDate(""); setStatus('onboarding'); setCustomerStage('new'); setTrainerId(""); setAddress({}); setServices([]); setOnboardOpt('nao_enviar'); setTab('general')
     }
   }, [open, mode, student])
 
@@ -200,6 +202,7 @@ export function StudentFullModal({
         customer_stage: customerStage,
         trainer_id: trainerId || null,
         address: address && Object.keys(address).length ? address : null,
+        onboard_opt: onboardOpt,
       }
       // persist responsibles (somente em edit com id)
       if (mode === 'edit' && student?.id) {
@@ -309,6 +312,14 @@ export function StudentFullModal({
                   <option value="onboarding">onboarding</option>
                   <option value="active">active</option>
                   <option value="paused">paused</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="f-onboard" className="mb-1 block text-sm">Onboarding</label>
+                <select id="f-onboard" value={onboardOpt} onChange={(e)=>setOnboardOpt(e.target.value as 'nao_enviar'|'enviar'|'enviado')} className="w-full rounded-md border px-3 py-2 text-sm">
+                  <option value="nao_enviar">não enviar</option>
+                  <option value="enviar">enviar</option>
+                  <option value="enviado" disabled>enviado</option>
                 </select>
               </div>
               <div>

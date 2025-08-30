@@ -98,10 +98,12 @@ export function Header() {
 
 				<div className="hidden md:flex items-center gap-3">
 					<ThemeToggle />
-					<LoginDrawer />
-					<form action="/api/auth/signout" method="post" onSubmit={async (e) => { e.preventDefault(); await fetch('/api/auth/signout', { method: 'POST', credentials: 'include' }); location.href = '/' }}>
-						<Button size="sm" variant="outline" className="rounded-full" aria-label="Sair">Sair</Button>
-					</form>
+					<Button asChild size="sm" variant="ghost" className="rounded-full">
+						<Link href="/login">Entrar</Link>
+					</Button>
+					<Button asChild size="sm" className="rounded-full bg-gradient-to-r from-primary to-accent">
+						<Link href="/signup">Começar agora</Link>
+					</Button>
 				</div>
 
 				<button className="flex md:hidden" onClick={() => setIsMenuOpen((v) => !v)} aria-label="Abrir menu mobile">
@@ -148,8 +150,12 @@ export function Header() {
 							</button>
 						)}
 						<div className="flex flex-col gap-3 pt-4">
-							<LoginDrawer />
-							<Button className="w-full rounded-full" aria-label="Começar">Começar</Button>
+							<Button asChild variant="ghost" className="w-full rounded-full">
+								<Link href="/login">Entrar</Link>
+							</Button>
+							<Button asChild className="w-full rounded-full bg-gradient-to-r from-primary to-accent">
+								<Link href="/signup">Começar agora</Link>
+							</Button>
 						</div>
 					</nav>
 				</div>

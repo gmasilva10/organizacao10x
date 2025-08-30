@@ -96,4 +96,19 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Esconder scrollbars desnecessários no Kanban */
+  .kanban-column::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .kanban-column {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Garantir que cards não tenham overflow */
+  .kanban-card {
+    overflow: hidden;
+  }
 }

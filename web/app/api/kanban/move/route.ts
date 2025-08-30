@@ -1,83 +1,111 @@
-import { NextResponse } from "next/server"
-import { resolveRequestContext } from "@/server/context"
-import { logEvent } from "@/server/events"
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/utils/supabase/server'
+import { cookies } from 'next/headers'
 
-type MoveBody = {
-  studentId: string
-  from: string
-  to: string
-}
-
-const ALLOWED = new Set(["admin", "manager", "trainer"]) as Set<string>
-
-export async function POST(request: Request) {
-  const ctx = await resolveRequestContext(request)
-  if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
-
-  if (!ALLOWED.has(ctx.role)) {
-    await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: "rbac.denied", payload: { action: "kanban.move" } })
-    return NextResponse.json({ error: "forbidden" }, { status: 403 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as Partial<MoveBody>
-  const studentId = String(body.studentId || "").trim()
-  const from = String(body.from || "").trim()
-  const to = String(body.to || "").trim()
-  if (!studentId || !from || !to) return NextResponse.json({ error: "invalid_payload" }, { status: 400 })
-
-  const now = new Date().toISOString()
-
-  // Persistir movimento no banco (MVP): atualizar column_id/sort do card
-  let persisted = false
+export async function POST(request: NextRequest) {
+  console.log('🔍 API /api/kanban/move POST chamada')
   try {
-    const url = process.env.SUPABASE_URL!
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-    // busca card por (tenant_id, student_id)
-    const search = await fetch(`${url}/rest/v1/onboarding_cards?tenant_id=eq.${ctx.tenantId}&student_id=eq.${encodeURIComponent(studentId)}&select=id,column_id,sort`, {
-      headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
-    })
-    const arr = await search.json().catch(()=>[])
-    const cardId = arr?.[0]?.id
-    if (cardId) {
-      // calcular nova ordenação simples: sort = epoch seconds
-      const newSort = Math.floor(Date.now() / 1000)
-      // detectar se coluna destino é "Entrega do Treino" para completed_at
-      const colResp = await fetch(`${url}/rest/v1/onboarding_columns?id=eq.${to}&tenant_id=eq.${ctx.tenantId}&select=title,sort&limit=1`, {
-        headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
-      })
-      const col = (await colResp.json().catch(()=>[]))?.[0]
-      const completedAt = col && String(col.title).toLowerCase().includes('entrega do treino') ? now : null
-      const upd = await fetch(`${url}/rest/v1/onboarding_cards?id=eq.${cardId}&tenant_id=eq.${ctx.tenantId}`, {
-        method: 'PATCH',
-        headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ column_id: to, sort: newSort, completed_at: completedAt })
-      })
-      persisted = upd.ok
+    const cookieStore = cookies()
+    const supabase = await createClient(cookieStore)
+    
+    // Verificar autenticação
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      console.warn('⚠️ Auth falhou:', authError)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-  } catch {}
 
-  if (persisted) {
-    // Telemetria somente em sucesso
-    await logEvent({
-      tenantId: ctx.tenantId,
-      userId: ctx.userId,
-      eventType: "feature.used",
-      payload: {
-        type: "student.stage.moved",
-        details: {
-          studentId,
-          from,
-          to,
-          columns_version: 1,
-          source: "kanban.ui",
-          ts: now,
-        },
-        route: "/(app)/onboarding",
-      },
+    const body = await request.json()
+    const { cardId, fromColumnId, toColumnId } = body || {}
+    console.log('📝 Payload recebido:', body)
+    
+    if (!cardId || !fromColumnId || !toColumnId) {
+      console.warn('⚠️ Dados inválidos:', { cardId, fromColumnId, toColumnId })
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 })
+    }
+
+    // Buscar informações do card e colunas
+    const { data: card, error: cardError } = await supabase
+      .from('kanban_items')
+      .select('id, org_id, student_id, stage_id')
+      .eq('id', cardId)
+      .single()
+
+    if (cardError || !card) {
+      console.error('❌ Card não encontrado:', { cardError, card })
+      return NextResponse.json({ error: 'Card não encontrado', detail: cardError?.message }, { status: 404 })
+    }
+    console.log('✅ Card carregado:', card)
+
+    const { data: fromStage, error: fromStageError } = await supabase
+      .from('kanban_stages')
+      .select('id, name, position, stage_code')
+      .eq('id', fromColumnId)
+      .single()
+
+    if (fromStageError || !fromStage) {
+      console.error('❌ fromStage não encontrado:', { fromColumnId, fromStageError, fromStage })
+      return NextResponse.json({ error: 'Coluna origem não encontrada', detail: fromStageError?.message }, { status: 404 })
+    }
+
+    const { data: toStage, error: toStageError } = await supabase
+      .from('kanban_stages')
+      .select('id, name, position, stage_code')
+      .eq('id', toColumnId)
+      .single()
+
+    if (toStageError || !toStage) {
+      console.error('❌ toStage não encontrado:', { toColumnId, toStageError, toStage })
+      return NextResponse.json({ error: 'Coluna destino não encontrada', detail: toStageError?.message }, { status: 404 })
+    }
+
+    console.log('✅ Stages carregados:', { fromStage, toStage })
+
+    // Verificar se é uma coluna fixa (1 ou 99)
+    // Removido: bloqueio de colunas fixas (1 e 99) — regra atual permite mover de qualquer coluna
+
+    // Atualizar o card para a nova coluna
+    const { error: updateError } = await supabase
+      .from('kanban_items')
+      .update({ stage_id: toColumnId })
+      .eq('id', cardId)
+
+    if (updateError) {
+      console.error('❌ Erro ao atualizar card:', updateError)
+      return NextResponse.json({ error: 'Erro interno', detail: updateError.message }, { status: 500 })
+    }
+
+    // Log da movimentação
+    try {
+      await supabase
+        .from('kanban_logs')
+        .insert({
+          org_id: card.org_id,
+          card_id: cardId,
+          stage_id: toColumnId,
+          action: 'card_moved',
+          payload: {
+            from_stage: fromStage.name,
+            to_stage: toStage.name,
+            from_position: fromStage.position,
+            to_position: toStage.position,
+            student_id: card.student_id
+          },
+          created_by: user.id
+        })
+    } catch (logError) {
+      console.error('⚠️ Erro ao criar log (ignorado):', logError)
+      // Não falha a operação se o log falhar
+    }
+
+    console.log('✅ Card movido com sucesso:', { cardId, from: fromStage.id, to: toStage.id })
+    return NextResponse.json({ 
+      success: true, 
+      message: `Card movido de "${fromStage.name}" para "${toStage.name}"`
     })
+
+  } catch (error) {
+    console.error('❌ Erro inesperado:', error)
+    return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
-
-  return new NextResponse(null, { status: persisted ? 204 : 500 })
 }
-
-

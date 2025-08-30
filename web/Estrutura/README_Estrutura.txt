@@ -1,4 +1,4 @@
-Última atualização: 13/08/2025
+Última atualização: 2025-08-26
 # ESTRUTURA — Guia de Operação da Pasta
 Produto: Personal Global (Organização10x)
 Propósito: Central único de documentação viva do projeto (controle de atividades, pendências, erros, padrões e rotas).
@@ -22,6 +22,10 @@ Checklist de “pronto”
 - Lighthouse: Performance ≥ 0.90, Acessibilidade ≥ 0.95, SEO ≥ 0.90 (em ambiente de build).
 - Design consistente com paleta e padrões definidos.
 - Documentação nesta pasta atualizada no mesmo commit.
+
+Commits
+- Usar Conventional Commits (ex.: feat(students): ..., docs(estrutura): ...)
+- Incluir links para evidências em `web/evidencias` no corpo do commit [[Conventional Commits e evidências]].
 
 Como registrar uma nova entrada (exemplo prático)
 - Atividades.txt:
