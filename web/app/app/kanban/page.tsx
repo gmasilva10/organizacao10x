@@ -15,6 +15,9 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { Skeleton } from "@/components/ui/skeleton"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { KanbanLogDrawer } from '@/components/KanbanLogDrawer'
 import { KanbanChecklist } from '@/components/KanbanChecklist'
 import { KanbanCardEditor } from '@/components/KanbanCardEditor'
@@ -551,6 +554,13 @@ export default function KanbanPage() {
 
   return (
     <div className="container py-8" data-alias="onboarding-kanban">
+      
+      <Breadcrumb 
+        items={[
+          { label: "Onboarding/Kanban", current: true }
+        ]}
+        className="mb-4"
+      />
 
       {showHistory ? (
         <div className="rounded-md border p-4">
@@ -578,11 +588,28 @@ export default function KanbanPage() {
             <div className={`${boardCollapsed ? "opacity-60" : ""} flex gap-4 overflow-x-auto pb-2`} style={{ scrollSnapType: 'x proximity' }}>
               {loadingBoard ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                  <div key={`sk-${i}`} className="w-[300px] shrink-0 rounded-md border bg-muted/10 p-3">
-                    <div className="mb-2 h-5 w-2/3 animate-pulse rounded bg-muted" />
-                    <div className="space-y-2">
-                      <div className="h-16 animate-pulse rounded bg-muted" />
-                      <div className="h-16 animate-pulse rounded bg-muted" />
+                  <div key={`sk-${i}`} className="w-[300px] shrink-0 rounded-md border bg-card p-3">
+                    <div className="mb-4">
+                      <Skeleton className="h-5 w-2/3 mb-2" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="rounded-md border p-3">
+                        <Skeleton className="h-4 w-3/4 mb-2" />
+                        <Skeleton className="h-3 w-1/2 mb-2" />
+                        <div className="flex items-center justify-between">
+                          <Skeleton className="h-5 w-16 rounded-full" />
+                          <Skeleton className="h-4 w-8" />
+                        </div>
+                      </div>
+                      <div className="rounded-md border p-3">
+                        <Skeleton className="h-4 w-2/3 mb-2" />
+                        <Skeleton className="h-3 w-3/4 mb-2" />
+                        <div className="flex items-center justify-between">
+                          <Skeleton className="h-5 w-20 rounded-full" />
+                          <Skeleton className="h-4 w-8" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -844,10 +871,12 @@ function ColumnView({
           const statusOk = !filters?.status || filters.status.length === 0 || filters.status.includes(String(c.status || 'onboarding'))
           return textOk && statusOk
         }).length === 0 ? (
-          <div className="flex min-h-[80px] flex-col items-center justify-center rounded-md border border-dashed bg-muted/20 py-6 text-center">
-            <div className="mb-1 text-2xl">🗂️</div>
-            <p className="text-xs text-muted-foreground">Nenhum card aqui ainda</p>
-          </div>
+          <EmptyState
+            title="Nenhum card aqui ainda"
+            description="Arraste cards de outras colunas ou crie um novo"
+            icon="🗂️"
+            className="min-h-[80px] border-dashed"
+          />
         ) : (
           matchesFilters(column.title) ? (
             column.cards

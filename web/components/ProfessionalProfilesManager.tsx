@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/toast"
+import { useConfirmDialog } from "@/components/ui/confirm-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -141,24 +142,31 @@ export function ProfessionalProfilesManager() {
   }
 
   const handleDelete = async (profile: ProfessionalProfile) => {
-    if (!confirm(`Tem certeza que deseja excluir o perfil "${profile.name}"?`)) {
-      return
-    }
+    const { confirm, ConfirmDialog } = useConfirmDialog()
+    
+    confirm({
+      title: "Excluir Perfil Profissional",
+      description: `Tem certeza que deseja excluir o perfil "${profile.name}"? Esta ação não pode ser desfeita.`,
+      confirmText: "Sim, excluir",
+      cancelText: "Cancelar",
+      variant: "destructive",
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`/api/professional-profiles/${profile.id}`, {
+            method: 'DELETE'
+          })
 
-    try {
-      const response = await fetch(`/api/professional-profiles/${profile.id}`, {
-        method: 'DELETE'
-      })
-
-      if (response.ok) {
-        success('Perfil excluído com sucesso!')
-        loadProfiles()
-      } else {
-        error('Erro ao excluir perfil')
+          if (response.ok) {
+            success('Perfil excluído com sucesso!')
+            loadProfiles()
+          } else {
+            error('Erro ao excluir perfil')
+          }
+        } catch (err) {
+          error('Erro ao excluir perfil')
+        }
       }
-    } catch (err) {
-      error('Erro ao excluir perfil')
-    }
+    })
   }
 
   const openCreateModal = () => {
@@ -356,6 +364,8 @@ export function ProfessionalProfilesManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ConfirmDialog />
     </div>
   )
 }

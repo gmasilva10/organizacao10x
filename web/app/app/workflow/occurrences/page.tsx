@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { X, Filter, Eye, CheckCircle, Bell, Calendar, Copy, Download } from "lucide-react"
 import { useOccurrencesPermissions } from "@/lib/use-occurrences-permissions"
+import { useConfirmDialog } from "@/components/ui/confirm-dialog"
+import { TableSkeleton, EmptyState, ErrorState } from "@/components/ui/skeleton"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
 
 type OccurrenceRow = {
   id: number
@@ -163,9 +166,19 @@ export default function OccurrencesManagementPage() {
   }
 
   async function cancelReminder(row: OccurrenceRow) {
-    if (!confirm('Tem certeza que deseja cancelar este lembrete?')) return
-    await fetch(`/api/occurrences/${row.id}/reminder`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ reminder_status: 'CANCELLED' }) })
-    fetchList()
+    const { confirm, ConfirmDialog } = useConfirmDialog()
+    
+    confirm({
+      title: "Cancelar Lembrete",
+      description: "Tem certeza que deseja cancelar este lembrete?",
+      confirmText: "Sim, cancelar",
+      cancelText: "Manter",
+      variant: "default",
+      onConfirm: async () => {
+        await fetch(`/api/occurrences/${row.id}/reminder`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ reminder_status: 'CANCELLED' }) })
+        fetchList()
+      }
+    })
   }
 
   // Handlers dos modais
@@ -194,11 +207,12 @@ export default function OccurrencesManagementPage() {
   if (permissionsLoading) {
     return (
       <div className="container max-w-6xl mx-auto">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Carregando permissões...</p>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-10 w-24" />
           </div>
+          <TableSkeleton rows={5} columns={7} />
         </div>
       </div>
     )
@@ -221,6 +235,14 @@ export default function OccurrencesManagementPage() {
 
   return (
     <div className="container max-w-6xl mx-auto">
+      {/* Breadcrumb */}
+      <Breadcrumb 
+        items={[
+          { label: "Gestão de Ocorrências", current: true }
+        ]}
+        className="mb-4"
+      />
+      
       {/* Header compacto */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
@@ -283,13 +305,15 @@ export default function OccurrencesManagementPage() {
 
       <div className="rounded-lg border">
         {loading ? (
-          <div className="p-6 text-center text-muted-foreground">Carregando…</div>
-        ) : rows.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="mb-4 text-6xl">📋</div>
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">Nenhuma ocorrência encontrada</h3>
-            <p className="text-slate-500">Tente ajustar os filtros ou criar uma nova ocorrência.</p>
+          <div className="p-6">
+            <TableSkeleton rows={5} columns={7} />
           </div>
+        ) : rows.length === 0 ? (
+          <EmptyState
+            icon="📋"
+            title="Nenhuma ocorrência encontrada"
+            description="Tente ajustar os filtros ou criar uma nova ocorrência."
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -475,6 +499,8 @@ export default function OccurrencesManagementPage() {
         onClear={handleClearFilters}
         initialFilters={initialFilters}
       />
+
+      <ConfirmDialog />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useConfirmDialog } from "@/components/ui/confirm-dialog"
 
 type Template = { id: string; title: string; type: 'nota'|'ligacao'|'whatsapp'|'email'; content: string }
 
@@ -40,9 +41,19 @@ export default function RelationshipTemplatesPage() {
   }
 
   async function remove(id: string) {
-    if (!confirm('Excluir template?')) return
-    const res = await fetch(`/api/relationship/templates/${id}`, { method: 'DELETE' })
-    if (res.ok) load()
+    const { confirm, ConfirmDialog } = useConfirmDialog()
+    
+    confirm({
+      title: "Excluir Template",
+      description: "Tem certeza que deseja excluir este template? Esta ação não pode ser desfeita.",
+      confirmText: "Sim, excluir",
+      cancelText: "Cancelar",
+      variant: "destructive",
+      onConfirm: async () => {
+        const res = await fetch(`/api/relationship/templates/${id}`, { method: 'DELETE' })
+        if (res.ok) load()
+      }
+    })
   }
 
   return (
@@ -109,6 +120,8 @@ export default function RelationshipTemplatesPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog />
     </div>
   )
 }

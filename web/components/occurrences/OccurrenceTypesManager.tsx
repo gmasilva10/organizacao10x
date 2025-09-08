@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, Plus, Edit, Trash2, Search, Filter } from "lucide-react"
 import { toast } from "sonner"
+import { useConfirmDialog } from "@/components/ui/confirm-dialog"
 
 interface OccurrenceGroup {
   id: number
@@ -145,25 +146,32 @@ export function OccurrenceTypesManager() {
   }
 
   async function handleDelete(type: OccurrenceType) {
-    if (!confirm(`Tem certeza que deseja excluir o tipo "${type.name}"?`)) {
-      return
-    }
+    const { confirm, ConfirmDialog } = useConfirmDialog()
+    
+    confirm({
+      title: "Excluir Tipo de Ocorrência",
+      description: `Tem certeza que deseja excluir o tipo "${type.name}"? Esta ação não pode ser desfeita.`,
+      confirmText: "Sim, excluir",
+      cancelText: "Cancelar",
+      variant: "destructive",
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/occurrence-types/${type.id}`, {
+            method: 'DELETE'
+          })
 
-    try {
-      const res = await fetch(`/api/occurrence-types/${type.id}`, {
-        method: 'DELETE'
-      })
-
-      if (res.ok) {
-        toast.success('Tipo excluído com sucesso')
-        fetchData()
-      } else {
-        const error = await res.json()
-        toast.error(error?.error || 'Erro ao excluir tipo')
+          if (res.ok) {
+            toast.success('Tipo excluído com sucesso')
+            fetchData()
+          } else {
+            const error = await res.json()
+            toast.error(error?.error || 'Erro ao excluir tipo')
+          }
+        } catch (error) {
+          toast.error('Erro ao excluir tipo')
+        }
       }
-    } catch (error) {
-      toast.error('Erro ao excluir tipo')
-    }
+    })
   }
 
   async function handleToggleStatus(type: OccurrenceType) {
@@ -416,6 +424,8 @@ export function OccurrenceTypesManager() {
           </Table>
         </CardContent>
       </Card>
+
+      <ConfirmDialog />
     </div>
   )
 }

@@ -8,6 +8,7 @@ import { StudentsSkeleton } from "@/components/students/StudentsSkeleton"
 import { StudentsFilters } from "@/components/students/StudentsFilters"
 import { AssignTrainerSelect } from "@/components/students/AssignTrainerSelect"
 import { StudentFullModal } from "@/components/students/StudentFullModal"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
 
 type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; onboard_opt?: 'nao_enviar'|'enviar'|'enviado'; trainer: { id: string | null; name: string | null } | null; created_at: string }
 type Trainer = { id: string; user_id: string; name: string; email?: string }
@@ -174,6 +175,14 @@ export default function StudentsPage() {
     <div className="container py-8">
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} title="Limite do seu plano foi atingido" description="Para adicionar mais alunos, faça upgrade para o plano Enterprise." primaryHref="/contact" secondaryHref="/planos" />
       <StudentFullModal open={showFull!==false} mode={showFull==='create'?'create':'edit'} student={showFull==='edit'? editing : null} trainers={trainers} onClose={()=>{ setShowFull(false); setEditing(null) }} onSaved={()=>{ fetchList(); fetchSummary() }} />
+      
+      <Breadcrumb 
+        items={[
+          { label: "Alunos", current: true }
+        ]}
+        className="mb-4"
+      />
+      
       <h1 className="text-2xl font-semibold">Alunos</h1>
       {counts && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
@@ -238,7 +247,18 @@ export default function StudentsPage() {
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td className="px-3 py-6 text-center text-muted-foreground" colSpan={5}>{loading ? 'Carregando…' : 'Nenhum aluno encontrado. Crie seu primeiro aluno para começar.'}</td></tr>
+              <tr>
+                <td className="px-3 py-6 text-center text-muted-foreground" colSpan={5}>
+                  {loading ? (
+                    <div className="space-y-3">
+                      <Skeleton className="h-4 w-32 mx-auto" />
+                      <Skeleton className="h-3 w-48 mx-auto" />
+                    </div>
+                  ) : (
+                    'Nenhum aluno encontrado. Crie seu primeiro aluno para começar.'
+                  )}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

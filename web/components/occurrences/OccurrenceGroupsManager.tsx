@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Loader2, Plus, Edit, Trash2, Search, Filter } from "lucide-react"
 import { toast } from "sonner"
+import { useConfirmDialog } from "@/components/ui/confirm-dialog"
 
 interface OccurrenceGroup {
   id: number
@@ -109,25 +110,32 @@ export function OccurrenceGroupsManager() {
   }
 
   async function handleDelete(group: OccurrenceGroup) {
-    if (!confirm(`Tem certeza que deseja excluir o grupo "${group.name}"?`)) {
-      return
-    }
+    const { confirm, ConfirmDialog } = useConfirmDialog()
+    
+    confirm({
+      title: "Excluir Grupo de Ocorrência",
+      description: `Tem certeza que deseja excluir o grupo "${group.name}"? Esta ação não pode ser desfeita.`,
+      confirmText: "Sim, excluir",
+      cancelText: "Cancelar",
+      variant: "destructive",
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/occurrence-groups/${group.id}`, {
+            method: 'DELETE'
+          })
 
-    try {
-      const res = await fetch(`/api/occurrence-groups/${group.id}`, {
-        method: 'DELETE'
-      })
-
-      if (res.ok) {
-        toast.success('Grupo excluído com sucesso')
-        fetchGroups()
-      } else {
-        const error = await res.json()
-        toast.error(error?.error || 'Erro ao excluir grupo')
+          if (res.ok) {
+            toast.success('Grupo excluído com sucesso')
+            fetchGroups()
+          } else {
+            const error = await res.json()
+            toast.error(error?.error || 'Erro ao excluir grupo')
+          }
+        } catch (error) {
+          toast.error('Erro ao excluir grupo')
+        }
       }
-    } catch (error) {
-      toast.error('Erro ao excluir grupo')
-    }
+    })
   }
 
   async function handleToggleStatus(group: OccurrenceGroup) {
@@ -332,6 +340,8 @@ export function OccurrenceGroupsManager() {
           </Table>
         </CardContent>
       </Card>
+
+      <ConfirmDialog />
     </div>
   )
 }

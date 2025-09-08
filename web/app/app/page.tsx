@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Users, Briefcase, UserCheck, ClipboardList, Activity, ArrowRight, TrendingUp, Calendar, BarChart3 } from "lucide-react"
 
 interface DashboardStats {
@@ -131,41 +132,56 @@ export default function DashboardPage() {
 
       {/* Cards de Estatísticas */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => {
-          const Icon = card.icon
-          return (
-            <Card key={card.title} className="relative overflow-hidden">
+        {stats.loading ? (
+          // Skeleton para os cards durante loading
+          Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} className="relative overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {card.title}
-                </CardTitle>
-                <div className={`rounded-full p-2 ${card.bgColor}`}>
-                  <Icon className={`h-4 w-4 ${card.color}`} />
+                <Skeleton className="h-4 w-20" />
+                <div className="rounded-full p-2 bg-muted">
+                  <Skeleton className="h-4 w-4" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.loading ? (
-                    <div className="h-8 w-16 bg-muted animate-pulse rounded" />
-                  ) : (
-                    card.value.toLocaleString()
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {card.description}
-                </p>
-                <div className="mt-3">
-                  <Button asChild variant="ghost" size="sm" className="h-auto p-0 text-xs">
-                    <Link href={card.href} className="flex items-center gap-1">
-                      {card.actionText}
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </Button>
-                </div>
+                <Skeleton className="h-8 w-16 mb-2" />
+                <Skeleton className="h-3 w-32 mb-3" />
+                <Skeleton className="h-4 w-24" />
               </CardContent>
             </Card>
-          )
-        })}
+          ))
+        ) : (
+          cards.map((card) => {
+            const Icon = card.icon
+            return (
+              <Card key={card.title} className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {card.title}
+                  </CardTitle>
+                  <div className={`rounded-full p-2 ${card.bgColor}`}>
+                    <Icon className={`h-4 w-4 ${card.color}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {card.value.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {card.description}
+                  </p>
+                  <div className="mt-3">
+                    <Button asChild variant="ghost" size="sm" className="h-auto p-0 text-xs">
+                      <Link href={card.href} className="flex items-center gap-1">
+                        {card.actionText}
+                        <ArrowRight className="h-3 w-3" />
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })
+        )}
       </div>
 
       {/* Ações Rápidas */}

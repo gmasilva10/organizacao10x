@@ -31,6 +31,7 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/toast"
+import { useConfirmDialog } from "@/components/ui/confirm-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -271,24 +272,31 @@ export function ProfessionalsManager() {
   }
 
   const handleDelete = async (professional: Professional) => {
-    if (!confirm(`Tem certeza que deseja excluir o profissional "${professional.full_name}"?`)) {
-      return
-    }
+    const { confirm, ConfirmDialog } = useConfirmDialog()
+    
+    confirm({
+      title: "Excluir Profissional",
+      description: `Tem certeza que deseja excluir o profissional "${professional.full_name}"? Esta ação não pode ser desfeita.`,
+      confirmText: "Sim, excluir",
+      cancelText: "Cancelar",
+      variant: "destructive",
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`/api/professionals/${professional.id}`, {
+            method: 'DELETE'
+          })
 
-    try {
-      const response = await fetch(`/api/professionals/${professional.id}`, {
-        method: 'DELETE'
-      })
-
-      if (response.ok) {
-        success('Profissional excluído com sucesso!')
-        loadData()
-      } else {
-        error('Erro ao excluir profissional')
+          if (response.ok) {
+            success('Profissional excluído com sucesso!')
+            loadData()
+          } else {
+            error('Erro ao excluir profissional')
+          }
+        } catch (err) {
+          error('Erro ao excluir profissional')
+        }
       }
-    } catch (err) {
-      error('Erro ao excluir profissional')
-    }
+    })
   }
 
   const handleLinkUser = async (professional: Professional) => {
@@ -945,6 +953,8 @@ export function ProfessionalsManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ConfirmDialog />
     </div>
   )
 }
