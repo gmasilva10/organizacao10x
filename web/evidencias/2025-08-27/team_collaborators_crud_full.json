@@ -1,0 +1,213 @@
+{
+  "test_case": "Team Collaborators CRUD + Plan Limits - P0 Module",
+  "timestamp": "2025-08-27T12:00:00Z",
+  "module": "feat/team-collaborators-crud",
+  "database_migration": {
+    "file": "supabase/migrations/cfg-team-p1.sql",
+    "features": {
+      "table_structure": {
+        "name": "collaborators",
+        "columns": [
+          "id (UUID, PK)",
+          "org_id (UUID, FK to tenants)",
+          "full_name (TEXT, min 2 chars)",
+          "email (TEXT, optional, validated)",
+          "phone (TEXT, optional, E.164)",
+          "role (ENUM: admin, manager, trainer, viewer)",
+          "status (ENUM: active, inactive)",
+          "user_id (UUID, optional FK to auth.users)",
+          "created_at, updated_at (TIMESTAMPTZ)"
+        ]
+      },
+      "rls_security": {
+        "enabled": true,
+        "policies": [
+          "collaborators_org_isolation: só vê colaboradores da própria org",
+          "collaborators_write_rbac: insert/update/delete apenas admin/manager"
+        ]
+      },
+      "unique_constraints": {
+        "user_org_unique": "1 user_id por org (vínculo 1:1)"
+      },
+      "indexes": [
+        "org_id",
+        "status", 
+        "role",
+        "user_id (where not null)"
+      ],
+      "seed_data": "Colaborador admin para cada tenant existente"
+    }
+  },
+  "api_endpoints": {
+    "list_collaborators": {
+      "method": "GET",
+      "endpoint": "/api/collaborators",
+      "rbac": ["admin", "manager", "trainer"],
+      "query_params": {
+        "query": "busca por nome/email",
+        "status": "active/inactive",
+        "role": "admin/manager/trainer/viewer",
+        "page": "número da página",
+        "pageSize": "itens por página (10-100)"
+      },
+      "response": {
+        "ok": true,
+        "items": "array de colaboradores",
+        "page": "número",
+        "pageSize": "número",
+        "total": "total de itens",
+        "filters": "filtros aplicados"
+      }
+    },
+    "create_collaborator": {
+      "method": "POST",
+      "endpoint": "/api/collaborators",
+      "rbac": ["admin", "manager"],
+      "payload": {
+        "full_name": "string (min 2)",
+        "email": "string optional (validated)",
+        "phone": "string optional (E.164)",
+        "role": "admin|manager|trainer|viewer",
+        "status": "active|inactive"
+      },
+      "plan_limits": {
+        "basic": "máximo 3 colaboradores ativos",
+        "enterprise": "máximo 100 colaboradores ativos"
+      },
+      "response_codes": {
+        "200": "criado com sucesso",
+        "400": "validation_error",
+        "422": "limit_reached",
+        "403": "forbidden"
+      }
+    },
+    "update_collaborator": {
+      "method": "PATCH",
+      "endpoint": "/api/collaborators/{id}",
+      "rbac": ["admin", "manager"],
+      "payload": "campos parciais para atualização",
+      "plan_limits": "verifica limite ao ativar colaborador",
+      "response": "colaborador atualizado"
+    },
+    "toggle_status": {
+      "method": "PATCH",
+      "endpoint": "/api/collaborators/{id}/toggle",
+      "rbac": ["admin", "manager"],
+      "behavior": "toggle active ⇄ inactive",
+      "plan_limits": "verifica limite ao ativar",
+      "response": {
+        "ok": true,
+        "collaborator": "dados atualizados",
+        "action": "activated|deactivated"
+      }
+    },
+    "soft_delete": {
+      "method": "DELETE",
+      "endpoint": "/api/collaborators/{id}",
+      "rbac": ["admin"],
+      "behavior": "marca como inactive (soft delete)",
+      "response": "ok: true"
+    }
+  },
+  "ui_implementation": {
+    "route": "/app/team",
+    "appshell_integration": {
+      "menu_item": {
+        "id": "team",
+        "title": "Equipe",
+        "href": "/app/team",
+        "icon": "Shield",
+        "section": "Administração"
+      },
+      "rbac": "admin/manager podem gerenciar; trainer pode visualizar"
+    },
+    "page_features": {
+      "filters": {
+        "search_input": "busca por nome/email",
+        "status_filter": "Todos, Ativo, Inativo",
+        "role_filter": "Todos, Admin, Manager, Trainer, Viewer"
+      },
+      "collaborator_card": {
+        "displays": [
+          "nome",
+          "badges (role + status)",
+          "email (se existir)",
+          "telefone (se existir)"
+        ],
+        "actions": [
+          "botão Editar",
+          "botão Ativar/Desativar (toggle)"
+        ]
+      },
+      "create_modal": {
+        "fields": [
+          "Nome completo *",
+          "Email (opcional)",
+          "Telefone (opcional)",
+          "Papel (select)",
+          "Status (select)"
+        ],
+        "validations": {
+          "frontend": "nome min 2 chars, email format, phone E.164",
+          "backend": "same + plan limits"
+        }
+      },
+      "edit_modal": {
+        "behavior": "pré-popula dados atuais",
+        "fields": "mesmos do create",
+        "validations": "mesmas + verificação de limites"
+      }
+    },
+    "error_handling": {
+      "limit_reached": "Limite atingido: máximo X colaboradores ativos no plano Y",
+      "validation_error": "Campo específico inválido",
+      "forbidden": "Sem permissão para esta ação",
+      "network_error": "Erro de conexão, tente novamente"
+    },
+    "loading_states": {
+      "page_load": "skeleton cards",
+      "creating": "botão Criar disabled + spinner",
+      "updating": "botão Salvar disabled + spinner", 
+      "toggling": "botão toggle disabled + spinner por colaborador"
+    },
+    "optimistic_updates": {
+      "enabled": true,
+      "behavior": "atualiza UI imediatamente, reverte em erro"
+    }
+  },
+  "plan_limits_integration": {
+    "basic_plan": {
+      "collaborators": 3,
+      "behavior": "ao atingir limite, botão Novo + ativação bloqueados"
+    },
+    "enterprise_plan": {
+      "collaborators": 100,
+      "behavior": "limite alto, raramente atingido"
+    },
+    "error_response": {
+      "code": "limit_reached",
+      "details": {
+        "limit": "collaborators",
+        "current": "número atual",
+        "max": "limite máximo",
+        "plan": "nome do plano"
+      }
+    }
+  },
+  "telemetry_events": {
+    "collaborators.list": "visualização da lista",
+    "collaborator.created": "colaborador criado",
+    "collaborator.updated": "colaborador editado", 
+    "collaborator.status_changed": "status alterado",
+    "collaborator.deleted": "colaborador removido (soft delete)"
+  },
+  "acceptance_criteria": {
+    "create_flow": "Criar 2-3 colaboradores; no Basic, 4º deve ser bloqueado com 422",
+    "edit_flow": "Editar dados de colaborador existente (nome, email, telefone, role)",
+    "toggle_flow": "Ativar/desativar colaborador (reflete na lista imediatamente)", 
+    "search_flow": "Buscar por nome/email funciona",
+    "filter_flow": "Filtrar por status/role funciona",
+    "rbac_flow": "Viewer não vê botões de ação; admin/manager podem gerenciar",
+    "limit_flow": "Plano Basic bloqueia ao atingir 3 ativos com mensagem clara"
+  }
+}

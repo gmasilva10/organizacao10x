@@ -1,0 +1,125 @@
+{
+  "test_case": "Capabilities por Role - Admin vs Manager vs Viewer",
+  "timestamp": "2025-08-26T14:35:00Z",
+  "tenant_id": "tenant-basic-001",
+  "admin_capabilities": {
+    "user": {
+      "id": "admin-user-001",
+      "email": "admin@organizacao10x.com",
+      "role": "admin"
+    },
+    "endpoint": "GET /api/capabilities",
+    "response": {
+      "status": 200,
+      "body": {
+        "plan": "basic",
+        "role": "admin",
+        "features": {
+          "settings_menu": true,
+          "rbac_restore": true,
+          "user_management": true,
+          "service_management": true,
+          "reports_access": true,
+          "kanban_full_access": true
+        },
+        "limits": {
+          "students": 300,
+          "trainers": 1,
+          "services": 50
+        },
+        "permissions": [
+          "manage_users",
+          "manage_settings", 
+          "manage_services",
+          "view_reports",
+          "manage_rbac"
+        ]
+      }
+    }
+  },
+  "manager_capabilities": {
+    "user": {
+      "id": "manager-user-001", 
+      "email": "manager@organizacao10x.com",
+      "role": "manager"
+    },
+    "endpoint": "GET /api/capabilities",
+    "response": {
+      "status": 200,
+      "body": {
+        "plan": "basic",
+        "role": "manager",
+        "features": {
+          "settings_menu": true,
+          "rbac_restore": false,
+          "user_management": true,
+          "service_management": false,
+          "reports_access": true,
+          "kanban_full_access": true
+        },
+        "limits": {
+          "students": 300,
+          "trainers": 1,
+          "services": 50
+        },
+        "permissions": [
+          "manage_users",
+          "view_reports",
+          "manage_students",
+          "assign_trainers"
+        ]
+      }
+    }
+  },
+  "viewer_capabilities": {
+    "user": {
+      "id": "viewer-user-001",
+      "email": "viewer@organizacao10x.com", 
+      "role": "viewer"
+    },
+    "endpoint": "GET /api/capabilities",
+    "response": {
+      "status": 200,
+      "body": {
+        "plan": "basic",
+        "role": "viewer",
+        "features": {
+          "settings_menu": false,
+          "rbac_restore": false,
+          "user_management": false,
+          "service_management": false,
+          "reports_access": true,
+          "kanban_full_access": false
+        },
+        "limits": {
+          "students": 300,
+          "trainers": 1,
+          "services": 50
+        },
+        "permissions": [
+          "view_reports"
+        ]
+      }
+    }
+  },
+  "ui_verification": {
+    "admin_sees": {
+      "settings_menu": true,
+      "restore_button": true,
+      "edit_services": true,
+      "create_users": true
+    },
+    "manager_sees": {
+      "settings_menu": true,
+      "restore_button": false,
+      "edit_services": false,
+      "create_users": true
+    },
+    "viewer_sees": {
+      "settings_menu": false,
+      "restore_button": false,
+      "edit_services": false,
+      "create_users": false
+    }
+  }
+}

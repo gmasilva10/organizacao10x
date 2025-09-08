@@ -1,0 +1,90 @@
+name: Nightly E2E Regression
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # 2 AM UTC (11 PM BRT)
+  workflow_dispatch: # Permitir execução manual
+
+jobs:
+  e2e-regression:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+        
+      - name: Install Playwright browsers
+        working-directory: web
+        run: npx playwright install chromium firefox
+        
+      - name: Run E2E tests
+        working-directory: web
+        run: npm run test:e2e:ui
+        env:
+          PLAYWRIGHT_HEADLESS: true
+          PLAYWRIGHT_WORKERS: 2
+          
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-results-${{ github.run_number }}
+          path: |
+            web/test-results/
+            web/playwright-report/
+          retention-days: 30
+          
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-screenshots-${{ github.run_number }}
+          path: web/test-results/
+          retention-days: 7
+          
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            let comment = '## 🧪 E2E Regression Results\n\n';
+            
+            // Verificar se há relatório
+            const reportPath = 'web/playwright-report/index.html';
+            if (fs.existsSync(reportPath)) {
+              comment += '✅ Testes executados com sucesso\n';
+              comment += `📊 [Ver relatório completo](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})\n`;
+            } else {
+              comment += '❌ Falha na execução dos testes\n';
+            }
+            
+            // Adicionar estatísticas se disponível
+            const resultsPath = 'web/test-results/results.json';
+            if (fs.existsSync(resultsPath)) {
+              const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+              comment += `\n📈 **Estatísticas:**\n`;
+              comment += `- Total: ${results.stats?.total || 0}\n`;
+              comment += `- Passou: ${results.stats?.passed || 0}\n`;
+              comment += `- Falhou: ${results.stats?.failed || 0}\n`;
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

@@ -1,0 +1,2385 @@
+<testsuites id="" name="" tests="53" failures="41" skipped="0" errors="0" time="144.463195">
+<testsuite name="basic-test.spec.ts" timestamp="2025-09-08T18:33:08.319Z" hostname="chromium" tests="1" failures="0" skipped="0" time="8.084" errors="0">
+<testcase name="Basic Test › Aplicação carrega" classname="basic-test.spec.ts" time="8.084">
+<system-out>
+<![CDATA[URL atual: http://localhost:3000/
+Título da página: Personal Global — Organize seus alunos. Escale seus resultados.
+Conteúdo da página: Personal GlobalFeaturesStatsAboutContactOnboardingEntrarComeçar agoraPlataforma para Personal TrainersOrganize seus alunos. Escale seus resultados.Centralize alunos, vendas, campanhas e comunicação — 
+
+[[ATTACHMENT|basic-test-Basic-Test-Aplicação-carrega-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="debug-login-simple.spec.ts" timestamp="2025-09-08T18:33:08.319Z" hostname="chromium" tests="1" failures="0" skipped="0" time="9.644" errors="0">
+<testcase name="Debug Login Simple › Teste simples de login na página simplificada" classname="debug-login-simple.spec.ts" time="9.644">
+<system-out>
+<![CDATA[URL atual: http://localhost:3000/login-simple
+Título da página: Personal Global — Organize seus alunos. Escale seus resultados.
+Conteúdo da página: EntrarAcesse sua conta para continuarEmailSenhaEntrarVoltarCriar contarequestAnimationFrame(function(){$RT=performance.now()});(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,"5:\"$Sreact.fragment\"\n1b:I[\"(app-pages-browser)/./lib/use-theme.ts\",[\"app/layout\",\"static/chunks/app/layout.js\"],\"ThemeProvider\"]\n1d:I[\"(app-pages-browser)/./components/ui/toast.tsx\",[\"app/layout\",\"static/chunks/app/layout.js\"],\"ToastProvider\"]\n1f:I[\"(app-pages-browser)/./components/Lo
+Email input visível: [33mtrue[39m
+Password input visível: [33mtrue[39m
+Submit button visível: [33mtrue[39m
+URL após submit: http://localhost:3000/login-simple
+Console logs: []
+
+[[ATTACHMENT|debug-login-simple-Debug-L-7eb1c-ogin-na-página-simplificada-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="debug-login.spec.ts" timestamp="2025-09-08T18:33:08.319Z" hostname="chromium" tests="1" failures="0" skipped="0" time="13.596" errors="0">
+<testcase name="Debug Login › Teste simples de login" classname="debug-login.spec.ts" time="13.596">
+<system-out>
+<![CDATA[URL atual: http://localhost:3000/login
+Título da página: Personal Global — Organize seus alunos. Escale seus resultados.
+Conteúdo da página: EntrarAcesse sua conta para continuarVoltarCriar contaLoginrequestAnimationFrame(function(){$RT=performance.now()});(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,"5:\"$Sreact.fragment\"\n1b:I[\"(app-pages-browser)/./lib/use-theme.ts\",[\"app/layout\",\"static/chunks/app/layout.js\"],\"ThemeProvider\"]\n1d:I[\"(app-pages-browser)/./components/ui/toast.tsx\",[\"app/layout\",\"static/chunks/app/layout.js\"],\"ToastProvider\"]\n1f:I[\"(app-pages-browser)/./components/LoginUIContex
+Email input visível: [33mtrue[39m
+Password input visível: [33mtrue[39m
+Submit button visível: [33mtrue[39m
+Drawer encontrado: [33m1[39m
+Número de botões na página: [33m6[39m
+Botão 0: "Login"
+Botão 1: ""
+Botão 2: "Entrar"
+Botão 3: "Continuar com Google"
+Botão 4: "Cancelar"
+URL após login: http://localhost:3000/login
+
+[[ATTACHMENT|debug-login-Debug-Login-Teste-simples-de-login-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="kanban-dnd.spec.ts" timestamp="2025-09-08T18:33:08.319Z" hostname="chromium" tests="12" failures="12" skipped="0" time="361.275" errors="0">
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Board carrega com performance adequada" classname="kanban-dnd.spec.ts" time="14.738">
+<failure message="kanban-dnd.spec.ts:13:7 Board carrega com performance adequada" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:13:7 › Kanban Drag & Drop + Performance @regression › Board carrega com performance adequada 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('[data-testid="kanban-board"]')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('[data-testid="kanban-board"]')
+
+
+      15 |     
+      16 |     // Verificar se board carregou
+    > 17 |     await expect(page.locator(TEST_IDS.kanbanBoard)).toBeVisible();
+         |                                                      ^
+      18 |     
+      19 |     // Verificar headers de performance
+      20 |     await helpers.expectPerformanceHeaders();
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:17:54
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-f7efd-ga-com-performance-adequada-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Skeleton durante carregamento do board" classname="kanban-dnd.spec.ts" time="25.279">
+<failure message="kanban-dnd.spec.ts:23:7 Skeleton durante carregamento do board" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:23:7 › Kanban Drag & Drop + Performance @regression › Skeleton durante carregamento do board 
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  locator('[data-testid="skeleton"]').first()
+    Expected: hidden
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeHidden" with timeout 5000ms
+      - waiting for locator('[data-testid="skeleton"]').first()
+        8 × locator resolved to <div data-testid="skeleton" class="animate-pulse rounded-md bg-muted h-5 w-2/3 mb-2"></div>
+          - unexpected value "visible"
+
+
+       at ..\utils\test-helpers.ts:95
+
+      93 |
+      94 |   async expectSkeletonHidden() {
+    > 95 |     await expect(this.page.locator(TEST_IDS.skeleton).first()).toBeHidden();
+         |                                                                ^
+      96 |   }
+      97 |
+      98 |   async expectEmptyStateVisible() {
+        at TestHelpers.expectSkeletonHidden (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:95:64)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:31:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-4a5f1-rante-carregamento-do-board-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Drag and drop de card altera order_index" classname="kanban-dnd.spec.ts" time="31.731">
+<failure message="kanban-dnd.spec.ts:34:7 Drag and drop de card altera order_index" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:34:7 › Kanban Drag & Drop + Performance @regression › Drag and drop de card altera order_index 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="kanban-column"]') to be visible
+
+
+      36 |     
+      37 |     // Aguardar board carregar
+    > 38 |     await page.waitForSelector(TEST_IDS.kanbanColumn);
+         |                ^
+      39 |     
+      40 |     // Encontrar primeiro card
+      41 |     const firstCard = page.locator(TEST_IDS.kanbanCard).first();
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:38:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-3c7ca--de-card-altera-order-index-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Persistência após reload" classname="kanban-dnd.spec.ts" time="31.79">
+<failure message="kanban-dnd.spec.ts:63:7 Persistência após reload" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:63:7 › Kanban Drag & Drop + Performance @regression › Persistência após reload 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="kanban-column"]') to be visible
+
+
+      65 |     
+      66 |     // Aguardar board carregar
+    > 67 |     await page.waitForSelector(TEST_IDS.kanbanColumn);
+         |                ^
+      68 |     
+      69 |     // Fazer uma movimentação
+      70 |     const firstCard = page.locator(TEST_IDS.kanbanCard).first();
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:67:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-49e54-on-Persistência-após-reload-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Contadores atualizam corretamente" classname="kanban-dnd.spec.ts" time="31.774">
+<failure message="kanban-dnd.spec.ts:93:7 Contadores atualizam corretamente" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:93:7 › Kanban Drag & Drop + Performance @regression › Contadores atualizam corretamente 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="kanban-column"]') to be visible
+
+
+       95 |     
+       96 |     // Aguardar board carregar
+    >  97 |     await page.waitForSelector(TEST_IDS.kanbanColumn);
+          |                ^
+       98 |     
+       99 |     // Contar cards em cada coluna
+      100 |     const columns = page.locator(TEST_IDS.kanbanColumn);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:97:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-76bf4-ores-atualizam-corretamente-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Adicionar nova coluna" classname="kanban-dnd.spec.ts" time="31.76">
+<failure message="kanban-dnd.spec.ts:116:7 Adicionar nova coluna" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:116:7 › Kanban Drag & Drop + Performance @regression › Adicionar nova coluna 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="kanban-add-column-button"]')
+
+
+      118 |     
+      119 |     // Clicar em adicionar coluna
+    > 120 |     await page.click(TEST_IDS.kanbanAddColumnButton);
+          |                ^
+      121 |     
+      122 |     // Preencher nome da coluna
+      123 |     await page.fill('[data-testid="column-name-input"]', TEST_DATA.kanbanColumn.title);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:120:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-d4995-ssion-Adicionar-nova-coluna-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Adicionar novo card" classname="kanban-dnd.spec.ts" time="31.737">
+<failure message="kanban-dnd.spec.ts:135:7 Adicionar novo card" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:135:7 › Kanban Drag & Drop + Performance @regression › Adicionar novo card 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="kanban-column"]') to be visible
+
+
+      137 |     
+      138 |     // Aguardar board carregar
+    > 139 |     await page.waitForSelector(TEST_IDS.kanbanColumn);
+          |                ^
+      140 |     
+      141 |     // Clicar em adicionar card na primeira coluna
+      142 |     await page.click(TEST_IDS.kanbanAddCardButton);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:139:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-1ad08-ression-Adicionar-novo-card-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Empty state em coluna vazia" classname="kanban-dnd.spec.ts" time="31.771">
+<failure message="kanban-dnd.spec.ts:157:7 Empty state em coluna vazia" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:157:7 › Kanban Drag & Drop + Performance @regression › Empty state em coluna vazia 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="kanban-column"]') to be visible
+
+
+      159 |     
+      160 |     // Aguardar board carregar
+    > 161 |     await page.waitForSelector(TEST_IDS.kanbanColumn);
+          |                ^
+      162 |     
+      163 |     // Verificar se há colunas vazias
+      164 |     const columns = page.locator(TEST_IDS.kanbanColumn);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:161:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-08dce-Empty-state-em-coluna-vazia-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Acessibilidade - navegação por teclado" classname="kanban-dnd.spec.ts" time="31.664">
+<failure message="kanban-dnd.spec.ts:179:7 Acessibilidade - navegação por teclado" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:179:7 › Kanban Drag & Drop + Performance @regression › Acessibilidade - navegação por teclado 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="kanban-board"]') to be visible
+
+
+      181 |     
+      182 |     // Aguardar board carregar
+    > 183 |     await page.waitForSelector(TEST_IDS.kanbanBoard);
+          |                ^
+      184 |     
+      185 |     // Testar navegação por teclado
+      186 |     await page.keyboard.press('Tab');
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:183:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-f5c74-ade---navegação-por-teclado-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Performance - X-Query-Time &lt; 400ms" classname="kanban-dnd.spec.ts" time="34.388">
+<failure message="kanban-dnd.spec.ts:195:7 Performance - X-Query-Time &lt; 400ms" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:195:7 › Kanban Drag & Drop + Performance @regression › Performance - X-Query-Time < 400ms 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/kanban", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:53
+
+      51 |
+      52 |   async navigateToKanban() {
+    > 53 |     await this.page.goto('/app/kanban');
+         |                     ^
+      54 |     await this.page.waitForLoadState('networkidle');
+      55 |   }
+      56 |
+        at TestHelpers.navigateToKanban (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:53:21)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:196:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-3de92-rmance---X-Query-Time-400ms-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Skeleton específico do Kanban" classname="kanban-dnd.spec.ts" time="34.015">
+<failure message="kanban-dnd.spec.ts:202:7 Skeleton específico do Kanban" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:202:7 › Kanban Drag & Drop + Performance @regression › Skeleton específico do Kanban 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/kanban", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:53
+
+      51 |
+      52 |   async navigateToKanban() {
+    > 53 |     await this.page.goto('/app/kanban');
+         |                     ^
+      54 |     await this.page.waitForLoadState('networkidle');
+      55 |   }
+      56 |
+        at TestHelpers.navigateToKanban (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:53:21)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:203:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-107cc-eleton-específico-do-Kanban-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Kanban Drag &amp; Drop + Performance @regression › Responsividade - layout em diferentes tamanhos" classname="kanban-dnd.spec.ts" time="30.628">
+<failure message="kanban-dnd.spec.ts:216:7 Responsividade - layout em diferentes tamanhos" type="FAILURE">
+<![CDATA[  [chromium] › kanban-dnd.spec.ts:216:7 › Kanban Drag & Drop + Performance @regression › Responsividade - layout em diferentes tamanhos 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/kanban", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:53
+
+      51 |
+      52 |   async navigateToKanban() {
+    > 53 |     await this.page.goto('/app/kanban');
+         |                     ^
+      54 |     await this.page.waitForLoadState('networkidle');
+      55 |   }
+      56 |
+        at TestHelpers.navigateToKanban (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:53:21)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\kanban-dnd.spec.ts:217:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\video.webm]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\error-context.md]]
+
+[[ATTACHMENT|kanban-dnd-Kanban-Drag-Dro-ab1fa-yout-em-diferentes-tamanhos-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="occurrences-lifecycle.spec.ts" timestamp="2025-09-08T18:33:08.319Z" hostname="chromium" tests="9" failures="9" skipped="0" time="316.862" errors="0">
+<testcase name="Occurrences Lifecycle + Audit @regression › Criar ocorrência com campos válidos" classname="occurrences-lifecycle.spec.ts" time="35.657">
+<failure message="occurrences-lifecycle.spec.ts:19:7 Criar ocorrência com campos válidos" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:19:7 › Occurrences Lifecycle + Audit @regression › Criar ocorrência com campos válidos 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\error-context.md]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-daed1-orrência-com-campos-válidos-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Occurrences Lifecycle + Audit @regression › Editar ocorrência e validar auditoria" classname="occurrences-lifecycle.spec.ts" time="40.63">
+<failure message="occurrences-lifecycle.spec.ts:44:7 Editar ocorrência e validar auditoria" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:44:7 › Occurrences Lifecycle + Audit @regression › Editar ocorrência e validar auditoria 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-53781-rrência-e-validar-auditoria-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-53781-rrência-e-validar-auditoria-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-53781-rrência-e-validar-auditoria-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-53781-rrência-e-validar-auditoria-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-53781-rrência-e-validar-auditoria-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Occurrences Lifecycle + Audit @regression › Fechar ocorrência com motivo obrigatório" classname="occurrences-lifecycle.spec.ts" time="31.507">
+<failure message="occurrences-lifecycle.spec.ts:66:7 Fechar ocorrência com motivo obrigatório" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:66:7 › Occurrences Lifecycle + Audit @regression › Fechar ocorrência com motivo obrigatório 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\error-context.md]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-ed616-ncia-com-motivo-obrigatório-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Occurrences Lifecycle + Audit @regression › Modo degradado - auditoria com falha" classname="occurrences-lifecycle.spec.ts" time="34.788">
+<failure message="occurrences-lifecycle.spec.ts:92:7 Modo degradado - auditoria com falha" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:92:7 › Occurrences Lifecycle + Audit @regression › Modo degradado - auditoria com falha 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\error-context.md]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-5dd32-adado---auditoria-com-falha-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Occurrences Lifecycle + Audit @regression › Validação - reminder_at &gt;= occurred_at" classname="occurrences-lifecycle.spec.ts" time="35.01">
+<failure message="occurrences-lifecycle.spec.ts:122:7 Validação - reminder_at &gt;= occurred_at" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:122:7 › Occurrences Lifecycle + Audit @regression › Validação - reminder_at >= occurred_at 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\error-context.md]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-32e61-o---reminder-at-occurred-at-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Occurrences Lifecycle + Audit @regression › Skeleton durante carregamento" classname="occurrences-lifecycle.spec.ts" time="34.883">
+<failure message="occurrences-lifecycle.spec.ts:149:7 Skeleton durante carregamento" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:149:7 › Occurrences Lifecycle + Audit @regression › Skeleton durante carregamento 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\error-context.md]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-0eba7-eleton-durante-carregamento-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Occurrences Lifecycle + Audit @regression › Empty state quando não há ocorrências" classname="occurrences-lifecycle.spec.ts" time="34.699">
+<failure message="occurrences-lifecycle.spec.ts:160:7 Empty state quando não há ocorrências" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:160:7 › Occurrences Lifecycle + Audit @regression › Empty state quando não há ocorrências 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\error-context.md]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-dbdd2-e-quando-não-há-ocorrências-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Occurrences Lifecycle + Audit @regression › Acessibilidade - AlertDialog em ações destrutivas" classname="occurrences-lifecycle.spec.ts" time="34.778">
+<failure message="occurrences-lifecycle.spec.ts:171:7 Acessibilidade - AlertDialog em ações destrutivas" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:171:7 › Occurrences Lifecycle + Audit @regression › Acessibilidade - AlertDialog em ações destrutivas 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\error-context.md]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-a1068-Dialog-em-ações-destrutivas-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Occurrences Lifecycle + Audit @regression › Performance - headers de tempo de resposta" classname="occurrences-lifecycle.spec.ts" time="34.91">
+<failure message="occurrences-lifecycle.spec.ts:189:7 Performance - headers de tempo de resposta" type="FAILURE">
+<![CDATA[  [chromium] › occurrences-lifecycle.spec.ts:189:7 › Occurrences Lifecycle + Audit @regression › Performance - headers de tempo de resposta 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       7 |   let studentId: string;
+       8 |
+    >  9 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      10 |     helpers = new TestHelpers(page);
+      11 |     await helpers.loginAsAdmin();
+      12 |     
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:9:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/students", waiting until "load"
+
+
+       at ..\utils\test-helpers.ts:43
+
+      41 |   // Navegação
+      42 |   async navigateToStudents() {
+    > 43 |     await this.page.goto('/app/students');
+         |                     ^
+      44 |     await this.page.waitForLoadState('networkidle');
+      45 |   }
+      46 |
+        at TestHelpers.navigateToStudents (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:43:21)
+        at TestHelpers.createTestStudent (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:138:16)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\occurrences-lifecycle.spec.ts:14:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\video.webm]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\error-context.md]]
+
+[[ATTACHMENT|occurrences-lifecycle-Occu-d72df-eaders-de-tempo-de-resposta-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="smoke-auth-nav.spec.ts" timestamp="2025-09-08T18:33:08.319Z" hostname="chromium" tests="6" failures="1" skipped="0" time="141.701" errors="0">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como admin redireciona para /app" classname="smoke-auth-nav.spec.ts" time="27.842">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-11b3c--admin-redireciona-para-app-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como trainer redireciona para /app" classname="smoke-auth-nav.spec.ts" time="27.854">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-89cff-rainer-redireciona-para-app-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Página de login carrega corretamente" classname="smoke-auth-nav.spec.ts" time="10.258">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-99073--login-carrega-corretamente-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Navegação após login funciona" classname="smoke-auth-nav.spec.ts" time="33.053">
+<failure message="smoke-auth-nav.spec.ts:28:7 Navegação após login funciona" type="FAILURE">
+<![CDATA[  [chromium] › smoke-auth-nav.spec.ts:28:7 › Smoke Tests - Autenticação e Navegação @smoke › Navegação após login funciona 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/app/workflow/occurrences", waiting until "load"
+
+
+      38 |     
+      39 |     // Occurrences
+    > 40 |     await page.goto('/app/workflow/occurrences');
+         |                ^
+      41 |     await expect(page).toHaveURL('/app/workflow/occurrences');
+      42 |     
+      43 |     // Kanban
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:40:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\video.webm]]
+
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\error-context.md]]
+
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Skeletons exibidos durante carregamento" classname="smoke-auth-nav.spec.ts" time="16.942">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Performance headers presentes nas rotas principais" classname="smoke-auth-nav.spec.ts" time="25.752">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="students-crud.spec.ts" timestamp="2025-09-08T18:33:08.319Z" hostname="chromium" tests="9" failures="9" skipped="0" time="259.02" errors="0">
+<testcase name="Students CRUD Flow @regression › Criar aluno → toast success → listar" classname="students-crud.spec.ts" time="31.82">
+<failure message="students-crud.spec.ts:13:7 Criar aluno → toast success → listar" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:13:7 › Students CRUD Flow @regression › Criar aluno → toast success → listar 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="add-student-button"]')
+
+
+      15 |     
+      16 |     // Clicar em "Novo Aluno"
+    > 17 |     await page.click('[data-testid="add-student-button"]');
+         |                ^
+      18 |     
+      19 |     // Preencher formulário
+      20 |     await page.fill(TEST_IDS.studentNameInput, TEST_DATA.student.full_name);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:17:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-704be-no-→-toast-success-→-listar-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Students CRUD Flow @regression › Filtrar alunos por nome" classname="students-crud.spec.ts" time="31.553">
+<failure message="students-crud.spec.ts:34:7 Filtrar alunos por nome" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:34:7 › Students CRUD Flow @regression › Filtrar alunos por nome 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="student-search-input"]')
+
+
+      36 |     
+      37 |     // Preencher campo de busca
+    > 38 |     await page.fill('[data-testid="student-search-input"]', 'João');
+         |                ^
+      39 |     
+      40 |     // Aguardar filtro ser aplicado
+      41 |     await page.waitForTimeout(500);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:38:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-9c6ec-ion-Filtrar-alunos-por-nome-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Students CRUD Flow @regression › Editar campo simples do aluno" classname="students-crud.spec.ts" time="31.77">
+<failure message="students-crud.spec.ts:52:7 Editar campo simples do aluno" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:52:7 › Students CRUD Flow @regression › Editar campo simples do aluno 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="student-row"]:first-child [data-testid="edit-student-button"]')
+
+
+      54 |     
+      55 |     // Clicar no primeiro aluno para editar
+    > 56 |     await page.click('[data-testid="student-row"]:first-child [data-testid="edit-student-button"]');
+         |                ^
+      57 |     
+      58 |     // Alterar nome
+      59 |     const nameInput = page.locator(TEST_IDS.studentNameInput);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:56:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-1d2a2-itar-campo-simples-do-aluno-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Students CRUD Flow @regression › Excluir aluno com AlertDialog" classname="students-crud.spec.ts" time="31.57">
+<failure message="students-crud.spec.ts:73:7 Excluir aluno com AlertDialog" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:73:7 › Students CRUD Flow @regression › Excluir aluno com AlertDialog 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="student-row"]:first-child [data-testid="delete-student-button"]')
+
+
+      75 |     
+      76 |     // Clicar em excluir no primeiro aluno
+    > 77 |     await page.click('[data-testid="student-row"]:first-child [data-testid="delete-student-button"]');
+         |                ^
+      78 |     
+      79 |     // Verificar se AlertDialog aparece
+      80 |     await helpers.expectAlertDialogVisible();
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:77:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-3a891-cluir-aluno-com-AlertDialog-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Students CRUD Flow @regression › Validação de campos obrigatórios" classname="students-crud.spec.ts" time="31.709">
+<failure message="students-crud.spec.ts:89:7 Validação de campos obrigatórios" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:89:7 › Students CRUD Flow @regression › Validação de campos obrigatórios 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="add-student-button"]')
+
+
+      91 |     
+      92 |     // Clicar em "Novo Aluno"
+    > 93 |     await page.click('[data-testid="add-student-button"]');
+         |                ^
+      94 |     
+      95 |     // Tentar salvar sem preencher campos obrigatórios
+      96 |     await page.click(TEST_IDS.studentSaveButton);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:93:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-7f443-ação-de-campos-obrigatórios-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Students CRUD Flow @regression › Skeleton durante carregamento da lista" classname="students-crud.spec.ts" time="24.28">
+<failure message="students-crud.spec.ts:105:7 Skeleton durante carregamento da lista" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:105:7 › Students CRUD Flow @regression › Skeleton durante carregamento da lista 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('[data-testid="skeleton"]').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('[data-testid="skeleton"]').first()
+        5 × locator resolved to <div data-testid="skeleton" class="animate-pulse rounded-md bg-muted h-4 w-32 mx-auto"></div>
+          - unexpected value "hidden"
+
+
+       at ..\utils\test-helpers.ts:91
+
+      89 |
+      90 |   async expectSkeletonVisible() {
+    > 91 |     await expect(this.page.locator(TEST_IDS.skeleton).first()).toBeVisible();
+         |                                                                ^
+      92 |   }
+      93 |
+      94 |   async expectSkeletonHidden() {
+        at TestHelpers.expectSkeletonVisible (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:91:64)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:109:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-db83f-rante-carregamento-da-lista-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Students CRUD Flow @regression › Empty state quando não há alunos" classname="students-crud.spec.ts" time="24.589">
+<failure message="students-crud.spec.ts:116:7 Empty state quando não há alunos" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:116:7 › Students CRUD Flow @regression › Empty state quando não há alunos 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('[data-testid="empty-state"]')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('[data-testid="empty-state"]')
+
+
+       at ..\utils\test-helpers.ts:99
+
+       97 |
+       98 |   async expectEmptyStateVisible() {
+    >  99 |     await expect(this.page.locator(TEST_IDS.emptyState)).toBeVisible();
+          |                                                          ^
+      100 |   }
+      101 |
+      102 |   async expectBreadcrumbVisible() {
+        at TestHelpers.expectEmptyStateVisible (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:99:58)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:125:21
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-7408e--state-quando-não-há-alunos-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Students CRUD Flow @regression › Acessibilidade - navegação por teclado no formulário" classname="students-crud.spec.ts" time="31.409">
+<failure message="students-crud.spec.ts:129:7 Acessibilidade - navegação por teclado no formulário" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:129:7 › Students CRUD Flow @regression › Acessibilidade - navegação por teclado no formulário 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="add-student-button"]')
+
+
+      129 |   test('Acessibilidade - navegação por teclado no formulário', async ({ page }) => {
+      130 |     await helpers.navigateToStudents();
+    > 131 |     await page.click('[data-testid="add-student-button"]');
+          |                ^
+      132 |     
+      133 |     // Testar navegação por teclado no formulário
+      134 |     await page.keyboard.press('Tab'); // Nome
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:131:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-1afe6-o-por-teclado-no-formulário-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Students CRUD Flow @regression › Performance - tempo de resposta da API" classname="students-crud.spec.ts" time="20.32">
+<failure message="students-crud.spec.ts:143:7 Performance - tempo de resposta da API" type="FAILURE">
+<![CDATA[  [chromium] › students-crud.spec.ts:143:7 › Students CRUD Flow @regression › Performance - tempo de resposta da API 
+
+    Error: expect(received).toBeDefined()
+
+    Received: undefined
+
+       at ..\utils\test-helpers.ts:116
+
+      114 |     
+      115 |     expect(queryTime).toBeDefined();
+    > 116 |     expect(rowCount).toBeDefined();
+          |                      ^
+      117 |     
+      118 |     const queryTimeMs = parseInt(queryTime || '0');
+      119 |     expect(queryTimeMs).toBeLessThan(TEST_CONFIG.PERFORMANCE_THRESHOLD_MS);
+        at TestHelpers.expectPerformanceHeaders (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:116:22)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\students-crud.spec.ts:147:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\video.webm]]
+
+[[ATTACHMENT|students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\error-context.md]]
+
+[[ATTACHMENT|students-crud-Students-CRU-c32e4----tempo-de-resposta-da-API-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="ux-premium-a11y.spec.ts" timestamp="2025-09-08T18:33:08.319Z" hostname="chromium" tests="14" failures="10" skipped="0" time="307.811" errors="0">
+<testcase name="UX Premium &amp; Acessibilidade @regression › AlertDialog - presente em ações destrutivas" classname="ux-premium-a11y.spec.ts" time="31.712">
+<failure message="ux-premium-a11y.spec.ts:13:7 AlertDialog - presente em ações destrutivas" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:13:7 › UX Premium & Acessibilidade @regression › AlertDialog - presente em ações destrutivas 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="student-row"]:first-child [data-testid="delete-student-button"]')
+
+
+      15 |     
+      16 |     // Tentar excluir um aluno
+    > 17 |     await page.click('[data-testid="student-row"]:first-child [data-testid="delete-student-button"]');
+         |                ^
+      18 |     
+      19 |     // Verificar se AlertDialog aparece
+      20 |     await helpers.expectAlertDialogVisible();
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:17:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-f6251-esente-em-ações-destrutivas-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › AlertDialog - navegação por teclado (TAB/ESC/ENTER)" classname="ux-premium-a11y.spec.ts" time="30.888">
+<failure message="ux-premium-a11y.spec.ts:27:7 AlertDialog - navegação por teclado (TAB/ESC/ENTER)" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:27:7 › UX Premium & Acessibilidade @regression › AlertDialog - navegação por teclado (TAB/ESC/ENTER) 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="student-row"]:first-child [data-testid="delete-student-button"]')
+
+
+      29 |     
+      30 |     // Abrir AlertDialog
+    > 31 |     await page.click('[data-testid="student-row"]:first-child [data-testid="delete-student-button"]');
+         |                ^
+      32 |     await helpers.expectAlertDialogVisible();
+      33 |     
+      34 |     // Testar TAB navigation
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:31:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-a3044--por-teclado-TAB-ESC-ENTER--chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › AlertDialog - ENTER confirma ação" classname="ux-premium-a11y.spec.ts" time="30.813">
+<failure message="ux-premium-a11y.spec.ts:46:7 AlertDialog - ENTER confirma ação" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:46:7 › UX Premium & Acessibilidade @regression › AlertDialog - ENTER confirma ação 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="student-row"]:first-child [data-testid="delete-student-button"]')
+
+
+      48 |     
+      49 |     // Abrir AlertDialog
+    > 50 |     await page.click('[data-testid="student-row"]:first-child [data-testid="delete-student-button"]');
+         |                ^
+      51 |     await helpers.expectAlertDialogVisible();
+      52 |     
+      53 |     // Focar no botão confirmar e pressionar ENTER
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:50:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-461ee-ialog---ENTER-confirma-ação-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Toasts - success/error/warning/degraded padronizados" classname="ux-premium-a11y.spec.ts" time="30.77">
+<failure message="ux-premium-a11y.spec.ts:61:7 Toasts - success/error/warning/degraded padronizados" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:61:7 › UX Premium & Acessibilidade @regression › Toasts - success/error/warning/degraded padronizados 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="add-student-button"]')
+
+
+      63 |     
+      64 |     // Testar toast de sucesso
+    > 65 |     await page.click('[data-testid="add-student-button"]');
+         |                ^
+      66 |     await page.fill(TEST_IDS.studentNameInput, 'Teste Toast');
+      67 |     await page.fill(TEST_IDS.studentEmailInput, 'teste@toast.com');
+      68 |     await page.click(TEST_IDS.studentSaveButton);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:65:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-b3e97-rning-degraded-padronizados-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Skeletons - visíveis em todas as telas" classname="ux-premium-a11y.spec.ts" time="19.631">
+<failure message="ux-premium-a11y.spec.ts:79:7 Skeletons - visíveis em todas as telas" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:79:7 › UX Premium & Acessibilidade @regression › Skeletons - visíveis em todas as telas 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('[data-testid="skeleton"]').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('[data-testid="skeleton"]').first()
+        4 × locator resolved to <div data-testid="skeleton" class="animate-pulse rounded-md bg-muted h-4 w-32 mx-auto"></div>
+          - unexpected value "hidden"
+
+
+       at ..\utils\test-helpers.ts:91
+
+      89 |
+      90 |   async expectSkeletonVisible() {
+    > 91 |     await expect(this.page.locator(TEST_IDS.skeleton).first()).toBeVisible();
+         |                                                                ^
+      92 |   }
+      93 |
+      94 |   async expectSkeletonHidden() {
+        at TestHelpers.expectSkeletonVisible (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:91:64)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:88:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2fdf6--visíveis-em-todas-as-telas-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Empty/Error states - com CTA &quot;tentar novamente&quot;" classname="ux-premium-a11y.spec.ts" time="10.808">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-50958---com-CTA-tentar-novamente--chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Breadcrumbs - navegação clara em todas as páginas" classname="ux-premium-a11y.spec.ts" time="15.8">
+<failure message="ux-premium-a11y.spec.ts:128:7 Breadcrumbs - navegação clara em todas as páginas" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:128:7 › UX Premium & Acessibilidade @regression › Breadcrumbs - navegação clara em todas as páginas 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('[data-testid="breadcrumb"]')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('[data-testid="breadcrumb"]')
+
+
+       at ..\utils\test-helpers.ts:103
+
+      101 |
+      102 |   async expectBreadcrumbVisible() {
+    > 103 |     await expect(this.page.locator(TEST_IDS.breadcrumb)).toBeVisible();
+          |                                                          ^
+      104 |   }
+      105 |
+      106 |   // Validações de Performance
+        at TestHelpers.expectBreadcrumbVisible (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:103:58)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:138:21
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-9d4ce-o-clara-em-todas-as-páginas-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Acessibilidade - ARIA labels e descrições" classname="ux-premium-a11y.spec.ts" time="11.68">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-ef47d----ARIA-labels-e-descrições-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Acessibilidade - foco inicial correto" classname="ux-premium-a11y.spec.ts" time="30.748">
+<failure message="ux-premium-a11y.spec.ts:163:7 Acessibilidade - foco inicial correto" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:163:7 › UX Premium & Acessibilidade @regression › Acessibilidade - foco inicial correto 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="add-student-button"]')
+
+
+      165 |     
+      166 |     // Abrir modal de novo aluno
+    > 167 |     await page.click('[data-testid="add-student-button"]');
+          |                ^
+      168 |     
+      169 |     // Verificar se foco está no primeiro campo
+      170 |     const firstInput = page.locator(TEST_IDS.studentNameInput);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:167:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-72739-dade---foco-inicial-correto-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Acessibilidade - ordem de tabulação lógica" classname="ux-premium-a11y.spec.ts" time="11.67">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-7f9be---ordem-de-tabulação-lógica-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Acessibilidade - leitura por screen reader" classname="ux-premium-a11y.spec.ts" time="11.617">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2e171---leitura-por-screen-reader-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Cross-browser - funcionalidades básicas" classname="ux-premium-a11y.spec.ts" time="30.753">
+<failure message="ux-premium-a11y.spec.ts:221:7 Cross-browser - funcionalidades básicas" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:221:7 › UX Premium & Acessibilidade @regression › Cross-browser - funcionalidades básicas 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="add-student-button"]')
+
+
+      223 |     
+      224 |     // Testar funcionalidades básicas em diferentes browsers
+    > 225 |     await page.click('[data-testid="add-student-button"]');
+          |                ^
+      226 |     await page.fill(TEST_IDS.studentNameInput, `Teste ${browserName}`);
+      227 |     await page.fill(TEST_IDS.studentEmailInput, `teste@${browserName}.com`);
+      228 |     await page.click(TEST_IDS.studentSaveButton);
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:225:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-dfd83-r---funcionalidades-básicas-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Performance - headers X-Query-Time &lt; 400ms" classname="ux-premium-a11y.spec.ts" time="10.288">
+<failure message="ux-premium-a11y.spec.ts:234:7 Performance - headers X-Query-Time &lt; 400ms" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:234:7 › UX Premium & Acessibilidade @regression › Performance - headers X-Query-Time < 400ms 
+
+    Error: expect(received).toBeDefined()
+
+    Received: undefined
+
+       at ..\utils\test-helpers.ts:116
+
+      114 |     
+      115 |     expect(queryTime).toBeDefined();
+    > 116 |     expect(rowCount).toBeDefined();
+          |                      ^
+      117 |     
+      118 |     const queryTimeMs = parseInt(queryTime || '0');
+      119 |     expect(queryTimeMs).toBeLessThan(TEST_CONFIG.PERFORMANCE_THRESHOLD_MS);
+        at TestHelpers.expectPerformanceHeaders (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:116:22)
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:239:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-2f2d9--headers-X-Query-Time-400ms-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="UX Premium &amp; Acessibilidade @regression › Responsividade - modais sem scroll indevido" classname="ux-premium-a11y.spec.ts" time="30.633">
+<failure message="ux-premium-a11y.spec.ts:243:7 Responsividade - modais sem scroll indevido" type="FAILURE">
+<![CDATA[  [chromium] › ux-premium-a11y.spec.ts:243:7 › UX Premium & Acessibilidade @regression › Responsividade - modais sem scroll indevido 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="add-student-button"]')
+
+
+      247 |     await page.setViewportSize({ width: 375, height: 667 });
+      248 |     
+    > 249 |     await page.click('[data-testid="add-student-button"]');
+          |                ^
+      250 |     
+      251 |     // Verificar se modal não causa scroll horizontal
+      252 |     const body = page.locator('body');
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\ux-premium-a11y.spec.ts:249:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\..\test-results\ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\..\test-results\ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\video.webm]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\error-context.md]]
+
+[[ATTACHMENT|ux-premium-a11y-UX-Premium-0db97--modais-sem-scroll-indevido-chromium\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

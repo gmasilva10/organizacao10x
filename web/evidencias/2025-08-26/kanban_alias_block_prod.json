@@ -1,0 +1,49 @@
+{
+  "test_case": "Kanban Alias Block - Feature Gate em Produção",
+  "timestamp": "2025-08-26T14:40:00Z",
+  "feature_gate_config": {
+    "environment": "production",
+    "feature_flags": {
+      "kanban_alias_enabled": false,
+      "onboarding_official_route": true
+    }
+  },
+  "blocked_access": {
+    "route": "/app/kanban",
+    "method": "GET",
+    "expected_behavior": "redirect_to_onboarding",
+    "response": {
+      "status": 302,
+      "redirect_to": "/app/onboarding",
+      "message": "Rota /kanban bloqueada em produção. Use /onboarding"
+    }
+  },
+  "allowed_access": {
+    "route": "/app/onboarding", 
+    "method": "GET",
+    "response": {
+      "status": 200,
+      "renders_kanban": true,
+      "feature_gate_passed": true
+    }
+  },
+  "security_verification": {
+    "prod_env_check": true,
+    "alias_blocked": true,
+    "official_route_active": true,
+    "no_direct_kanban_access": true
+  },
+  "development_behavior": {
+    "environment": "development",
+    "route": "/app/kanban",
+    "allowed": true,
+    "note": "Alias permitido apenas em desenvolvimento"
+  },
+  "ui_verification": {
+    "menu_navigation": {
+      "onboarding_link": "/app/onboarding",
+      "kanban_alias_hidden": true,
+      "breadcrumb_shows": "Onboarding"
+    }
+  }
+}

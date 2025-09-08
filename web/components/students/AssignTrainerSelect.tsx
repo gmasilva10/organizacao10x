@@ -1,4 +1,4 @@
-type Trainer = { user_id: string; email: string }
+type Trainer = { user_id: string; name: string; email?: string }
 
 export function AssignTrainerSelect({
 	value,
@@ -14,7 +14,7 @@ export function AssignTrainerSelect({
 			<option value="">—</option>
 			{trainers.map((t) => (
 				<option key={t.user_id} value={t.user_id}>
-					{t.email}
+					{t.name}
 				</option>
 			))}
 		</select>

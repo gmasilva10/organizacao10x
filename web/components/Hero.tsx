@@ -6,6 +6,7 @@ import { ArrowRight, Globe as GlobeIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useLoginUI } from "./LoginUIContext"
 import Image from "next/image"
+import Link from "next/link"
 import { useTheme } from "@/lib/use-theme"
 import { Globe as DottedGlobe } from "@/components/ui/globe"
 import { useState, useEffect } from "react"
@@ -92,12 +93,14 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.6 }}
             className="flex flex-col gap-3 sm:flex-row"
           >
-            <Button role="button" size="lg" className="rounded-full group bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg shadow-primary/40 hover:scale-[1.03] transition-transform" aria-label="Começar agora">
-              Começar agora
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <Button asChild size="lg" className="rounded-full group bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg shadow-primary/40 hover:scale-[1.03] transition-transform" aria-label="Começar agora">
+              <Link href="/signup?plan=basic">
+                Começar agora
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </Button>
-            <Button role="button" variant="outline" size="lg" className="rounded-full border-primary text-primary hover:bg-primary hover:text-white" aria-label="Saiba mais">
-              Saiba mais
+            <Button asChild variant="outline" size="lg" className="rounded-full border-primary text-primary hover:bg-primary hover:text-white" aria-label="Ver planos">
+              <Link href="#planos">Ver planos</Link>
             </Button>
           </motion.div>
           {/* Animação de logo ao abrir Login (mobile) */}

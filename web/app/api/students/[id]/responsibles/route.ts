@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
+import { writeAudit, logEvent } from "@/server/events"
 
 function canRead(role: string) { return ['admin','manager','trainer','seller','support'].includes(role) }
 function canWrite(role: string) { return ['admin','manager'].includes(role) }
@@ -55,7 +56,15 @@ export async function POST(request: Request, ctxParam: { params: Promise<{ id: s
     return NextResponse.json({ error:'insert_failed' }, { status: 500 })
   }
   const rows = await ins.json().catch(()=>[])
-  return NextResponse.json({ ok: true, id: rows?.[0]?.id || null })
+  const respId = rows?.[0]?.id || null
+  // audit + telemetria (best-effort)
+  ;(async () => {
+    try {
+      await writeAudit({ orgId: ctx.tenantId, actorId: ctx.userId, entityType: 'student_responsible', entityId: String(respId || ''), action: 'assigned', payload: { student_id: id, user_id: userId, role } })
+      await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'feature.used', payload: { type: 'students.responsible.assigned', student_id: id, user_id: userId, role } })
+    } catch {}
+  })()
+  return NextResponse.json({ ok: true, id: respId })
 }
 
 

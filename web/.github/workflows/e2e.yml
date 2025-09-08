@@ -1,0 +1,119 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+  schedule:
+    # Nightly regression tests
+    - cron: '0 2 * * *'
+
+jobs:
+  e2e-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox]
+        test-tag: [smoke, regression]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+      
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+        
+    - name: Start application
+      run: |
+        npm start &
+        npx wait-on http://localhost:3000 --timeout 60000
+      env:
+        NODE_ENV: production
+        PORT: 3000
+        
+    - name: Run E2E tests
+      run: |
+        if [ "${{ matrix.test-tag }}" = "smoke" ]; then
+          npx playwright test --project=${{ matrix.browser }} --grep="@smoke"
+        else
+          npx playwright test --project=${{ matrix.browser }} --grep="@regression"
+        fi
+      env:
+        BASE_URL: http://localhost:3000
+        NODE_ENV: test
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.browser }}-${{ matrix.test-tag }}
+        path: |
+          test-results/
+          playwright-report/
+        retention-days: 30
+        
+    - name: Upload videos and screenshots
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-failure-${{ matrix.browser }}-${{ matrix.test-tag }}
+        path: |
+          test-results/screenshots/
+          test-results/videos/
+        retention-days: 7
+
+  smoke-gate:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Check smoke test results
+      run: |
+        echo "Smoke tests must pass for PR to be mergeable"
+        echo "Check the e2e-tests job results above"
+        
+  regression-report:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - name: Download test results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: playwright-report-*
+        merge-multiple: true
+        
+    - name: Generate regression report
+      run: |
+        echo "# Nightly Regression Test Report" > regression-report.md
+        echo "Date: $(date)" >> regression-report.md
+        echo "## Test Results" >> regression-report.md
+        echo "Check individual job results for detailed information." >> regression-report.md
+        
+    - name: Upload regression report
+      uses: actions/upload-artifact@v4
+      with:
+        name: regression-report
+        path: regression-report.md
+        retention-days: 30

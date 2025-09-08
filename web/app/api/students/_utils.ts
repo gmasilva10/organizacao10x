@@ -1,10 +1,13 @@
-export function sanitizeAddress(input: Record<string, unknown>): Record<string, string> {
+export function sanitizeAddress(input?: unknown): Record<string, string> {
   const out: Record<string, string> = {}
-  const zip = String(input?.zip ?? "").replace(/\D/g, "")
+  const source: Record<string, unknown> =
+    input && typeof input === 'object' ? (input as Record<string, unknown>) : {}
+
+  const zip = String((source as Record<string, unknown>)?.zip ?? "").replace(/\D/g, "")
   if (zip) out.zip = zip.slice(0, 8)
   const fields = ['street','number','complement','district','city','state','country'] as const
   for (const f of fields) {
-    const value = (input as Record<string, unknown>)[f]
+    const value = (source as Record<string, unknown>)[f]
     const v = String(value ?? "").trim()
     if (v) out[f] = v
   }

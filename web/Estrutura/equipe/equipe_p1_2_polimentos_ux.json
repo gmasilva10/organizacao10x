@@ -1,0 +1,114 @@
+{
+  "timestamp": "2025-01-28T21:30:00-03:00",
+  "feature": "EQUIPE-P1.2-POLIMENTOS-UX",
+  "description": "Polimentos UX premium implementados conforme ordens do GP",
+  "status": "COMPLETED",
+  "gp_orders": {
+    "decision": "Opção B → Implementar Polimentos",
+    "reason": "Funcionalidades principais entregues mas UX incompleta. Não aceitar sem paridade com Serviços."
+  },
+  "implementations": {
+    "ui_parity_services": {
+      "status": "✅ COMPLETED",
+      "changes": [
+        "Layout idêntico ao módulo Serviços: space-y-6",
+        "Cards horizontais com grid gap-4 sm:grid-cols-3", 
+        "Título: text-3xl font-bold tracking-tight",
+        "Subtítulo: text-muted-foreground mt-2",
+        "Cards ativos: bg-primary text-primary-foreground",
+        "Cards inativos: bg-card hover:bg-accent",
+        "Banner de versão removido completamente"
+      ],
+      "files": ["web/app/app/team/page.tsx"]
+    },
+    "menu_actions_3dots": {
+      "status": "✅ COMPLETED", 
+      "changes": [
+        "DropdownMenu com MoreHorizontal icon",
+        "Opções: Editar (Edit icon) + Excluir (Trash2 icon)", 
+        "Modal de confirmação para exclusão",
+        "Estilo destructive para ação de excluir",
+        "Aplicado em ambas as tabelas (Perfis + Profissionais)"
+      ],
+      "files": [
+        "web/components/ProfessionalProfilesManager.tsx",
+        "web/components/ProfessionalsManager.tsx"
+      ]
+    },
+    "toolbar_premium": {
+      "status": "✅ COMPLETED",
+      "changes": [
+        "Barra com bg-muted/50 rounded-lg p-4",
+        "Campo de busca: nome/email com placeholder",
+        "Filtro por perfil: Select dropdown",
+        "Lógica de filtro em tempo real",
+        "Mensagens inteligentes (lista vazia vs sem resultados)",
+        "Layout responsivo: flex items-center gap-4"
+      ],
+      "files": ["web/components/ProfessionalsManager.tsx"]
+    },
+    "modals_premium": {
+      "status": "✅ COMPLETED",
+      "changes": [
+        "DialogContent: flex flex-col max-h-[90vh]",
+        "Conteúdo scrollável: flex-1 overflow-y-auto", 
+        "Rodapé sticky: border-t bg-background p-4",
+        "Botões padronizados: Cancelar + Ação primária",
+        "Máscaras implementadas:",
+        "  - CPF: XXX.XXX.XXX-XX (maxLength: 14)",
+        "  - WhatsApp: (XX) XXXXX-XXXX (maxLength: 15)",
+        "Aplicado em ambos os modais (Perfis + Profissionais)"
+      ],
+      "files": [
+        "web/components/ProfessionalProfilesManager.tsx",
+        "web/components/ProfessionalsManager.tsx"
+      ]
+    }
+  },
+  "technical_details": {
+    "mask_functions": [
+      "CPF: .replace(/\\D/g, '').replace(/(\\d{3})(\\d)/, '$1.$2')",
+      "WhatsApp: .replace(/\\D/g, '').replace(/(\\d{2})(\\d)/, '($1) $2')"
+    ],
+    "ui_consistency": "100% paridade visual com módulo Serviços",
+    "responsive_design": "Layout adaptável com grid e flex",
+    "accessibility": "Modais com focus trap e sticky footer"
+  },
+  "validation": {
+    "linter_errors": "0 (No linter errors found)",
+    "components_updated": 3,
+    "build_errors_fixed": [
+      "Module not found: @/components/ui/alert-dialog",
+      "Dependency installed: @radix-ui/react-alert-dialog",
+      "Component created: web/components/ui/alert-dialog.tsx"
+    ],
+    "runtime_errors_fixed": [
+      "ReferenceError: handleSave is not defined",
+      "Fixed: onClick={handleSave} → onClick={handleSubmit}",
+      "Root cause: Rodapé sticky chamando função inexistente",
+      "Select.Item value vazio: value='' → value='all'",
+      "Fixed: lógica de filtro atualizada para 'all'",
+      "Duplicação de botões: removidos botões originais, mantido apenas rodapé sticky",
+      "Fixed: modais agora têm apenas 1 conjunto de botões (consistente com Serviços)",
+      "Duplicação na aba Usuário: removidos botões 'Voltar' e 'Salvar Usuário' originais",
+      "Fixed: aba Usuário agora usa apenas rodapé sticky para ações",
+      "Erro 409 (Conflict): profissional já tem usuário vinculado",
+      "Fixed: aba Usuário desabilitada quando profissional já tem user_id, mensagem informativa adicionada"
+    ],
+    "features_premium": [
+      "Menu de ações com confirmação",
+      "Barra de ferramentas com filtros",
+      "Modais com rodapé sticky",
+      "Máscaras de entrada",
+      "Layout idêntico ao Serviços"
+    ]
+  },
+  "next_steps": {
+    "evidence_required": "GIFs obrigatórios conforme ordens do GP",
+    "gifs_needed": [
+      "(1) Perfis: criar/editar/excluir via menu de ações",
+      "(2) Profissionais: usar barra de ferramentas (search/filtro)",
+      "(3) Modal premium: rodapé sticky, máscara CPF/WhatsApp"
+    ]
+  }
+}

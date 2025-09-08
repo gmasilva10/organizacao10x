@@ -1,6 +1,13 @@
 # LOG DE ATIVIDADES — Personal Global
-# Última atualização: 2025-08-20 17:23
+# Última atualização: 2025-09-08 20:16
 # Formato: [AAAA-MM-DD HH:MM] Autor — Tipo — Módulo/Área — Título curto — (#tarefa/issue opcional) — Evidência (commit/PR/URL)
+
+Hoje — 08/09/2025
+[2025-09-08 20:16-03] GATE 12X concluído — Infra/Métricas/Telemetria (buffer técnico pré-V1).
+[2025-09-08 20:16-03] GATE 12X merged — PR #23 aprovado e merge realizado com sucesso.
+[2025-09-08 00:00-03] GATE 11 validado — Smoke E2E e fluxos básicos.
+[2025-09-08 00:00-03] GATE 12X aberto — Infra/Métricas/Telemetria (buffer técnico pré-V1).
+[2025-09-08 00:00-03] Anamnese (GATE 13A) — iniciado ciclo de workshops (W1 a W4) para Spec Freeze.
 
 Hoje — 26/08/2025
 [2025-08-26 09:35] DEV — DOC — Estrutura — Revisão ampla de documentos (Rotas, Padronizacao, README, Erros, Credenciais) + criação de Relatorio_Progresso_2025-08-26 — evidência: web/Estrutura/Relatorio_Progresso_2025-08-26.txt
