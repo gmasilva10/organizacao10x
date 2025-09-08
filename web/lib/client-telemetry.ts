@@ -16,8 +16,11 @@ class ClientTelemetry {
   private flushTimer: NodeJS.Timeout | null = null
 
   constructor() {
-    this.startFlushTimer()
-    this.setupFetchInterceptor()
+    // Só inicializar no browser
+    if (typeof window !== 'undefined') {
+      this.startFlushTimer()
+      this.setupFetchInterceptor()
+    }
   }
 
   private getEnvironment(): 'dev' | 'prod' {
@@ -25,6 +28,9 @@ class ClientTelemetry {
   }
 
   private setupFetchInterceptor() {
+    // Verificação adicional de segurança
+    if (typeof window === 'undefined') return
+    
     const originalFetch = window.fetch
     const self = this
 
@@ -78,6 +84,9 @@ class ClientTelemetry {
   }
 
   private startFlushTimer() {
+    // Verificação adicional de segurança
+    if (typeof window === 'undefined') return
+    
     this.flushTimer = setInterval(() => {
       if (this.data.length > 0) {
         this.flush()
