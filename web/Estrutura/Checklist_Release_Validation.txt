@@ -1,4 +1,24 @@
 [ACC06] Telemetria: PASS — evid.: Estrutura/account/telemetry_samples.json
+
+## Gestão de Ocorrências — UI v0.1 (2025-09-04)
+- Filtros: período, grupo/tipo, status, prioridade, sensível, lembrete (com/sem/janela), responsável (multi), busca → PASS
+- Tabela: Prioridade (chip), Sensível (ícone), Lembrete (ícone + data) → PASS
+- ID clicável abre modal Detalhes/Editar → PASS
+- Modal Detalhes/Editar: campos editáveis, anexos, RBAC, validações → PASS
+- Modal Encerrar: campos resolução, PATCH /close, RBAC → PASS
+- Ações lembrete: concluir e alterar data funcionam → PASS
+- Chips premium com ícone X para limpar → PASS
+- Paginação mantém filtros → PASS
+- Estados loading/empty consistentes → PASS
+
+## Gestão de Ocorrências — UX Premium (2025-09-04)
+- Drawer lateral: filtros movidos para painel lateral (padrão Onboarding/Kanban) → PASS
+- Header compacto: título + contadores + botão Filtros → PASS
+- Resumo filtros: "Filtros ativos: N" + "Limpar tudo" → PASS
+- Responsividade: desktop drawer 420-480px, mobile sheet full-height → PASS
+- Hotkeys: Esc para fechar drawer → PASS
+- Zero regressão: consultas, ações ⋮, modais, lembretes, anexos, RBAC → PASS
+
 # Checklist de Liberação para Validação (v1)
 
 ## Kanban — Fluxos críticos
@@ -253,6 +273,26 @@ Notas de governança
 
 ---
 
+## 🔧 Fix Imediato - Botão "Avançar etapa" Reativo
+
+### 📋 Smoke Test (5/5 PASS)
+- [x] **1. Card com 2 obrigatórias + 1 opcional** - Marcar as 2 obrigatórias → botão habilita imediatamente ✅
+- [x] **2. Card com 0 tarefas** - Abrir modal → botão já habilitado ✅
+- [x] **3. Desmarcar uma obrigatória** - Botão desabilita no ato (regressão tratada) ✅
+- [x] **4. Mover card para próxima coluna** - Continua funcionando; sem regressão ✅
+- [x] **5. Console limpo** - Sem warnings ou erros ✅
+
+### 🎯 Implementação
+- [x] **Estado derivado** do checklist vivo ✅
+- [x] **Optimistic update** com invalidação ✅
+- [x] **Reatividade instantânea** sem reload ✅
+- [x] **Edge cases tratados** (0 tarefas, opcionais, erros) ✅
+
+**Status:** FIX CONCLUÍDO ✅  
+**Commit:** `fix(kanban): enable advance button on live checklist changes`
+
+---
+
 ## 🚀 Checklist de Validação da Release v0.3.1-dev
 
 ### 🎯 P1 — Módulo Serviços → Onboarding (Reformulação)
@@ -267,7 +307,19 @@ Notas de governança
 - [ ] **P2-03: UX Clean** - Sem scroll, informações essenciais
 - [ ] **P2-04: Consistência Visual** - Mesmo design em todas as colunas
 
+### 🎯 P3 — Módulo Equipe (P1)
+- [x] **P3-01: CRUD Perfis Profissionais** - Criar, editar, excluir perfis ✅
+- [x] **P3-02: CRUD Profissionais** - Criar, editar, excluir profissionais ✅
+- [x] **P3-03: Integração com Usuários** - Vínculo automático e criação ✅
+- [x] **P3-04: Regras de Plano** - Modal de upgrade para Basic ✅
+- [x] **P3-05: Validações Robustas** - CPF, WhatsApp, Email ✅
+- [x] **P3-06: Interface Premium** - Modais, toasts, loading states ✅
+- [x] **P3-07: Banco de Dados** - Migração aplicada, IDs sequenciais ✅
+- [x] **P3-08: Seed e Backfill** - Admin por tenant + donos vinculados ✅
+- [x] **P3-09: RBAC e Middleware** - Acesso configurado corretamente ✅
+- [x] **P3-10: Integração Alunos** - student_responsibles implementado ✅
+
 ### 📊 Status Geral v0.3.1-dev
-**Progresso:** 1/8 funcionalidades implementadas  
+**Progresso:** 8/14 funcionalidades implementadas  
 **Status:** EM DESENVOLVIMENTO  
-**Próxima entrega:** P1-02 (CRUD Inline de Tarefas)
+**Próxima entrega:** P1-02 (CRUD Inline de Tarefas) + Validação Equipe pelo Patrocinador

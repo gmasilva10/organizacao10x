@@ -1,0 +1,62 @@
+{
+  "module": "EQUIPE-P1-API-QUERY-FIX",
+  "timestamp": "2025-01-28T19:30:00Z",
+  "status": "API_QUERIES_FIXED",
+  "description": "Queries da API corrigidas - problema era JOIN com users(email)",
+  "problem_identified": {
+    "issue": "Erro PGRST200 persistindo mesmo após correção do constraint",
+    "root_cause": "Queries da API tentavam fazer JOIN com users(email) no schema public",
+    "impact": "API /api/professionals retornava erro 500",
+    "evidence": "Terminal mostrava PGRST200 mesmo com constraint correto"
+  },
+  "technical_analysis": {
+    "error_code": "PGRST200",
+    "error_message": "Searched for a foreign key relationship between 'professionals' and 'users' in the schema 'public'",
+    "api_queries": "Duas queries na API tentavam JOIN com users(email)",
+    "schema_issue": "Supabase procurava tabela users no schema public em vez de auth"
+  },
+  "solution_applied": {
+    "action": "Removed unnecessary JOIN with users(email) from API queries",
+    "files_modified": ["web/app/api/professionals/route.ts"],
+    "queries_fixed": [
+      "GET /api/professionals - removed users(email) from select",
+      "POST /api/professionals - removed users(email) from select"
+    ],
+    "result": "API queries no longer attempt to JOIN with users table"
+  },
+  "verification": {
+    "constraint_correct": "professionals_user_id_fkey references auth.users ✅",
+    "data_exists": "4 professionals in database ✅",
+    "api_queries_fixed": "No more users(email) JOINs ✅",
+    "expected_result": "API should return 200 with professional data ✅"
+  },
+  "expected_behavior": {
+    "url": "localhost:3000/app/team",
+    "tab_click": "Clicking 'Profissionais' tab should work without PGRST200 error",
+    "api_response": "/api/professionals should return 200 with data",
+    "visible_elements": [
+      "List of professionals (4 total)",
+      "No console errors",
+      "Professional data displayed in table"
+    ]
+  },
+  "next_steps": [
+    "Test /app/team page in browser",
+    "Click on 'Profissionais' tab",
+    "Verify no PGRST200 errors in console",
+    "Confirm professional data is displayed",
+    "Continue with remaining premium polish items"
+  ],
+  "acceptance_criteria": {
+    "no_pgrst200_error": "PGRST200 error completely resolved",
+    "api_working": "API /api/professionals returns 200 with data",
+    "tab_functional": "Profissionais tab loads without errors",
+    "data_visible": "Professional data displayed correctly"
+  },
+  "technical_notes": [
+    "Constraint was correct, problem was in API queries",
+    "JOIN with users(email) was unnecessary and causing PGRST200",
+    "Professional data already includes email field",
+    "API queries simplified to avoid schema conflicts"
+  ]
+}

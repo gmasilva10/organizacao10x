@@ -80,6 +80,7 @@ export function KanbanCardEditor({
   const [canAdvance, setCanAdvance] = useState(false)
   const [isAdvancing, setIsAdvancing] = useState(false)
   const [isCompleting, setIsCompleting] = useState(false)
+  const [checklistData, setChecklistData] = useState<any>(null)
 
   // Verificar se pode avançar (100% obrigatórias concluídas)
   useEffect(() => {
@@ -88,20 +89,71 @@ export function KanbanCardEditor({
     }
   }, [isOpen, activeTab])
 
+  // Recalcular canAdvance quando checklistData muda
+  useEffect(() => {
+    if (checklistData) {
+      const requiredTasks = checklistData.tasks?.filter((task: any) => task.task?.is_required) || []
+      const completedRequired = requiredTasks.filter((task: any) => task.status === 'completed')
+      
+      // Regra: apenas tarefas obrigatórias bloqueiam avanço
+      // Se não há tarefas obrigatórias (requiredTasks.length === 0), pode avançar
+      // Se há tarefas obrigatórias, todas devem estar concluídas
+      const canAdvanceNow = requiredTasks.length === 0 || completedRequired.length === requiredTasks.length
+      setCanAdvance(canAdvanceNow)
+    }
+  }, [checklistData])
+
   const checkCanAdvance = async () => {
     try {
-      // Buscar tarefas obrigatórias do card
+      // Buscar tarefas do card
       const response = await fetch(`/api/kanban/items/${card.id}/tasks`)
       if (response.ok) {
         const data = await response.json()
-        const requiredTasks = data.tasks?.filter((task: any) => task.task?.is_required) || []
-        const completedRequired = requiredTasks.filter((task: any) => task.status === 'completed')
-        
-        setCanAdvance(requiredTasks.length > 0 && completedRequired.length === requiredTasks.length)
+        setChecklistData(data)
+      } else {
+        console.error('Erro ao buscar tarefas do card:', response.status)
+        setChecklistData(null)
+        setCanAdvance(false)
       }
     } catch (error) {
       console.error('Erro ao verificar tarefas:', error)
+      setChecklistData(null)
       setCanAdvance(false)
+    }
+  }
+
+  // Callback para atualizar checklist após toggle de tarefa
+  const handleTaskToggle = async (catalogTaskId: string, status: string) => {
+    try {
+      const response = await fetch(`/api/kanban/items/${card.id}/tasks/${catalogTaskId}/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar tarefa')
+      }
+      
+      // Optimistic update: atualizar estado local imediatamente
+      if (checklistData) {
+        const updatedTasks = checklistData.tasks.map((task: any) => 
+          task.task_id === catalogTaskId 
+            ? { ...task, status, completed_at: status === 'completed' ? new Date().toISOString() : undefined }
+            : task
+        )
+        setChecklistData({ ...checklistData, tasks: updatedTasks })
+      }
+      
+      // Atualizar o progresso do card após toggle bem-sucedido
+      if (updateCardProgress) {
+        updateCardProgress(card.id, catalogTaskId, status)
+      }
+    } catch (error) {
+      console.error('Erro:', error)
+      // Reverter optimistic update em caso de erro
+      checkCanAdvance()
+      throw error
     }
   }
 
@@ -322,27 +374,7 @@ export function KanbanCardEditor({
                 <KanbanChecklist
                   cardId={card.id}
                   stageCode={column.stageCode || 'novo_aluno'}
-                  onTaskToggle={async (catalogTaskId, status) => {
-                    try {
-                      const response = await fetch(`/api/kanban/items/${card.id}/tasks/${catalogTaskId}/toggle`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status })
-                      })
-                      
-                      if (!response.ok) {
-                        throw new Error('Erro ao atualizar tarefa')
-                      }
-                      
-                      // Atualizar o progresso do card após toggle bem-sucedido
-                      if (updateCardProgress) {
-                        updateCardProgress(card.id, catalogTaskId, status)
-                      }
-                    } catch (error) {
-                      console.error('Erro:', error)
-                      throw error
-                    }
-                  }}
+                  onTaskToggle={handleTaskToggle}
                 />
               </div>
             )}
@@ -522,11 +554,11 @@ export function KanbanCardEditor({
               {!isLastColumn && (
                 <Button 
                   onClick={() => setAdvanceConfirmOpen(true)}
-                  disabled={!canAdvance}
+                  disabled={!canAdvance || isAdvancing}
                   className="gap-2"
                 >
                   <ArrowRight className="h-4 w-4" />
-                  Avançar Etapa
+                  {isAdvancing ? "Avançando..." : "Avançar Etapa"}
                 </Button>
               )}
               

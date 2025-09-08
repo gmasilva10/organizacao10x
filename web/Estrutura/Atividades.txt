@@ -1,6 +1,10 @@
 # LOG DE ATIVIDADES — Personal Global
-# Última atualização: 2025-08-27 14:30
+# Última atualização: 2025-09-04 16:15
 # Formato: [AAAA-MM-DD HH:MM] Autor — Tipo — Módulo/Área — Título curto — (#tarefa/issue opcional) — Evidência (commit/PR/URL)
+
+Hoje — 04/09/2025
+[2025-09-04 16:15] DEV — UX — Gestão de Ocorrências — Ajuste UX imediato: refatoração filtros inline para drawer lateral (padrão Onboarding/Kanban), header compacto, resumo filtros ativos — evid.: web/app/app/workflow/occurrences/page.tsx, web/components/occurrences/OccurrencesFiltersDrawer.tsx
+[2025-09-04 15:45] DEV — UI — Gestão de Ocorrências — Implementação completa v0.1: modais Detalhes/Editar e Encerrar, filtros avançados, chips premium, anexos, RBAC — evid.: web/app/app/workflow/occurrences/page.tsx, web/components/occurrences/*, web/app/api/occurrences/*
 
 Ontem — 26/08/2025
 [2025-08-26 09:35] DEV — DOC — Estrutura — Revisão ampla de documentos (Rotas, Padronizacao, README, Erros, Credenciais) + criação de Relatorio_Progresso_2025-08-26 — evidência: web/Estrutura/Relatorio_Progresso_2025-08-26.txt

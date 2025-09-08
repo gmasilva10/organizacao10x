@@ -19,12 +19,12 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 import { motion, LayoutGroup } from "framer-motion"
 import { useTheme } from "@/lib/use-theme"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { useToast } from "@/components/ui/toast"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-export function LoginDrawer() {
+function LoginDrawerContent() {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -166,4 +166,12 @@ export function LoginDrawer() {
 			</DrawerContent>
 		</Drawer>
 	)
+}
+
+export function LoginDrawer() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <LoginDrawerContent />
+        </Suspense>
+    )
 }

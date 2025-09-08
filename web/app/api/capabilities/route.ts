@@ -14,6 +14,7 @@ export type Capabilities = {
     reports: { advanced: boolean }
     services: { onboarding: boolean }
     kanban: { card_minimal: boolean }
+    occurrences: boolean
   }
 }
 
@@ -37,6 +38,7 @@ export async function GET(request: Request) {
       // v0.3.1-dev: Novas features SEMPRE habilitadas - HARDCODE
       services: { onboarding: true }, // SEMPRE TRUE
       kanban: { card_minimal: true }, // SEMPRE TRUE
+      occurrences: true, // SEMPRE TRUE - MÓDULO OCORRÊNCIAS
     },
   }
   

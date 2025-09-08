@@ -41,7 +41,8 @@ export async function GET(request: Request) {
   const base = `${url}/rest/v1/students?${filters.join("&")}${search}`
   const rangeStart = (page - 1) * pageSize
   const rangeEnd = rangeStart + pageSize - 1
-  const resp = await fetch(`${base}&order=created_at.desc`, {
+  const t0 = Date.now()
+  const resp = await fetch(`${base}&select=id,name,email,phone,status,onboard_opt,trainer_id,created_at&order=created_at.desc`, {
     headers: { apikey: key, Authorization: `Bearer ${key}`, Range: `${rangeStart}-${rangeEnd}`, Prefer: "count=exact" },
     cache: "no-store",
   })
@@ -50,10 +51,6 @@ export async function GET(request: Request) {
     name: string
     email?: string | null
     phone?: string | null
-    cpf?: string | null
-    birth_date?: string | null
-    customer_stage?: string | null
-    address?: Record<string, unknown> | null
     status: string
     onboard_opt?: 'nao_enviar'|'enviar'|'enviado'
     trainer_id?: string | null
@@ -73,20 +70,17 @@ export async function GET(request: Request) {
     full_name: it.name,
     email: it.email ?? null,
     phone: it.phone ?? null,
-    cpf: it.cpf ?? null,
-    birth_date: it.birth_date ?? null,
-    customer_stage: it.customer_stage ?? 'new',
-    address: it.address ?? null,
     status: it.status,
     onboard_opt: (it.onboard_opt as any) ?? 'nao_enviar',
     trainer: it.trainer_id ? { id: it.trainer_id, name: null as string | null } : null,
     created_at: it.created_at,
   }))
+  const ms = Date.now() - t0
   return NextResponse.json({
     meta,
     data,
     pagination: { page, page_size: pageSize, total, total_pages: totalPages },
-  })
+  }, { headers: { 'X-Query-Time': String(ms), 'Cache-Control': 'private, max-age=15' } })
 }
 
 // POST /api/students
@@ -226,52 +220,8 @@ export async function POST(request: Request) {
         // marca como enviado (após criar card com sucesso)
         await fetch(`${url}/rest/v1/students?id=eq.${newId}&tenant_id=eq.${ctx.tenantId}`, { method:'PATCH', headers, body: JSON.stringify({ onboard_opt: 'enviado' }) })
         
-        // Instanciar tarefas obrigatórias para o card
-        try {
-          // Buscar tarefas do estágio
-          const tasksResp = await fetch(`${url}/rest/v1/service_onboarding_tasks?stage_code=eq.novo_aluno&is_required=eq.true&select=id&order=order_index.asc`, { headers, cache: 'no-store' })
-          const tasks = await tasksResp.json().catch(() => [])
-          
-          if (tasks && tasks.length > 0) {
-            // Buscar o card criado para obter o ID
-            const cardResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&student_id=eq.${newId}&select=id&limit=1`, { headers, cache: 'no-store' })
-            const card = (await cardResp.json().catch(() => []))?.[0]
-            
-            if (card?.id) {
-              // Criar instâncias de tarefas para o card
-              const cardTasks = tasks.map((task: any) => ({
-                org_id: ctx.tenantId,
-                card_id: card.id,
-                task_id: task.id
-              }))
-              
-              await fetch(`${url}/rest/v1/card_tasks`, { 
-                method: 'POST', 
-                headers, 
-                body: JSON.stringify(cardTasks) 
-              }).catch(() => {}) // Não falha se as tarefas falharem
-              
-              // Log da criação do card com tarefas
-              try { 
-                await logEvent({ 
-                  tenantId: ctx.tenantId, 
-                  userId: ctx.userId, 
-                  eventType: 'aluno_to_kanban.created', 
-                  payload: { 
-                    studentId: newId, 
-                    stageId: stage.id, 
-                    position: nextPos, 
-                    source: 'api',
-                    tasksCount: tasks.length 
-                  } 
-                }) 
-              } catch {}
-            }
-          }
-        } catch (taskError) {
-          console.error('Erro ao instanciar tarefas:', taskError)
-          // Não falha a criação do aluno se as tarefas falharem
-        }
+        // As tarefas são instanciadas automaticamente pelo trigger trigger_instantiate_tasks_on_card_create
+        // quando o card é criado na tabela kanban_items
         
         try { await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'aluno_to_kanban.created', payload: { studentId: newId, stageId: stage.id, position: nextPos, source:'api' } }) } catch {}
       }

@@ -16,7 +16,8 @@ import {
   User,
   Badge as BadgeIcon,
   MessageCircle,
-  ChevronDown
+  ChevronDown,
+  ClipboardList
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -80,17 +81,18 @@ const menuGroups: MenuGroup[] = [
         href: "/app/onboarding",
         icon: KanbanSquare
       },
-      {
-        id: "history",
-        title: "Histórico",
-        href: "/app/onboarding/history",
-        icon: History
-      },
+      // Removido: Histórico
       {
         id: "relationship",
         title: "Relacionamento",
         href: "/app/relationship",
         icon: MessageCircle
+      },
+      {
+        id: "occurrences-management",
+        title: "Gestão de Ocorrências",
+        href: "/app/workflow/occurrences",
+        icon: ClipboardList
       }
     ]
   },
@@ -109,18 +111,6 @@ const menuGroups: MenuGroup[] = [
         title: "Configurações",
         href: "/app/settings", 
         icon: Settings
-      }
-    ]
-  },
-  {
-    id: "team",
-    title: "Equipe",
-    items: [
-      {
-        id: "team-management",
-        title: "Gerenciar Equipe",
-        href: "/app/team",
-        icon: Shield
       }
     ]
   }

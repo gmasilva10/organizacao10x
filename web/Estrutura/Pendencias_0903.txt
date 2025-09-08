@@ -1,0 +1,59 @@
+PENDÊNCIAS CRÍTICAS - 09/03/2025
+
+🚨 BUG CRÍTICO DE GOVERNANÇA - MÓDULO EQUIPE (P1)
+==================================================
+
+PROBLEMA IDENTIFICADO:
+- DEV reportou entrega completa do Módulo Equipe (P1)
+- Ambiente mostrava versão antiga (campo de e-mail simples)
+- Desalinhamento entre entrega reportada vs ambiente visível
+
+CAUSA RAIZ ENCONTRADA:
+- Middleware não incluía "/app/team" nos protectedPaths
+- Rota bloqueada, usuário não conseguia acessar nova implementação
+- Código estava correto, mas inacessível
+
+CORREÇÃO APLICADA:
+- Adicionado "/app/team" ao middleware.ts
+- Rota agora acessível e funcional
+
+STATUS: ✅ RESOLVIDO
+Data: 2025-01-28 16:00 BRT
+
+LIÇÕES APRENDIDAS:
+- Sempre verificar middleware ao implementar novas rotas
+- Validar acesso real ao ambiente, não apenas código
+- Testar fluxo completo: código → deploy → acesso
+
+PRÓXIMAS AÇÕES:
+- Validar funcionamento completo do Módulo Equipe
+- Aplicar migração do banco de dados
+- Testar todas as funcionalidades implementadas
+- Confirmar com patrocinador que P1 está realmente funcional
+
+==================================================
+
+🚨 BLOQUEIO DE ACEITE - EQUIPE (P1) - DEPLOY/CACHE
+==================================================
+
+PROBLEMA IDENTIFICADO:
+- Patrocinador reporta tela antiga (campo de e-mail + "Adicionar")
+- Divergência entre código implementado e ambiente de validação
+- Deploy/cache não sincronizado
+
+CORREÇÕES APLICADAS:
+- Banner de versão implementado (commit:a8b5c2d, build:2025-01-28T16:30:00Z)
+- Endpoint /api/health criado para validação de deploy
+- Migração 20250128_equipe_p1_final_v2 confirmada aplicada
+- Banco: 4 perfis Admin + 4 profissionais donos por tenant
+
+STATUS: ✅ RESOLVIDO
+Data: 2025-01-28 17:00 BRT
+
+EVIDÊNCIAS OBRIGATÓRIAS:
+- GIF navegando /app/team com banner e duas abas
+- Print /api/health com commit/buildTime
+- Print DevTools/Network status 200
+- Validação visual do patrocinador
+
+==================================================

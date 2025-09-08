@@ -45,15 +45,23 @@ export async function PATCH(
       return NextResponse.json({ error: 'Coluna não encontrada' }, { status: 404 })
     }
 
-    // Verificar se é uma coluna fixa
-    if (existingColumn.is_fixed) {
-      return NextResponse.json({ error: 'Não é possível editar colunas fixas' }, { status: 403 })
-    }
-
     // Preparar dados para atualização
     const updateData: any = {}
     if (title !== undefined) updateData.name = title.trim()
-    if (position !== undefined) updateData.position = position
+    
+    // Para colunas fixas, permitir apenas renomeação (não mudança de posição)
+    if (existingColumn.is_fixed) {
+      if (position !== undefined) {
+        return NextResponse.json({ error: 'Não é possível alterar a posição de colunas fixas' }, { status: 403 })
+      }
+      // Permitir apenas renomeação para colunas fixas
+      if (title === undefined) {
+        return NextResponse.json({ error: 'Apenas o nome pode ser alterado em colunas fixas' }, { status: 400 })
+      }
+    } else {
+      // Para colunas não-fixas, permitir alteração de posição
+      if (position !== undefined) updateData.position = position
+    }
 
     // Atualizar coluna
     const { data: updatedColumn, error: updateError } = await supabase

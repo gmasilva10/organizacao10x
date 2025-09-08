@@ -43,44 +43,18 @@ export function KanbanChecklist({ cardId, stageCode, onTaskToggle }: KanbanCheck
   const fetchTasks = async () => {
     setLoading(true)
     try {
-      // Buscar tarefas do estágio
-      const tasksResponse = await fetch(`/api/services/onboarding/tasks?stage_code=${stageCode}`)
-      if (tasksResponse.ok) {
-        const tasksData = await tasksResponse.json()
-        
-        // Buscar instâncias de tarefas do card
-        const cardTasksResponse = await fetch(`/api/kanban/items/${cardId}/tasks`)
-        if (cardTasksResponse.ok) {
-          const cardTasksData = await cardTasksResponse.json()
-          
-          // Combinar tarefas com instâncias
-          const combinedTasks = tasksData.tasks.map((task: Task) => {
-            const cardTask = cardTasksData.tasks?.find((ct: CardTask) => ct.task_id === task.id)
-            return {
-              id: cardTask?.id || `temp_${task.id}`,
-              task_id: task.id,
-              status: cardTask?.status || 'pending',
-              started_at: cardTask?.started_at,
-              completed_at: cardTask?.completed_at,
-              notes: cardTask?.notes,
-              task
-            }
-          })
-          
-          setTasks(combinedTasks)
-        } else {
-          // Se não há instâncias, criar com status pending
-          const pendingTasks = tasksData.tasks.map((task: Task) => ({
-            id: `temp_${task.id}`,
-            task_id: task.id,
-            status: 'pending' as const,
-            task
-          }))
-          setTasks(pendingTasks)
-        }
+      // Buscar tarefas do card (já combina templates com instâncias)
+      const response = await fetch(`/api/kanban/items/${cardId}/tasks`)
+      if (response.ok) {
+        const data = await response.json()
+        setTasks(data.tasks || [])
+      } else {
+        console.error('Erro ao buscar tarefas do card:', response.status)
+        setTasks([])
       }
     } catch (error) {
       console.error('Erro ao buscar tarefas:', error)
+      setTasks([])
     } finally {
       setLoading(false)
     }

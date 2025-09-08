@@ -1,7 +1,7 @@
 "use client"
 
 import { ReactNode } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./dialog"
 import { Button } from "./button"
 
 type Props = {
@@ -21,7 +21,7 @@ export function ConfirmDialog({ open, title, description, confirmText = "Confirm
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {description ? <DialogDescription>{description}</DialogDescription> : null}
+          {description ? <div className="text-sm text-muted-foreground">{description}</div> : null}
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={onCancel}>{cancelText}</Button>

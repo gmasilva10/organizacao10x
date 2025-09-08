@@ -14,6 +14,7 @@ export async function GET(request: Request) {
 
   // Removido resync automático; será feito via endpoint dedicado
 
+  const t0 = Date.now()
   // Columns (kanban_stages)
   let columns: Array<{ id: string; title: string; sort: number; is_fixed?: boolean; stage_code?: string; blocked?: boolean }> = []
   {
@@ -136,8 +137,14 @@ export async function GET(request: Request) {
   }
 
   const enriched = cards.map(c => ({ ...c, student_status: studentsMap[c.student_id]?.status || 'onboarding', student_name: studentsMap[c.student_id]?.name }))
-
-  return NextResponse.json({ columns, cards: enriched })
+  const ms = Date.now() - t0
+  return NextResponse.json({ columns, cards: enriched }, { 
+    headers: { 
+      'X-Query-Time': String(ms), 
+      'X-Row-Count': String(cards.length),
+      'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' 
+    } 
+  })
 }
 
 

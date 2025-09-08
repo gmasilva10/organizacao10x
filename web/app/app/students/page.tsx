@@ -7,12 +7,10 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { StudentsSkeleton } from "@/components/students/StudentsSkeleton"
 import { StudentsFilters } from "@/components/students/StudentsFilters"
 import { AssignTrainerSelect } from "@/components/students/AssignTrainerSelect"
-import { StudentCreateModal } from "@/components/students/StudentCreateModal"
-import { StudentEditModal } from "@/components/students/StudentEditModal"
 import { StudentFullModal } from "@/components/students/StudentFullModal"
 
 type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; onboard_opt?: 'nao_enviar'|'enviar'|'enviado'; trainer: { id: string | null; name: string | null } | null; created_at: string }
-type Trainer = { id: string; name: string }
+type Trainer = { id: string; user_id: string; name: string; email?: string }
 
 export default function StudentsPage() {
   const [showUpgrade, setShowUpgrade] = useState(false)
@@ -27,7 +25,6 @@ export default function StudentsPage() {
   const pageSize = 20
   const qDebounceRef = useRef<number | null>(null)
   const [trainers, setTrainers] = useState<Trainer[]>([])
-  const [showCreate, setShowCreate] = useState(false)
   const [showFull, setShowFull] = useState<false | 'create' | 'edit'>(false)
   const [error, setError] = useState<string>("")
   const [editing, setEditing] = useState<StudentRow | null>(null)
@@ -63,9 +60,9 @@ export default function StudentsPage() {
   }, [page, pageSize, q, status, trainerId])
 
   async function fetchTrainers() {
-    const res = await fetch('/api/users/trainers', { cache: 'no-store' })
-    const data: { items?: Array<{ user_id: string; email: string|null }> } = await res.json()
-    const mapped = (data?.items || []).map((x) => ({ id: x.user_id, name: x.email || x.user_id })) as Trainer[]
+    const res = await fetch('/api/professionals/trainers', { cache: 'no-store' })
+    const data: { trainers?: Array<{ id: string; user_id: string; name: string; email?: string }> } = await res.json()
+    const mapped = (data?.trainers || []) as Trainer[]
     setTrainers(mapped)
   }
 
@@ -93,26 +90,7 @@ export default function StudentsPage() {
   }, [q])
   useEffect(() => { fetchSummary() }, [])
 
-  async function onCreate(payload: { name: string; email: string; phone?: string | null; status?: 'onboarding'|'active'|'paused'; trainer_id?: string | null }) {
-    setLoading(true)
-    try {
-      toast.info('Criando aluno...')
-      const res = await fetch('/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      if (res.status === 200) {
-        toast.success('Aluno criado com sucesso.')
-        fetchList(); fetchSummary()
-      } else if (res.status === 422) {
-        setShowUpgrade(true)
-        toast.info('Limite de alunos atingido.')
-      } else if (res.status === 403) {
-        toast.error('Sem permissão para criar alunos.')
-      } else {
-        toast.error(`Falha ao criar aluno (${res.status}).`)
-      }
-    } catch {
-      toast.error('Erro de rede ao criar aluno.')
-    } finally { setLoading(false) }
-  }
+  // cadastro rápido removido
 
   async function onAssign(id: string, trainerId: string | null) {
     setLoading(true)
@@ -195,15 +173,7 @@ export default function StudentsPage() {
   return (
     <div className="container py-8">
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} title="Limite do seu plano foi atingido" description="Para adicionar mais alunos, faça upgrade para o plano Enterprise." primaryHref="/contact" secondaryHref="/planos" />
-      <StudentCreateModal open={showCreate} onClose={()=>setShowCreate(false)} onCreate={onCreate} trainers={trainers} />
-      <StudentEditModal
-        open={!!editing && showFull===false}
-        student={editing ? { id: editing.id, full_name: editing.full_name, email: null, phone: editing.phone ?? null, status: editing.status as 'onboarding'|'active'|'paused', trainer: editing.trainer ? { id: editing.trainer.id } : null } : null}
-        trainers={trainers}
-        onClose={()=>setEditing(null)}
-        onSave={onUpdate}
-      />
-      <StudentFullModal open={showFull!==false} mode={showFull==='create'?'create':'edit'} student={showFull==='edit'? editing : null} trainers={trainers} onClose={()=>{ setShowFull(false); if (showFull==='create') setShowCreate(false) }} onSaved={()=>{ fetchList(); fetchSummary() }} />
+      <StudentFullModal open={showFull!==false} mode={showFull==='create'?'create':'edit'} student={showFull==='edit'? editing : null} trainers={trainers} onClose={()=>{ setShowFull(false); setEditing(null) }} onSaved={()=>{ fetchList(); fetchSummary() }} />
       <h1 className="text-2xl font-semibold">Alunos</h1>
       {counts && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
@@ -216,8 +186,7 @@ export default function StudentsPage() {
       <div className="mt-4 flex items-center gap-3">
         <StudentsFilters q={q} status={status} trainerId={trainerId} trainers={trainers} onQ={setQ} onStatus={setStatus} onTrainer={setTrainerId} />
         <div className="ml-auto flex gap-2">
-          <button onClick={()=>setShowCreate(true)} className="rounded-md border px-4 py-2 text-sm">Novo (rápido)</button>
-          <button onClick={()=>setShowFull('create')} className="rounded-md bg-primary px-4 py-2 text-sm text-white">Cadastro completo</button>
+          <button onClick={()=>setShowFull('create')} className="rounded-md bg-primary px-4 py-2 text-sm text-white">Novo Aluno</button>
         </div>
       </div>
 
@@ -254,7 +223,7 @@ export default function StudentsPage() {
                   </div>
                 </td>
                 <td className="px-3 py-2">
-                  <AssignTrainerSelect value={s.trainer?.id || null} trainers={trainers.map(t => ({ user_id: t.id, email: t.name }))} onChange={(v)=>onAssign(s.id, v)} />
+                  <AssignTrainerSelect value={s.trainer?.id || null} trainers={trainers.map(t => ({ user_id: t.user_id, name: t.name, email: t.email }))} onChange={(v)=>onAssign(s.id, v)} />
                 </td>
                 <td className="px-3 py-2">{new Date(s.created_at).toLocaleString(undefined, { hour12: false })}</td>
                 <td className="px-3 py-2">

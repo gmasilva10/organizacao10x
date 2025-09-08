@@ -17,6 +17,7 @@ export type Capabilities = {
     // v0.3.1-dev: Novas features
     services: { onboarding: boolean }
     kanban: { card_minimal: boolean }
+    occurrences: boolean
   }
 }
 
@@ -51,6 +52,7 @@ export type FeatureKey =
   // v0.3.1-dev: Novas features
   | "features.services.onboarding"
   | "features.kanban.card_minimal"
+  | "features.occurrences"
 
 export type LimitKey = "limits.students" | "limits.trainers"
 
@@ -72,6 +74,8 @@ export function useFeature(key: FeatureKey) {
       return { enabled: true, loading: false } // SEMPRE TRUE - SEM DEPENDÊNCIA
     case "features.kanban.card_minimal":
       return { enabled: true, loading: false } // SEMPRE TRUE - SEM DEPENDÊNCIA
+    case "features.occurrences":
+      return { enabled: Boolean(caps.features.occurrences), loading: false }
     default:
       return { enabled: false, loading: false }
   }

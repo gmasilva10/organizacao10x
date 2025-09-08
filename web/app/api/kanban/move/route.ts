@@ -75,6 +75,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro interno', detail: updateError.message }, { status: 500 })
     }
 
+    // O trigger trigger_instantiate_tasks_on_card_move já instancia automaticamente
+    // as tarefas da nova coluna quando o card é movido
+
     // Log da movimentação
     try {
       await supabase
@@ -85,11 +88,17 @@ export async function POST(request: NextRequest) {
           stage_id: toColumnId,
           action: 'card_moved',
           payload: {
+            from_column_id: fromColumnId,
+            to_column_id: toColumnId,
             from_stage: fromStage.name,
             to_stage: toStage.name,
             from_position: fromStage.position,
             to_position: toStage.position,
-            student_id: card.student_id
+            student_id: card.student_id,
+            actor_id: user.id,
+            timestamp: new Date().toISOString(),
+            // added_templates será preenchido pelos logs de card_task_instantiated
+            added_templates: []
           },
           created_by: user.id
         })

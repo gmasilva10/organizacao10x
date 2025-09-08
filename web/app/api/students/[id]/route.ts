@@ -71,6 +71,19 @@ export async function PATCH(_request: Request, ctxParam: { params: Promise<{ id:
 
   if (allowedFull.has(ctx.role)) {
     // update livre (soft delete via deleted_at também passaria por aqui com value null/now)
+    // Se trainer_id vier como user_id, converter para user_id (string) nesta tabela (alinhado ao restante do app)
+    if (Object.prototype.hasOwnProperty.call(body, 'trainer_id')) {
+      const value = (body as any).trainer_id
+      if (typeof value === 'string' && value.length > 0 && value.length < 36) {
+        // Parece ser um id numérico/string curto do professional; buscar user_id
+        try {
+          const headers = { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json' }
+          const resp = await fetch(`${url}/rest/v1/professionals?tenant_id=eq.${ctx.tenantId}&id=eq.${encodeURIComponent(value)}&select=user_id&limit=1`, { headers })
+          const row = (await resp.json().catch(()=>[]))?.[0]
+          if (row?.user_id) (body as any).trainer_id = row.user_id
+        } catch {}
+      }
+    }
     const patch = await fetch(`${url}/rest/v1/students?id=eq.${id}&tenant_id=eq.${ctx.tenantId}&deleted_at=is.null`, {
       method: "PATCH",
       headers: { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json", Prefer: "return=minimal" },

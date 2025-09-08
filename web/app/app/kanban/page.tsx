@@ -74,6 +74,28 @@ export default function KanbanPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [confirm.open])
 
+  // Listener para invalidar cache quando templates são alterados
+  useEffect(() => {
+    function handleCacheInvalidation(event: CustomEvent) {
+      console.log('🔄 Cache invalidation event received:', event.detail)
+      
+      // Recarregar board para sincronizar com mudanças nos templates
+      loadBoard(trainerScope)
+      
+      // Recarregar progresso de todos os cards
+      if (columns.length > 0) {
+        columns.forEach(column => {
+          column.cards.forEach(card => {
+            loadCardProgress(card.id)
+          })
+        })
+      }
+    }
+
+    window.addEventListener('kanban:invalidateCache', handleCacheInvalidation as EventListener)
+    return () => window.removeEventListener('kanban:invalidateCache', handleCacheInvalidation as EventListener)
+  }, [trainerScope, columns])
+
   async function loadBoard(trainerId?: string) {
     setLoadingBoard(true)
     const url = new URL('/api/kanban/board', location.origin)

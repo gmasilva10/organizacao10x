@@ -30,12 +30,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Usuário não pertence a uma organização' }, { status: 403 })
     }
 
-    // Buscar tarefas do catálogo para esta coluna
+    // Buscar tarefas do catálogo para esta coluna (excluir soft deleted com order_index = -1)
     const { data: tasks, error: tasksError } = await supabase
       .from('service_onboarding_tasks')
       .select('*')
       .eq('stage_code', stageCode)
       .eq('org_id', membership.tenant_id)
+      .neq('order_index', -1)  // Filtrar tarefas soft deleted
       .order('order_index')
 
     if (tasksError) {
@@ -173,7 +174,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       message: 'Tarefa criada com sucesso',
-      task
+      task,
+      invalidateCache: true  // Flag para o frontend invalidar cache
     })
 
   } catch (error) {

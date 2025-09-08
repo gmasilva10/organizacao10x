@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -19,7 +19,7 @@ interface SignupForm {
   acceptTerms: boolean
 }
 
-export default function SignupPage() {
+function SignupForm() {
   const { success, error } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -407,5 +407,13 @@ export default function SignupPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <SignupForm />
+    </Suspense>
   )
 }

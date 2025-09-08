@@ -112,7 +112,8 @@ export async function PATCH(
       success: true, 
       message: 'Tarefa atualizada com sucesso',
       task: updatedTask,
-      applied_to_existing: apply_to_existing || false
+      applied_to_existing: apply_to_existing || false,
+      invalidateCache: true  // Flag para o frontend invalidar cache
     })
 
   } catch (error) {
@@ -142,7 +143,12 @@ export async function DELETE(
     }
 
     // Buscar org_id do usuário
-    const { data: membership, error: membershipError } = await supabase.auth.getUser()
+    const { data: membership, error: membershipError } = await supabase
+      .from('memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+      .single()
+
     if (membershipError || !membership) {
       return NextResponse.json({ error: 'Usuário não pertence a uma organização' }, { status: 403 })
     }
@@ -152,65 +158,39 @@ export async function DELETE(
       .from('service_onboarding_tasks')
       .select('*')
       .eq('id', id)
-      .eq('org_id', membership.org_id)
+      .eq('org_id', membership.tenant_id)
       .single()
 
     if (fetchError || !existingTask) {
       return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 })
     }
 
-    // Verificar se há cards com esta tarefa
-    const { data: cardTasks, error: cardTasksError } = await supabase
-      .from('card_tasks')
-      .select('id')
-      .eq('task_id', id)
-      .limit(1)
-
-    if (cardTasksError) {
-      console.error('Erro ao verificar cards com tarefa:', cardTasksError)
-      return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
-    }
-
-    if (cardTasks && cardTasks.length > 0) {
-      return NextResponse.json({ 
-        error: 'Não é possível excluir tarefa que está sendo usada em cards',
-        card_count: cardTasks.length
-      }, { status: 400 })
-    }
-
-    // Excluir tarefa
-    const { error: deleteError } = await supabase
+    // Implementar soft delete - marcar como excluída em vez de apagar fisicamente
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+    const { data: updatedTask, error: deleteError } = await supabase
       .from('service_onboarding_tasks')
-      .delete()
+      .update({
+        title: `[EXCLUÍDO-${timestamp}] ${existingTask.title}`,
+        description: `Tarefa excluída em ${new Date().toISOString()}. Descrição original: ${existingTask.description || 'Sem descrição'}`,
+        is_required: false,
+        order_index: -1
+      })
       .eq('id', id)
+      .select()
+      .single()
 
     if (deleteError) {
-      console.error('Erro ao excluir tarefa:', deleteError)
-      return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
+      console.error('Erro ao excluir tarefa (soft delete):', deleteError)
+      return NextResponse.json({ error: 'Erro ao excluir tarefa' }, { status: 500 })
     }
 
-    // Log da exclusão
-    try {
-      await supabase
-        .from('kanban_logs')
-        .insert({
-          org_id: membership.org_id,
-          action: 'task_catalog_deleted',
-          payload: {
-            task_id: id,
-            task_title: existingTask.title,
-            stage_code: existingTask.stage_code
-          },
-          created_by: user.id
-        })
-    } catch (logError) {
-      console.error('Erro ao criar log:', logError)
-      // Não falha a operação se o log falhar
-    }
+    // Log da exclusão (simplificado - não usar kanban_logs que é específico para cards)
+    console.log(`Template excluído: ${existingTask.title} (${existingTask.stage_code}) por usuário ${user.id} na org ${membership.tenant_id}`)
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Tarefa excluída com sucesso'
+      message: 'Tarefa excluída com sucesso',
+      invalidateCache: true  // Flag para o frontend invalidar cache
     })
 
   } catch (error) {

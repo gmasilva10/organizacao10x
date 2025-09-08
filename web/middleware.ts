@@ -21,6 +21,7 @@ export async function middleware(request: NextRequest) {
       "/app/onboarding/history",
       "/app/finance",
       "/app/settings",
+      "/app/team",
     ]
     const path = url.pathname
     const needsOrg = protectedPaths.some((p) => path === p || path.startsWith(p + "/"))

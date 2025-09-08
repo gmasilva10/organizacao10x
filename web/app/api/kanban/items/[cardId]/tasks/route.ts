@@ -7,8 +7,8 @@ export async function GET(
   { params }: { params: Promise<{ cardId: string }> }
 ) {
   try {
+    const t0 = Date.now()
     const { cardId } = await params
-    console.log('🔍 Buscando tarefas do card:', cardId)
     
     const cookieStore = cookies()
     const supabase = await createClient(cookieStore)
@@ -19,7 +19,7 @@ export async function GET(
       console.error('❌ Erro de autenticação:', authError)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    console.log('✅ Usuário autenticado:', user.id)
+    // auth ok
     
     // Primeiro, buscar o card para obter o stage_id
     const { data: cardData, error: cardError } = await supabase
@@ -33,7 +33,7 @@ export async function GET(
       return NextResponse.json({ error: 'Card não encontrado' }, { status: 404 })
     }
 
-    console.log('🔍 Card encontrado:', { stage_id: cardData.stage_id, org_id: cardData.org_id })
+    // card ok
 
     // Agora buscar o stage_code da tabela kanban_stages
     const { data: stageData, error: stageError } = await supabase
@@ -47,14 +47,16 @@ export async function GET(
       return NextResponse.json({ error: 'Stage não encontrado' }, { status: 404 })
     }
 
-    console.log('🔍 Stage encontrado:', { stage_code: stageData.stage_code })
+    // stage ok
 
     // Buscar todas as tarefas do estágio (obrigatórias + opcionais) usando stage_code
+    // Filtrar tarefas soft deleted (order_index = -1)
     const { data: stageTasks, error: stageTasksError } = await supabase
       .from('service_onboarding_tasks')
       .select('id, title, description, is_required, order_index')
       .eq('stage_code', stageData.stage_code)
-      .eq('org_id', cardData.org_id)
+      .or(`org_id.eq.${cardData.org_id},org_id.is.null`)
+      .neq('order_index', -1)  // Filtrar tarefas soft deleted
       .order('order_index', { ascending: true })
 
     if (stageTasksError) {
@@ -62,13 +64,12 @@ export async function GET(
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
-    console.log('🔍 Tarefas do estágio encontradas:', stageTasks?.length || 0)
-    console.log('📋 Detalhes das tarefas:', stageTasks)
+    // stage tasks loaded
 
     // Buscar instâncias de tarefas do card (se existirem)
     const { data: rawCardTasks, error: cardTasksError } = await supabase
       .from('card_tasks')
-      .select('task_id, is_completed, completed_at')
+      .select('id, task_id, is_completed, completed_at')
       .eq('card_id', cardId)
 
     if (cardTasksError) {
@@ -76,8 +77,7 @@ export async function GET(
       // Continuar mesmo com erro, retornando apenas as tarefas do estágio
     }
 
-    console.log('🔍 Instâncias de tarefas do card encontradas:', rawCardTasks?.length || 0)
-    console.log('📋 Detalhes das instâncias:', rawCardTasks)
+    // instances loaded
 
     // Combinar tarefas do estágio com instâncias do card
     const cardTasksMap = new Map()
@@ -87,13 +87,15 @@ export async function GET(
       })
     }
 
-    const tasks = stageTasks.map((task: any) => {
+    // Unificar: incluir tarefas definidas no estágio e também instâncias órfãs (task_id sem definição)
+    const byId: Record<string, any> = {}
+    for (const task of stageTasks || []) {
       const cardTask = cardTasksMap.get(task.id)
-      return {
+      byId[task.id] = {
         id: cardTask?.id || `temp_${task.id}`,
         task_id: task.id,
         status: cardTask?.is_completed ? 'completed' : 'pending',
-        completed_at: cardTask?.completed_at,
+        completed_at: cardTask?.completed_at || null,
         task: {
           id: task.id,
           title: task.title,
@@ -102,10 +104,29 @@ export async function GET(
           order_index: task.order_index
         }
       }
-    })
+    }
+    // órfãs: existem em card_tasks mas não em service_onboarding_tasks (ex.: legado ou tasks globais)
+    for (const ct of rawCardTasks || []) {
+      if (!byId[ct.task_id]) {
+        byId[ct.task_id] = {
+          id: ct.id || `ct_${ct.task_id}`,
+          task_id: ct.task_id,
+          status: ct.is_completed ? 'completed' : 'pending',
+          completed_at: ct.completed_at || null,
+          task: {
+            id: ct.task_id,
+            title: 'Tarefa',
+            description: null,
+            is_required: false,
+            order_index: 9999
+          }
+        }
+      }
+    }
+    const tasks = Object.values(byId).sort((a:any,b:any)=> (a.task?.order_index||0) - (b.task?.order_index||0))
 
-    console.log('✅ Tarefas encontradas:', tasks.length)
-    return NextResponse.json({ tasks })
+    const ms = Date.now() - t0
+    return NextResponse.json({ tasks }, { headers: { 'X-Query-Time': String(ms), 'Cache-Control': 'private, max-age=10' } })
 
   } catch (error) {
     console.error('💥 Erro inesperado:', error)
