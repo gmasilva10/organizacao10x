@@ -1,37 +1,67 @@
+"use client"
+
+import Link from "next/link";
+import {
+  CreditCard,
+  Users,
+  Heart,
+  AlertTriangle
+} from "lucide-react";
+
 export default function ServicesPage() {
+  // Hardcode para evitar delay na renderização
+  const occurrencesEnabled = true
+  
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Serviços</h1>
-        <p className="text-muted-foreground mt-2">
-          Gerencie seu catálogo de serviços oferecidos
-        </p>
+        <p className="text-muted-foreground mt-2">Estruture seus serviços como Planos, Onboarding e Relacionamento.</p>
       </div>
 
-      <div className="bg-card border rounded-lg p-8 text-center">
-        <div className="max-w-md mx-auto space-y-4">
-          <div className="w-16 h-16 bg-muted rounded-full mx-auto flex items-center justify-center">
-            <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-            </svg>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Link href="/app/services/plans" className="block rounded-lg border bg-card p-6 hover:bg-accent transition-colors">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+              <CreditCard className="h-5 w-5" />
+            </div>
+            <h3 className="font-semibold">Planos</h3>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold">Em breve</h3>
-            <p className="text-muted-foreground">
-              O módulo de Serviços está em desenvolvimento e será disponibilizado em breve.
-            </p>
+          <p className="text-sm text-muted-foreground">Gerencie serviços, planos e opções.</p>
+        </Link>
+        
+        <Link href="/app/services/onboard" className="block rounded-lg border bg-card p-6 hover:bg-accent transition-colors">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-green-100 text-green-600">
+              <Users className="h-5 w-5" />
+            </div>
+            <h3 className="font-semibold">Onboarding</h3>
           </div>
-          <div className="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground">
-            <p className="font-medium mb-2">Funcionalidades planejadas:</p>
-            <ul className="text-left space-y-1 list-disc list-inside">
-              <li>Catálogo de serviços</li>
-              <li>Gestão de preços</li>
-              <li>Integração com onboarding</li>
-              <li>Histórico de vendas</li>
-            </ul>
+          <p className="text-sm text-muted-foreground">Acesse o Kanban de onboarding dentro de Serviços.</p>
+        </Link>
+        
+        <Link href="/app/services/relationship" className="block rounded-lg border bg-card p-6 hover:bg-accent transition-colors">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-pink-100 text-pink-600">
+              <Heart className="h-5 w-5" />
+            </div>
+            <h3 className="font-semibold">Relacionamento</h3>
           </div>
-        </div>
+          <p className="text-sm text-muted-foreground">Templates e mensagens relacionadas a serviços.</p>
+        </Link>
+        
+        {occurrencesEnabled && (
+          <Link href="/app/services/occurrences" className="block rounded-lg border bg-card p-6 hover:bg-accent transition-colors">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-amber-100 text-amber-600">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <h3 className="font-semibold">Ocorrências</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">Gerencie grupos e tipos de ocorrências dos alunos.</p>
+          </Link>
+        )}
       </div>
     </div>
-  )
+  );
 }

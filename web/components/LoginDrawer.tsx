@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuthSync } from "@/lib/use-auth-sync"
 import {
 	Drawer,
 	DrawerClose,
@@ -19,17 +20,20 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 import { motion, LayoutGroup } from "framer-motion"
 import { useTheme } from "@/lib/use-theme"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { useToast } from "@/components/ui/toast"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-export function LoginDrawer() {
+function LoginDrawerContent() {
     const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
     const { open, setOpen } = useLoginUI()
     const [show, setShow] = useState(false)
     const { theme } = useTheme()
     const toast = useToast()
+    const { syncAuth } = useAuthSync()
 
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -53,19 +57,15 @@ export function LoginDrawer() {
                 return
             }
             try {
-                const res = await fetch("/api/auth/sync", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    cache: "no-store",
-                    body: JSON.stringify({
-                        access_token: accessToken,
-                        refresh_token: refreshToken,
-                    }),
-                })
-                if (!res.ok) {
-                    toast.error("Falha ao sincronizar sessão (" + res.status + ").")
-                    return
+                const syncResult = await syncAuth(accessToken, refreshToken)
+                if (!syncResult.success) {
+                    if (syncResult.reason === 'already_pending' || syncResult.reason === 'debounced') {
+                        // Ignorar silenciosamente - já está sendo processado
+                        console.log('Auth sync ignorado:', syncResult.reason)
+                    } else {
+                        toast.error("Falha ao sincronizar sessão. Tente novamente.")
+                        return
+                    }
                 }
             } catch {
                 toast.error("Erro ao sincronizar sessão. Verifique a conexão e tente novamente.")
@@ -145,11 +145,31 @@ export function LoginDrawer() {
 					</div>
 				</div>
 				<DrawerFooter>
-					<DrawerClose asChild>
-						<Button variant="outline">Cancelar</Button>
-					</DrawerClose>
+					<Button
+						variant="outline"
+						onClick={() => {
+							const from = searchParams?.get("from") || "/"
+							// Fecha o drawer e navega sem reabrir via histórico
+							if (pathname === "/login") {
+								setOpen(false)
+								router.replace(from)
+							} else {
+								setOpen(false)
+							}
+						}}
+					>
+						Cancelar
+					</Button>
 				</DrawerFooter>
 			</DrawerContent>
 		</Drawer>
 	)
+}
+
+export function LoginDrawer() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <LoginDrawerContent />
+        </Suspense>
+    )
 }

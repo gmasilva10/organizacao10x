@@ -3,15 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useToast } from "@/components/ui/toast"
 import { UpgradeModal } from "@/components/UpgradeModal"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { StudentsSkeleton } from "@/components/students/StudentsSkeleton"
 import { StudentsFilters } from "@/components/students/StudentsFilters"
 import { AssignTrainerSelect } from "@/components/students/AssignTrainerSelect"
-import { StudentCreateModal } from "@/components/students/StudentCreateModal"
-import { StudentEditModal } from "@/components/students/StudentEditModal"
 import { StudentFullModal } from "@/components/students/StudentFullModal"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
+import { Skeleton } from "@/components/ui/skeleton"
 
-type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; trainer: { id: string | null; name: string | null } | null; created_at: string }
-type Trainer = { id: string; name: string }
+type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; onboard_opt?: 'nao_enviar'|'enviar'|'enviado'; trainer: { id: string | null; name: string | null } | null; created_at: string }
+type Trainer = { id: string; user_id: string; name: string; email?: string }
 
 export default function StudentsPage() {
   const [showUpgrade, setShowUpgrade] = useState(false)
@@ -26,11 +27,21 @@ export default function StudentsPage() {
   const pageSize = 20
   const qDebounceRef = useRef<number | null>(null)
   const [trainers, setTrainers] = useState<Trainer[]>([])
-  const [showCreate, setShowCreate] = useState(false)
   const [showFull, setShowFull] = useState<false | 'create' | 'edit'>(false)
   const [error, setError] = useState<string>("")
   const [editing, setEditing] = useState<StudentRow | null>(null)
   const toast = useToast()
+  const [confirm, setConfirm] = useState<{ open: boolean; title: string; description?: string; onConfirm?: () => void }>({ open: false })
+
+  // Abrir cadastro completo quando vier ?new=true
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href)
+      if (url.searchParams.get('new') === 'true') {
+        setShowFull('create')
+      }
+    } catch {}
+  }, [])
 
   const fetchList = useCallback(async () => {
     setLoading(true)
@@ -51,9 +62,9 @@ export default function StudentsPage() {
   }, [page, pageSize, q, status, trainerId])
 
   async function fetchTrainers() {
-    const res = await fetch('/api/users/trainers', { cache: 'no-store' })
-    const data: { items?: Array<{ user_id: string; email: string|null }> } = await res.json()
-    const mapped = (data?.items || []).map((x) => ({ id: x.user_id, name: x.email || x.user_id })) as Trainer[]
+    const res = await fetch('/api/professionals/trainers', { cache: 'no-store' })
+    const data: { trainers?: Array<{ id: string; user_id: string; name: string; email?: string }> } = await res.json()
+    const mapped = (data?.trainers || []) as Trainer[]
     setTrainers(mapped)
   }
 
@@ -81,26 +92,7 @@ export default function StudentsPage() {
   }, [q])
   useEffect(() => { fetchSummary() }, [])
 
-  async function onCreate(payload: { name: string; email: string; phone?: string | null; status?: 'onboarding'|'active'|'paused'; trainer_id?: string | null }) {
-    setLoading(true)
-    try {
-      toast.info('Criando aluno...')
-      const res = await fetch('/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      if (res.status === 200) {
-        toast.success('Aluno criado com sucesso.')
-        fetchList(); fetchSummary()
-      } else if (res.status === 422) {
-        setShowUpgrade(true)
-        toast.info('Limite de alunos atingido.')
-      } else if (res.status === 403) {
-        toast.error('Sem permissão para criar alunos.')
-      } else {
-        toast.error(`Falha ao criar aluno (${res.status}).`)
-      }
-    } catch {
-      toast.error('Erro de rede ao criar aluno.')
-    } finally { setLoading(false) }
-  }
+  // cadastro rápido removido
 
   async function onAssign(id: string, trainerId: string | null) {
     setLoading(true)
@@ -113,6 +105,21 @@ export default function StudentsPage() {
         toast.error('Sem permissão para atribuir treinador.')
       } else {
         toast.error(`Falha ao atribuir (${res.status}).`)
+      }
+    } finally { setLoading(false) }
+  }
+
+  async function onSendToKanban(id: string) {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/students/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ onboard_opt: 'enviar' }) })
+      if (res.status === 200) {
+        toast.success('Enviado para o Kanban.')
+        fetchList(); fetchSummary()
+      } else if (res.status === 403) {
+        toast.error('Sem permissão para enviar para o Kanban.')
+      } else {
+        toast.error(`Falha ao enviar (${res.status}).`)
       }
     } finally { setLoading(false) }
   }
@@ -131,18 +138,36 @@ export default function StudentsPage() {
     } finally { setLoading(false) }
   }
 
-  async function onDelete(id: string) {
-    if (!confirm('Excluir aluno? Esta ação é irreversível.')) return
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/students/${id}`, { method: 'DELETE' })
-      if (res.status === 200) {
-        toast.success('Aluno excluído.')
-        fetchList(); fetchSummary()
-      } else {
-        toast.error(`Falha ao excluir (${res.status}).`)
+  async function onDelete(id: string, name?: string) {
+    // Dialog destrutivo com confirmação "EXCLUIR"
+    const inputId = `confirm-${id}`
+    setConfirm({
+      open: true,
+      title: 'Excluir aluno',
+      description: (
+        <div className="space-y-2">
+          <p>Excluir o aluno <b>{name || 'selecionado'}</b> e todos os dados vinculados (cards, serviços, financeiro, histórico)? Esta ação é irreversível.</p>
+          <p>Para confirmar, digite <b>EXCLUIR</b> abaixo.</p>
+          <input id={inputId} className="mt-1 w-full rounded border px-2 py-1 text-sm" placeholder="EXCLUIR" />
+        </div>
+      ) as any,
+      onConfirm: async () => {
+        const el = document.getElementById(inputId) as HTMLInputElement | null
+        if (!el || el.value.trim().toUpperCase() !== 'EXCLUIR') { toast.error('Digite EXCLUIR para confirmar.'); return }
+        setLoading(true)
+        try {
+          const res = await fetch(`/api/students/${id}`, { method: 'DELETE' })
+          if (res.status === 204) {
+            toast.success('Aluno excluído.')
+            // Remover cards do board (otimista)
+            try { window.dispatchEvent(new Event('pg:kanban:refetchTree')); window.dispatchEvent(new Event('pg:kanban:refresh')) } catch {}
+            fetchList(); fetchSummary()
+          } else {
+            toast.error(`Falha ao excluir (${res.status}).`)
+          }
+        } finally { setLoading(false) }
       }
-    } finally { setLoading(false) }
+    })
   }
 
   const pages = useMemo(() => Math.max(1, Math.ceil(total / pageSize)), [total])
@@ -150,15 +175,15 @@ export default function StudentsPage() {
   return (
     <div className="container py-8">
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} title="Limite do seu plano foi atingido" description="Para adicionar mais alunos, faça upgrade para o plano Enterprise." primaryHref="/contact" secondaryHref="/planos" />
-      <StudentCreateModal open={showCreate} onClose={()=>setShowCreate(false)} onCreate={onCreate} trainers={trainers} />
-      <StudentEditModal
-        open={!!editing && showFull===false}
-        student={editing ? { id: editing.id, full_name: editing.full_name, email: null, phone: editing.phone ?? null, status: editing.status as 'onboarding'|'active'|'paused', trainer: editing.trainer ? { id: editing.trainer.id } : null } : null}
-        trainers={trainers}
-        onClose={()=>setEditing(null)}
-        onSave={onUpdate}
+      <StudentFullModal open={showFull!==false} mode={showFull==='create'?'create':'edit'} student={showFull==='edit'? editing : null} trainers={trainers} onClose={()=>{ setShowFull(false); setEditing(null) }} onSaved={()=>{ fetchList(); fetchSummary() }} />
+      
+      <Breadcrumb 
+        items={[
+          { label: "Alunos", current: true }
+        ]}
+        className="mb-4"
       />
-      <StudentFullModal open={showFull!==false} mode={showFull==='create'?'create':'edit'} student={showFull==='edit'? editing : null} trainers={trainers} onClose={()=>{ setShowFull(false); if (showFull==='create') setShowCreate(false) }} onSaved={()=>{ fetchList(); fetchSummary() }} />
+      
       <h1 className="text-2xl font-semibold">Alunos</h1>
       {counts && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
@@ -171,8 +196,7 @@ export default function StudentsPage() {
       <div className="mt-4 flex items-center gap-3">
         <StudentsFilters q={q} status={status} trainerId={trainerId} trainers={trainers} onQ={setQ} onStatus={setStatus} onTrainer={setTrainerId} />
         <div className="ml-auto flex gap-2">
-          <button onClick={()=>setShowCreate(true)} className="rounded-md border px-4 py-2 text-sm">Novo (rápido)</button>
-          <button onClick={()=>setShowFull('create')} className="rounded-md bg-primary px-4 py-2 text-sm text-white">Cadastro completo</button>
+          <button onClick={()=>setShowFull('create')} className="rounded-md bg-primary px-4 py-2 text-sm text-white">Novo Aluno</button>
         </div>
       </div>
 
@@ -200,21 +224,42 @@ export default function StudentsPage() {
               <tr key={s.id} className="border-t">
                 <td className="px-3 py-2">{s.full_name}</td>
                 <td className="px-3 py-2">{s.phone || '—'}</td>
-                <td className="px-3 py-2 capitalize">{s.status}</td>
+                <td className="px-3 py-2 capitalize">
+                  <div className="flex items-center gap-2">
+                    <span>{s.status}</span>
+                    {s.onboard_opt === 'enviado' && (
+                      <span className="rounded-full bg-emerald-50 px-2 py-[2px] text-[10px] text-emerald-700 ring-1 ring-emerald-200">Enviado</span>
+                    )}
+                  </div>
+                </td>
                 <td className="px-3 py-2">
-                  <AssignTrainerSelect value={s.trainer?.id || null} trainers={trainers.map(t => ({ user_id: t.id, email: t.name }))} onChange={(v)=>onAssign(s.id, v)} />
+                  <AssignTrainerSelect value={s.trainer?.id || null} trainers={trainers.map(t => ({ user_id: t.user_id, name: t.name, email: t.email }))} onChange={(v)=>onAssign(s.id, v)} />
                 </td>
                 <td className="px-3 py-2">{new Date(s.created_at).toLocaleString(undefined, { hour12: false })}</td>
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-2">
                     <button onClick={()=>{ setEditing(s); setShowFull('edit') }} className="rounded-md border px-2 py-1 text-xs">Editar</button>
                     <button onClick={()=>onDelete(s.id)} className="rounded-md border px-2 py-1 text-xs text-red-600">Excluir</button>
+                    {s.onboard_opt !== 'enviado' && (
+                      <button onClick={()=>onSendToKanban(s.id)} className="rounded-md border px-2 py-1 text-xs">Enviar para Kanban</button>
+                    )}
                   </div>
                 </td>
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td className="px-3 py-6 text-center text-muted-foreground" colSpan={5}>{loading ? 'Carregando…' : 'Nenhum aluno encontrado. Crie seu primeiro aluno para começar.'}</td></tr>
+              <tr>
+                <td className="px-3 py-6 text-center text-muted-foreground" colSpan={5}>
+                  {loading ? (
+                    <div className="space-y-3">
+                      <Skeleton className="h-4 w-32 mx-auto" />
+                      <Skeleton className="h-3 w-48 mx-auto" />
+                    </div>
+                  ) : (
+                    'Nenhum aluno encontrado. Crie seu primeiro aluno para começar.'
+                  )}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -228,6 +273,14 @@ export default function StudentsPage() {
           <button disabled={page>=pages} onClick={() => setPage(p => Math.min(pages, p+1))} className="rounded-md border px-3 py-1 disabled:opacity-60">Próxima</button>
         </div>
       </div>
+      <ConfirmDialog
+        open={confirm.open}
+        title={confirm.title || ''}
+        description={confirm.description}
+        destructive
+        onCancel={()=> setConfirm({ open:false, title:'' })}
+        onConfirm={()=>{ try { confirm.onConfirm?.() } finally { setConfirm({ open:false, title:'' }) } }}
+      />
     </div>
   )
 }

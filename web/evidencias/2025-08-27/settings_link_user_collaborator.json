@@ -1,0 +1,139 @@
+{
+  "test_case": "Settings User-Collaborator Link/Unlink - P0 Module",
+  "timestamp": "2025-08-27T14:00:00Z",
+  "module": "feat/settings-link-user-collaborator",
+  "api_endpoints": {
+    "link_user_collaborator": {
+      "method": "POST",
+      "endpoint": "/api/settings/users/{userId}/link-collaborator",
+      "rbac": ["admin", "manager"],
+      "payload": {
+        "collaborator_id": "UUID do colaborador a ser vinculado"
+      },
+      "validations": {
+        "user_exists": "verifica se usuário existe na organização",
+        "collaborator_exists": "verifica se colaborador existe na organização",
+        "not_already_linked": "colaborador não pode estar vinculado a outro usuário",
+        "unique_per_user": "usuário só pode vincular a 1 colaborador por org"
+      },
+      "response_codes": {
+        "200": "vínculo criado ou já existia",
+        "404": "usuário ou colaborador não encontrado",
+        "409": "conflito - já vinculado",
+        "403": "sem permissão"
+      },
+      "audit": "settings.users.linked_to_collaborator"
+    },
+    "unlink_user_collaborator": {
+      "method": "DELETE",
+      "endpoint": "/api/settings/users/{userId}/link-collaborator",
+      "rbac": ["admin", "manager"],
+      "behavior": "remove user_id do collaborator (set NULL)",
+      "response": {
+        "ok": true,
+        "message": "Vínculo removido com sucesso",
+        "unlinked_collaborator": "dados do colaborador desvinculado"
+      },
+      "audit": "settings.users.unlinked_from_collaborator"
+    }
+  },
+  "database_relationship": {
+    "table": "collaborators",
+    "column": "user_id",
+    "constraint": "UNIQUE (user_id, org_id) WHERE user_id IS NOT NULL",
+    "relationship": "1:1 user ⇄ collaborator por organização",
+    "nullable": true,
+    "on_delete": "SET NULL"
+  },
+  "ui_implementation": {
+    "route": "/app/settings/users",
+    "updated_features": {
+      "table_columns": [
+        "Email",
+        "Status", 
+        "Colaborador vinculado (NEW)",
+        "Papéis",
+        "Ações"
+      ],
+      "collaborator_column": {
+        "displays": "nome do colaborador vinculado ou '—'",
+        "icon": "User icon quando vinculado"
+      },
+      "action_buttons": {
+        "link": {
+          "text": "Vincular",
+          "icon": "Link",
+          "shows_when": "usuário não tem colaborador vinculado",
+          "action": "abre modal de seleção"
+        },
+        "unlink": {
+          "text": "Desvincular", 
+          "icon": "Unlink",
+          "shows_when": "usuário tem colaborador vinculado",
+          "action": "remove vínculo diretamente",
+          "style": "text-red-600"
+        }
+      }
+    },
+    "link_modal": {
+      "title": "Vincular Usuário a Colaborador",
+      "fields": [
+        {
+          "label": "Usuário",
+          "type": "readonly",
+          "value": "email do usuário selecionado"
+        },
+        {
+          "label": "Colaborador",
+          "type": "select",
+          "options": "colaboradores ativos não vinculados",
+          "display": "nome (papel)"
+        }
+      ],
+      "data_loading": "busca /api/collaborators?status=active ao abrir modal",
+      "filtering": "exibe apenas colaboradores sem user_id",
+      "buttons": ["Cancelar", "Vincular"]
+    },
+    "loading_states": {
+      "page_load": "skeleton rows na tabela",
+      "modal_open": "loading ao buscar colaboradores",
+      "linking": "spinner no botão Vincular específico por usuário",
+      "unlinking": "spinner no botão Desvincular específico por usuário"
+    }
+  },
+  "error_handling": {
+    "collaborator_already_linked": "Colaborador já está vinculado a outro usuário",
+    "user_already_linked": "Usuário já está vinculado ao colaborador: {nome}",
+    "not_found": "Usuário/colaborador não encontrado nesta organização",
+    "forbidden": "Sem permissão para gerenciar vínculos",
+    "network_error": "Erro de conexão"
+  },
+  "success_flows": {
+    "link_success": {
+      "toast": "Usuário vinculado ao colaborador com sucesso!",
+      "modal_close": true,
+      "table_reload": true,
+      "optimistic_update": false
+    },
+    "unlink_success": {
+      "toast": "Vínculo removido com sucesso!",
+      "table_reload": true,
+      "optimistic_update": false
+    }
+  },
+  "acceptance_criteria": {
+    "link_flow": "Admin/manager pode vincular usuário a colaborador ativo não vinculado",
+    "unlink_flow": "Admin/manager pode desvincular usuário de colaborador",
+    "modal_flow": "Modal mostra apenas colaboradores disponíveis (ativos + não vinculados)",
+    "table_display": "Coluna mostra nome do colaborador ou '—'",
+    "rbac_flow": "Viewer não vê botões de vincular/desvincular",
+    "conflict_handling": "Erro claro se colaborador já vinculado ou usuário já vinculado",
+    "reload_flow": "Tabela atualiza após vínculo/desvínculo mostrando mudanças"
+  },
+  "security_notes": {
+    "org_isolation": "usuário e colaborador devem estar na mesma organização",
+    "rbac_enforcement": "apenas admin/manager podem gerenciar vínculos",
+    "unique_constraint": "1 user_id por colaborador, 1 colaborador por user_id por org",
+    "audit_trail": "eventos linkage registrados para auditoria"
+  }
+}

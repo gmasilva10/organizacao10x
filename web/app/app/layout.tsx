@@ -17,22 +17,33 @@ export default async function AppLayout({
       redirect('/')
     }
 
-    // Buscar informações do usuário + membership/role
+    // Buscar informações do usuário + membership/role + perfil (avatar)
     const user = session.user
-    const { data: membership } = await (await createClient())
-      .from('memberships')
-      .select('tenant_id, role')
-      .eq('user_id', user.id)
-      .limit(1)
-      .maybeSingle()
+    const [membershipRes, profileRes] = await Promise.all([
+      (await createClient())
+        .from('memberships')
+        .select('tenant_id, role')
+        .eq('user_id', user.id)
+        .limit(1)
+        .maybeSingle(),
+      (await createClient())
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('user_id', user.id)
+        .maybeSingle()
+    ])
+
+    const membership = membershipRes.data
+    const profile = profileRes.data
 
     const cookieStore = await cookies()
     const activeOrg = cookieStore.get('pg.active_org')?.value || null
 
     const userInfo = {
-      name: user.user_metadata?.name || user.email?.split('@')[0],
+      name: profile?.full_name || user.user_metadata?.name || user.email?.split('@')[0],
       email: user.email,
       role: (membership?.role as string) || (user.user_metadata?.role as string) || 'support',
+      avatar_url: profile?.avatar_url || null,
     }
 
     return (

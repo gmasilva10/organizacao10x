@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useToast } from "@/components/ui/toast"
+import { FinancialModule } from "./FinancialModule"
+import { StudentOccurrenceModal } from "./StudentOccurrenceModal"
 
 type Trainer = { id: string; name: string }
 type Address = { zip?: string; street?: string; number?: string; complement?: string; district?: string; city?: string; state?: string; country?: string }
-type StudentRow = { id: string; full_name: string; email?: string | null; phone?: string | null; cpf?: string | null; birth_date?: string | null; customer_stage?: string | null; address?: Address | null; status: string; trainer?: { id: string | null } | null }
+type StudentRow = { id: string; full_name: string; email?: string | null; phone?: string | null; cpf?: string | null; birth_date?: string | null; customer_stage?: string | null; address?: Address | null; status: string; onboard_opt?: 'nao_enviar'|'enviar'|'enviado'; trainer?: { id: string | null } | null }
 
 // Tipos de serviço usados dentro e fora do componente
 type Service = {
@@ -47,6 +49,8 @@ export function StudentFullModal({
 }) {
   const toast = useToast()
   const [tab, setTab] = useState<'general'|'address'|'services'>("general")
+  const [actionsOpen, setActionsOpen] = useState(false)
+  const [occurrenceModalOpen, setOccurrenceModalOpen] = useState(false)
   const [timelineOpen, setTimelineOpen] = useState(false)
   const [timelineItems, setTimelineItems] = useState<Array<{ id:string; created_at:string; type:string; channel:string|null; body:string }>>([])
   const [timelinePage, setTimelinePage] = useState(1)
@@ -68,10 +72,13 @@ export function StudentFullModal({
   const [customerStage, setCustomerStage] = useState<'new'|'renewal'|'canceled'>("new")
   const [trainerId, setTrainerId] = useState<string>("")
   const [address, setAddress] = useState<Address>({})
+  const [onboardOpt, setOnboardOpt] = useState<'nao_enviar'|'enviar'|'enviado'>("nao_enviar")
   const [ownerId, setOwnerId] = useState<string>("")
   const [primaryId, setPrimaryId] = useState<string>("")
   const [supportId, setSupportId] = useState<string>("")
+  const [defaultsLoaded, setDefaultsLoaded] = useState(false)
   const nameRef = useRef<HTMLInputElement | null>(null)
+  const actionsRef = useRef<HTMLDivElement | null>(null)
   const emailRef = useRef<HTMLInputElement | null>(null)
 
   // Serviços
@@ -89,6 +96,7 @@ export function StudentFullModal({
       setCustomerStage((student.customer_stage as 'new'|'renewal'|'canceled') || 'new')
       setTrainerId(student.trainer?.id || "")
       setAddress(student.address || {})
+      setOnboardOpt((student as any)?.onboard_opt || 'nao_enviar')
       // carregar responsibles
       fetch(`/api/students/${student.id}/responsibles`, { cache: 'no-store' })
         .then(r=>r.json())
@@ -102,9 +110,52 @@ export function StudentFullModal({
       // carregar serviços
       fetch(`/api/students/${student.id}/services`, { cache: 'no-store' }).then(r=>r.json()).then(d => setServices(d?.items || [])).catch(()=>setServices([]))
     } else if (mode === 'create') {
-      setName(""); setEmail(""); setPhone(""); setCpf(""); setBirthDate(""); setStatus('onboarding'); setCustomerStage('new'); setTrainerId(""); setAddress({}); setServices([]); setTab('general')
+      setName(""); setEmail(""); setPhone(""); setCpf(""); setBirthDate(""); setStatus('onboarding'); setCustomerStage('new'); setTrainerId(""); setAddress({}); setServices([]); setOnboardOpt('nao_enviar'); setTab('general')
+      setOwnerId(""); setPrimaryId(""); setSupportId(""); setDefaultsLoaded(false)
+      // Carregar defaults para novo aluno
+      loadDefaults()
     }
   }, [open, mode, student])
+
+  // Fechar dropdown de ações ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (actionsRef.current && !actionsRef.current.contains(event.target as Node)) {
+        setActionsOpen(false)
+      }
+    }
+
+    if (actionsOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [actionsOpen])
+
+  const loadDefaults = async () => {
+    if (defaultsLoaded) return
+    
+    try {
+      const response = await fetch('/api/team/defaults')
+      const data = await response.json()
+      
+      if (response.ok && data.defaults) {
+        // Pré-preencher com defaults
+        setOwnerId(data.defaults.owner_professional_id.toString())
+        setPrimaryId(data.defaults.trainer_primary_professional_id.toString())
+        setSupportId(data.defaults.trainer_support_professional_id?.toString() || "")
+      } else if (response.ok && !data.defaults && trainers.length === 1) {
+        // Plano Basic: se só tem 1 profissional, usar ele para todos os campos
+        const singleTrainer = trainers[0]
+        setOwnerId(singleTrainer.id)
+        setPrimaryId(singleTrainer.id)
+        setSupportId("") // Treinador de apoio fica vazio
+      }
+    } catch (error) {
+      console.error('Erro ao carregar defaults:', error)
+    } finally {
+      setDefaultsLoaded(true)
+    }
+  }
 
   function formatPhone(value: string) {
     const digits = value.replace(/\D/g, "").slice(0, 11)
@@ -200,6 +251,7 @@ export function StudentFullModal({
         customer_stage: customerStage,
         trainer_id: trainerId || null,
         address: address && Object.keys(address).length ? address : null,
+        onboard_opt: onboardOpt,
       }
       // persist responsibles (somente em edit com id)
       if (mode === 'edit' && student?.id) {
@@ -273,7 +325,36 @@ export function StudentFullModal({
           <div role="tablist" aria-label="Abas do cadastro" className="flex gap-2">
             <button role="tab" aria-selected={tab==='general'} className={`rounded-md border px-3 py-1 ${tab==='general'?'bg-muted':''}`} onClick={()=>setTab('general')}>Dados Gerais</button>
             <button role="tab" aria-selected={tab==='address'} className={`rounded-md border px-3 py-1 ${tab==='address'?'bg-muted':''}`} onClick={()=>setTab('address')}>Endereço</button>
-            <button role="tab" aria-selected={tab==='services'} className={`rounded-md border px-3 py-1 ${tab==='services'?'bg-muted':''}`} onClick={()=>setTab('services')}>Financeiro → Serviços</button>
+            <button role="tab" aria-selected={tab==='services'} className={`rounded-md border px-3 py-1 ${tab==='services'?'bg-muted':''}`} onClick={()=>setTab('services')}>Financeiro</button>
+            {student?.id && (
+              <div className="relative" ref={actionsRef}>
+                <button 
+                  type="button" 
+                  onClick={() => setActionsOpen(!actionsOpen)}
+                  className="rounded-md border px-3 py-1 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                  aria-label="Ações do aluno"
+                >
+                  Ações
+                </button>
+                {actionsOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-48 bg-background border border-border rounded-lg shadow-lg z-50">
+                    <div className="py-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActionsOpen(false)
+                          setOccurrenceModalOpen(true)
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                      >
+                        Gerar Ocorrência
+                      </button>
+                      {/* Futuras ações podem ser adicionadas aqui */}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           {student?.id && (
             <button type="button" onClick={openTimeline} className="rounded-md border px-3 py-1" aria-label="Ver timeline do aluno">Ver timeline</button>
@@ -309,6 +390,14 @@ export function StudentFullModal({
                   <option value="onboarding">onboarding</option>
                   <option value="active">active</option>
                   <option value="paused">paused</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="f-onboard" className="mb-1 block text-sm">Onboarding</label>
+                <select id="f-onboard" value={onboardOpt} onChange={(e)=>setOnboardOpt(e.target.value as 'nao_enviar'|'enviar'|'enviado')} className="w-full rounded-md border px-3 py-2 text-sm">
+                  <option value="nao_enviar">não enviar</option>
+                  <option value="enviar">enviar</option>
+                  <option value="enviado" disabled>enviado</option>
                 </select>
               </div>
               <div>
@@ -404,9 +493,18 @@ export function StudentFullModal({
                 </div>
               </div>
               {student?.id ? (
-                <ServicesGrid studentId={student.id} services={services} onChanged={async()=>{ const d = await (await fetch(`/api/students/${student.id}/services`)).json(); setServices(d?.items||[]) }} onAdd={addService} />
+                <FinancialModule 
+                  studentId={student.id} 
+                  onSummaryChange={(summary) => {
+                    setFinancialSummary({
+                      activeTitle: summary.activeServices.length > 0 ? summary.activeServices.join(', ') : 'Nenhum',
+                      nextCharge: summary.nextBilling ? `${summary.nextBilling.slice(4, 6)}/${summary.nextBilling.slice(0, 4)}` : 'Nenhuma',
+                      totalMonthlyBRL: `R$ ${summary.totalMonthly.toFixed(2)}`
+                    })
+                  }}
+                />
               ) : (
-                <div className="rounded-md border p-4 text-sm text-muted-foreground">Salve o aluno para gerenciar serviços.</div>
+                <div className="rounded-md border p-4 text-sm text-muted-foreground">Salve o aluno para gerenciar contratos e cobranças.</div>
               )}
             </div>
           )}
@@ -489,6 +587,21 @@ export function StudentFullModal({
           </div>
         )}
       </div>
+
+      {/* Modal de Ocorrência */}
+      {student && (
+        <StudentOccurrenceModal
+          open={occurrenceModalOpen}
+          onClose={() => setOccurrenceModalOpen(false)}
+          studentId={student.id}
+          studentName={student.full_name}
+          mode="create"
+          onSaved={() => {
+            // TODO: Atualizar timeline do aluno quando implementado
+            console.log('Ocorrência salva, atualizar timeline')
+          }}
+        />
+      )}
     </div>
   )
 }

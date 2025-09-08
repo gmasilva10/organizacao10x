@@ -66,7 +66,7 @@ Confirmações (2025-08-19 10:20)
 - Schema do evento student.stage.moved aplicado no endpoint /api/kanban/move (payload dentro de feature.used).
 - Regras de RBAC aplicadas no endpoint: admin|manager|trainer liberados; seller|support recebem 403 e evento rbac.denied.
 # PADRONIZAÇÃO (Código, UI/UX, Conteúdo)
-# Última atualização: 13/08/2025
+# Última atualização: 2025-08-26
 
 CÓDIGO
 - Stack: Next.js + TS + App Router + Tailwind v4 + shadcn/ui + framer-motion + lucide-react.
@@ -78,7 +78,7 @@ Commits (Conventional Commits)
 - feat(landing): ...
 - fix(contrast): ...
 - chore(build): ...
-PRs: título = escopo claro + label (landing, a11y, perf); descrição com “antes/depois” (prints).
+PRs: título = escopo claro + label (landing, a11y, perf); descrição com “antes/depois” (prints). Commits devem vincular evidências sob `web/evidencias`.
 
 UI/UX
 - Paleta (light): primary #5B7CFA, accent #22D3EE, background #F8FAFC, foreground #0F172A.
@@ -139,3 +139,8 @@ AUTH / SESSÃO (App Router)
 - Server-first: o client do Supabase no server deve usar interface de cookies { get, set, remove } via `next/headers`.
 - Sync pós-login: chamar `POST /api/auth/sync` com `credentials: 'include'` e `cache: 'no-store'` e, após 204, `router.replace('/app')` + `router.refresh()`.
 - Middleware: manter somente refresh de sessão; não criar cookies se envs ausentes.
+
+[APP SHELL]
+- Sidebar: traço accent de 3px à esquerda no item ativo; estados hover/active consistentes.
+- Tooltips: exibir somente quando a sidebar estiver colapsada.
+- Breadcrumb: padrão único em todas as rotas privadas.

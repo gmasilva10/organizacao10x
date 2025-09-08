@@ -103,7 +103,7 @@ Próximos passos sugeridos:
 - Ao retomar automação: aguardar /api/auth/sync 204 → /api/capabilities 200 → reload /students e waitForResponse de GET 200; após ações (POST/PATCH/DELETE) esperar novo GET 200
 - Considerar rota de debug /api/debug/session para validar cookies no runner antes de ações
 # REGISTRO DE ERROS / INCIDENTES
-# Última atualização: 13/08/2025
+# Última atualização: 2025-08-26
 # Formato: [ID] Data — Ambiente — Título — Gravidade (S1..S4) — Status — Dono
 # Inclusão obrigatória de: PASSOS PARA REPRODUZIR, ESPERADO vs OBTIDO, LOGS/EVIDÊNCIAS, FIX/WORKAROUND, CONFIRMAÇÃO DE QA.
 

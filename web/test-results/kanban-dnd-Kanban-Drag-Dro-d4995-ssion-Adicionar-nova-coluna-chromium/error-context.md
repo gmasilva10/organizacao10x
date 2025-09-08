@@ -1,0 +1,161 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner "Cabeçalho principal" [ref=e4]:
+      - generic [ref=e5]:
+        - button "Recolher menu de navegação" [expanded] [ref=e6]:
+          - img
+        - link "Página inicial - Organização10x" [ref=e7] [cursor=pointer]:
+          - /url: /app
+          - generic [ref=e8] [cursor=pointer]: 10x
+          - generic [ref=e9] [cursor=pointer]: Organização10x
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: DEV
+        - generic [ref=e14]:
+          - button "Alternar tema" [ref=e15]:
+            - img
+          - button "Menu do usuário" [ref=e16]:
+            - generic [ref=e17]:
+              - generic [ref=e18]:
+                - generic [ref=e19]: GUSTAVO MOREIRA DE ARAUJO SILVA
+                - generic [ref=e20]: admin
+              - img "Avatar" [ref=e22]
+            - img
+    - generic [ref=e23]:
+      - navigation "Menu de navegação principal" [ref=e24]:
+        - navigation "Menu de navegação" [ref=e25]:
+          - generic [ref=e26]:
+            - heading "Gestão" [level=3] [ref=e29]
+            - generic [ref=e30]:
+              - link "Dashboard" [ref=e31] [cursor=pointer]:
+                - /url: /app
+                - img [ref=e34] [cursor=pointer]
+                - generic [ref=e40] [cursor=pointer]: Dashboard
+              - link "Alunos" [ref=e41] [cursor=pointer]:
+                - /url: /app/students
+                - img [ref=e43] [cursor=pointer]
+                - generic [ref=e48] [cursor=pointer]: Alunos
+              - link "Serviços" [ref=e49] [cursor=pointer]:
+                - /url: /app/services
+                - img [ref=e51] [cursor=pointer]
+                - generic [ref=e55] [cursor=pointer]: Serviços
+          - generic [ref=e56]:
+            - heading "Fluxo de Trabalho" [level=3] [ref=e59]
+            - generic [ref=e60]:
+              - link "Onboarding/Kanban" [ref=e61] [cursor=pointer]:
+                - /url: /app/onboarding
+                - img [ref=e63] [cursor=pointer]
+                - generic [ref=e65] [cursor=pointer]: Onboarding/Kanban
+              - link "Relacionamento" [ref=e66] [cursor=pointer]:
+                - /url: /app/relationship
+                - img [ref=e68] [cursor=pointer]
+                - generic [ref=e70] [cursor=pointer]: Relacionamento
+              - link "Gestão de Ocorrências" [ref=e71] [cursor=pointer]:
+                - /url: /app/workflow/occurrences
+                - img [ref=e73] [cursor=pointer]
+                - generic [ref=e76] [cursor=pointer]: Gestão de Ocorrências
+          - generic [ref=e77]:
+            - heading "Administração" [level=3] [ref=e80]
+            - generic [ref=e81]:
+              - link "Equipe" [ref=e82] [cursor=pointer]:
+                - /url: /app/team
+                - img [ref=e84] [cursor=pointer]
+                - generic [ref=e86] [cursor=pointer]: Equipe
+              - link "Configurações" [ref=e87] [cursor=pointer]:
+                - /url: /app/settings
+                - img [ref=e89] [cursor=pointer]
+                - generic [ref=e92] [cursor=pointer]: Configurações
+      - main [ref=e93]:
+        - generic [ref=e95]:
+          - navigation "Breadcrumb" [ref=e96]:
+            - link "Dashboard" [ref=e97] [cursor=pointer]:
+              - /url: /app
+              - generic [ref=e98] [cursor=pointer]:
+                - img [ref=e99] [cursor=pointer]
+                - generic [ref=e102] [cursor=pointer]: Dashboard
+            - img [ref=e103]
+            - generic [ref=e105]: Onboarding/Kanban
+          - generic [ref=e106]:
+            - generic [ref=e108]:
+              - generic [ref=e109]:
+                - button "Novo Aluno2" [disabled] [ref=e110]:
+                  - text: Novo Aluno
+                  - generic [ref=e111]: "2"
+                - button "⋮" [ref=e113] [cursor=pointer]
+              - generic [ref=e114]:
+                - 'button "Mover aluno: Rafa Miranda" [ref=e115]':
+                  - generic [ref=e117]:
+                    - generic [ref=e118]:
+                      - heading "Rafa Miranda" [level=4] [ref=e120]
+                      - button "Editar card" [ref=e121]:
+                        - img [ref=e122]
+                    - generic [ref=e124]:
+                      - generic [ref=e125]:
+                        - generic [ref=e126]: 🔵
+                        - generic [ref=e127]: onboarding
+                      - generic [ref=e128]:
+                        - img [ref=e129]
+                        - generic [ref=e131]: 0/0
+                - 'button "Mover aluno: Teste Novo Aluno" [ref=e134]':
+                  - generic [ref=e136]:
+                    - generic [ref=e137]:
+                      - heading "Teste Novo Aluno" [level=4] [ref=e139]
+                      - button "Editar card" [ref=e140]:
+                        - img [ref=e141]
+                    - generic [ref=e143]:
+                      - generic [ref=e144]:
+                        - generic [ref=e145]: 🔵
+                        - generic [ref=e146]: onboarding
+                      - generic [ref=e147]:
+                        - img [ref=e148]
+                        - generic [ref=e150]: 0/0
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - button "Teste1" [ref=e156]:
+                  - text: Teste
+                  - generic [ref=e157]: "1"
+                - button "⋮" [ref=e159] [cursor=pointer]
+              - 'button "Mover aluno: Regina M Araujo" [ref=e161]':
+                - generic [ref=e163]:
+                  - generic [ref=e164]:
+                    - heading "Regina M Araujo" [level=4] [ref=e166]
+                    - button "Editar card" [ref=e167]:
+                      - img [ref=e168]
+                  - generic [ref=e170]:
+                    - generic [ref=e171]:
+                      - generic [ref=e172]: 🔵
+                      - generic [ref=e173]: onboarding
+                    - generic [ref=e174]:
+                      - img [ref=e175]
+                      - generic [ref=e177]: 0/0
+            - generic [ref=e181]:
+              - generic [ref=e182]:
+                - button "Teste Coluna 20" [ref=e183]:
+                  - text: Teste Coluna 2
+                  - generic [ref=e184]: "0"
+                - button "⋮" [ref=e186] [cursor=pointer]
+              - generic [ref=e188]:
+                - generic [ref=e189]: 🗂️
+                - heading "Nenhum card aqui ainda" [level=3] [ref=e190]
+                - paragraph [ref=e191]: Arraste cards de outras colunas ou crie um novo
+            - generic [ref=e193]:
+              - generic [ref=e194]:
+                - button "Entrega do Treino0" [disabled] [ref=e195]:
+                  - text: Entrega do Treino
+                  - generic [ref=e196]: "0"
+                - button "⋮" [ref=e198] [cursor=pointer]
+              - generic [ref=e200]:
+                - generic [ref=e201]: 🗂️
+                - heading "Nenhum card aqui ainda" [level=3] [ref=e202]
+                - paragraph [ref=e203]: Arraste cards de outras colunas ou crie um novo
+          - status [ref=e204]
+  - status
+  - button "Open Next.js Dev Tools" [ref=e210] [cursor=pointer]:
+    - img [ref=e211] [cursor=pointer]
+  - alert [ref=e214]
+```

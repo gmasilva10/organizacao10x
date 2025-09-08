@@ -31,6 +31,7 @@ export async function GET(request: Request) {
     return Number(contentRange.split("/").pop() || 0)
   }
 
+  const t0 = Date.now()
   const [onboarding, active, paused, total] = await Promise.all([
     countFor("onboarding"),
     countFor("active"),
@@ -38,7 +39,16 @@ export async function GET(request: Request) {
     countAll(),
   ])
 
-  return NextResponse.json({ counts: { onboarding, active, paused, total } })
+  const ms = Date.now() - t0
+  const totalRows = onboarding + active + paused
+  return NextResponse.json({ counts: { onboarding, active, paused, total } }, { 
+    headers: { 
+      'X-Query-Time': String(ms), 
+      'X-Row-Count': String(totalRows),
+      'Cache-Control': 'public, max-age=30, stale-while-revalidate=60',
+      'X-Cache-Hit': 'false'
+    } 
+  })
 }
 
 

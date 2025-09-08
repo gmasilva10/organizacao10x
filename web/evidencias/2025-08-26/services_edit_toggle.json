@@ -1,0 +1,161 @@
+{
+  "test_case": "Services - Edit & Toggle Active Flow",
+  "timestamp": "2025-08-26T14:55:00Z",
+  "user_role": "admin",
+  "edit_service_flow": {
+    "step_1": {
+      "action": "navigate_to_services",
+      "route": "/app/services",
+      "status": 200,
+      "page_elements": {
+        "title": "Serviços",
+        "breadcrumb": "Dashboard > Serviços",
+        "services_grid": true,
+        "add_service_button": true,
+        "search_filter": true
+      }
+    },
+    "step_2": {
+      "action": "click_edit_service",
+      "service_id": "service-001",
+      "current_data": {
+        "name": "Treino Personal Básico",
+        "description": "Treino individual com acompanhamento básico",
+        "price": 150.00,
+        "active": true
+      },
+      "modal": {
+        "title": "Editar Serviço",
+        "form_fields": {
+          "name": "Treino Personal Básico",
+          "description": "Treino individual com acompanhamento básico",
+          "price": 150.00,
+          "active": true
+        },
+        "validation": true,
+        "buttons": ["Cancelar", "Salvar"]
+      }
+    },
+    "step_3": {
+      "action": "update_service_data",
+      "changes": {
+        "name": "Treino Personal Premium",
+        "price": 200.00,
+        "description": "Treino individual com acompanhamento premium e nutrição"
+      },
+      "api_call": {
+        "endpoint": "PATCH /api/services/service-001",
+        "method": "PATCH",
+        "body": {
+          "name": "Treino Personal Premium",
+          "price": 200.00,
+          "description": "Treino individual com acompanhamento premium e nutrição"
+        },
+        "response": {
+          "status": 200,
+          "body": {
+            "ok": true,
+            "service_id": "service-001",
+            "updated_fields": ["name", "price", "description"]
+          }
+        }
+      }
+    },
+    "step_4": {
+      "action": "success_feedback",
+      "toast": {
+        "type": "success",
+        "message": "Serviço atualizado com sucesso",
+        "duration": 3000
+      },
+      "grid_update": {
+        "optimistic_update": true,
+        "service_card_refreshed": true,
+        "no_full_reload": true
+      }
+    }
+  },
+  "toggle_active_flow": {
+    "step_1": {
+      "action": "toggle_service_active",
+      "service_id": "service-002",
+      "current_status": true,
+      "toggle_action": "deactivate"
+    },
+    "step_2": {
+      "confirmation_modal": {
+        "title": "Desativar Serviço",
+        "message": "Deseja desativar este serviço? Ele não aparecerá mais para novos alunos.",
+        "buttons": ["Cancelar", "Desativar"]
+      }
+    },
+    "step_3": {
+      "api_call": {
+        "endpoint": "PATCH /api/services/service-002",
+        "method": "PATCH",
+        "body": {
+          "active": false
+        },
+        "response": {
+          "status": 200,
+          "body": {
+            "ok": true,
+            "service_id": "service-002",
+            "active": false
+          }
+        }
+      }
+    },
+    "step_4": {
+      "ui_update": {
+        "service_card_dimmed": true,
+        "inactive_badge": true,
+        "toggle_button_text": "Ativar",
+        "optimistic_update": true
+      },
+      "toast": {
+        "type": "success",
+        "message": "Serviço desativado com sucesso"
+      }
+    }
+  },
+  "activate_service_flow": {
+    "service_id": "service-002",
+    "current_status": false,
+    "toggle_action": "activate",
+    "api_call": {
+      "endpoint": "PATCH /api/services/service-002",
+      "body": {
+        "active": true
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "service_id": "service-002",
+          "active": true
+        }
+      }
+    },
+    "ui_update": {
+      "service_card_normal": true,
+      "active_badge": true,
+      "toggle_button_text": "Desativar"
+    }
+  },
+  "rbac_verification": {
+    "admin_can_edit": true,
+    "admin_can_toggle": true,
+    "manager_can_edit": true,
+    "manager_can_toggle": true,
+    "trainer_cannot_edit": false,
+    "viewer_cannot_edit": false
+  },
+  "validation": {
+    "required_fields": ["name", "price"],
+    "price_numeric": true,
+    "name_min_length": 3,
+    "description_optional": true,
+    "audit_logged": true
+  }
+}

@@ -21,11 +21,21 @@ export async function middleware(request: NextRequest) {
       "/app/onboarding/history",
       "/app/finance",
       "/app/settings",
+      "/app/team",
     ]
     const path = url.pathname
     const needsOrg = protectedPaths.some((p) => path === p || path.startsWith(p + "/"))
     const hasActiveOrg = Boolean(request.cookies.get("pg.active_org")?.value)
     if (needsOrg && !hasActiveOrg) {
+      // Server-first: tenta resolver organização atual
+      const origin = url.origin
+      const resp = await fetch(`${origin}/api/auth/resolve-org`, { headers: { cookie: request.headers.get('cookie') || '' }, cache: 'no-store' })
+      const data = await resp.json().catch(() => ({ orgId: null })) as { orgId: string | null }
+      if (data?.orgId) {
+        const next = NextResponse.next()
+        try { next.cookies.set("pg.active_org", data.orgId, { path: "/", sameSite: "lax", httpOnly: true }) } catch {}
+        return next
+      }
       return NextResponse.redirect(new URL("/onboarding/account/player", request.url))
     }
   } catch {}

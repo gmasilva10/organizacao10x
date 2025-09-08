@@ -5,6 +5,7 @@ import "../styles/animations.css"
 import { LoginUIProvider } from "@/components/LoginUIContext"
 import { ThemeProvider } from "@/lib/use-theme"
 import { ToastProvider } from "@/components/ui/toast"
+import { ClientTelemetryInit } from "@/components/ClientTelemetryInit"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -65,7 +66,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider initialTheme={undefined}>
           <ToastProvider>
-            <LoginUIProvider>{children}</LoginUIProvider>
+            <LoginUIProvider>
+              <ClientTelemetryInit />
+              {children}
+            </LoginUIProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

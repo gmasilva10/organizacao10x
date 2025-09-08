@@ -1,0 +1,75 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner "Cabeçalho principal" [ref=e4]:
+      - generic [ref=e5]:
+        - button "Recolher menu de navegação" [expanded] [ref=e6]:
+          - img
+        - link "Página inicial - Organização10x" [ref=e7] [cursor=pointer]:
+          - /url: /app
+          - generic [ref=e8] [cursor=pointer]: 10x
+          - generic [ref=e9] [cursor=pointer]: Organização10x
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: DEV
+        - generic [ref=e14]:
+          - button "Alternar tema" [ref=e15]:
+            - img
+          - button "Menu do usuário" [ref=e16]:
+            - generic [ref=e17]:
+              - generic [ref=e18]:
+                - generic [ref=e19]: GUSTAVO MOREIRA DE ARAUJO SILVA
+                - generic [ref=e20]: admin
+              - img "Avatar" [ref=e22]
+            - img
+    - generic [ref=e23]:
+      - navigation "Menu de navegação principal" [ref=e24]:
+        - navigation "Menu de navegação" [ref=e25]:
+          - generic [ref=e26]:
+            - heading "Gestão" [level=3] [ref=e29]
+            - generic [ref=e30]:
+              - link "Dashboard" [ref=e31] [cursor=pointer]:
+                - /url: /app
+                - img [ref=e33] [cursor=pointer]
+                - generic [ref=e38] [cursor=pointer]: Dashboard
+              - link "Alunos" [ref=e39] [cursor=pointer]:
+                - /url: /app/students
+                - img [ref=e41] [cursor=pointer]
+                - generic [ref=e46] [cursor=pointer]: Alunos
+              - link "Serviços" [ref=e47] [cursor=pointer]:
+                - /url: /app/services
+                - img [ref=e49] [cursor=pointer]
+                - generic [ref=e53] [cursor=pointer]: Serviços
+          - generic [ref=e54]:
+            - heading "Fluxo de Trabalho" [level=3] [ref=e57]
+            - generic [ref=e58]:
+              - link "Onboarding/Kanban" [ref=e59] [cursor=pointer]:
+                - /url: /app/onboarding
+                - img [ref=e61] [cursor=pointer]
+                - generic [ref=e63] [cursor=pointer]: Onboarding/Kanban
+              - link "Relacionamento" [ref=e64] [cursor=pointer]:
+                - /url: /app/relationship
+                - img [ref=e66] [cursor=pointer]
+                - generic [ref=e68] [cursor=pointer]: Relacionamento
+              - link "Gestão de Ocorrências" [ref=e69] [cursor=pointer]:
+                - /url: /app/workflow/occurrences
+                - img [ref=e72] [cursor=pointer]
+                - generic [ref=e76] [cursor=pointer]: Gestão de Ocorrências
+          - generic [ref=e77]:
+            - heading "Administração" [level=3] [ref=e80]
+            - generic [ref=e81]:
+              - link "Equipe" [ref=e82] [cursor=pointer]:
+                - /url: /app/team
+                - img [ref=e84] [cursor=pointer]
+                - generic [ref=e86] [cursor=pointer]: Equipe
+              - link "Configurações" [ref=e87] [cursor=pointer]:
+                - /url: /app/settings
+                - img [ref=e89] [cursor=pointer]
+                - generic [ref=e92] [cursor=pointer]: Configurações
+      - main [ref=e93]
+  - status
+```
