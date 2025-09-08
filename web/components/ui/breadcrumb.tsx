@@ -24,6 +24,7 @@ export function Breadcrumb({ items, className, showHome = true }: BreadcrumbProp
     <nav
       aria-label="Breadcrumb"
       className={cn("flex items-center space-x-1 text-sm text-muted-foreground", className)}
+      data-testid="breadcrumb"
     >
       {allItems.map((item, index) => (
         <React.Fragment key={index}>

@@ -1,0 +1,206 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner "Cabeçalho principal" [ref=e4]:
+      - generic [ref=e5]:
+        - button "Recolher menu de navegação" [expanded] [ref=e6]:
+          - img
+        - link "Página inicial - Organização10x" [ref=e7] [cursor=pointer]:
+          - /url: /app
+          - generic [ref=e8] [cursor=pointer]: 10x
+          - generic [ref=e9] [cursor=pointer]: Organização10x
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: DEV
+        - generic [ref=e14]:
+          - button "Alternar tema" [ref=e15]:
+            - img
+          - button "Menu do usuário" [ref=e16]:
+            - generic [ref=e17]:
+              - generic [ref=e18]:
+                - generic [ref=e19]: GUSTAVO MOREIRA DE ARAUJO SILVA
+                - generic [ref=e20]: admin
+              - img "Avatar" [ref=e22]
+            - img
+    - generic [ref=e23]:
+      - navigation "Menu de navegação principal" [ref=e24]:
+        - navigation "Menu de navegação" [ref=e25]:
+          - generic [ref=e26]:
+            - heading "Gestão" [level=3] [ref=e29]
+            - generic [ref=e30]:
+              - link "Dashboard" [ref=e31] [cursor=pointer]:
+                - /url: /app
+                - img [ref=e33] [cursor=pointer]
+                - generic [ref=e38] [cursor=pointer]: Dashboard
+              - link "Alunos" [ref=e39] [cursor=pointer]:
+                - /url: /app/students
+                - img [ref=e42] [cursor=pointer]
+                - generic [ref=e48] [cursor=pointer]: Alunos
+              - link "Serviços" [ref=e49] [cursor=pointer]:
+                - /url: /app/services
+                - img [ref=e51] [cursor=pointer]
+                - generic [ref=e55] [cursor=pointer]: Serviços
+          - generic [ref=e56]:
+            - heading "Fluxo de Trabalho" [level=3] [ref=e59]
+            - generic [ref=e60]:
+              - link "Onboarding/Kanban" [ref=e61] [cursor=pointer]:
+                - /url: /app/onboarding
+                - img [ref=e63] [cursor=pointer]
+                - generic [ref=e65] [cursor=pointer]: Onboarding/Kanban
+              - link "Relacionamento" [ref=e66] [cursor=pointer]:
+                - /url: /app/relationship
+                - img [ref=e68] [cursor=pointer]
+                - generic [ref=e70] [cursor=pointer]: Relacionamento
+              - link "Gestão de Ocorrências" [ref=e71] [cursor=pointer]:
+                - /url: /app/workflow/occurrences
+                - img [ref=e73] [cursor=pointer]
+                - generic [ref=e76] [cursor=pointer]: Gestão de Ocorrências
+          - generic [ref=e77]:
+            - heading "Administração" [level=3] [ref=e80]
+            - generic [ref=e81]:
+              - link "Equipe" [ref=e82] [cursor=pointer]:
+                - /url: /app/team
+                - img [ref=e84] [cursor=pointer]
+                - generic [ref=e86] [cursor=pointer]: Equipe
+              - link "Configurações" [ref=e87] [cursor=pointer]:
+                - /url: /app/settings
+                - img [ref=e89] [cursor=pointer]
+                - generic [ref=e92] [cursor=pointer]: Configurações
+      - main [ref=e93]:
+        - generic [ref=e95]:
+          - navigation "Breadcrumb" [ref=e96]:
+            - link "Dashboard" [ref=e97] [cursor=pointer]:
+              - /url: /app
+              - generic [ref=e98] [cursor=pointer]:
+                - img [ref=e99] [cursor=pointer]
+                - generic [ref=e102] [cursor=pointer]: Dashboard
+            - generic [ref=e104]: Alunos
+          - heading "Alunos" [level=1] [ref=e105]
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - text: "Onboarding:"
+              - generic [ref=e108]: "5"
+            - generic [ref=e109]:
+              - text: "Active:"
+              - generic [ref=e110]: "0"
+            - generic [ref=e111]:
+              - text: "Paused:"
+              - generic [ref=e112]: "0"
+            - generic [ref=e113]:
+              - text: "Total:"
+              - generic [ref=e114]: "5"
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - textbox "Buscar por nome" [ref=e117]
+              - combobox "Filtrar por status" [ref=e118]:
+                - option "Status (todos)" [selected]
+                - option "Active"
+                - option "Paused"
+                - option "Archived"
+              - combobox "Filtrar por treinador" [ref=e119]:
+                - option "Treinador (todos)" [selected]
+                - option "GUSTAVO MOREIRA DE ARAUJO SILVA"
+            - button "Novo Aluno" [ref=e121]
+          - table [ref=e123]:
+            - rowgroup [ref=e124]:
+              - row "Nome Telefone Status Treinador Criado em Ações" [ref=e125]:
+                - cell "Nome" [ref=e126]
+                - cell "Telefone" [ref=e127]
+                - cell "Status" [ref=e128]
+                - cell "Treinador" [ref=e129]
+                - cell "Criado em" [ref=e130]
+                - cell "Ações" [ref=e131]
+            - rowgroup [ref=e132]:
+              - row "Teste Novo Aluno 17996693458 onboarding Enviado GUSTAVO MOREIRA DE ARAUJO SILVA 9/3/2025, 16:19:20 Editar Excluir" [ref=e133]:
+                - cell "Teste Novo Aluno" [ref=e134]
+                - cell "17996693458" [ref=e135]
+                - cell "onboarding Enviado" [ref=e136]:
+                  - generic [ref=e137]:
+                    - generic [ref=e138]: onboarding
+                    - generic [ref=e139]: Enviado
+                - cell "GUSTAVO MOREIRA DE ARAUJO SILVA" [ref=e140]:
+                  - combobox [ref=e141]:
+                    - option "—"
+                    - option "GUSTAVO MOREIRA DE ARAUJO SILVA" [selected]
+                - cell "9/3/2025, 16:19:20" [ref=e142]
+                - cell "Editar Excluir" [ref=e143]:
+                  - generic [ref=e144]:
+                    - button "Editar" [ref=e145]
+                    - button "Excluir" [ref=e146]
+              - row "Rafa Miranda 11998584471 onboarding Enviado GUSTAVO MOREIRA DE ARAUJO SILVA 9/2/2025, 19:54:26 Editar Excluir" [ref=e147]:
+                - cell "Rafa Miranda" [ref=e148]
+                - cell "11998584471" [ref=e149]
+                - cell "onboarding Enviado" [ref=e150]:
+                  - generic [ref=e151]:
+                    - generic [ref=e152]: onboarding
+                    - generic [ref=e153]: Enviado
+                - cell "GUSTAVO MOREIRA DE ARAUJO SILVA" [ref=e154]:
+                  - combobox [ref=e155]:
+                    - option "—"
+                    - option "GUSTAVO MOREIRA DE ARAUJO SILVA" [selected]
+                - cell "9/2/2025, 19:54:26" [ref=e156]
+                - cell "Editar Excluir" [ref=e157]:
+                  - generic [ref=e158]:
+                    - button "Editar" [ref=e159]
+                    - button "Excluir" [ref=e160]
+              - row "Regina M Araujo 17996693499 onboarding Enviado GUSTAVO MOREIRA DE ARAUJO SILVA 9/2/2025, 11:27:20 Editar Excluir" [ref=e161]:
+                - cell "Regina M Araujo" [ref=e162]
+                - cell "17996693499" [ref=e163]
+                - cell "onboarding Enviado" [ref=e164]:
+                  - generic [ref=e165]:
+                    - generic [ref=e166]: onboarding
+                    - generic [ref=e167]: Enviado
+                - cell "GUSTAVO MOREIRA DE ARAUJO SILVA" [ref=e168]:
+                  - combobox [ref=e169]:
+                    - option "—"
+                    - option "GUSTAVO MOREIRA DE ARAUJO SILVA" [selected]
+                - cell "9/2/2025, 11:27:20" [ref=e170]
+                - cell "Editar Excluir" [ref=e171]:
+                  - generic [ref=e172]:
+                    - button "Editar" [ref=e173]
+                    - button "Excluir" [ref=e174]
+              - row "GUSMORE TECNOLOGIA 3733831088 onboarding GUSTAVO MOREIRA DE ARAUJO SILVA 9/1/2025, 17:07:08 Editar Excluir Enviar para Kanban" [ref=e175]:
+                - cell "GUSMORE TECNOLOGIA" [ref=e176]
+                - cell "3733831088" [ref=e177]
+                - cell "onboarding" [ref=e178]:
+                  - generic [ref=e180]: onboarding
+                - cell "GUSTAVO MOREIRA DE ARAUJO SILVA" [ref=e181]:
+                  - combobox [ref=e182]:
+                    - option "—"
+                    - option "GUSTAVO MOREIRA DE ARAUJO SILVA" [selected]
+                - cell "9/1/2025, 17:07:08" [ref=e183]
+                - cell "Editar Excluir Enviar para Kanban" [ref=e184]:
+                  - generic [ref=e185]:
+                    - button "Editar" [ref=e186]
+                    - button "Excluir" [ref=e187]
+                    - button "Enviar para Kanban" [ref=e188]
+              - row "GUSTAVO MOREIRA DE ARAUJO SILVA 17996693499 onboarding GUSTAVO MOREIRA DE ARAUJO SILVA 9/1/2025, 16:42:20 Editar Excluir Enviar para Kanban" [ref=e189]:
+                - cell "GUSTAVO MOREIRA DE ARAUJO SILVA" [ref=e190]
+                - cell "17996693499" [ref=e191]
+                - cell "onboarding" [ref=e192]:
+                  - generic [ref=e194]: onboarding
+                - cell "GUSTAVO MOREIRA DE ARAUJO SILVA" [ref=e195]:
+                  - combobox [ref=e196]:
+                    - option "—"
+                    - option "GUSTAVO MOREIRA DE ARAUJO SILVA" [selected]
+                - cell "9/1/2025, 16:42:20" [ref=e197]
+                - cell "Editar Excluir Enviar para Kanban" [ref=e198]:
+                  - generic [ref=e199]:
+                    - button "Editar" [ref=e200]
+                    - button "Excluir" [ref=e201]
+                    - button "Enviar para Kanban" [ref=e202]
+          - generic [ref=e203]:
+            - generic [ref=e204]: "Total: 5"
+            - generic [ref=e205]:
+              - button "Anterior" [disabled] [ref=e206]
+              - generic [ref=e207]: Página 1 / 1
+              - button "Próxima" [disabled] [ref=e208]
+  - status
+  - button "Open Next.js Dev Tools" [ref=e214] [cursor=pointer]:
+    - img [ref=e215] [cursor=pointer]
+  - alert [ref=e218]
+```

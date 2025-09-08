@@ -1,0 +1,196 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner "Cabeçalho principal" [ref=e4]:
+      - generic [ref=e5]:
+        - button "Recolher menu de navegação" [expanded] [ref=e6]:
+          - img
+        - link "Página inicial - Organização10x" [ref=e7] [cursor=pointer]:
+          - /url: /app
+          - generic [ref=e8] [cursor=pointer]: 10x
+          - generic [ref=e9] [cursor=pointer]: Organização10x
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: DEV
+        - generic [ref=e14]:
+          - button "Alternar tema" [ref=e15]:
+            - img
+          - button "Menu do usuário" [ref=e16]:
+            - generic [ref=e17]:
+              - generic [ref=e18]:
+                - generic [ref=e19]: GUSTAVO MOREIRA DE ARAUJO SILVA
+                - generic [ref=e20]: admin
+              - img "Avatar" [ref=e22]
+            - img
+    - generic [ref=e23]:
+      - navigation "Menu de navegação principal" [ref=e24]:
+        - navigation "Menu de navegação" [ref=e25]:
+          - generic [ref=e26]:
+            - heading "Gestão" [level=3] [ref=e29]
+            - generic [ref=e30]:
+              - link "Dashboard" [ref=e31] [cursor=pointer]:
+                - /url: /app
+                - img [ref=e34] [cursor=pointer]
+                - generic [ref=e40] [cursor=pointer]: Dashboard
+              - link "Alunos" [ref=e41] [cursor=pointer]:
+                - /url: /app/students
+                - img [ref=e43] [cursor=pointer]
+                - generic [ref=e48] [cursor=pointer]: Alunos
+              - link "Serviços" [ref=e49] [cursor=pointer]:
+                - /url: /app/services
+                - img [ref=e51] [cursor=pointer]
+                - generic [ref=e55] [cursor=pointer]: Serviços
+          - generic [ref=e56]:
+            - heading "Fluxo de Trabalho" [level=3] [ref=e59]
+            - generic [ref=e60]:
+              - link "Onboarding/Kanban" [ref=e61] [cursor=pointer]:
+                - /url: /app/onboarding
+                - img [ref=e63] [cursor=pointer]
+                - generic [ref=e65] [cursor=pointer]: Onboarding/Kanban
+              - link "Relacionamento" [ref=e66] [cursor=pointer]:
+                - /url: /app/relationship
+                - img [ref=e68] [cursor=pointer]
+                - generic [ref=e70] [cursor=pointer]: Relacionamento
+              - link "Gestão de Ocorrências" [ref=e71] [cursor=pointer]:
+                - /url: /app/workflow/occurrences
+                - img [ref=e73] [cursor=pointer]
+                - generic [ref=e76] [cursor=pointer]: Gestão de Ocorrências
+          - generic [ref=e77]:
+            - heading "Administração" [level=3] [ref=e80]
+            - generic [ref=e81]:
+              - link "Equipe" [ref=e82] [cursor=pointer]:
+                - /url: /app/team
+                - img [ref=e84] [cursor=pointer]
+                - generic [ref=e86] [cursor=pointer]: Equipe
+              - link "Configurações" [ref=e87] [cursor=pointer]:
+                - /url: /app/settings
+                - img [ref=e89] [cursor=pointer]
+                - generic [ref=e92] [cursor=pointer]: Configurações
+      - main [ref=e93]:
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - heading "Dashboard" [level=1] [ref=e97]
+            - paragraph [ref=e98]: Visão geral da sua plataforma Personal Global
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - generic [ref=e101]:
+                - generic [ref=e102]: Alunos
+                - img [ref=e104]
+              - generic [ref=e109]:
+                - generic [ref=e110]: "0"
+                - paragraph [ref=e111]: Total de alunos cadastrados
+                - link "Gerenciar alunos" [ref=e113] [cursor=pointer]:
+                  - /url: /app/students
+                  - text: Gerenciar alunos
+                  - img
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: Serviços
+                - img [ref=e118]
+              - generic [ref=e121]:
+                - generic [ref=e122]: "0"
+                - paragraph [ref=e123]: Serviços disponíveis
+                - link "Ver serviços" [ref=e125] [cursor=pointer]:
+                  - /url: /app/services
+                  - text: Ver serviços
+                  - img
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [ref=e128]: Colaboradores
+                - img [ref=e130]
+              - generic [ref=e134]:
+                - generic [ref=e135]: "0"
+                - paragraph [ref=e136]: Membros da equipe
+                - link "Gerenciar equipe" [ref=e138] [cursor=pointer]:
+                  - /url: /app/team
+                  - text: Gerenciar equipe
+                  - img
+            - generic [ref=e139]:
+              - generic [ref=e140]:
+                - generic [ref=e141]: Itens no Kanban
+                - img [ref=e143]
+              - generic [ref=e146]:
+                - generic [ref=e147]: "3"
+                - paragraph [ref=e148]: Processos em andamento
+                - link "Ver processos" [ref=e150] [cursor=pointer]:
+                  - /url: /app/onboarding
+                  - text: Ver processos
+                  - img
+          - generic [ref=e151]:
+            - heading "Ações Rápidas" [level=2] [ref=e153]
+            - generic [ref=e154]:
+              - generic [ref=e155] [cursor=pointer]:
+                - generic [ref=e157] [cursor=pointer]:
+                  - img [ref=e158] [cursor=pointer]
+                  - generic [ref=e163] [cursor=pointer]:
+                    - generic [ref=e164] [cursor=pointer]: Novo Aluno
+                    - generic [ref=e165] [cursor=pointer]: Cadastrar um novo aluno
+                - link "Ir para novo aluno" [ref=e167] [cursor=pointer]:
+                  - /url: /app/students?new=true
+                  - text: Ir para novo aluno
+                  - img
+              - generic [ref=e168] [cursor=pointer]:
+                - generic [ref=e170] [cursor=pointer]:
+                  - img [ref=e171] [cursor=pointer]
+                  - generic [ref=e174] [cursor=pointer]:
+                    - generic [ref=e175] [cursor=pointer]: Novo Serviço
+                    - generic [ref=e176] [cursor=pointer]: Criar um novo serviço
+                - link "Ir para novo serviço" [ref=e178] [cursor=pointer]:
+                  - /url: /app/services?new=true
+                  - text: Ir para novo serviço
+                  - img
+              - generic [ref=e179] [cursor=pointer]:
+                - generic [ref=e181] [cursor=pointer]:
+                  - img [ref=e182] [cursor=pointer]
+                  - generic [ref=e184] [cursor=pointer]:
+                    - generic [ref=e185] [cursor=pointer]: Configurações
+                    - generic [ref=e186] [cursor=pointer]: Gerenciar usuários e papéis
+                - link "Ir para configurações" [ref=e188] [cursor=pointer]:
+                  - /url: /app/settings
+                  - text: Ir para configurações
+                  - img
+          - generic [ref=e189]:
+            - generic [ref=e191]:
+              - img [ref=e192]
+              - text: Status do Sistema
+            - generic [ref=e196]:
+              - generic [ref=e197]:
+                - generic [ref=e198]:
+                  - generic [ref=e199]: Status do Sistema
+                  - img [ref=e200]
+                - generic [ref=e202]:
+                  - generic [ref=e203]: Ativo
+                  - paragraph [ref=e204]: Sistema operacional
+              - generic [ref=e205]:
+                - generic [ref=e206]:
+                  - generic [ref=e207]: Version
+                  - img [ref=e208]
+                - generic [ref=e210]:
+                  - generic [ref=e211]: v0.3.1-dev
+                  - paragraph [ref=e212]: Versão atual
+              - generic [ref=e213]:
+                - generic [ref=e214]:
+                  - generic [ref=e215]: Features v0.3.1-dev
+                  - img [ref=e216]
+                - generic [ref=e219]:
+                  - generic [ref=e220]: ✅ Services Onboarding
+                  - generic [ref=e221]: ✅ Kanban Card Minimal
+                  - paragraph [ref=e222]: Hardcoded para true
+          - generic [ref=e223]:
+            - paragraph [ref=e224]: Personal Global • Organize seus alunos. Escale seus resultados.
+            - paragraph [ref=e225]:
+              - text: Precisa de ajuda?
+              - link "Configurações" [ref=e226] [cursor=pointer]:
+                - /url: /app/settings
+              - text: •
+              - link "Suporte" [ref=e227] [cursor=pointer]:
+                - /url: /support
+  - status
+  - button "Open Next.js Dev Tools" [ref=e233] [cursor=pointer]:
+    - img [ref=e234] [cursor=pointer]
+  - alert [ref=e237]
+```

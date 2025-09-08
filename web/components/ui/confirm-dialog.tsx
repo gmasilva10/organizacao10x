@@ -68,6 +68,7 @@ export function ConfirmDialog({
           sizeClasses[size],
           variantClasses[variant]
         )}
+        data-testid="alert-dialog"
       >
         <AlertDialogHeader>
           <AlertDialogTitle className="text-left">
@@ -80,7 +81,7 @@ export function ConfirmDialog({
           )}
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2">
-          <AlertDialogCancel onClick={handleCancel}>
+          <AlertDialogCancel onClick={handleCancel} data-testid="alert-dialog-cancel">
             {cancelText}
           </AlertDialogCancel>
           <AlertDialogAction
@@ -89,6 +90,7 @@ export function ConfirmDialog({
               variant === "destructive" && "bg-red-600 hover:bg-red-700",
               variant === "warning" && "bg-amber-600 hover:bg-amber-700"
             )}
+            data-testid="alert-dialog-confirm"
           >
             {confirmText}
           </AlertDialogAction>

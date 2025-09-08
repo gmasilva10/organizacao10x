@@ -18,7 +18,7 @@ export type Capabilities = {
   }
 }
 
-// DEBUG: API simplificada para testar
+// API de capabilities com cache
 export async function GET(request: Request) {
   console.log('🚀 API Capabilities chamada!')
   
@@ -43,7 +43,14 @@ export async function GET(request: Request) {
   }
   
   console.log('✅ Retornando capabilities:', caps)
-  return NextResponse.json(caps)
+  
+  // Adicionar cache para melhorar performance
+  return NextResponse.json(caps, {
+    headers: {
+      'Cache-Control': 'public, max-age=300, stale-while-revalidate=600', // 5min cache, 10min stale
+      'X-Cache-Hit': 'false'
+    }
+  })
 }
 
 

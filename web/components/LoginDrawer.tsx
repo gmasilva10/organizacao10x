@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuthSync } from "@/lib/use-auth-sync"
 import {
 	Drawer,
 	DrawerClose,
@@ -32,6 +33,7 @@ function LoginDrawerContent() {
     const [show, setShow] = useState(false)
     const { theme } = useTheme()
     const toast = useToast()
+    const { syncAuth } = useAuthSync()
 
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -55,19 +57,15 @@ function LoginDrawerContent() {
                 return
             }
             try {
-                const res = await fetch("/api/auth/sync", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    cache: "no-store",
-                    body: JSON.stringify({
-                        access_token: accessToken,
-                        refresh_token: refreshToken,
-                    }),
-                })
-                if (!res.ok) {
-                    toast.error("Falha ao sincronizar sessão (" + res.status + ").")
-                    return
+                const syncResult = await syncAuth(accessToken, refreshToken)
+                if (!syncResult.success) {
+                    if (syncResult.reason === 'already_pending' || syncResult.reason === 'debounced') {
+                        // Ignorar silenciosamente - já está sendo processado
+                        console.log('Auth sync ignorado:', syncResult.reason)
+                    } else {
+                        toast.error("Falha ao sincronizar sessão. Tente novamente.")
+                        return
+                    }
                 }
             } catch {
                 toast.error("Erro ao sincronizar sessão. Verifique a conexão e tente novamente.")

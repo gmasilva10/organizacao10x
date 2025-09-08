@@ -1,0 +1,5 @@
+[ABERTO]  GATE 12X — Infra + Métricas + Telemetria.
+[ALINHAMENTO] GATE 13A — Anamnese V1 (aguardando Spec Freeze).
+[PRÓXIMO] GATE 15 — Financeiro V1 (após 13A Spec Freeze).
+[FUTURO]  GATE 16F — Integrações (EDUS/HotMarket).
+[FUTURO]  GATE 17T — Treino V2 (depende de Anamnese).

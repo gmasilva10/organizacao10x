@@ -18,12 +18,20 @@ export async function GET(request: Request) {
   const headers: Record<string, string> = { apikey: key!, Authorization: `Bearer ${key}`! }
 
   if (countOnly) {
+    const t0 = Date.now()
     const resp = await fetch(
       `${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&select=id`,
       { headers: { ...headers, Prefer: "count=exact" }, cache: "no-store" }
     )
     const total = Number(resp.headers.get("content-range")?.split("/")?.[1] || 0)
-    return NextResponse.json({ count: total })
+    const ms = Date.now() - t0
+    return NextResponse.json({ count: total }, {
+      headers: {
+        'X-Query-Time': String(ms),
+        'Cache-Control': 'public, max-age=45, stale-while-revalidate=90',
+        'X-Cache-Hit': 'false'
+      }
+    })
   }
 
   // Seleção resiliente: não depende de coluna meta

@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { X, Filter, Eye, CheckCircle, Bell, Calendar, Copy, Download } from "lucide-react"
 import { useOccurrencesPermissions } from "@/lib/use-occurrences-permissions"
-import { useConfirmDialog } from "@/components/ui/confirm-dialog"
-import { TableSkeleton, EmptyState, ErrorState } from "@/components/ui/skeleton"
+import { useConfirmDialog, ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { TableSkeleton, EmptyState, ErrorState, Skeleton } from "@/components/ui/skeleton"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 
 type OccurrenceRow = {

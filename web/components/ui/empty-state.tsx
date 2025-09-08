@@ -25,7 +25,7 @@ export function EmptyState({
     <div className={cn(
       "flex flex-col items-center justify-center py-12 px-4 text-center",
       className
-    )}>
+    )} data-testid="empty-state">
       <div className="text-6xl mb-4">{icon}</div>
       <h3 className="text-lg font-semibold text-gray-900 mb-2">
         {title}

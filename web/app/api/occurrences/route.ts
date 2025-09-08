@@ -162,9 +162,10 @@ export async function GET(request: NextRequest) {
         }
       }, { 
         headers: { 
-          'Cache-Control': 'private, max-age=45, stale-while-revalidate=90', 
+          'Cache-Control': 'public, max-age=30, stale-while-revalidate=60', 
           'X-Query-Time': String(ms),
-          'X-Row-Count': String(enrichedData.length)
+          'X-Row-Count': String(enrichedData.length),
+          'X-Cache-Hit': 'false'
         } 
       })
 

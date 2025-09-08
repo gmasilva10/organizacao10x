@@ -113,6 +113,7 @@ export function OccurrenceTypesManager() {
       if (statusFilter !== 'all') params.set('status', statusFilter)
       if (query) params.set('query', query)
       if (groupFilter !== 'all') params.set('group_id', String(groupFilter))
+      
       const [typesResponse, groupsResponse] = await Promise.all([
         fetch(`/api/occurrence-types?${params.toString()}`),
         fetch('/api/occurrence-groups')
@@ -126,10 +127,10 @@ export function OccurrenceTypesManager() {
         groupsResponse.json()
       ])
 
-      setTypes(typesData)
-      setGroups(groupsData)
+      setTypes(Array.isArray(typesData?.types) ? typesData.types : [])
+      setGroups(Array.isArray(groupsData?.groups) ? groupsData.groups : [])
     } catch (err) {
-      error('Erro ao carregar dados')
+      showError('Erro ao carregar dados')
       console.error(err)
     } finally {
       setLoading(false)
@@ -162,13 +163,13 @@ export function OccurrenceTypesManager() {
         throw new Error(errorData.error || 'Erro ao salvar tipo')
       }
 
-      success(editingType ? 'Tipo atualizado com sucesso!' : 'Tipo criado com sucesso!')
+      showSuccess(editingType ? 'Tipo atualizado com sucesso!' : 'Tipo criado com sucesso!')
       setIsModalOpen(false)
       setFormData({ name: '', description: '', group_id: '', applies_to: 'student', is_active: true })
       setEditingType(null)
       loadData()
     } catch (err) {
-      error(err instanceof Error ? err.message : 'Erro ao salvar tipo')
+      showError(err instanceof Error ? err.message : 'Erro ao salvar tipo')
       console.error(err)
     } finally {
       setSaving(false)
@@ -198,10 +199,10 @@ export function OccurrenceTypesManager() {
         throw new Error(errorData.error || 'Erro ao excluir tipo')
       }
 
-      success('Tipo excluído com sucesso!')
+      showSuccess('Tipo excluído com sucesso!')
       loadData()
     } catch (err) {
-      error(err instanceof Error ? err.message : 'Erro ao excluir tipo')
+      showError(err instanceof Error ? err.message : 'Erro ao excluir tipo')
       console.error(err)
     }
   }

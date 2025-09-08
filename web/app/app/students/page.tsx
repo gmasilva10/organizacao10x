@@ -9,6 +9,7 @@ import { StudentsFilters } from "@/components/students/StudentsFilters"
 import { AssignTrainerSelect } from "@/components/students/AssignTrainerSelect"
 import { StudentFullModal } from "@/components/students/StudentFullModal"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type StudentRow = { id: string; full_name: string; phone?: string | null; status: string; onboard_opt?: 'nao_enviar'|'enviar'|'enviado'; trainer: { id: string | null; name: string | null } | null; created_at: string }
 type Trainer = { id: string; user_id: string; name: string; email?: string }

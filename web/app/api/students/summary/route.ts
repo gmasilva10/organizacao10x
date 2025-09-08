@@ -45,7 +45,8 @@ export async function GET(request: Request) {
     headers: { 
       'X-Query-Time': String(ms), 
       'X-Row-Count': String(totalRows),
-      'Cache-Control': 'private, max-age=60, stale-while-revalidate=120' 
+      'Cache-Control': 'public, max-age=30, stale-while-revalidate=60',
+      'X-Cache-Hit': 'false'
     } 
   })
 }

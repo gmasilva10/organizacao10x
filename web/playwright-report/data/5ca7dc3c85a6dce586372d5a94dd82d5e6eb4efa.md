@@ -1,0 +1,114 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner "Cabeçalho principal" [ref=e4]:
+      - generic [ref=e5]:
+        - button "Recolher menu de navegação" [expanded] [ref=e6]:
+          - img
+        - link "Página inicial - Organização10x" [ref=e7] [cursor=pointer]:
+          - /url: /app
+          - generic [ref=e8] [cursor=pointer]: 10x
+          - generic [ref=e9] [cursor=pointer]: Organização10x
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: DEV
+        - generic [ref=e14]:
+          - button "Alternar tema" [ref=e15]:
+            - img
+          - button "Menu do usuário" [ref=e16]:
+            - generic [ref=e17]:
+              - generic [ref=e18]:
+                - generic [ref=e19]: GUSTAVO MOREIRA DE ARAUJO SILVA
+                - generic [ref=e20]: admin
+              - img "Avatar" [ref=e22]
+            - img
+    - generic [ref=e23]:
+      - navigation "Menu de navegação principal" [ref=e24]:
+        - navigation "Menu de navegação" [ref=e25]:
+          - generic [ref=e26]:
+            - heading "Gestão" [level=3] [ref=e29]
+            - generic [ref=e30]:
+              - link "Dashboard" [ref=e31] [cursor=pointer]:
+                - /url: /app
+                - img [ref=e33] [cursor=pointer]
+                - generic [ref=e38] [cursor=pointer]: Dashboard
+              - link "Alunos" [ref=e39] [cursor=pointer]:
+                - /url: /app/students
+                - img [ref=e42] [cursor=pointer]
+                - generic [ref=e48] [cursor=pointer]: Alunos
+              - link "Serviços" [ref=e49] [cursor=pointer]:
+                - /url: /app/services
+                - img [ref=e51] [cursor=pointer]
+                - generic [ref=e55] [cursor=pointer]: Serviços
+          - generic [ref=e56]:
+            - heading "Fluxo de Trabalho" [level=3] [ref=e59]
+            - generic [ref=e60]:
+              - link "Onboarding/Kanban" [ref=e61] [cursor=pointer]:
+                - /url: /app/onboarding
+                - img [ref=e63] [cursor=pointer]
+                - generic [ref=e65] [cursor=pointer]: Onboarding/Kanban
+              - link "Relacionamento" [ref=e66] [cursor=pointer]:
+                - /url: /app/relationship
+                - img [ref=e68] [cursor=pointer]
+                - generic [ref=e70] [cursor=pointer]: Relacionamento
+              - link "Gestão de Ocorrências" [ref=e71] [cursor=pointer]:
+                - /url: /app/workflow/occurrences
+                - img [ref=e73] [cursor=pointer]
+                - generic [ref=e76] [cursor=pointer]: Gestão de Ocorrências
+          - generic [ref=e77]:
+            - heading "Administração" [level=3] [ref=e80]
+            - generic [ref=e81]:
+              - link "Equipe" [ref=e82] [cursor=pointer]:
+                - /url: /app/team
+                - img [ref=e84] [cursor=pointer]
+                - generic [ref=e86] [cursor=pointer]: Equipe
+              - link "Configurações" [ref=e87] [cursor=pointer]:
+                - /url: /app/settings
+                - img [ref=e89] [cursor=pointer]
+                - generic [ref=e92] [cursor=pointer]: Configurações
+      - main [ref=e93]:
+        - generic [ref=e95]:
+          - navigation "Breadcrumb" [ref=e96]:
+            - link "Dashboard" [ref=e97] [cursor=pointer]:
+              - /url: /app
+              - generic [ref=e98] [cursor=pointer]:
+                - img [ref=e99] [cursor=pointer]
+                - generic [ref=e102] [cursor=pointer]: Dashboard
+            - img [ref=e103]
+            - generic [ref=e105]: Alunos
+          - heading "Alunos" [level=1] [ref=e106]
+          - generic [ref=e107]:
+            - generic [ref=e108]:
+              - textbox "Buscar por nome" [ref=e109]
+              - combobox "Filtrar por status" [ref=e110]:
+                - option "Status (todos)" [selected]
+                - option "Active"
+                - option "Paused"
+                - option "Archived"
+              - combobox "Filtrar por treinador" [ref=e111]:
+                - option "Treinador (todos)" [selected]
+            - button "Novo Aluno" [ref=e113]
+          - table [ref=e115]:
+            - rowgroup [ref=e116]:
+              - row "Nome Telefone Status Treinador Criado em Ações" [ref=e117]:
+                - cell "Nome" [ref=e118]
+                - cell "Telefone" [ref=e119]
+                - cell "Status" [ref=e120]
+                - cell "Treinador" [ref=e121]
+                - cell "Criado em" [ref=e122]
+                - cell "Ações" [ref=e123]
+            - rowgroup [ref=e124]:
+              - row "Nenhum aluno encontrado. Crie seu primeiro aluno para começar." [ref=e125]:
+                - cell "Nenhum aluno encontrado. Crie seu primeiro aluno para começar." [ref=e126]
+          - generic [ref=e127]:
+            - generic [ref=e128]: "Total: 0"
+            - generic [ref=e129]:
+              - button "Anterior" [disabled] [ref=e130]
+              - generic [ref=e131]: Página 1 / 1
+              - button "Próxima" [disabled] [ref=e132]
+  - status
+```
