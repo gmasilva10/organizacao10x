@@ -104,189 +104,38 @@ export async function POST(
 ) {
   try {
     const { id: studentId } = await params
-    const supabase = await createClient()
+    const startTime = Date.now()
     
-    // Verificar autenticação
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
-
-    // Verificar membership
-    const { data: membership } = await supabase
-      .from('memberships')
-      .select('tenant_id, role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (!membership) {
-      return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 })
-    }
-
-    // Verificar se o aluno existe e pertence ao tenant
-    const { data: student } = await supabase
-      .from('students')
-      .select('id')
-      .eq('id', studentId)
-      .eq('tenant_id', membership.tenant_id)
-      .single()
-
-    if (!student) {
-      return NextResponse.json({ error: 'Aluno não encontrado' }, { status: 404 })
-    }
-
-    // Validar dados
+    // Proxy para a rota canônica /api/occurrences
     const body = await request.json()
-    const validatedData = createOccurrenceSchema.parse(body)
-
-    // Verificar se o grupo e tipo pertencem ao tenant
-    const { data: group } = await supabase
-      .from('occurrence_groups')
-      .select('id')
-      .eq('id', validatedData.group_id)
-      .eq('tenant_id', membership.tenant_id)
-      .single()
-
-    if (!group) {
-      return NextResponse.json({ 
-        error: 'Grupo de ocorrência inválido', 
-        details: 'O grupo selecionado não existe ou não pertence à sua organização' 
-      }, { status: 400 })
+    
+    // Adicionar student_id ao payload
+    const payloadWithStudentId = {
+      ...body,
+      student_id: studentId
     }
-
-    const { data: type } = await supabase
-      .from('occurrence_types')
-      .select('id')
-      .eq('id', validatedData.type_id)
-      .eq('tenant_id', membership.tenant_id)
-      .eq('group_id', validatedData.group_id)
-      .single()
-
-    if (!type) {
-      return NextResponse.json({ 
-        error: 'Tipo de ocorrência inválido', 
-        details: 'O tipo selecionado não existe, não pertence ao grupo escolhido ou não está disponível em sua organização' 
-      }, { status: 400 })
-    }
-
-    // Verificar se o responsável é um profissional válido
-    const { data: professional } = await supabase
-      .from('professionals')
-      .select('user_id')
-      .eq('user_id', validatedData.owner_user_id)
-      .eq('tenant_id', membership.tenant_id)
-      .single()
-
-    if (!professional) {
-      return NextResponse.json({ 
-        error: 'Responsável inválido', 
-        details: 'O responsável selecionado não existe ou não pertence à equipe da sua organização' 
-      }, { status: 400 })
-    }
-
-    // Verificar se o profissional tem acesso ao aluno (se aplicável)
-    // Para trainers, verificar se o aluno está atribuído a eles
-    if (membership.role === 'trainer') {
-      const { data: studentWithTrainer } = await supabase
-        .from('students')
-        .select('trainer_id')
-        .eq('id', studentId)
-        .eq('tenant_id', membership.tenant_id)
-        .single()
-
-      if (studentWithTrainer?.trainer_id !== validatedData.owner_user_id) {
-        return NextResponse.json({ 
-          error: 'Você só pode atribuir ocorrências a alunos que estão sob sua responsabilidade' 
-        }, { status: 403 })
-      }
-    }
-
-    // Preparar dados de lembrete
-    const reminderData = validatedData.reminder_at ? {
-      reminder_at: validatedData.reminder_at,
-      reminder_status: validatedData.reminder_status,
-      reminder_created_by: user.id
-    } : {
-      reminder_at: null,
-      reminder_status: null,
-      reminder_created_by: null
-    }
-
-    // Criar ocorrência
-    const { data: newOccurrence, error } = await supabase
-      .from('student_occurrences')
-      .insert({
-        tenant_id: membership.tenant_id,
-        student_id: studentId,
-        group_id: validatedData.group_id,
-        type_id: validatedData.type_id,
-        occurred_at: validatedData.occurred_at,
-        notes: validatedData.notes,
-        owner_user_id: validatedData.owner_user_id,
-        priority: validatedData.priority,
-        is_sensitive: validatedData.is_sensitive,
-        status: 'OPEN',
-        ...reminderData
-      })
-      .select(`
-        id,
-        occurred_at,
-        notes,
-        status,
-        group_id,
-        type_id,
-        owner_user_id,
-        reminder_at,
-        reminder_status,
-        reminder_created_by,
-        created_at,
-        updated_at
-      `)
-      .single()
-
-    if (error) {
-      console.error('Erro ao criar ocorrência:', error)
-      return NextResponse.json({ error: 'Erro ao criar ocorrência' }, { status: 500 })
-    }
-
-    // Log de auditoria
-    try {
-      await auditLogger.logOccurrenceCreated(
-        newOccurrence.id.toString(),
-        user.id,
-        membership.tenant_id,
-        {
-          studentId: studentId,
-          groupId: validatedData.group_id,
-          typeId: validatedData.type_id,
-          occurredAt: validatedData.occurred_at,
-          priority: validatedData.priority,
-          isSensitive: validatedData.is_sensitive,
-          ownerUserId: validatedData.owner_user_id
-        }
-      )
-    } catch (auditError) {
-      console.error('Erro ao registrar log de auditoria:', auditError)
-      // Não falha a operação por erro de auditoria
-    }
-
-    return NextResponse.json({ 
-      message: 'Ocorrência criada com sucesso',
-      occurrence: newOccurrence
-    }, { status: 201 })
+    
+    // Fazer proxy para /api/occurrences
+    const response = await fetch(`${request.nextUrl.origin}/api/occurrences`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': request.headers.get('Authorization') || '',
+        'Cookie': request.headers.get('Cookie') || ''
+      },
+      body: JSON.stringify(payloadWithStudentId)
+    })
+    
+    const responseData = await response.json()
+    const endTime = Date.now()
+    const queryTime = endTime - startTime
+    
+    const nextResponse = NextResponse.json(responseData, { status: response.status })
+    nextResponse.headers.set('X-Query-Time', `${queryTime}ms`)
+    
+    return nextResponse
   } catch (error) {
-    console.error('Erro na API:', error)
-    if (error instanceof z.ZodError) {
-      const fieldMessages = error.errors.map(e => {
-        const field = e.path.join('.')
-        return `${field}: ${e.message}`
-      }).join('; ')
-      
-      return NextResponse.json({ 
-        error: 'Dados inválidos',
-        details: fieldMessages
-      }, { status: 400 })
-    }
+    console.error('Erro no proxy de ocorrências:', error)
     return NextResponse.json({ 
       error: 'Erro interno do servidor', 
       details: 'Ocorreu um erro inesperado. Tente novamente em alguns instantes.' 

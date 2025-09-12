@@ -31,9 +31,9 @@ export function useAuthSync() {
       return { success: false, reason: 'debounced' }
     }
 
-    // Verificar lock máximo
+    // Verificar lock máximo - se muito antigo, forçar sincronização
     if (now - syncState.current.lastSync > LOCK_MS) {
-      console.log('Auth sync muito antigo, forçando...')
+      // Forçar sincronização quando muito antigo
     }
 
     syncState.current.isPending = true

@@ -33,7 +33,7 @@ export function VersionBanner() {
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Badge variant="outline" className="bg-blue-100 text-blue-800">
-            v0.3.1-dev
+            v0.3.3-dev
           </Badge>
           <span className="text-blue-700">
             <strong>Commit:</strong> {versionInfo.commit}

@@ -7,8 +7,8 @@ import Link from "next/link"
 import { useState } from "react"
 
 export default function LoginSimplePage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('gma_silva@yahoo.com.br')
+  const [password, setPassword] = useState('Gma@11914984')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

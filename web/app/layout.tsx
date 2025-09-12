@@ -5,7 +5,10 @@ import "../styles/animations.css"
 import { LoginUIProvider } from "@/components/LoginUIContext"
 import { ThemeProvider } from "@/lib/use-theme"
 import { ToastProvider } from "@/components/ui/toast"
+import { Toaster } from "sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { ClientTelemetryInit } from "@/components/ClientTelemetryInit"
+import QueryProvider from "@/components/providers/QueryProvider"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -65,12 +68,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider initialTheme={undefined}>
-          <ToastProvider>
-            <LoginUIProvider>
-              <ClientTelemetryInit />
-              {children}
-            </LoginUIProvider>
-          </ToastProvider>
+          <QueryProvider>
+            <TooltipProvider>
+              <ToastProvider>
+                <LoginUIProvider>
+                  <ClientTelemetryInit />
+                  {children}
+                  <Toaster richColors position="top-right" />
+                </LoginUIProvider>
+              </ToastProvider>
+            </TooltipProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
 		</html>

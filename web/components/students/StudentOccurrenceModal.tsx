@@ -148,12 +148,12 @@ export function StudentOccurrenceModal({
       // Carregar grupos
       const groupsResponse = await fetch('/api/occurrence-groups')
       const groupsData = await groupsResponse.json()
-      setGroups(groupsData)
+      setGroups(groupsData.groups || [])
 
       // Carregar tipos
       const typesResponse = await fetch('/api/occurrence-types')
       const typesData = await typesResponse.json()
-      setTypes(typesData)
+      setTypes(typesData.types || [])
 
       // Carregar trainers
       const trainersResponse = await fetch('/api/professionals/trainers')
@@ -172,7 +172,7 @@ export function StudentOccurrenceModal({
   }
 
   // Filtrar tipos baseado no grupo selecionado
-  const filteredTypes = types.filter(type => 
+  const filteredTypes = (types || []).filter(type => 
     formData.group_id ? type.group_id === parseInt(formData.group_id) : true
   )
 
@@ -310,7 +310,7 @@ export function StudentOccurrenceModal({
           ...formData,
           group_id: parseInt(formData.group_id),
           type_id: parseInt(formData.type_id),
-          owner_user_id: parseInt(formData.owner_user_id),
+          owner_user_id: formData.owner_user_id, // Manter como string UUID
           reminder_at: formData.reminder_enabled && formData.reminder_at 
             ? new Date(formData.reminder_at).toISOString() 
             : null
@@ -382,181 +382,230 @@ export function StudentOccurrenceModal({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto space-y-4">
-            {/* Identificação */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Identificação</h3>
-              <div>
-                <Label>Aluno</Label>
-                <Input value={studentName} disabled />
-              </div>
-            </div>
-
-            {/* Classificação */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Classificação</h3>
-              <div className="grid grid-cols-2 gap-4">
+          <div className="flex-1 overflow-y-auto space-y-6">
+            {/* Identificação do Aluno */}
+            <div className="bg-card border rounded-lg p-6">
+              <div className="space-y-4">
                 <div>
-                  <Label htmlFor="group_id">Grupo *</Label>
-                  <Select value={formData.group_id} onValueChange={(value) => handleInputChange('group_id', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um grupo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {groups.map((group) => (
-                        <SelectItem key={group.id} value={group.id.toString()}>
-                          {group.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <h3 className="text-lg font-semibold text-foreground">Identificação do Aluno</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Confirme o aluno para esta ocorrência
+                  </p>
                 </div>
                 <div>
-                  <Label htmlFor="type_id">Tipo *</Label>
-                  <Select 
-                    value={formData.type_id} 
-                    onValueChange={(value) => handleInputChange('type_id', value)}
-                    disabled={!formData.group_id}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filteredTypes.map((type) => (
-                        <SelectItem key={type.id} value={type.id.toString()}>
-                          {type.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-sm font-medium">Aluno</Label>
+                  <Input value={studentName} disabled className="mt-2" />
                 </div>
               </div>
             </div>
 
-            {/* Detalhes */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Detalhes</h3>
-              <div className="space-y-2">
+            {/* Classificação da Ocorrência */}
+            <div className="bg-card border rounded-lg p-6">
+              <div className="space-y-4">
                 <div>
-                  <Label htmlFor="occurred_at">Data da Ocorrência *</Label>
-                  <Input
-                    id="occurred_at"
-                    type="date"
-                    value={formData.occurred_at}
-                    onChange={(e) => handleInputChange('occurred_at', e.target.value)}
-                    max={new Date().toISOString().split('T')[0]}
-                  />
+                  <h3 className="text-lg font-semibold text-foreground">Classificação da Ocorrência</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Defina o grupo e tipo da ocorrência
+                  </p>
                 </div>
-              </div>
-              <div>
-                <Label htmlFor="notes">Descrição *</Label>
-                <Textarea
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => handleInputChange('notes', e.target.value)}
-                  placeholder="Descreva a ocorrência..."
-                  rows={4}
-                  maxLength={500}
-                />
-                <div className="text-xs text-muted-foreground mt-1">
-                  {formData.notes.length}/500 caracteres
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="owner_user_id">Responsável</Label>
-                <Select value={formData.owner_user_id} onValueChange={(value) => handleInputChange('owner_user_id', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um responsável" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {trainers.map((trainer) => (
-                      <SelectItem key={trainer.id} value={trainer.id}>
-                        {trainer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="reminder_enabled"
-                    checked={formData.reminder_enabled}
-                    onCheckedChange={(checked) => handleInputChange('reminder_enabled', checked)}
-                  />
-                  <Label htmlFor="reminder_enabled">Lembrete</Label>
-                </div>
-                {formData.reminder_enabled && (
-                  <div className="w-48">
-                    <Input
-                      id="reminder_at"
-                      type="datetime-local"
-                      value={formData.reminder_at}
-                      onChange={(e) => handleInputChange('reminder_at', e.target.value)}
-                      min={new Date().toISOString().slice(0, 16)}
-                      className="h-9 text-sm w-full"
-                      placeholder="Data e hora"
-                    />
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="group_id" className="text-sm font-medium">Grupo *</Label>
+                    <Select value={formData.group_id} onValueChange={(value) => handleInputChange('group_id', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um grupo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(groups || []).map((group) => (
+                          <SelectItem key={group.id} value={group.id.toString()}>
+                            {group.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                )}
-              </div>
-              {formData.reminder_enabled && (
-                <div className="text-xs text-muted-foreground">
-                  Defina quando deseja ser lembrado sobre esta ocorrência
+                  <div className="space-y-2">
+                    <Label htmlFor="type_id" className="text-sm font-medium">Tipo *</Label>
+                    <Select 
+                      value={formData.type_id} 
+                      onValueChange={(value) => handleInputChange('type_id', value)}
+                      disabled={!formData.group_id}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(filteredTypes || []).map((type) => (
+                          <SelectItem key={type.id} value={type.id.toString()}>
+                            {type.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              )}
+              </div>
+            </div>
+
+            {/* Detalhes da Ocorrência */}
+            <div className="bg-card border rounded-lg p-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Detalhes da Ocorrência</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Informe os detalhes e descrição da ocorrência
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="occurred_at" className="text-sm font-medium">Data da Ocorrência *</Label>
+                      <Input
+                        id="occurred_at"
+                        type="date"
+                        value={formData.occurred_at}
+                        onChange={(e) => handleInputChange('occurred_at', e.target.value)}
+                        max={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="owner_user_id" className="text-sm font-medium">Responsável</Label>
+                      <Select value={formData.owner_user_id} onValueChange={(value) => handleInputChange('owner_user_id', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um responsável" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {trainers.map((trainer) => (
+                            <SelectItem key={trainer.id} value={trainer.id}>
+                              {trainer.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="notes" className="text-sm font-medium">Descrição *</Label>
+                    <Textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => handleInputChange('notes', e.target.value)}
+                      placeholder="Descreva a ocorrência..."
+                      rows={4}
+                      maxLength={500}
+                      className="resize-none"
+                    />
+                    <div className="text-xs text-muted-foreground">
+                      {formData.notes.length}/500 caracteres
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Lembrete */}
+            <div className="bg-card border rounded-lg p-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Lembrete</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Configure um lembrete para acompanhar esta ocorrência
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="reminder_enabled"
+                        checked={formData.reminder_enabled}
+                        onCheckedChange={(checked) => handleInputChange('reminder_enabled', checked)}
+                      />
+                      <Label htmlFor="reminder_enabled" className="text-sm font-medium">Ativar Lembrete</Label>
+                    </div>
+                    {formData.reminder_enabled && (
+                      <div className="w-64">
+                        <Input
+                          id="reminder_at"
+                          type="datetime-local"
+                          value={formData.reminder_at}
+                          onChange={(e) => handleInputChange('reminder_at', e.target.value)}
+                          min={new Date().toISOString().slice(0, 16)}
+                          className="h-9 text-sm w-full"
+                          placeholder="Data e hora"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {formData.reminder_enabled && (
+                    <div className="text-xs text-muted-foreground">
+                      Defina quando deseja ser lembrado sobre esta ocorrência
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Anexos */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Anexos</h3>
-              <div className="space-y-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Adicionar Arquivos
-                </Button>
-                <div className="text-xs text-muted-foreground mt-1">
-                  PDF, JPG, PNG até 10MB cada
+            <div className="bg-card border rounded-lg p-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Anexos</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Adicione arquivos relacionados à ocorrência
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full h-12 border-dashed border-2 hover:border-primary hover:bg-primary/5"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Adicionar Arquivos
+                  </Button>
+                  <div className="text-xs text-muted-foreground text-center">
+                    PDF, JPG, PNG até 10MB cada
+                  </div>
+                  
+                  {attachments.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium text-foreground">Arquivos anexados:</div>
+                      {attachments.map((attachment, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
+                          <div className="flex items-center space-x-3">
+                            {getFileIcon(attachment.file_ext)}
+                            <div>
+                              <div className="text-sm font-medium">{attachment.file_name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {formatFileSize(attachment.file_size_bytes)}
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeAttachment(index)}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-              {attachments.length > 0 && (
-                <div className="space-y-1">
-                  {attachments.map((attachment, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 border rounded">
-                      <div className="flex items-center space-x-2">
-                        {getFileIcon(attachment.file_ext)}
-                        <div>
-                          <div className="text-sm font-medium">{attachment.file_name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {formatFileSize(attachment.file_size_bytes)}
-                          </div>
-                        </div>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeAttachment(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 

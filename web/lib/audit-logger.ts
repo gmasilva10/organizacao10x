@@ -1,101 +1,126 @@
-import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
+// GATE S4: Utilitário para auditoria do módulo de anamnese
 
-export type AuditAction = 
-  | 'occurrence_created'
-  | 'occurrence_updated' 
-  | 'occurrence_closed'
-  | 'occurrence_reminder_created'
-  | 'occurrence_reminder_updated'
-  | 'occurrence_reminder_cancelled'
-  | 'occurrence_attachment_uploaded'
-  | 'occurrence_attachment_deleted'
-
-export interface AuditLogEntry {
-  tenantId: string
-  entity: string
-  entityId: string
-  action: string
-  actorId?: string | null
-  before?: Record<string, any> | null
-  after: Record<string, any>
-  meta?: Record<string, any> | null
+interface AuditLogEntry {
+  organization_id: string
+  user_id: string
+  action: 'create' | 'update' | 'delete' | 'publish' | 'set_default'
+  resource_type: 'template' | 'template_version' | 'question' | 'guideline' | 'guideline_version' | 'rule'
+  resource_id: string
+  payload_before?: any
+  payload_after?: any
+  metadata?: {
+    ip_address?: string
+    user_agent?: string
+    [key: string]: any
+  }
 }
 
 export class AuditLogger {
+  private static instance: AuditLogger
   private supabase: any
-  private admin: any
 
-  constructor() {
-    this.supabase = null
-    this.admin = null
+  constructor(supabase: any) {
+    this.supabase = supabase
   }
 
-  private async getSupabase() {
-    if (!this.supabase) {
-      this.supabase = await createClient()
+  static getInstance(supabase: any): AuditLogger {
+    if (!AuditLogger.instance) {
+      AuditLogger.instance = new AuditLogger(supabase)
     }
-    return this.supabase
+    return AuditLogger.instance
   }
 
-  private async getAdmin() {
-    if (!this.admin) {
-      this.admin = createAdminClient()
+  async log(entry: AuditLogEntry): Promise<void> {
+    try {
+      await this.supabase
+        .from('anamnesis_audit_logs')
+        .insert({
+          organization_id: entry.organization_id,
+          user_id: entry.user_id,
+          action: entry.action,
+          resource_type: entry.resource_type,
+          resource_id: entry.resource_id,
+          payload_before: entry.payload_before || null,
+          payload_after: entry.payload_after || null,
+          metadata: entry.metadata || null
+        })
+    } catch (error) {
+      console.error('Erro ao registrar auditoria:', error)
+      // Não falhar a operação principal por causa da auditoria
     }
-    return this.admin
   }
 
-  async log(entry: AuditLogEntry): Promise<string | undefined> {
-    const admin = await this.getAdmin()
-    const { data, error } = await admin
-      .from('audit_log')
-      .insert({
-        tenant_id: entry.tenantId,
-        entity: entry.entity,
-        entity_id: entry.entityId,
-        action: entry.action,
-        actor_id: entry.actorId ?? null,
-        payload_before: entry.before ?? null,
-        payload_after: entry.after,
-        meta: entry.meta ?? null,
-        created_at: new Date().toISOString()
-      })
-      .select('id')
-
-    if (error) {
-      const safe: any = {
-        code: (error as any)?.code || 'db_error',
-        message: (error as any)?.message || 'Falha ao inserir auditoria',
-        details: (error as any)?.details || null,
-        hint: (error as any)?.hint || null
-      }
-      const err: any = new Error(safe.message)
-      Object.assign(err, safe)
-      throw err
-    }
-    return Array.isArray(data) ? data[0]?.id : (data as any)?.id
+  // Métodos de conveniência para ações comuns
+  async logTemplatePublish(organizationId: string, userId: string, templateId: string, versionId: string, before: any, after: any) {
+    await this.log({
+      organization_id: organizationId,
+      user_id: userId,
+      action: 'publish',
+      resource_type: 'template_version',
+      resource_id: versionId,
+      payload_before: before,
+      payload_after: after,
+      metadata: { template_id: templateId }
+    })
   }
 
-  async logOccurrenceUpdated(
-    occurrenceId: string,
-    actorId: string,
-    tenantId: string,
-    payload: {
-      changes: Record<string, any>
-      previousValues: Record<string, any>
-    }
-  ) {
-    return await this.log({
-      tenantId,
-      entity: 'student_occurrence',
-      entityId: occurrenceId,
+  async logSetDefault(organizationId: string, userId: string, resourceType: 'template' | 'guideline', resourceId: string, before: any, after: any) {
+    await this.log({
+      organization_id: organizationId,
+      user_id: userId,
+      action: 'set_default',
+      resource_type: resourceType === 'template' ? 'template_version' : 'guideline_version',
+      resource_id: resourceId,
+      payload_before: before,
+      payload_after: after
+    })
+  }
+
+  async logQuestionCreate(organizationId: string, userId: string, questionId: string, templateVersionId: string, payload: any) {
+    await this.log({
+      organization_id: organizationId,
+      user_id: userId,
+      action: 'create',
+      resource_type: 'question',
+      resource_id: questionId,
+      payload_after: payload,
+      metadata: { template_version_id: templateVersionId }
+    })
+  }
+
+  async logQuestionUpdate(organizationId: string, userId: string, questionId: string, before: any, after: any) {
+    await this.log({
+      organization_id: organizationId,
+      user_id: userId,
       action: 'update',
-      actorId,
-      before: payload.previousValues,
-      after: payload.changes,
-      meta: { source: 'api', route: '/api/occurrences/[id]' }
+      resource_type: 'question',
+      resource_id: questionId,
+      payload_before: before,
+      payload_after: after
+    })
+  }
+
+  async logRuleCreate(organizationId: string, userId: string, ruleId: string, guidelineVersionId: string, payload: any) {
+    await this.log({
+      organization_id: organizationId,
+      user_id: userId,
+      action: 'create',
+      resource_type: 'rule',
+      resource_id: ruleId,
+      payload_after: payload,
+      metadata: { guideline_version_id: guidelineVersionId }
+    })
+  }
+
+  async logRuleUpdate(organizationId: string, userId: string, ruleId: string, before: any, after: any) {
+    await this.log({
+      organization_id: organizationId,
+      user_id: userId,
+      action: 'update',
+      resource_type: 'rule',
+      resource_id: ruleId,
+      payload_before: before,
+      payload_after: after
     })
   }
 }
-
-export const auditLogger = new AuditLogger()

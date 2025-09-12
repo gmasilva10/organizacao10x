@@ -1,0 +1,64 @@
+Procedimento de Login (Ambiente Local) — Somente Execução de Testes
+Objetivo
+
+Permitir que o desenvolvedor acesse o sistema localmente apenas para realizar os testes solicitados pelo GP, sem iniciar servidor e sem capturas de tela.
+
+Regras Inegociáveis
+
+Não iniciar servidor/local stack. O ambiente já estará ativo.
+
+Não gerar prints, GIFs ou evidências visuais.
+
+Apenas executar o passo a passo de login e os testes especificados pelo GP.
+
+Relatar por texto o que foi testado (modelo abaixo).
+
+Acesso
+
+Abrir o navegador (Chrome/Edge/Firefox).
+
+Acessar: http://localhost:3000
+
+Clicar em Entrar.
+
+Campo Usuário/E-mail: apagar conteúdo e digitar gma_silva@yahoo.com.br
+
+Campo Senha: apagar conteúdo e digitar Gma@11914984
+
+Clicar em Entrar/Login e aguardar o redirecionamento ao dashboard.
+
+Critérios de Sucesso (Login)
+
+Redireciona para o Dashboard sem erro.
+
+Menus e navegação principal carregam normalmente.
+
+Não há mensagens de erro visíveis.
+
+Caso qualquer erro apareça (ex.: “credenciais inválidas” ou falha de rede), não tente corrigir nem iniciar servidor. Informe imediatamente ao GP.
+
+Como reportar (texto, sem anexos)
+
+Ao finalizar cada solicitação de teste, responder com o texto:
+
+[LOGIN]
+- Acessou: http://localhost:3000
+- Login realizado com e-mail gma_silva@yahoo.com.br → sucesso/erro: <descrever>
+- Tempo aproximado até o dashboard: <x>s
+
+[TESTES EXECUTADOS]
+- Tarefa 1: <nome curto> → resultado: <ok/erro> → observações: <curto e factual>
+- Tarefa 2: <nome curto> → resultado: <ok/erro> → observações: <curto e factual>
+(...)
+
+[BLOQUEIOS OU ERROS]
+- <descrever mensagem exata que apareceu na tela, se houver>
+- Não reiniciei servidor. Sem prints.
+
+Observações
+
+As credenciais acima são exclusivas para uso local.
+
+Sempre utilizar exatamente o e-mail e senha informados neste documento.
+
+Em caso de erro, parar e informar (não alterar ambiente, não limpar cache, não mexer em .env, não reiniciar nada).

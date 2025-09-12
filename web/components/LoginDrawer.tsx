@@ -113,14 +113,14 @@ function LoginDrawerContent() {
 							<Label htmlFor="email">Email</Label>
 							<div className="relative">
 								<Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input id="email" name="email" type="email" placeholder="demo@personalglobal.com.br" className="pl-9" autoFocus aria-label="Email" autoComplete="off" spellCheck={false} inputMode="email" defaultValue="admin.basic@pg.local" />
+                                <Input id="email" name="email" type="email" placeholder="demo@personalglobal.com.br" className="pl-9" autoFocus aria-label="Email" autoComplete="off" spellCheck={false} inputMode="email" defaultValue="gma_silva@yahoo.com.br" />
 							</div>
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="password">Senha</Label>
                             <div className="relative">
                                 <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input id="password" name="password" type={show ? "text" : "password"} placeholder="••••••••" className="pl-9 pr-9" autoComplete="new-password" defaultValue="Teste@123" />
+                                <Input id="password" name="password" type={show ? "text" : "password"} placeholder="••••••••" className="pl-9 pr-9" autoComplete="new-password" defaultValue="Gma@11914984" />
                                 <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? "Ocultar senha" : "Mostrar senha"} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                                     {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>

@@ -244,20 +244,22 @@ export default function DashboardPage() {
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">v0.3.1-dev</div>
+                <div className="text-2xl font-bold">v0.4.0</div>
                 <p className="text-xs text-muted-foreground">Versão atual</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Features v0.3.1-dev</CardTitle>
+                <CardTitle className="text-sm font-medium">Features v0.4.0</CardTitle>
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-green-600">✅ Services Onboarding</div>
-                  <div className="text-sm font-medium text-green-600">✅ Kanban Card Minimal</div>
-                  <p className="text-xs text-muted-foreground">Hardcoded para true</p>
+                  <div className="text-sm font-medium text-green-600">✅ Módulo Alunos Completo</div>
+                  <div className="text-sm font-medium text-green-600">✅ Anexos & Processos</div>
+                  <div className="text-sm font-medium text-green-600">✅ Onboarding Kanban</div>
+                  <div className="text-sm font-medium text-green-600">✅ Performance Otimizada</div>
+                  <p className="text-xs text-muted-foreground">GATE 10.5 Concluído</p>
                 </div>
               </CardContent>
             </Card>

@@ -1,14 +1,14 @@
 "use client"
 
 // Rota oficial de Onboarding — renderiza o Kanban
-import dynamic from "next/dynamic"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-const Kanban = dynamic(() => import("../kanban/page"), { ssr: false })
+// Import estático temporário para resolver ChunkLoadError
+import Kanban from "../kanban/page"
 
 export default function OnboardingKanban() {
   const [filtersOpen, setFiltersOpen] = useState(false)

@@ -5,7 +5,8 @@ import {
   CreditCard,
   Users,
   Heart,
-  AlertTriangle
+  AlertTriangle,
+  FileText
 } from "lucide-react";
 
 export default function ServicesPage() {
@@ -19,6 +20,7 @@ export default function ServicesPage() {
         <p className="text-muted-foreground mt-2">Estruture seus serviços como Planos, Onboarding e Relacionamento.</p>
       </div>
 
+      {/* Linha 1: Planos, Onboarding, Relacionamento, Ocorrências */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link href="/app/services/plans" className="block rounded-lg border bg-card p-6 hover:bg-accent transition-colors">
           <div className="flex items-center gap-3 mb-2">
@@ -61,6 +63,19 @@ export default function ServicesPage() {
             <p className="text-sm text-muted-foreground">Gerencie grupos e tipos de ocorrências dos alunos.</p>
           </Link>
         )}
+      </div>
+
+      {/* Linha 2: Anamnese */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Link href="/app/services/anamnesis" className="block rounded-lg border bg-card p-6 hover:bg-accent transition-colors">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+              <FileText className="h-5 w-5" />
+            </div>
+            <h3 className="font-semibold">Anamnese</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">Configure templates de perguntas e diretrizes de treino.</p>
+        </Link>
       </div>
     </div>
   );

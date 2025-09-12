@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Manual Processos</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .resultado { margin-top: 20px; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Teste Manual - Processos</h1>
+    <p>Este é um teste para verificar se o JavaScript está funcionando.</p>
+    
+    <button onclick="testarProcessos()">Testar Processos</button>
+    <button onclick="testarModal()">Testar Modal</button>
+    
+    <div id="resultado" class="resultado">
+        Clique nos botões acima para testar.
+    </div>
+    
+    <script>
+        function testarProcessos() {
+            document.getElementById('resultado').innerHTML = 
+                '<h3>✅ Processos funcionando!</h3>' +
+                '<p>O JavaScript está funcionando corretamente.</p>' +
+                '<p>Timestamp: ' + new Date().toLocaleString() + '</p>';
+        }
+        
+        function testarModal() {
+            document.getElementById('resultado').innerHTML = 
+                '<h3>✅ Modal funcionando!</h3>' +
+                '<p>Simulando abertura de modal...</p>' +
+                '<p>Timestamp: ' + new Date().toLocaleString() + '</p>';
+        }
+        
+        console.log('Script carregado com sucesso!');
+    </script>
+</body>
+</html>

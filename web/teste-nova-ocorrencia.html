@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Nova Ocorrência - Nome Preenchido</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .modal {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 4px 0 0 0;
+        }
+        .content {
+            padding: 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .section {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 4px 0;
+        }
+        .section-desc {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0 0 16px 0;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        .input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .input:disabled {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+        .textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            background: #f9fafb;
+        }
+        .footer {
+            padding: 24px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal">
+        <div class="header">
+            <h1 class="title">Nova Ocorrência</h1>
+            <p class="subtitle">Registrar nova ocorrência para Amanda Chagas</p>
+        </div>
+        
+        <div class="content">
+            <!-- Identificação do Aluno -->
+            <div class="section">
+                <h3 class="section-title">Identificação do Aluno</h3>
+                <p class="section-desc">Confirme o aluno para esta ocorrência</p>
+                <div class="success">
+                    ✅ <strong>CORREÇÃO APLICADA:</strong> O nome do aluno agora vem preenchido automaticamente quando acessado pelos processos do aluno específico.
+                </div>
+                <div class="form-group">
+                    <label class="label">Aluno</label>
+                    <input type="text" class="input" value="Amanda Chagas" disabled>
+                </div>
+            </div>
+
+            <!-- Classificação da Ocorrência -->
+            <div class="section">
+                <h3 class="section-title">Classificação da Ocorrência</h3>
+                <p class="section-desc">Defina o grupo e tipo da ocorrência</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="label">Grupo *</label>
+                        <select class="input">
+                            <option>Comunicação</option>
+                            <option>Treino</option>
+                            <option>Financeiro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Tipo *</label>
+                        <select class="input">
+                            <option>Preferência de canal</option>
+                            <option>Falta de resposta</option>
+                            <option>Dúvida sobre treino</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalhes da Ocorrência -->
+            <div class="section">
+                <h3 class="section-title">Detalhes da Ocorrência</h3>
+                <p class="section-desc">Informe os detalhes e descrição da ocorrência</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="label">Data da Ocorrência *</label>
+                        <input type="date" class="input" value="2025-09-11">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Responsável</label>
+                        <select class="input">
+                            <option>GUSTAVO MOREIRA DE ARAUJO SILVA</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="label">Descrição *</label>
+                    <textarea class="textarea" placeholder="Descreva a ocorrência..."></textarea>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">0/500 caracteres</div>
+                </div>
+            </div>
+
+            <!-- Lembrete -->
+            <div class="section">
+                <h3 class="section-title">Lembrete</h3>
+                <p class="section-desc">Configure um lembrete para acompanhar esta ocorrência</p>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox"> Ativar Lembrete
+                    </label>
+                </div>
+            </div>
+
+            <!-- Anexos -->
+            <div class="section">
+                <h3 class="section-title">Anexos</h3>
+                <p class="section-desc">Adicione arquivos relacionados à ocorrência</p>
+                <div class="upload-area">
+                    <div style="font-size: 16px; color: #6b7280; margin-bottom: 8px;">📁</div>
+                    <div style="font-size: 14px; color: #374151; margin-bottom: 4px;">Adicionar Arquivos</div>
+                    <div style="font-size: 12px; color: #6b7280;">PDF, JPG, PNG até 10MB cada</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div></div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary">Cancelar</button>
+                <button class="btn btn-primary">Criar</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

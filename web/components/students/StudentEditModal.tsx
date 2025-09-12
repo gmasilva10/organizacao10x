@@ -82,6 +82,9 @@ export function StudentEditModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-student-title" onKeyDown={(e)=>{ if (e.key === 'Escape' && !loading) onClose() }}>
       <div className="w-full max-w-md rounded-lg bg-background p-5 shadow-lg ring-1 ring-border">
         <h2 id="edit-student-title" className="text-lg font-semibold">Editar aluno</h2>
+        {process.env.NEXT_PUBLIC_DEBUG === 'true' && student?.id && (
+          <p className="mt-1 text-xs text-muted-foreground">id={student.id}</p>
+        )}
         <form onSubmit={submit} onKeyDown={(e)=>{ if (e.ctrlKey && e.key === 'Enter') submit(e as unknown as React.FormEvent) }} className="mt-4 space-y-3">
           <div>
             <label htmlFor="edit-name" className="mb-1 block text-sm">Nome</label>

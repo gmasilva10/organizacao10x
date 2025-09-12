@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { resolveRequestContext } from "@/server/context"
+import { resolveRequestContext } from "@/utils/context/request-context"
 
 // GET /api/students/summary — retorna contagens por status respeitando RBAC (trainer vê apenas seus alunos)
 export async function GET(request: Request) {
