@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.55.0",
+    "@supabase/supabase-js": "^2.57.4",
     "three-globe": "^2.44.0"
   },
   "devDependencies": {
