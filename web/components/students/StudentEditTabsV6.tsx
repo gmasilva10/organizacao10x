@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -32,7 +32,9 @@ import { showStudentUpdated, showStudentError, showSuccessToast, showErrorToast,
 
 // Importar componentes compartilhados
 import StudentActions from "./shared/StudentActions"
-import StudentAttachments from "./StudentAttachments"
+import RelationshipTimeline from "../relationship/RelationshipTimeline"
+import ProfessionalSearchModal from "./ProfessionalSearchModal"
+import ProcessosDropdown from "./ProcessosDropdown"
 
 type Student = {
   id: string
@@ -86,7 +88,6 @@ export default function StudentEditTabsV6({
 }: StudentEditTabsV6Props) {
   const [activeTab, setActiveTab] = useState("identificacao")
   const [saving, setSaving] = useState(false)
-  const [expandedResponsaveis, setExpandedResponsaveis] = useState(false)
   const [formData, setFormData] = useState({
     name: student.name,
     email: student.email,
@@ -111,11 +112,11 @@ export default function StudentEditTabsV6({
   })
 
   const [responsaveisData, setResponsaveisData] = useState({
-    trainer_principal: student.trainer?.name || '',
-    trainer_principal_id: student.trainer?.id || '',
-    treinadores_apoio: [] as any[],
-    responsaveis_especificos: [] as any[]
+    principal: null as any,
+    apoio: [] as any[],
+    especificos: [] as any[]
   })
+  const [responsaveisLoading, setResponsaveisLoading] = useState(false)
 
   const [photoData, setPhotoData] = useState({
     file: null as File | null,
@@ -125,7 +126,107 @@ export default function StudentEditTabsV6({
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   
-  const [attachments, setAttachments] = useState<any[]>([])
+  // Estados para modais de busca
+  const [searchModalOpen, setSearchModalOpen] = useState(false)
+  const [searchModalType, setSearchModalType] = useState<'principal' | 'apoio' | 'especifico'>('principal')
+
+  // Carregar responsáveis do aluno
+  const loadResponsaveis = async () => {
+    try {
+      setResponsaveisLoading(true)
+      
+      // Carregar responsáveis atuais
+      const response = await fetch(`/api/students/${studentId}/responsibles`)
+      if (!response.ok) throw new Error('Erro ao carregar responsáveis')
+      
+      const data = await response.json()
+      
+      // Se não há responsáveis, carregar defaults do Equipe
+      if (data.total === 0) {
+        const defaultsResponse = await fetch('/api/team/defaults')
+        if (defaultsResponse.ok) {
+          const defaultsData = await defaultsResponse.json()
+          setResponsaveisData({
+            principal: defaultsData.defaults.principal || null,
+            apoio: defaultsData.defaults.apoio || [],
+            especificos: defaultsData.defaults.especificos || []
+          })
+          return
+        }
+      }
+      
+      setResponsaveisData({
+        principal: data.responsibles.principal[0] || null,
+        apoio: data.responsibles.apoio || [],
+        especificos: data.responsibles.especificos || []
+      })
+    } catch (error) {
+      console.error('Erro ao carregar responsáveis:', error)
+      showErrorToast('Erro ao carregar responsáveis')
+    } finally {
+      setResponsaveisLoading(false)
+    }
+  }
+
+  // Adicionar responsável
+  const addResponsavel = async (role: 'principal' | 'apoio' | 'especifico', professional: any, note?: string) => {
+    try {
+      const response = await fetch(`/api/students/${studentId}/responsibles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, professional_id: professional.id, note })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erro ao adicionar responsável')
+      }
+
+      const data = await response.json()
+      
+      // Atualizar estado local
+      if (role === 'principal') {
+        setResponsaveisData(prev => ({ ...prev, principal: data.responsible }))
+      } else if (role === 'apoio') {
+        setResponsaveisData(prev => ({ ...prev, apoio: [...prev.apoio, data.responsible] }))
+      } else {
+        setResponsaveisData(prev => ({ ...prev, especificos: [...prev.especificos, data.responsible] }))
+      }
+
+      showSuccessToast('Responsável adicionado com sucesso')
+    } catch (error: any) {
+      console.error('Erro ao adicionar responsável:', error)
+      showErrorToast(error.message || 'Erro ao adicionar responsável')
+    }
+  }
+
+  // Remover responsável
+  const removeResponsavel = async (responsibleId: string, role: 'principal' | 'apoio' | 'especifico') => {
+    try {
+      const response = await fetch(`/api/students/${studentId}/responsibles/${responsibleId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erro ao remover responsável')
+      }
+
+      // Atualizar estado local
+      if (role === 'principal') {
+        setResponsaveisData(prev => ({ ...prev, principal: null }))
+      } else if (role === 'apoio') {
+        setResponsaveisData(prev => ({ ...prev, apoio: prev.apoio.filter(r => r.id !== responsibleId) }))
+      } else {
+        setResponsaveisData(prev => ({ ...prev, especificos: prev.especificos.filter(r => r.id !== responsibleId) }))
+      }
+
+      showSuccessToast('Responsável removido com sucesso')
+    } catch (error: any) {
+      console.error('Erro ao remover responsável:', error)
+      showErrorToast(error.message || 'Erro ao remover responsável')
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -317,6 +418,21 @@ export default function StudentEditTabsV6({
     }
   }
 
+  const handleSearchProfessional = (type: 'principal' | 'apoio' | 'especifico') => {
+    setSearchModalType(type)
+    setSearchModalOpen(true)
+  }
+
+  const handleSelectProfessional = (professional: any) => {
+    addResponsavel(searchModalType, professional)
+    setSearchModalOpen(false)
+  }
+
+  // Carregar responsáveis quando o componente montar
+  useEffect(() => {
+    loadResponsaveis()
+  }, [studentId])
+
   // Verificação de segurança mais flexível
   if (!student) {
     return (
@@ -342,11 +458,22 @@ export default function StudentEditTabsV6({
             <StudentActions 
               studentId={studentId} 
               studentName={student.name} 
+              studentPhone={student.phone}
               variant="edit"
               onActionComplete={() => {
                 // Callback para atualizar dados após ações
                 console.log('Ação completada, dados podem ser atualizados')
               }}
+            />
+            
+            {/* Processos Dropdown */}
+            <ProcessosDropdown
+              studentId={studentId}
+              studentName={student.name}
+              studentPhone={student.phone}
+              studentEmail={student.email}
+              responsibles={[]} // TODO: Carregar responsáveis quando necessário
+              organizationName="Personal Global" // TODO: Carregar da organização
             />
           </div>
           
@@ -793,119 +920,202 @@ export default function StudentEditTabsV6({
 
           {/* Responsáveis */}
           <TabsContent value="responsaveis" className="pt-6 space-y-6">
-            {/* Treinador Principal */}
-            <Card className="shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  Treinador Principal *
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={responsaveisData.trainer_principal}
-                    onChange={(e) => setResponsaveisData({...responsaveisData, trainer_principal: e.target.value})}
-                    className="h-9 flex-1 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                    placeholder="Adicionar responsável da equipe"
-                  />
-                  <Button size="sm" className="h-9 px-3">
-                    <Search className="h-4 w-4 mr-1" />
-                    Buscar
-                  </Button>
+            {responsaveisLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+                  <p className="text-muted-foreground">Carregando responsáveis...</p>
                 </div>
-                {student.trainer && (
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    Responsável atual: {student.trainer.name}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Treinadores de Apoio */}
-            <Card className="shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  Treinadores de Apoio
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Input
-                      className="h-9 flex-1 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                      placeholder="Adicionar responsável da equipe"
-                    />
-                    <Button size="sm" className="h-9 px-3">
-                      <Plus className="h-4 w-4 mr-1" />
-                      Adicionar
-                    </Button>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Nenhum treinador de apoio adicionado
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Responsáveis Específicos */}
-            <Card className="shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Users2 className="h-5 w-5 text-primary" />
-                  Responsáveis Específicos
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setExpandedResponsaveis(!expandedResponsaveis)}
-                    className="ml-auto h-6 w-6 p-0"
-                  >
-                    {expandedResponsaveis ? (
-                      <ChevronUp className="h-4 w-4" />
+              </div>
+            ) : (
+              <>
+                {/* Treinador Principal */}
+                <Card className="shadow-sm hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <User className="h-5 w-5 text-primary" />
+                      Treinador Principal
+                      {!responsaveisData.principal && (
+                        <Badge variant="outline" className="text-xs text-amber-600 border-amber-200">
+                          Recomendado
+                        </Badge>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {responsaveisData.principal ? (
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <User className="h-5 w-5 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-green-900">{responsaveisData.principal.professionals.full_name}</p>
+                            <p className="text-sm text-green-700">{responsaveisData.principal.professionals.email}</p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeResponsavel(responsaveisData.principal.id, 'principal')}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
                     ) : (
-                      <ChevronDown className="h-4 w-4" />
+                      <div className="flex items-center gap-2">
+                        <Input
+                          className="h-9 flex-1"
+                          placeholder="Nenhum treinador principal definido"
+                          disabled
+                        />
+                        <Button 
+                          size="sm" 
+                          className="h-9 px-3"
+                          onClick={() => handleSearchProfessional('principal')}
+                        >
+                          <Search className="h-4 w-4 mr-1" />
+                          Selecionar
+                        </Button>
+                      </div>
                     )}
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Input
-                      className="h-9 flex-1 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                      placeholder="Adicionar responsável da equipe"
-                    />
-                    <Select>
-                      <SelectTrigger className="h-9 w-40 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
-                        <SelectValue placeholder="Papel" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="comercial">Comercial</SelectItem>
-                        <SelectItem value="anamnese">Anamnese</SelectItem>
-                        <SelectItem value="suporte">Suporte Técnico</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button size="sm" className="h-9 px-3">
-                      <Plus className="h-4 w-4 mr-1" />
-                      Adicionar
-                    </Button>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Nenhum responsável específico adicionado
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
 
-            {/* Anexos do Aluno */}
-            <StudentAttachments
-              studentId={studentId}
-              attachments={attachments}
-              onAttachmentsChange={setAttachments}
-            />
+                {/* Treinadores de Apoio */}
+                <Card className="shadow-sm hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      Treinadores de Apoio
+                      <Badge variant="secondary" className="text-xs">
+                        {responsaveisData.apoio.length}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {responsaveisData.apoio.length > 0 ? (
+                        <div className="space-y-2">
+                          {responsaveisData.apoio.map((responsavel) => (
+                            <div key={responsavel.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                  <Users className="h-5 w-5 text-blue-600" />
+                                </div>
+                                <div>
+                                  <p className="font-medium text-blue-900">{responsavel.professionals.full_name}</p>
+                                  <p className="text-sm text-blue-700">{responsavel.professionals.email}</p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeResponsavel(responsavel.id, 'apoio')}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-6 text-muted-foreground">
+                          <Users className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                          <p>Nenhum treinador de apoio adicionado</p>
+                        </div>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleSearchProfessional('apoio')}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar Treinador de Apoio
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Responsáveis Específicos */}
+                <Card className="shadow-sm hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Users2 className="h-5 w-5 text-primary" />
+                      Responsáveis Específicos
+                      <Badge variant="secondary" className="text-xs">
+                        {responsaveisData.especificos.length}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {responsaveisData.especificos.length > 0 ? (
+                        <div className="space-y-2">
+                          {responsaveisData.especificos.map((responsavel) => (
+                            <div key={responsavel.id} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                  <Users2 className="h-5 w-5 text-purple-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="font-medium text-purple-900">{responsavel.professionals.full_name}</p>
+                                  <p className="text-sm text-purple-700">{responsavel.professionals.email}</p>
+                                  {responsavel.note && (
+                                    <p className="text-xs text-purple-600 mt-1 italic">"{responsavel.note}"</p>
+                                  )}
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeResponsavel(responsavel.id, 'especifico')}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-6 text-muted-foreground">
+                          <Users2 className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                          <p>Nenhum responsável específico adicionado</p>
+                        </div>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleSearchProfessional('especifico')}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar Responsável Específico
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+              </>
+            )}
           </TabsContent>
+
         </Tabs>
+
+        {/* Modal de Busca de Profissionais */}
+        <ProfessionalSearchModal
+          open={searchModalOpen}
+          onOpenChange={setSearchModalOpen}
+          onSelect={handleSelectProfessional}
+          title={
+            searchModalType === 'principal' ? 'Selecionar Treinador Principal' :
+            searchModalType === 'apoio' ? 'Adicionar Treinador de Apoio' :
+            'Adicionar Responsável Específico'
+          }
+          placeholder="Buscar profissional ativo..."
+        />
       </div>
     </div>
   )
