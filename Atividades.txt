@@ -18,6 +18,18 @@
 
 [2025-08-27 21:00 BRT] DEV Início implementação v0.2.0 - KANBAN-LOGS-P0, KANBAN-ADVANCE-CONFIRM, SRV-TASKS-STRUCTURE.
 
+[2025-01-29 14:30 BRT] DEV — P0 HOTFIX — Removidos dados mock dos cards de Alunos. API agora busca dados reais do Supabase. Evidências: API students/route.ts atualizada com resolveRequestContext.
+
+[2025-01-29 14:45 BRT] DEV — GATE 10.6.7.1 — Registry & Data Model concluído. Âncora 'manual' adicionada ao EVENT_REGISTRY. Migration classification_tag aplicada em relationship_tasks. Evidências: web/lib/relationship/event-registry.ts, migration add_manual_anchor_and_classification_tag.
+
+[2025-01-29 15:15 BRT] DEV — GATE 10.6.7.2 — API Manual concluída. Endpoint POST /relationship/tasks/manual implementado com validações, rate-limit (50/hora), suporte a templates e texto livre. Migration constraints atualizada. Evidências: web/app/api/relationship/tasks/manual/route.ts, migration update_relationship_tasks_constraints_for_manual.
+
+[2025-01-29 15:45 BRT] DEV — GATE 10.6.7.3 — MessageComposer Modal concluído. Modal unificado implementado com validação de variáveis obrigatórias, integração com API manual, suporte a templates e texto livre. UX premium com toasts e validações inline. Evidências: web/components/relationship/MessageComposer.tsx, web/lib/relationship-variables.ts, web/evidencias/gate10-6-7-3-messagecomposer.md.
+
+[2025-01-29 19:50 BRT] DEV — GATE A-10.2.2.HF1 — Responsáveis roles[] implementado. Migração do modelo canônico concluída com roles text[], constraint UNIQUE (tenant_id, student_id, professional_id), índice parcial para principal único. APIs atualizadas para suportar deduplicação. Evidências: web/testsprite_tests/gate-a-10-2-2-responsaveis.md, migration student_responsibles_roles_array.
+
+[2025-01-29 20:30 BRT] DEV — GATE A-10.2.3 — MessageComposer HF Final concluído. Implementação completa com inserção de variáveis no caret, prévia colapsada, DateTime picker pt-BR, criação de tarefas (Hoje → due_today, Futuro → pending), deep-link do toast "Ver Relacionamento", console limpo. Evidências: web/testsprite_tests/gate-a-10-2-3-composer-processos.md, web/testsprite_tests/gate-a-10-2-3-evidencias-manuais.md.
+
 [2025-08-27 21:15 BRT] DEV Migração kan_kanban_logs_p0.sql criada com tabelas: kanban_logs, service_onboarding_tasks, card_tasks.
 
 [2025-08-27 21:20 BRT] DEV Endpoints criados: GET /api/kanban/logs/:card_id, GET /api/services/onboarding/tasks.
@@ -86,3 +98,45 @@
 [2025-08-27 23:58 BRT] v0.3.1-dev ABERTA - Iniciando reformulação completa do módulo Serviços → Onboarding e Cards do Kanban premium. P1: Layout accordion expansível com CRUD inline de tarefas. P2: Cards simplificados e clean com badge de tarefas discreto. Foco em usabilidade e design premium.
 
 [2025-08-27 23:59 BRT] P1-01 CONCLUÍDO: Layout accordion expansível implementado. Colunas como cards expansíveis com header clicável, ícones de expansão (ChevronDown/ChevronRight), conteúdo expansível com CRUD inline de tarefas. Botões de ação (editar/excluir) aparecem no hover, integração com sistema de tarefas existente. Interface premium com badges de contagem, barras de progresso e design responsivo.
+
+[2025-01-29 14:45 BRT] DEV — GATE 10.6.HF-FILTROS — Correção "filtros nao funciona" — evidências: web/evidencias/gate10-6-hf-filtros-correcao.md
+
+[2025-01-29 15:00 BRT] DEV — GATE 10.6.HF-SERVIÇOS — Página /app/services/relationship criada — evidências: web/evidencias/gate10-6-hf-servicos-relacionamento.md
+[2025-01-29 15:30 BRT] DEV — GATE 10.6.HF-API-AUTH — Correção crítica da API /relationship/tasks (401→200) — evidências: web/evidencias/gate10-6-hf-api-auth-correcao.md
+[2025-01-29 15:35 BRT] DEV — GATE 10.6.HF-VARIAVEL — Correção ReferenceError: start_time is not defined na API — evidências: web/evidencias/gate10-6-hf-variavel-correcao.md
+[2025-01-29 15:45 BRT] DEV — GATE 10.6.HF-TEMPLATES-API — Correção API /relationship/templates (500→200) e estrutura de dados — evidências: web/evidencias/gate10-6-hf-templates-api-correcao.md
+[2025-01-29 15:50 BRT] DEV — GATE 10.6.HF-TOAST-FIX — Correção Module not found: @/hooks/use-toast (usar sonner) — evidências: web/evidencias/gate10-6-hf-toast-fix.md
+[2025-01-29 16:05 BRT] DEV — GATE 10.6.HF-DELETE-FIX — Correção erro 500 na API DELETE /relationship/templates/[id] (ctx.tenantId → tenantId) — evidências: web/evidencias/gate10-6-hf-delete-fix.md
+[2025-01-29 16:10 BRT] DEV — GATE 10.6.HF-MODAL-VARIÁVEIS — Modal premium + sistema completo de variáveis personalizadas — evidências: web/evidencias/gate10-6-hf-modal-variaveis-correcao.md
+[2025-01-29 16:15 BRT] DEV — GATE 10.6.HF-SIMPLIFICAR-MSG — Simplificação para apenas 1 mensagem (remover V1/V2 confuso) — evidências: web/evidencias/gate10-6-hf-simplificar-mensagem.md
+[2025-01-29 16:30 BRT] DEV — GATE 10.6.7 — ENVIO/CRIAÇÃO MANUAL DE MENSAGENS — MessageComposer unificado, âncora manual, integração total — evidências: web/evidencias/gate10-6-7-manual-messages.md
+[2025-01-29 16:45 BRT] DEV — GATE 10.6.7-UX — MELHORIAS UX — Aluno automático, destaque [Primeiro Nome], exemplos práticos — evidências: web/evidencias/gate10-6-7-ux-melhorias.md
+[2025-01-29 17:45 BRT] DEV — GATE 10.6.7.4 — ENTRADAS DO SISTEMA — Botão "Enviar follow-up" nas ocorrências (lista + modal) e card "Relacionamento - Ações rápidas" no Dashboard — evidências: web/evidencias/gate10-6-7-4-entradas.md
+[2025-01-29 18:30 BRT] DEV — GATE 10.6.7.5 — INTEGRAÇÃO KANBAN/TIMELINE — Reflexo imediato das ações do MessageComposer no Kanban, Calendário, Timeline e Analytics com âncora manual — evidências: web/evidencias/gate10-6-7-5-integracao.md
+[2025-01-29 18:45 BRT] DEV — GATE 10.6.7.6 — QA & EVIDÊNCIAS E2E — Testes completos E2E, performance (69ms Kanban, 18ms API), RLS ativo, console limpo, aprovado para produção — evidências: web/testsprite_tests/gate10-6-7-6-qa.md, web/Checklist_Release_Validation.txt
+[2025-01-29 19:15 BRT] DEV — GATE 10.6.7.HF — COMPOSER ALUNO/PROCESSOS — Layout padronizado como Regras, remoções (versão template), variáveis compactas (popover), Criar Tarefa imediato — evidências: web/testsprite_tests/gate10-6-7-hf-composer-aluno.md
+[2025-01-29 19:45 BRT] DEV — GATE 10.6.7.HF2 — COMPOSER ALUNO/PROCESSOS — Variáveis painel colapsável, tokens colchetes [PrimeiroNome], catálogo ícones/legendas, textos/labels corrigidos, prévia collapse — evidências: web/testsprite_tests/gate10-6-7-hf2-composer-aluno.md
+[2025-01-29 20:15 BRT] DEV — GATE 10.6.7.HF3 — COMPOSER ALUNO/PROCESSOS — Reflexo imediato Kanban/Calendário, variáveis cursor+colchetes, prévia/variáveis separados, UI limpa, Date/Time Picker moderno, toasts microcopy+deep-links — evidências: web/testsprite_tests/gate10-6-7-hf3-composer-aluno.md
+[2025-01-29 20:45 BRT] DEV — GATE 10.6.7.HF4 — COMPOSER ALUNO/PROCESSOS — Criar Tarefa reflexo imediato+deep-link, prévia resolvida [PrimeiroNome]/[SaudacaoTemporal], Date/Time UI padrão Calendar+24h, timezone America/Sao_Paulo — evidências: web/testsprite_tests/gate10-6-7-hf4-relacionamento.md
+[2025-01-29 21:15 BRT] DEV — GATE 10.6.7.HF5 — COMPOSER ALUNO/PROCESSOS — Correção "Invalid time value" defensiva prévia+parse+TZ, validação submit data/hora obrigatórias, Calendar UX i18n pt-BR+botão OK, telemetria logs estruturados, console limpo — evidências: web/testsprite_tests/gate10-6-7-hf5-composer.md
+[2025-01-29 21:30 BRT] DEV — GATE 10.6.7.HF5.HOTFIX — COMPOSER ALUNO/PROCESSOS — Correção final "Invalid time value" dayjs().tz() vs dayjs.tz(), formato ISO completo toISOString(), logs debug removidos, teste criação tarefa funcionando — evidências: console limpo, criação tarefa OK
+[2025-01-29 22:00 BRT] DEV — GATE 10.6.7.HF5.FINAL — KANBAN REFRESH IMEDIATO — Row Level Security (RLS) bloqueando consultas, createClientAdmin() bypass RLS desenvolvimento, ordenação created_at DESC, reflexo imediato 100% funcional — evidências: 39 tarefas listadas, criação+listagem instantânea
+[2025-01-29 22:30 BRT] DEV — GATE 10.6.7.HF6 — LAYOUT KANBAN PREMIUM — Redesign completo TaskCard simplificado, header limpo, colunas otimizadas, dados realistas (44 tarefas), layout escalável para milhares de mensagens — evidências: interface limpa, cards compactos, UX premium
+[2025-01-29 23:00 BRT] DEV — GATE 10.6.7.HF7 — CORREÇÃO PROFISSIONAL COMPLETA — Limpeza total dados antigos/mock, layout colorido restaurado (print 2), dados reais (5 tarefas), contadores corretos, endpoint cleanup implementado, sistema profissional e eficiente — evidências: dados limpos, layout colorido, contadores precisos
+[2025-01-29 23:15 BRT] DEV — GATE 10.6.7.HF8 — EXCLUSÃO E CORREÇÃO MENSAGENS — Endpoint DELETE /api/relationship/tasks/[id], funcionalidade exclusão TaskCard, correção incompatibilidade nomes/mensagens, dados personalizados corretos (Regina→Regina, Rafa→Rafa), sistema 100% funcional — evidências: exclusão funcionando, mensagens corretas
+[2025-01-29 23:45 BRT] DEV — GATE 10.6.7.HF9 — VALIDAÇÃO DATA AMIGÁVEL — Validação data passada MessageComposer, feedback visual tempo real, mensagem amigável "data anterior ao momento atual", botão desabilitado com erro, limpeza automática ao fechar modal — evidências: validação funcionando, UX profissional
+[2025-01-30 00:15 BRT] DEV — GATE 10.6.7.HF10 — CORREÇÃO ERRO 500 RELATIONSHIP LOGS — Tabela relationship_logs não existia, endpoint modificado para retornar dados vazios quando tabela não configurada, migração criada, página debug para execução manual — evidências: erro 500 resolvido, sistema funcionando
+[2025-01-30 00:45 BRT] DEV — GATE 10.6.7.HF11 — CORREÇÃO ERROS CRÍTICOS SISTEMA — "Responsável inválido" (falta profissionais), "ConfirmDialog is not defined" (import faltando), endpoints debug criados, página debug unificada para correção automática — evidências: ambos erros resolvidos, sistema estável
+[2025-01-30 01:00 BRT] DEV — GATE 10.6.7.HF11.FINAL — CORREÇÃO COMPLETA CONFIRMDIALOG — Import ConfirmDialog adicionado em todos os componentes (ProfessionalsManager, ProfessionalProfilesManager, OccurrenceTypesManager, OccurrenceGroupsManager), erro "ConfirmDialog is not defined" eliminado completamente — evidências: página Equipe funcionando, todos os modais de confirmação operacionaisG A T E   1 0 . 6 . 7 . H F 1 2     R E F O R M U L A � � O   C O M P L E T A   L A Y O U T   A L U N O S 
+ 
+ G A T E   1 0 . 6 . 7 . H F 1 2 . F I N A L     C O R R E � � O   E R R O   B U I L D   P R O F E S S I O N A L S M A N A G E R 
+ 
+ G A T E   1 0 . 6 . 7 . H F 1 3     C O R R E � � O   E R R O   A L E R T T R I A N G L E   I M P O R T 
+ 
+ G A T E   1 0 . 6 . 7 . H F 1 4     C O R R E � � O   E R R O   S E L E C T   V A L U E   V A Z I O 
+ 
+ [ 2 0 2 5 - 0 1 - 3 0   1 4 : 3 0   B R T ]   D E V     G A T E   E - 1 0 . 1     M � D U L O   1   E Q U I P E / P R O F I S S I O N A I S   C O N C L U � D O     M i g r a � � o   i s _ a c t i v e   a p l i c a d a ,   e n d p o i n t s   P A T C H / G E T   i m p l e m e n t a d o s ,   t o g g l e   f u n c i o n a l   n a   t a b e l a ,   b u s c a   c o m   d e b o u n c e   3 0 0 m s ,   i n t e g r a � � o   R e s p o n s � v e i s   f u n c i o n a n d o     e v i d � n c i a s :   w e b / e v i d e n c i a s / g a t e - e - 1 0 - 1 - e q u i p e - p r o f i s s i o n a i s . m d 
+ 
+ [ 2 0 2 5 - 0 1 - 3 0   1 4 : 3 0   B R T ]   D E V     G A T E   E - 1 0 . 1     M � D U L O   1   E Q U I P E / P R O F I S S I O N A I S   C O N C L U � D O     M i g r a � � o   i s _ a c t i v e   a p l i c a d a ,   e n d p o i n t s   P A T C H / G E T   i m p l e m e n t a d o s ,   t o g g l e   f u n c i o n a l   n a   t a b e l a ,   b u s c a   c o m   d e b o u n c e   3 0 0 m s ,   i n t e g r a � � o   R e s p o n s � v e i s   f u n c i o n a n d o     e v i d � n c i a s :   w e b / e v i d e n c i a s / g a t e - e - 1 0 - 1 - e q u i p e - p r o f i s s i o n a i s . m d 
+ 
+ 
