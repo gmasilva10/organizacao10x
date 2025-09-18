@@ -124,3 +124,12 @@ export class AuditLogger {
     })
   }
 }
+
+// Exportar instância singleton para compatibilidade
+export const auditLogger = {
+  getInstance: AuditLogger.getInstance,
+  log: (entry: AuditLogEntry, supabase: any) => {
+    const logger = AuditLogger.getInstance(supabase)
+    return logger.log(entry)
+  }
+}
