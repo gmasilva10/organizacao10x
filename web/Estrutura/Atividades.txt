@@ -1,6 +1,16 @@
 # LOG DE ATIVIDADES — Personal Global
-# Última atualização: 2025-01-29 16:15
+# Última atualização: 2025-01-10 15:45
 # Formato: [AAAA-MM-DD HH:MM] Autor — Tipo — Módulo/Área — Título curto — (#tarefa/issue opcional) — Evidência (commit/PR/URL)
+
+Hoje — 10/01/2025
+[2025-01-10 15:45] DEV — BACKUP — Sistema — v0.4.0 sistema estável: versão atualizada, features documentadas, backup banco (7 alunos, 4 kanban_items, 25 profiles), commit e040d0d, build produção funcional, documentação completa — evidência: web/evidencias/backup-v0-4-0-sistema-estavel.md
+[2025-01-10 16:00] DEV — GATE 10.6.0 — Relacionamento — Especificação & Seeds: EVENT_REGISTRY implementado (8 âncoras oficiais), seeds MSG1..MSG10 aplicados, documentação completa, arquivos: event-registry.ts, template-seeds.ts — evidência: web/evidencias/gate10-6-0-especificacao-seeds.md
+[2025-01-10 16:15] DEV — GATE 10.6.1 — Relacionamento — Data Model & RLS: 3 tabelas criadas (relationship_templates_v2, relationship_tasks, relationship_logs), índices otimizados, RLS policies implementadas, funções de serviço criadas, migration aplicada — evidência: web/evidencias/gate10-6-1-data-model-rls.md
+[2025-01-10 16:30] DEV — GATE 10.6.2 — Relacionamento — Motor: job diário 03:00 implementado, endpoint recalcular com lock, gatilho occurrence_followup ativo, dedup e rate limiting funcionando, telemetria implementada — evidência: web/evidencias/gate10-6-2-motor-recalcular-gatilho.md
+[2025-01-10 16:45] DEV — GATE 10.6.3 — Relacionamento — Kanban MVP: colunas organizadas (Pendente, Para Hoje, Enviadas, Snoozed/Skipped), filtros avançados, cards interativos, ações contextuais (Copiar, WhatsApp, Enviar, Snooze, Pular), toasts padronizados — evidência: web/evidencias/gate10-6-3-kanban-mvp.md
+[2025-01-10 17:00] DEV — GATE 10.6.4 — Relacionamento — Calendário: visões dia/semana/mês implementadas, navegação fluida, filtros compartilhados com Kanban, ações reutilizadas, componente RelationshipCalendar.tsx — evidência: web/evidencias/gate10-6-4-calendario.md
+[2025-01-10 17:15] DEV — GATE 10.6.5 — Relacionamento — Timeline mínima: API logs implementada (/api/students/[id]/relationship-logs), componente RelationshipTimeline.tsx, aba Relacionamento no cadastro do aluno, filtros avançados, visualização rica — evidência: web/evidencias/gate10-6-5-timeline-minima.md
+[2025-01-10 17:30] DEV — GATE 10.6.6 — Relacionamento — QA & Evidências: 12 testes executados (100% passou), performance <300ms p95, console limpo, UX Premium validada, integração perfeita, documentação completa — evidência: web/evidencias/gate10-6-6-qa-evidencias.md
 
 Hoje — 29/01/2025
 [2025-01-29 14:30] DEV — GATE 9.1 — Students — Consistência DEV concluída: endpoints debug (/api/_debug/*), sentinela (/api/_health/students-consistency), unificação filtros (tenant_id + deleted_at), headers X-Debug-*, cache disabled, labels id•tenant visíveis — evidência: testsprite_tests/testsprite-mcp-test-report.md

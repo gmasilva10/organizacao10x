@@ -61,7 +61,14 @@ export function useStudents(filters: StudentsFilters = {}) {
       // Performance mark: Data Ready
       perf.markAlunosListDataReady()
       
-      return data
+      // Mapear dados da API para o formato esperado
+      return {
+        students: data.items || data.students || [],
+        total: data.total || 0,
+        page: data.page || 1,
+        page_size: data.pageSize || 20,
+        total_pages: Math.ceil((data.total || 0) / (data.pageSize || 20))
+      }
     },
     ...createQueryConfig('list'),
     // keepPreviousData para paginação suave

@@ -106,7 +106,8 @@ export function StudentOccurrenceModal({
     notes: '',
     owner_user_id: '',
     reminder_enabled: false,
-    reminder_at: ''
+    reminder_at: '',
+    reminder_notes: ''
   })
 
   const [hasChanges, setHasChanges] = useState(false)
@@ -123,7 +124,8 @@ export function StudentOccurrenceModal({
           notes: occurrence.notes,
           owner_user_id: occurrence.owner_user_id,
           reminder_enabled: !!occurrence.reminder_at,
-          reminder_at: occurrence.reminder_at ? new Date(occurrence.reminder_at).toISOString().slice(0, 16) : ''
+          reminder_at: occurrence.reminder_at ? new Date(occurrence.reminder_at).toISOString().slice(0, 16) : '',
+          reminder_notes: ''
         })
         setAttachments(occurrence.attachments || [])
       } else {
@@ -135,7 +137,8 @@ export function StudentOccurrenceModal({
           notes: '',
           owner_user_id: '',
           reminder_enabled: false,
-          reminder_at: ''
+          reminder_at: '',
+          reminder_notes: ''
         })
         setAttachments([])
       }
@@ -163,7 +166,7 @@ export function StudentOccurrenceModal({
       // Se não há owner_user_id definido, usar o primeiro trainer como padrão
       const trainersList = trainersData.trainers || []
       if (!formData.owner_user_id && trainersList.length > 0) {
-        setFormData(prev => ({ ...prev, owner_user_id: trainersList[0].id }))
+        setFormData(prev => ({ ...prev, owner_user_id: trainersList[0].user_id }))
       }
     } catch (error) {
       console.error('Erro ao carregar dados iniciais:', error)
@@ -186,7 +189,7 @@ export function StudentOccurrenceModal({
   const handleInputChange = (field: string, value: any) => {
     if (field === 'reminder_enabled' && !value) {
       // Limpar data do lembrete quando desativar
-      setFormData(prev => ({ ...prev, [field]: value, reminder_at: '' }))
+      setFormData(prev => ({ ...prev, [field]: value, reminder_at: '', reminder_notes: '' }))
     } else {
       setFormData(prev => ({ ...prev, [field]: value }))
     }
@@ -476,7 +479,7 @@ export function StudentOccurrenceModal({
                         </SelectTrigger>
                         <SelectContent>
                           {trainers.map((trainer) => (
-                            <SelectItem key={trainer.id} value={trainer.id}>
+                            <SelectItem key={trainer.id} value={trainer.user_id}>
                               {trainer.name}
                             </SelectItem>
                           ))}
@@ -538,8 +541,26 @@ export function StudentOccurrenceModal({
                     )}
                   </div>
                   {formData.reminder_enabled && (
-                    <div className="text-xs text-muted-foreground">
-                      Defina quando deseja ser lembrado sobre esta ocorrência
+                    <div className="space-y-3">
+                      <div className="text-xs text-muted-foreground">
+                        Defina quando deseja ser lembrado sobre esta ocorrência
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="reminder_notes" className="text-sm font-medium">
+                          Descrição do Lembrete
+                        </Label>
+                        <Textarea
+                          id="reminder_notes"
+                          value={formData.reminder_notes}
+                          onChange={(e) => handleInputChange('reminder_notes', e.target.value)}
+                          placeholder="Ex: Enviar uma msg perguntando se deu certo..."
+                          rows={2}
+                          className="text-sm"
+                        />
+                        <div className="text-xs text-muted-foreground">
+                          Descreva o que você precisa fazer quando o lembrete for acionado
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

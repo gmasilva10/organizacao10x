@@ -5,7 +5,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Users, Briefcase, UserCheck, ClipboardList, Activity, ArrowRight, TrendingUp, Calendar, BarChart3 } from "lucide-react"
+import { Users, Briefcase, UserCheck, ClipboardList, Activity, ArrowRight, TrendingUp, Calendar, BarChart3, MessageSquare, Send } from "lucide-react"
+import MessageComposer from "@/components/relationship/MessageComposer"
 
 interface DashboardStats {
   students: number
@@ -23,6 +24,8 @@ export default function DashboardPage() {
     kanbanItems: 0,
     loading: true
   })
+  const [messageComposerOpen, setMessageComposerOpen] = useState(false)
+  const [messageComposerMode, setMessageComposerMode] = useState<'free' | 'template'>('free')
 
   useEffect(() => {
     async function fetchStats() {
@@ -52,6 +55,11 @@ export default function DashboardPage() {
 
     fetchStats()
   }, [])
+
+  const handleNewMessage = (mode: 'free' | 'template') => {
+    setMessageComposerMode(mode)
+    setMessageComposerOpen(true)
+  }
 
   const cards = [
     {
@@ -218,6 +226,61 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Relacionamento - Ações Rápidas */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Relacionamento - Ações Rápidas</h2>
+        </div>
+        
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle className="text-base">Nova Mensagem (Livre)</CardTitle>
+                  <CardDescription>Enviar mensagem personalizada para qualquer aluno</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => handleNewMessage('free')}
+              >
+                <Send className="h-3 w-3 mr-2" />
+                Criar Mensagem Livre
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-md transition-shadow">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle className="text-base">Nova Mensagem (Template)</CardTitle>
+                  <CardDescription>Usar template pré-definido para envio</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => handleNewMessage('template')}
+              >
+                <MessageSquare className="h-3 w-3 mr-2" />
+                Usar Template
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* Status do Sistema */}
       <Card>
         <CardHeader>
@@ -281,6 +344,16 @@ export default function DashboardPage() {
           </Link>
         </p>
       </div>
+
+      {/* MessageComposer Modal */}
+      <MessageComposer
+        open={messageComposerOpen}
+        onOpenChange={setMessageComposerOpen}
+        initialMessage={messageComposerMode === 'free' ? '' : 'Olá [Primeiro Nome], [Saudação Temporal]! Como está o treino hoje?'}
+        onSuccess={() => {
+          console.log('Mensagem enviada com sucesso!')
+        }}
+      />
     </div>
   )
 }

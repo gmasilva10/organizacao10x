@@ -32,4 +32,29 @@ export async function createClient() {
   )
 }
 
+// Cliente para desenvolvimento que bypassa RLS
+export async function createClientAdmin() {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  
+  if (!supabaseUrl || !supabaseServiceKey) {
+    // Fallback para cliente normal se não tiver service key
+    console.warn('⚠️ SUPABASE_SERVICE_ROLE_KEY não encontrada, usando cliente normal')
+    return createClient()
+  }
+  
+  const { createClient: createSupabaseClient } = await import('@supabase/supabase-js')
+  
+  return createSupabaseClient(
+    supabaseUrl,
+    supabaseServiceKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  )
+}
+
 

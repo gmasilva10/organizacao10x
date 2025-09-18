@@ -369,6 +369,8 @@ export default function KanbanPage() {
     }
   }
 
+  // Exclusão de coluna é feita apenas na tela de Serviços/Onboard
+
   function moveColumnLeft(id: string) {
     const fixedFirst = columns.find(c=>c.title==='Novo Aluno')?.id
     const fixedLast = columns.find(c=>c.title==='Entrega do Treino')?.id

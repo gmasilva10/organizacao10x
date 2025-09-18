@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useRef } from "react"
 import { OccurrenceDetailsModal } from "@/components/occurrences/OccurrenceDetailsModal"
 import { OccurrenceCloseModal } from "@/components/occurrences/OccurrenceCloseModal"
+import { OccurrenceRescheduleModal } from "@/components/occurrences/OccurrenceRescheduleModal"
 import { OccurrencesFiltersDrawer } from "@/components/occurrences/OccurrencesFiltersDrawer"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -59,6 +60,8 @@ export default function OccurrencesManagementPage() {
   const [closeModalOpen, setCloseModalOpen] = useState(false)
   const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false)
   const [selectedOccurrenceId, setSelectedOccurrenceId] = useState<number | undefined>()
+  const [rescheduleOpen, setRescheduleOpen] = useState(false)
+  const [rescheduleCurrentAt, setRescheduleCurrentAt] = useState<string | null>(null)
 
   // Handlers para aplicar filtros do drawer
   function handleApplyFilters(newFilters: typeof initialFilters) {
@@ -159,10 +162,9 @@ export default function OccurrencesManagementPage() {
   }
 
   async function updateReminderDate(row: OccurrenceRow) {
-    const v = window.prompt('Definir data/hora do lembrete (YYYY-MM-DDTHH:mm):', row.reminder_at || '')
-    if (v === null) return
-    await fetch(`/api/occurrences/${row.id}/reminder`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ reminder_at: v, reminder_status: 'PENDING' }) })
-    fetchList()
+    setSelectedOccurrenceId(row.id)
+    setRescheduleCurrentAt(row.reminder_at || null)
+    setRescheduleOpen(true)
   }
 
   async function cancelReminder(row: OccurrenceRow) {
@@ -501,6 +503,14 @@ export default function OccurrencesManagementPage() {
       />
 
       <ConfirmDialog />
+
+      <OccurrenceRescheduleModal
+        open={rescheduleOpen}
+        onClose={() => setRescheduleOpen(false)}
+        occurrenceId={selectedOccurrenceId}
+        currentReminderAt={rescheduleCurrentAt || undefined}
+        onSuccess={fetchList}
+      />
     </div>
   )
 }

@@ -30,8 +30,9 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/toast"
-import { useConfirmDialog } from "@/components/ui/confirm-dialog"
+import { useConfirmDialog, ConfirmDialog } from "@/components/ui/confirm-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,28 +49,31 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { TeamUpgradeModal } from "@/components/TeamUpgradeModal"
 import { 
   Plus, 
   Edit, 
   Trash2, 
-  Users,
-  Loader2,
-  Copy,
+  MoreHorizontal, 
+  Search, 
+  Loader2, 
+  Copy, 
   Check,
   User,
   Key,
-  MoreHorizontal
+  Phone,
+  Settings
 } from "lucide-react"
+import { TeamUpgradeModal } from "./TeamUpgradeModal"
 
 interface ProfessionalProfile {
   id: number
   name: string
-  description?: string
+  description: string
 }
 
 interface Professional {
   id: number
+  profile_id: number
   full_name: string
   cpf: string
   sex: string
@@ -78,6 +82,7 @@ interface Professional {
   whatsapp_work: string
   email: string
   notes?: string
+  is_active: boolean
   professional_profiles: {
     name: string
   }
@@ -89,6 +94,7 @@ interface Professional {
 
 export function ProfessionalsManager() {
   const { success, error } = useToast()
+  const { confirm } = useConfirmDialog()
   const [professionals, setProfessionals] = useState<Professional[]>([])
   const [profiles, setProfiles] = useState<ProfessionalProfile[]>([])
   const [loading, setLoading] = useState(true)
@@ -115,7 +121,7 @@ export function ProfessionalsManager() {
       professional.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       professional.email.toLowerCase().includes(searchTerm.toLowerCase())
     
-    const matchesProfile = !profileFilter || profileFilter === 'all' ||
+    const matchesProfile = !profileFilter || profileFilter === 'all' || 
       professional.profile_id.toString() === profileFilter
     
     return matchesSearch && matchesProfile
@@ -131,7 +137,8 @@ export function ProfessionalsManager() {
     whatsapp_personal: '',
     whatsapp_work: '',
     email: '',
-    notes: ''
+    notes: '',
+    is_active: true
   })
 
   useEffect(() => {
@@ -185,7 +192,8 @@ export function ProfessionalsManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+    setSaving(true)
+
     // Verificar limite antes de salvar
     if (!editingProfessional) {
       const canAdd = await checkProfessionalLimit()
@@ -195,8 +203,6 @@ export function ProfessionalsManager() {
       }
     }
 
-    setSaving(true)
-
     try {
       const url = editingProfessional 
         ? `/api/professionals/${editingProfessional.id}`
@@ -204,39 +210,51 @@ export function ProfessionalsManager() {
       
       const method = editingProfessional ? 'PATCH' : 'POST'
       
+      // Validar profile_id antes de enviar
+      const profileId = parseInt(formData.profile_id)
+      if (isNaN(profileId) || profileId <= 0) {
+        error('Perfil profissional é obrigatório')
+        return
+      }
+
+      const requestBody = {
+        ...formData,
+        profile_id: profileId
+      }
+      
+      console.log('Enviando dados:', requestBody) // Debug
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          profile_id: parseInt(formData.profile_id)
-        })
+        body: JSON.stringify(requestBody)
       })
 
       const data = await response.json()
+      console.log('Resposta da API:', { status: response.status, data }) // Debug
 
       if (response.ok) {
         success(editingProfessional ? 'Profissional atualizado com sucesso!' : 'Profissional criado com sucesso!')
-        
+        // Atualiza a lista local imediatamente
+        if (data?.professional) {
+          setProfessionals((prev) => {
+            const idx = prev.findIndex(p => p.id === data.professional.id)
+            if (idx >= 0) {
+              const next = [...prev]
+              next[idx] = { ...prev[idx], ...data.professional }
+              return next
+            }
+            return prev
+          })
+        }
+        setIsModalOpen(false)
+        loadData()
+        resetForm()
+
         // Se foi criado um novo usuário, mostrar senha temporária
         if (data.tempPassword) {
           setTempPassword(data.tempPassword.password)
         }
-        
-        setIsModalOpen(false)
-        setEditingProfessional(null)
-        setFormData({
-          profile_id: '',
-          full_name: '',
-          cpf: '',
-          sex: '',
-          birth_date: '',
-          whatsapp_personal: '',
-          whatsapp_work: '',
-          email: '',
-          notes: ''
-        })
-        loadData()
       } else {
         if (data.error === 'cpf_already_exists') {
           error('Já existe um profissional com este CPF')
@@ -244,8 +262,11 @@ export function ProfessionalsManager() {
           error('Já existe um profissional com este e-mail')
         } else if (data.error === 'email_already_linked') {
           error(data.message || 'E-mail já vinculado a outro profissional')
+        } else if (data.error === 'validation_error') {
+          error(`Erro de validação: ${data.details?.map((d: any) => d.message).join(', ') || 'Dados inválidos'}`)
         } else {
-          error(data.error || 'Erro ao salvar profissional')
+          console.error('Erro na API:', data) // Debug
+          error(data.error || data.message || 'Erro ao salvar profissional')
         }
       }
     } catch (err) {
@@ -255,25 +276,71 @@ export function ProfessionalsManager() {
     }
   }
 
-  const handleEdit = (professional: Professional) => {
-    setEditingProfessional(professional)
-    setFormData({
-      profile_id: professional.profile_id.toString(),
-      full_name: professional.full_name,
-      cpf: professional.cpf,
-      sex: professional.sex,
-      birth_date: professional.birth_date,
-      whatsapp_personal: professional.whatsapp_personal || '',
-      whatsapp_work: professional.whatsapp_work,
-      email: professional.email,
-      notes: professional.notes || ''
-    })
-    setIsModalOpen(true)
+  const handleEdit = async (professional: Professional) => {
+    console.log('Editando profissional:', professional) // Debug
+    try {
+      // Buscar os dados completos do profissional (inclui cpf, sexo, nascimento, etc.)
+      const res = await fetch(`/api/professionals/${professional.id}`)
+      const data = await res.json()
+      const p = res.ok && data?.professional ? data.professional : professional
+
+      setEditingProfessional(p)
+      setFormData({
+        profile_id: p.profile_id ? p.profile_id.toString() : '',
+        full_name: p.full_name || '',
+        cpf: p.cpf || '',
+        sex: p.sex || '',
+        birth_date: p.birth_date || '',
+        whatsapp_personal: p.whatsapp_personal || '',
+        whatsapp_work: p.whatsapp_work || '',
+        email: p.email || '',
+        notes: p.notes || '',
+        is_active: p.is_active ?? true
+      })
+    } catch (e) {
+      // fallback com dados da lista
+      setEditingProfessional(professional)
+      setFormData({
+        profile_id: professional.profile_id ? professional.profile_id.toString() : '',
+        full_name: professional.full_name || '',
+        cpf: professional.cpf || '',
+        sex: professional.sex || '',
+        birth_date: professional.birth_date || '',
+        whatsapp_personal: professional.whatsapp_personal || '',
+        whatsapp_work: professional.whatsapp_work || '',
+        email: professional.email || '',
+        notes: professional.notes || '',
+        is_active: professional.is_active ?? true
+      })
+    } finally {
+      setIsModalOpen(true)
+    }
+  }
+
+  const handleToggleStatus = async (professional: Professional) => {
+    try {
+      const response = await fetch(`/api/professionals/${professional.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          is_active: !professional.is_active
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        success(data.message || `Profissional ${!professional.is_active ? 'ativado' : 'inativado'} com sucesso!`)
+        loadData()
+      } else {
+        error(data.message || 'Erro ao alterar status do profissional')
+      }
+    } catch (err) {
+      error('Erro ao alterar status do profissional')
+    }
   }
 
   const handleDelete = async (professional: Professional) => {
-    const { confirm, ConfirmDialog } = useConfirmDialog()
-    
     confirm({
       title: "Excluir Profissional",
       description: `Tem certeza que deseja excluir o profissional "${professional.full_name}"? Esta ação não pode ser desfeita.`,
@@ -317,16 +384,14 @@ export function ProfessionalsManager() {
       if (response.ok) {
         if (data.tempPassword) {
           setTempPassword(data.tempPassword.password)
-          success('Acesso criado com sucesso! Senha temporária gerada.')
-        } else {
-          success('Acesso criado com sucesso!')
         }
+        success('Usuário vinculado com sucesso!')
         loadData()
       } else {
-        error(data.error || 'Erro ao criar acesso')
+        error(data.message || 'Erro ao vincular usuário')
       }
     } catch (err) {
-      error('Erro ao criar acesso')
+      error('Erro ao vincular usuário')
     } finally {
       setLinkingUser(false)
     }
@@ -342,7 +407,7 @@ export function ProfessionalsManager() {
         body: JSON.stringify({
           email: editingProfessional.email,
           password: userFormData.password,
-          userProfile: userFormData.userProfile,
+          profile: userFormData.userProfile,
           isActive: userFormData.isActive
         })
       })
@@ -351,11 +416,12 @@ export function ProfessionalsManager() {
 
       if (response.ok) {
         success('Usuário criado com sucesso!')
-        setActiveTab('professional')
-        setUserFormData({ password: '', userProfile: 'admin', isActive: false })
+        if (data.tempPassword) {
+          setTempPassword(data.tempPassword.password)
+        }
         loadData()
       } else {
-        error(data.error || 'Erro ao criar usuário')
+        error(data.message || 'Erro ao criar usuário')
       }
     } catch (err) {
       error('Erro ao criar usuário')
@@ -364,6 +430,16 @@ export function ProfessionalsManager() {
 
   const openCreateModal = () => {
     setEditingProfessional(null)
+    resetForm()
+    setUserFormData({
+      password: '',
+      userProfile: 'admin',
+      isActive: false
+    })
+    setIsModalOpen(true)
+  }
+
+  const resetForm = () => {
     setFormData({
       profile_id: '',
       full_name: '',
@@ -373,9 +449,9 @@ export function ProfessionalsManager() {
       whatsapp_personal: '',
       whatsapp_work: '',
       email: '',
-      notes: ''
+      notes: '',
+      is_active: true
     })
-    setIsModalOpen(true)
   }
 
   const copyPassword = async () => {
@@ -384,7 +460,7 @@ export function ProfessionalsManager() {
         await navigator.clipboard.writeText(tempPassword)
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
-      } catch {
+      } catch (err) {
         // Fallback para navegadores que não suportam clipboard API
         const textArea = document.createElement('textarea')
         textArea.value = tempPassword
@@ -403,7 +479,15 @@ export function ProfessionalsManager() {
   }
 
   const formatWhatsApp = (whatsapp: string) => {
-    return whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+    const digits = (whatsapp || '').replace(/\D/g, '')
+    const local = digits.startsWith('55') ? digits.slice(2) : digits
+    if (local.length === 11) {
+      return `(${local.slice(0, 2)}) ${local.slice(2, 7)}-${local.slice(7)}`
+    }
+    if (local.length === 10) {
+      return `(${local.slice(0, 2)}) ${local.slice(2, 6)}-${local.slice(6)}`
+    }
+    return whatsapp
   }
 
   if (loading) {
@@ -425,516 +509,520 @@ export function ProfessionalsManager() {
         </Button>
       </div>
 
-      {/* Barra de Ferramentas Premium */}
-      <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+      {/* Filtros */}
+      <div className="flex gap-4">
         <div className="flex-1">
-          <Input
-            placeholder="Buscar por nome ou e-mail..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Buscar por nome ou email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Label htmlFor="profile-filter" className="text-sm font-medium">
-            Perfil:
-          </Label>
-          <Select value={profileFilter} onValueChange={setProfileFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Todos os perfis" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os perfis</SelectItem>
-              {profiles.map(profile => (
-                <SelectItem key={profile.id} value={profile.id.toString()}>
-                  {profile.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select value={profileFilter} onValueChange={setProfileFilter}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Filtrar por perfil" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os perfis</SelectItem>
+            {profiles.map((profile) => (
+              <SelectItem key={profile.id} value={profile.id.toString()}>
+                {profile.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      {filteredProfessionals.length === 0 ? (
-        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-          <Users className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-muted-foreground mb-2">
-            {professionals.length === 0 
-              ? 'Nenhum profissional cadastrado'
-              : 'Nenhum resultado encontrado'
-            }
-          </h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            {professionals.length === 0 
-              ? 'Cadastre seu primeiro profissional para começar a gerenciar sua equipe'
-              : 'Tente ajustar os filtros de busca.'
-            }
-          </p>
-          <Button onClick={openCreateModal} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Cadastrar Profissional
-          </Button>
-        </div>
-      ) : (
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Perfil</TableHead>
-                <TableHead>CPF</TableHead>
-                <TableHead>WhatsApp</TableHead>
-                <TableHead>E-mail</TableHead>
-                <TableHead>Usuário</TableHead>
-                <TableHead className="w-[100px]">Ações</TableHead>
+      {/* Tabela */}
+      <div className="border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead>Perfil</TableHead>
+              <TableHead>E-mail</TableHead>
+              <TableHead>WhatsApp</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-12"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredProfessionals.map((professional) => (
+              <TableRow key={professional.id}>
+                <TableCell className="font-medium">
+                  {professional.full_name}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary">
+                    {professional.professional_profiles.name}
+                  </Badge>
+                </TableCell>
+                <TableCell>{professional.email}</TableCell>
+                <TableCell>{formatWhatsApp(professional.whatsapp_work)}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={professional.is_active}
+                      onCheckedChange={() => handleToggleStatus(professional)}
+                      disabled={saving}
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {professional.is_active ? "Ativo" : "Inativo"}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEdit(professional)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDelete(professional)}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProfessionals.map((professional) => (
-                <TableRow key={professional.id}>
-                  <TableCell className="font-medium">{professional.full_name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {professional.professional_profiles.name}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm font-mono">
-                      {formatCPF(professional.cpf)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm">
-                      {formatWhatsApp(professional.whatsapp_work)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm">{professional.email}</span>
-                  </TableCell>
-                  <TableCell>
-                    {professional.user_id ? (
-                      <Badge variant="secondary" className="text-xs">
-                        Vinculado
-                      </Badge>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          Não vinculado
-                        </Badge>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleLinkUser(professional)}
-                          disabled={linkingUser}
-                          className="text-xs h-6 px-2"
-                        >
-                          {linkingUser ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            'Criar Acesso'
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(professional)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => setDeleteConfirm(professional)}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      {/* Modal de criação/edição */}
+      {/* Modal de Edição/Criação */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>
-              {editingProfessional ? 'Editar Profissional' : 'Novo Profissional'}
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
+            <DialogTitle className="text-xl font-semibold flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div>{editingProfessional ? 'Editar Profissional' : 'Novo Profissional'}</div>
+                <DialogDescription className="text-sm font-normal text-muted-foreground mt-1">
+                  {editingProfessional
+                    ? 'Atualize as informações do profissional'
+                    : 'Cadastre um novo profissional na equipe'
+                  }
+                </DialogDescription>
+              </div>
             </DialogTitle>
-            <DialogDescription>
-              {editingProfessional 
-                ? 'Atualize as informações do profissional'
-                : 'Cadastre um novo profissional na equipe'
-              }
-            </DialogDescription>
           </DialogHeader>
 
-          {/* Conteúdo scrollável */}
-          <div className="flex-1 overflow-y-auto">
-            {/* Sub-abas */}
-            <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
-            <button
-              type="button"
-              onClick={() => setActiveTab('professional')}
-              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeTab === 'professional'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <User className="h-4 w-4" />
-              Profissional
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('user')}
-              disabled={!editingProfessional && !formData.email}
-              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeTab === 'user'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              } ${(!editingProfessional && !formData.email) || (editingProfessional?.user_id) ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <Key className="h-4 w-4" />
-              Usuário
-            </button>
-          </div>
-          
-          {/* Conteúdo das abas */}
-          {activeTab === 'professional' && (
-            <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="full_name">Nome Completo *</Label>
-                <Input
-                  id="full_name"
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  placeholder="Nome completo do profissional"
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="profile_id">Perfil Profissional *</Label>
-                <Select value={formData.profile_id} onValueChange={(value) => setFormData({ ...formData, profile_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um perfil" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {profiles.map((profile) => (
-                      <SelectItem key={profile.id} value={profile.id.toString()}>
-                        {profile.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="px-6 py-6">
+            {/* Tabs */}
+            <div className="flex space-x-1 bg-muted/50 p-1 rounded-xl mb-6 border">
+              <button
+                type="button"
+                onClick={() => setActiveTab('professional')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  activeTab === 'professional'
+                    ? 'bg-background text-foreground shadow-sm border'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                <User className="h-4 w-4" />
+                Dados Profissionais
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('user')}
+                disabled={!editingProfessional && !formData.email}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  activeTab === 'user'
+                    ? 'bg-background text-foreground shadow-sm border'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                } ${(!editingProfessional && !formData.email) || (editingProfessional?.user_id) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <Key className="h-4 w-4" />
+                Acesso ao Sistema
+              </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="cpf">CPF *</Label>
-                <Input
-                  id="cpf"
-                  value={formData.cpf}
-                  onChange={(e) => {
-                    const masked = e.target.value
-                      .replace(/\D/g, '')
-                      .replace(/(\d{3})(\d)/, '$1.$2')
-                      .replace(/(\d{3})(\d)/, '$1.$2')
-                      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-                      .replace(/(-\d{2})\d+?$/, '$1')
-                    setFormData({ ...formData, cpf: masked })
-                  }}
-                  placeholder="000.000.000-00"
-                  maxLength={14}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="sex">Sexo *</Label>
-                <Select value={formData.sex} onValueChange={(value) => setFormData({ ...formData, sex: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="M">Masculino</SelectItem>
-                    <SelectItem value="F">Feminino</SelectItem>
-                    <SelectItem value="Outro">Outro</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="birth_date">Data de Nascimento *</Label>
-                <Input
-                  id="birth_date"
-                  type="date"
-                  value={formData.birth_date}
-                  onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {activeTab === 'professional' && (
+                <>
+                  {/* Card de Informações Básicas */}
+                  <Card className="border-0 shadow-sm bg-gradient-to-br from-background to-muted/20">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <User className="h-5 w-5 text-primary" />
+                        Informações Básicas
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="full_name">Nome Completo *</Label>
+                          <Input
+                            id="full_name"
+                            value={formData.full_name}
+                            onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                            className="h-10"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="profile_id">Perfil Profissional *</Label>
+                          <Select value={formData.profile_id} onValueChange={(value) => setFormData({ ...formData, profile_id: value })}>
+                            <SelectTrigger className="h-10">
+                              <SelectValue placeholder="Selecione um perfil" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {profiles.map((profile) => (
+                                <SelectItem key={profile.id} value={profile.id.toString()}>
+                                  {profile.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="whatsapp_personal">WhatsApp Pessoal</Label>
-                <Input
-                  id="whatsapp_personal"
-                  value={formData.whatsapp_personal}
-                  onChange={(e) => {
-                    const masked = e.target.value
-                      .replace(/\D/g, '')
-                      .replace(/(\d{2})(\d)/, '($1) $2')
-                      .replace(/(\d{5})(\d)/, '$1-$2')
-                      .replace(/(-\d{4})\d+?$/, '$1')
-                    setFormData({ ...formData, whatsapp_personal: masked })
-                  }}
-                  placeholder="(00) 00000-0000"
-                  maxLength={15}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="whatsapp_work">WhatsApp Profissional *</Label>
-                <Input
-                  id="whatsapp_work"
-                  value={formData.whatsapp_work}
-                  onChange={(e) => {
-                    const masked = e.target.value
-                      .replace(/\D/g, '')
-                      .replace(/(\d{2})(\d)/, '($1) $2')
-                      .replace(/(\d{5})(\d)/, '$1-$2')
-                      .replace(/(-\d{4})\d+?$/, '$1')
-                    setFormData({ ...formData, whatsapp_work: masked })
-                  }}
-                  placeholder="(00) 00000-0000"
-                  maxLength={15}
-                  required
-                />
-              </div>
-            </div>
+                  {/* Card de Documentos e Contato */}
+                  <Card className="border-0 shadow-sm bg-gradient-to-br from-background to-muted/20">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Phone className="h-5 w-5 text-primary" />
+                        Documentos e Contato
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="cpf" className="text-sm font-medium">CPF *</Label>
+                          <Input
+                            id="cpf"
+                            value={formData.cpf}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, '')
+                              if (value.length <= 11) {
+                                setFormData({ ...formData, cpf: value })
+                              }
+                            }}
+                            placeholder="000.000.000-00"
+                            className="h-10"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="sex" className="text-sm font-medium">Sexo *</Label>
+                          <Select value={formData.sex} onValueChange={(value) => setFormData({ ...formData, sex: value })}>
+                            <SelectTrigger className="h-10">
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="M">Masculino</SelectItem>
+                              <SelectItem value="F">Feminino</SelectItem>
+                              <SelectItem value="Outro">Outro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="birth_date" className="text-sm font-medium">Data de Nascimento *</Label>
+                          <Input
+                            id="birth_date"
+                            type="date"
+                            value={formData.birth_date}
+                            onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                            className="h-10"
+                            required
+                          />
+                        </div>
+                      </div>
 
-            <div>
-              <Label htmlFor="email">E-mail *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="email@exemplo.com"
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="notes">Observações</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Observações adicionais sobre o profissional..."
-                rows={3}
-              />
-            </div>
-            
-          </form>
-          )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="whatsapp_personal" className="text-sm font-medium">WhatsApp Pessoal</Label>
+                          <Input
+                            id="whatsapp_personal"
+                            value={formData.whatsapp_personal}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, '')
+                              if (value.length <= 11) {
+                                setFormData({ ...formData, whatsapp_personal: value })
+                              }
+                            }}
+                            placeholder="(00) 00000-0000"
+                            className="h-10"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="whatsapp_work" className="text-sm font-medium">WhatsApp Profissional *</Label>
+                          <Input
+                            id="whatsapp_work"
+                            value={formData.whatsapp_work}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, '')
+                              if (value.length <= 11) {
+                                setFormData({ ...formData, whatsapp_work: value })
+                              }
+                            }}
+                            placeholder="(00) 00000-0000"
+                            className="h-10"
+                            required
+                          />
+                        </div>
+                      </div>
 
-          {/* Aba Usuário */}
-          {activeTab === 'user' && (
-            <div className="space-y-4">
-              {editingProfessional?.user_id ? (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <h3 className="font-medium text-sm text-green-800 mb-2">Usuário Já Vinculado</h3>
-                  <p className="text-sm text-green-700">
-                    Este profissional já possui um usuário vinculado ao sistema. Para alterar as configurações, use a funcionalidade de gerenciamento de usuários.
-                  </p>
-                </div>
-              ) : (
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <h3 className="font-medium text-sm text-muted-foreground mb-2">Configuração de Acesso</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Configure o acesso do usuário ao sistema
-                  </p>
-                </div>
+                      <div>
+                        <Label htmlFor="email" className="text-sm font-medium">E-mail *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="h-10"
+                          required
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Card de Perfil e Status */}
+                  <Card className="border-0 shadow-sm bg-gradient-to-br from-background to-muted/20">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Settings className="h-5 w-5 text-primary" />
+                        Perfil e Status
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="profile_id" className="text-sm font-medium">Perfil Profissional *</Label>
+                          <Select value={formData.profile_id} onValueChange={(value) => setFormData({ ...formData, profile_id: value })}>
+                            <SelectTrigger className="h-10">
+                              <SelectValue placeholder="Selecione o perfil" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {profiles.map((profile) => (
+                                <SelectItem key={profile.id} value={profile.id.toString()}>
+                                  {profile.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="is_active" className="text-sm font-medium">Status do Profissional</Label>
+                            <p className="text-xs text-muted-foreground">
+                              {formData.is_active ? 'Profissional ativo no sistema' : 'Profissional inativo no sistema'}
+                            </p>
+                          </div>
+                          <Switch
+                            id="is_active"
+                            checked={formData.is_active}
+                            onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="notes" className="text-sm font-medium">Observações</Label>
+                        <Textarea
+                          id="notes"
+                          value={formData.notes}
+                          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                          placeholder="Observações sobre o profissional..."
+                          rows={3}
+                          className="resize-none"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
               )}
 
-              {!editingProfessional?.user_id && (
+              {activeTab === 'user' && (
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="user_email">E-mail</Label>
-                    <Input
-                      id="user_email"
-                      value={editingProfessional?.email || formData.email}
-                      disabled
-                      className="bg-muted/50"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      E-mail puxado automaticamente do cadastro do profissional
-                    </p>
-                  </div>
+                  {editingProfessional?.user_id ? (
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <h3 className="font-medium text-sm text-green-800 mb-2">Usuário Já Vinculado</h3>
+                      <p className="text-sm text-green-700">
+                        Este profissional já possui acesso ao sistema.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <h3 className="font-medium text-sm text-muted-foreground mb-2">Configuração de Acesso</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Configure as credenciais de acesso para este profissional.
+                      </p>
+                    </div>
+                  )}
 
-                  <div>
-                    <Label htmlFor="user_password">Senha</Label>
-                    <Input
-                      id="user_password"
-                      type="password"
-                      value={userFormData.password}
-                      onChange={(e) => setUserFormData(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder="Digite uma senha para o usuário"
-                    />
-                  </div>
+                  {!editingProfessional?.user_id && (
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="user_email">E-mail</Label>
+                        <Input
+                          id="user_email"
+                          value={formData.email}
+                          disabled
+                          className="bg-muted/50"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          O e-mail será usado para fazer login no sistema
+                        </p>
+                      </div>
 
-                  <div>
-                    <Label htmlFor="user_profile">Perfil de Usuário</Label>
-                    <Select
-                      value={userFormData.userProfile}
-                      onValueChange={(value) => setUserFormData(prev => ({ ...prev, userProfile: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                      <div>
+                        <Label htmlFor="user_password">Senha</Label>
+                        <Input
+                          id="user_password"
+                          type="password"
+                          value={userFormData.password}
+                          onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                          placeholder="Digite uma senha para o usuário"
+                        />
+                      </div>
 
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="user_active">Ativar usuário</Label>
-                    <Switch
-                      id="user_active"
-                      checked={userFormData.isActive}
-                      onCheckedChange={(checked) => setUserFormData(prev => ({ ...prev, isActive: checked }))}
-                    />
-                  </div>
+                      <div>
+                        <Label htmlFor="user_profile">Perfil de Usuário</Label>
+                        <Select
+                          value={userFormData.userProfile}
+                          onValueChange={(value) => setUserFormData(prev => ({ ...prev, userProfile: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="manager">Gerente</SelectItem>
+                            <SelectItem value="user">Usuário</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="user_active">Ativar usuário</Label>
+                        <Switch
+                          id="user_active"
+                          checked={userFormData.isActive}
+                          onCheckedChange={(checked) => setUserFormData(prev => ({ ...prev, isActive: checked }))}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-
-
-            </div>
-          )}
+            </form>
           </div>
 
-          {/* Rodapé Sticky */}
-          <div className="border-t bg-background p-4 flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsModalOpen(false)}
-            >
-              Cancelar
-            </Button>
-            {activeTab === 'professional' && (
+          {/* Footer do Modal */}
+          <div className="border-t bg-muted/30 px-6 py-4">
+            <div className="flex justify-end gap-3">
               <Button
                 type="button"
-                onClick={handleSubmit}
-                disabled={saving}
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="h-10 px-6"
               >
-                {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                {editingProfessional ? 'Salvar Alterações' : 'Cadastrar Profissional'}
+                Cancelar
               </Button>
-            )}
-            {activeTab === 'user' && !editingProfessional?.user_id && (
-              <Button
-                type="button"
-                onClick={handleUserSave}
-                disabled={!userFormData.password || !userFormData.isActive}
-              >
-                Salvar Usuário
-              </Button>
-            )}
+              {activeTab === 'professional' && (
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={saving}
+                  className="h-10 px-6 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                >
+                  {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  {editingProfessional ? 'Salvar Alterações' : 'Cadastrar Profissional'}
+                </Button>
+              )}
+              {activeTab === 'user' && !editingProfessional?.user_id && (
+                <Button
+                  type="button"
+                  onClick={handleUserSave}
+                  disabled={!userFormData.password || !userFormData.isActive}
+                  className="h-10 px-6 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                >
+                  Salvar Usuário
+                </Button>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Modal de senha temporária */}
-      {tempPassword && (
-        <Dialog open={!!tempPassword} onOpenChange={() => setTempPassword(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Usuário Criado com Sucesso</DialogTitle>
-              <DialogDescription>
-                Um usuário foi criado automaticamente para este profissional com uma senha temporária.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div className="p-4 bg-muted rounded-lg">
-                <Label className="text-sm font-medium">Senha Temporária:</Label>
-                <div className="flex items-center gap-2 mt-2">
-                  <Input
-                    value={tempPassword}
-                    readOnly
-                    className="font-mono"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={copyPassword}
-                    className="flex items-center gap-2"
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                    {copied ? 'Copiado!' : 'Copiar'}
-                  </Button>
-                </div>
+      <Dialog open={!!tempPassword} onOpenChange={() => setTempPassword(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Usuário Criado com Sucesso</DialogTitle>
+            <DialogDescription>
+              O usuário foi criado com sucesso. Anote a senha temporária abaixo.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <Label className="text-sm font-medium">Senha Temporária:</Label>
+              <div className="flex items-center gap-2 mt-2">
+                <Input
+                  value={tempPassword}
+                  readOnly
+                  className="font-mono"
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={copyPassword}
+                  className="flex items-center gap-2"
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                  {copied ? 'Copiado!' : 'Copiar'}
+                </Button>
               </div>
-              
-              <div className="text-sm text-muted-foreground">
-                <p>⚠️ <strong>Importante:</strong> Compartilhe esta senha com o profissional de forma segura.</p>
-                <p>Ele poderá alterar a senha após o primeiro login.</p>
-              </div>
-              
-              <Button onClick={() => setTempPassword(null)} className="w-full">
-                Entendi
-              </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
+            <div className="text-sm text-muted-foreground">
+              <p>⚠️ <strong>Importante:</strong> Compartilhe esta senha com o profissional de forma segura.</p>
+              <p>Ele poderá alterar a senha após o primeiro login.</p>
+            </div>
+            <Button onClick={() => setTempPassword(null)} className="w-full">
+              Entendi
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-      {/* Modal de upgrade */}
       <TeamUpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
-        onViewPlans={() => {
-          // Implementar navegação para planos
-          console.log('Navegar para planos')
-        }}
-        onContactSupport={() => {
-          // Implementar contato com suporte
-          console.log('Contatar suporte')
+        onUpgrade={() => {
+          setShowUpgradeModal(false)
+          // Aqui você pode redirecionar para a página de upgrade
         }}
       />
 
-      {/* Modal de Confirmação de Delete */}
       <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir o profissional "{deleteConfirm?.full_name}"? 
-              Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir o profissional "{deleteConfirm?.full_name}"? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

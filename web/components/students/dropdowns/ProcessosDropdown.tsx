@@ -15,7 +15,9 @@ import {
   AlertTriangle,
   FileText,
   Plus,
-  Link as LinkIcon
+  Link as LinkIcon,
+  UserPlus,
+  Users
 } from "lucide-react"
 
 type ProcessosDropdownProps = {
@@ -41,6 +43,18 @@ export default function ProcessosDropdown({ studentId }: ProcessosDropdownProps)
     setOpen(false)
     // Implementar modal de geração de diretriz
     console.log('Abrir modal gerar diretriz para aluno:', studentId)
+  }
+
+  const handleCriarContato = () => {
+    setOpen(false)
+    // Implementar criação de contato WhatsApp
+    console.log('Criar contato WhatsApp para aluno:', studentId)
+  }
+
+  const handleCriarGrupo = () => {
+    setOpen(false)
+    // Implementar criação de grupo WhatsApp
+    console.log('Criar grupo WhatsApp para aluno:', studentId)
   }
 
   return (
@@ -71,6 +85,20 @@ export default function ProcessosDropdown({ studentId }: ProcessosDropdownProps)
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
           <Target className="h-4 w-4 text-green-600" />
           <span>Gerar diretriz</span>
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        <DropdownMenuItem onClick={handleCriarContato} className="flex items-center gap-3">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <UserPlus className="h-4 w-4 text-green-600" />
+          <span>WhatsApp ▸ Criar contato</span>
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem onClick={handleCriarGrupo} className="flex items-center gap-3">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <Users className="h-4 w-4 text-green-600" />
+          <span>WhatsApp ▸ Criar grupo</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

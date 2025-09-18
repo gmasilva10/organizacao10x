@@ -276,6 +276,21 @@ export default function ServicesOnboardPage() {
     }
   }
 
+  async function deleteColumn(columnId: string) {
+    try {
+      const res = await fetch(`/api/kanban/stages/${columnId}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const msg = res.status === 403 ? 'Coluna fixa não pode ser excluída' : (res.status === 422 ? 'Coluna não vazia ou sem coluna padrão' : 'Erro ao excluir coluna')
+        throw new Error(msg)
+      }
+      success('Coluna excluída com sucesso!')
+      loadBoard()
+    } catch (err:any) {
+      console.error('Erro ao excluir coluna:', err)
+      error(err?.message || 'Erro ao excluir coluna')
+    }
+  }
+
   if (loading) {
     return (
       <div className="container py-6">
@@ -359,7 +374,7 @@ export default function ServicesOnboardPage() {
                         #{column.position}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-0.5 flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -369,8 +384,20 @@ export default function ServicesOnboardPage() {
                       >
                         <Edit className="h-2.5 w-2.5" />
                       </Button>
+                      {!column.is_fixed && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-5 w-5 p-0 ml-1 text-muted-foreground hover:text-destructive"
+                          onClick={() => deleteColumn(column.id)}
+                          title="Excluir coluna"
+                        >
+                          <Trash2 className="h-2.5 w-2.5" />
+                        </Button>
+                      )}
                     </div>
                   </div>
+                  <div className="h-px bg-muted/50 my-2" />
                   <div className="flex items-center justify-between gap-1">
                     <div className="flex items-center gap-1 min-w-0">
                       {column.is_fixed && (
@@ -384,7 +411,7 @@ export default function ServicesOnboardPage() {
                         {column.templates.length}
                       </div>
                     </div>
-                    <div className="flex items-center gap-0.5 flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -397,7 +424,7 @@ export default function ServicesOnboardPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-5 w-5 p-0"
+                        className="h-5 w-5 p-0 ml-1"
                         onClick={() => setManageTemplatesModal({ open: true, column })}
                         title="Gerenciar"
                       >
@@ -424,7 +451,7 @@ export default function ServicesOnboardPage() {
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -434,14 +461,26 @@ export default function ServicesOnboardPage() {
                       >
                         <Edit className="h-3 w-3" />
                       </Button>
+                      {!column.is_fixed && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 ml-1 text-muted-foreground hover:text-destructive"
+                          onClick={() => deleteColumn(column.id)}
+                          title="Excluir coluna"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      )}
                     </div>
                   </div>
+                  <div className="h-px bg-muted/50 my-2" />
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <List className="h-3 w-3" />
                       {column.templates.length} {column.templates.length === 1 ? 'tarefa' : 'tarefas'}
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -454,7 +493,7 @@ export default function ServicesOnboardPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 w-6 p-0"
+                        className="h-6 w-6 p-0 ml-1"
                         onClick={() => setManageTemplatesModal({ open: true, column })}
                         title="Gerenciar"
                       >
@@ -465,14 +504,17 @@ export default function ServicesOnboardPage() {
                 </>
               )}
             </CardHeader>
+            {/* Separador entre header e conteúdo da coluna */}
+            <div className="mx-3 h-px bg-muted/60" />
             {viewMode === 'default' && (
             <CardContent className="pt-0 px-3">
-              {/* Templates List */}
+            {/* Templates List */}
+            {/* removido separador extra */}
               <div className="space-y-1 mb-4">
                 {column.templates.map((template) => (
                   <div
                     key={template.id}
-                    className="p-2 bg-muted/50 rounded-lg border"
+                    className="p-2 bg-muted/50 rounded-lg border mb-2"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">

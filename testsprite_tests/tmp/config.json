@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "loginUser": "gma_silva@yahoo.com.br",
+  "loginPassword": "Gma@11914984",
+  "executionArgs": {
+    "projectName": "Organizacao10x",
+    "projectPath": "C:\\Projetos\\Organizacao10x",
+    "testIds": [],
+    "additionalInstruction": "Focar nos testes do módulo de Relacionamento (GATE 10.6) incluindo Kanban, Calendário, Timeline e integração com alunos. Validar performance, UX Premium e funcionalidades críticas.",
+    "envs": {
+      "API_KEY": "sk-user-L_Ma3VW6CGxvUlXstg766pouZj7dIgTPIVL2YtCqhDLEOQ5V1XGfBco9rWFJe_BtAl9M0QK3Nqtq4-V1HN2m7mG-_ddmOR0cyH-l6aDXnFI0ncTEsZVTOCkf9zY9visvp2A"
+    }
+  },
+  "proxy": "http://b7722075-9376-4b8f-a4b3-a57ecaa91152:OjDJiMCYyxPxYcJRqwKuDKuEy7HvwO4x@tun.testsprite.com:8080"
+}

@@ -34,7 +34,6 @@ import { showStudentUpdated, showStudentError, showSuccessToast, showErrorToast,
 import StudentActions from "./shared/StudentActions"
 import RelationshipTimeline from "../relationship/RelationshipTimeline"
 import ProfessionalSearchModal from "./ProfessionalSearchModal"
-import ProcessosDropdown from "./ProcessosDropdown"
 
 type Student = {
   id: string
@@ -464,16 +463,6 @@ export default function StudentEditTabsV6({
                 // Callback para atualizar dados após ações
                 console.log('Ação completada, dados podem ser atualizados')
               }}
-            />
-            
-            {/* Processos Dropdown */}
-            <ProcessosDropdown
-              studentId={studentId}
-              studentName={student.name}
-              studentPhone={student.phone}
-              studentEmail={student.email}
-              responsibles={[]} // TODO: Carregar responsáveis quando necessário
-              organizationName="Personal Global" // TODO: Carregar da organização
             />
           </div>
           
@@ -950,8 +939,8 @@ export default function StudentEditTabsV6({
                             <User className="h-5 w-5 text-green-600" />
                           </div>
                           <div>
-                            <p className="font-medium text-green-900">{responsaveisData.principal.professionals.full_name}</p>
-                            <p className="text-sm text-green-700">{responsaveisData.principal.professionals.email}</p>
+                            <p className="font-medium text-green-900">{responsaveisData.principal?.professionals?.full_name ?? responsaveisData.principal?.full_name ?? 'Profissional'}</p>
+                            <p className="text-sm text-green-700">{responsaveisData.principal?.professionals?.email ?? responsaveisData.principal?.email ?? ''}</p>
                           </div>
                         </div>
                         <Button
@@ -1005,8 +994,8 @@ export default function StudentEditTabsV6({
                                   <Users className="h-5 w-5 text-blue-600" />
                                 </div>
                                 <div>
-                                  <p className="font-medium text-blue-900">{responsavel.professionals.full_name}</p>
-                                  <p className="text-sm text-blue-700">{responsavel.professionals.email}</p>
+                                  <p className="font-medium text-blue-900">{responsavel.professionals?.full_name ?? responsavel.full_name ?? 'Profissional'}</p>
+                                  <p className="text-sm text-blue-700">{responsavel.professionals?.email ?? responsavel.email ?? ''}</p>
                                 </div>
                               </div>
                               <Button
@@ -1061,8 +1050,8 @@ export default function StudentEditTabsV6({
                                   <Users2 className="h-5 w-5 text-purple-600" />
                                 </div>
                                 <div className="flex-1">
-                                  <p className="font-medium text-purple-900">{responsavel.professionals.full_name}</p>
-                                  <p className="text-sm text-purple-700">{responsavel.professionals.email}</p>
+                                  <p className="font-medium text-purple-900">{responsavel.professionals?.full_name ?? responsavel.full_name ?? 'Profissional'}</p>
+                                  <p className="text-sm text-purple-700">{responsavel.professionals?.email ?? responsavel.email ?? ''}</p>
                                   {responsavel.note && (
                                     <p className="text-xs text-purple-600 mt-1 italic">"{responsavel.note}"</p>
                                   )}

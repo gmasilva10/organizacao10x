@@ -61,21 +61,70 @@ export async function GET(request: NextRequest) {
   const supabase = createClient(url, key)
 
   try {
-    const { data: professionals, error } = await supabase
+    // Extrair parâmetros de query
+    const { searchParams } = new URL(request.url)
+    const status = searchParams.get('status')
+    const q = searchParams.get('q')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50)
+    const offset = (page - 1) * limit
+
+    // Construir query base
+    let query = supabase
       .from('professionals')
       .select(`
-        *,
+        id,
+        profile_id,
+        full_name,
+        email,
+        whatsapp_work,
+        is_active,
         professional_profiles!inner(name)
       `)
       .eq('tenant_id', ctx.tenantId)
+
+    // Filtro por status (active/inactive)
+    if (status === 'active') {
+      query = query.eq('is_active', true)
+    } else if (status === 'inactive') {
+      query = query.eq('is_active', false)
+    }
+
+    // Filtro por busca (nome, email, telefone)
+    if (q && q.trim()) {
+      const searchTerm = q.trim()
+      // Normalizar telefone (remover caracteres não numéricos)
+      const phoneDigits = searchTerm.replace(/\D/g, '')
+      
+      query = query.or(`
+        full_name.ilike.%${searchTerm}%,
+        email.ilike.%${searchTerm}%,
+        whatsapp_work.ilike.%${phoneDigits}%,
+        whatsapp_personal.ilike.%${phoneDigits}%
+      `)
+    }
+
+    // Ordenação e paginação
+    query = query
       .order('full_name', { ascending: true })
+      .range(offset, offset + limit - 1)
+
+    const { data: professionals, error, count } = await query
 
     if (error) {
       console.error('Erro ao buscar profissionais:', error)
       return NextResponse.json({ error: "database_error" }, { status: 500 })
     }
 
-    return NextResponse.json({ professionals })
+    return NextResponse.json({ 
+      professionals: professionals || [],
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        pages: Math.ceil((count || 0) / limit)
+      }
+    })
   } catch (error) {
     console.error('Erro inesperado:', error)
     return NextResponse.json({ error: "internal_error" }, { status: 500 })
@@ -108,6 +157,7 @@ export async function POST(request: NextRequest) {
     whatsapp_work: string
     email: string
     notes?: string
+    is_active: boolean
   }>
 
   // Validações
@@ -150,6 +200,8 @@ export async function POST(request: NextRequest) {
   if (!Number.isInteger(profile_id) || profile_id <= 0) {
     return NextResponse.json({ error: "invalid_profile_id" }, { status: 400 })
   }
+
+  const is_active = b.is_active !== undefined ? Boolean(b.is_active) : true
 
   const supabase = createClient(url, key)
 
@@ -285,7 +337,8 @@ export async function POST(request: NextRequest) {
         whatsapp_personal,
         whatsapp_work,
         email,
-        notes: b.notes || null
+        notes: b.notes || null,
+        is_active
       })
       .select(`
         *,

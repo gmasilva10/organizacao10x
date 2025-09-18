@@ -1,0 +1,134 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Next.js 14",
+    "React 18",
+    "Tailwind CSS",
+    "Shadcn/ui",
+    "Supabase",
+    "PostgreSQL",
+    "Vercel",
+    "Lucide React",
+    "Sonner",
+    "Date-fns",
+    "Zod",
+    "React Query",
+    "Vaul",
+    "Radix UI"
+  ],
+  "features": [
+    {
+      "name": "Sistema de Autenticação",
+      "description": "Sistema completo de autenticação com Supabase Auth, login, cadastro, recuperação de senha e gerenciamento de sessão",
+      "files": [
+        "web/lib/use-auth-sync.ts",
+        "web/app/login/page.tsx",
+        "web/app/signup/page.tsx",
+        "web/app/login-simple/page.tsx",
+        "web/middleware.ts"
+      ]
+    },
+    {
+      "name": "Módulo de Alunos",
+      "description": "Sistema completo de gerenciamento de alunos com cadastro, edição, listagem, anexos e processos",
+      "files": [
+        "web/app/app/students/page.tsx",
+        "web/app/app/students/[id]/edit/page.tsx",
+        "web/components/students/StudentEditTabsV6.tsx",
+        "web/components/students/StudentCardActions.tsx",
+        "web/components/students/StudentTableActions.tsx",
+        "web/components/students/StudentAttachments.tsx",
+        "web/components/students/shared/StudentActions.tsx",
+        "web/components/students/modals/MatricularModal.tsx",
+        "web/components/students/modals/OnboardingModal.tsx",
+        "web/app/api/students/route.ts",
+        "web/app/api/students/[id]/route.ts",
+        "web/hooks/useStudents.ts"
+      ]
+    },
+    {
+      "name": "Módulo de Relacionamento",
+      "description": "Sistema de relacionamento com alunos incluindo templates, tarefas, Kanban, calendário e timeline",
+      "files": [
+        "web/app/app/relacionamento/page.tsx",
+        "web/components/relationship/RelationshipKanban.tsx",
+        "web/components/relationship/RelationshipCalendar.tsx",
+        "web/components/relationship/RelationshipTimeline.tsx",
+        "web/components/relationship/RelationshipFilters.tsx",
+        "web/hooks/useRelationshipFilters.ts",
+        "web/lib/relationship/event-registry.ts",
+        "web/lib/relationship/template-seeds.ts",
+        "web/app/api/relationship/tasks/route.ts",
+        "web/app/api/relationship/job/route.ts",
+        "web/app/api/relationship/recalculate/route.ts",
+        "web/app/api/relationship/occurrence-trigger/route.ts",
+        "web/app/api/students/[id]/relationship-logs/route.ts"
+      ]
+    },
+    {
+      "name": "Sistema de Ocorrências",
+      "description": "Gerenciamento de ocorrências dos alunos com tipos, status, lembretes e anexos",
+      "files": [
+        "web/app/api/occurrences/route.ts",
+        "web/app/api/students/[id]/occurrences/route.ts",
+        "web/components/students/StudentOccurrencesListContent.tsx"
+      ]
+    },
+    {
+      "name": "Sistema de Kanban",
+      "description": "Sistema de Kanban para gerenciamento de fluxo de trabalho e onboarding",
+      "files": [
+        "web/app/api/kanban/resync/route.ts",
+        "web/components/kanban/KanbanBoard.tsx"
+      ]
+    },
+    {
+      "name": "Sistema de Performance",
+      "description": "Sistema de monitoramento de performance com métricas, lazy loading e otimizações",
+      "files": [
+        "web/lib/perfClient.ts",
+        "web/hooks/usePreload.ts",
+        "web/hooks/useIcons.ts",
+        "web/components/ui/OptimizedIcon.tsx",
+        "web/scripts/performance-baseline.js"
+      ]
+    },
+    {
+      "name": "Sistema de Cache e Estado",
+      "description": "Gerenciamento de estado global com React Query, cache inteligente e sincronização",
+      "files": [
+        "web/lib/query-client.ts",
+        "web/components/providers/QueryProvider.tsx",
+        "web/hooks/useDebounce.ts"
+      ]
+    },
+    {
+      "name": "Sistema de UI/UX",
+      "description": "Componentes de interface padronizados, modais, toasts e feedback visual",
+      "files": [
+        "web/components/ui/",
+        "web/lib/toast-utils.ts",
+        "web/components/AppShell.tsx",
+        "web/app/layout.tsx"
+      ]
+    },
+    {
+      "name": "Sistema de Banco de Dados",
+      "description": "Migrations, RLS, funções e triggers do PostgreSQL via Supabase",
+      "files": [
+        "supabase/migrations/",
+        "web/supabase/migrations/"
+      ]
+    },
+    {
+      "name": "Sistema de Testes",
+      "description": "Testes automatizados, evidências e documentação de qualidade",
+      "files": [
+        "web/__tests__/",
+        "web/tests/",
+        "web/evidencias/",
+        "testsprite_tests/"
+      ]
+    }
+  ]
+}

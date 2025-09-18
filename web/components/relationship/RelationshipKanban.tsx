@@ -1,0 +1,446 @@
+/**
+ * GATE 10.6.3 - Kanban MVP para Relacionamento
+ * 
+ * Funcionalidades:
+ * - 4 colunas: Pendente, Para Hoje, Enviadas, Snoozed/Skipped
+ * - Filtros avançados
+ * - Cards com ações
+ * - Drag & drop (futuro)
+ */
+
+'use client'
+
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { 
+  Filter, 
+  Search, 
+  RefreshCw, 
+  Calendar,
+  MessageSquare,
+  Clock,
+  CheckCircle,
+  Pause,
+  X,
+  Copy,
+  ExternalLink,
+  User,
+  MoreHorizontal
+} from 'lucide-react'
+import TaskCard from './TaskCard'
+import { toast } from 'sonner'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import { useRelationshipFilters } from '@/hooks/useRelationshipFilters'
+
+// Mapeamento de âncoras para exibição
+const ANCHOR_LABELS = {
+  'sale_close': 'Pós Venda',
+  'first_workout': '1º Treino',
+  'weekly_followup': 'Follow-up Semanal',
+  'monthly_review': 'Revisão Mensal',
+  'birthday': 'Aniversário',
+  'renewal_window': 'Renovação',
+  'occurrence_followup': 'Follow-up Ocorrência',
+  'manual': 'Manual'
+}
+
+interface Student {
+  id: string
+  name: string
+  email: string
+  phone: string
+  status: string
+}
+
+interface Task {
+  id: string
+  student_id: string
+  template_code: string
+  anchor: string
+  scheduled_for: string
+  channel: string
+  status: 'pending' | 'due_today' | 'sent' | 'snoozed' | 'skipped' | 'failed'
+  payload: {
+    message: string
+    student_name: string
+    student_email: string
+    student_phone: string
+  }
+  variables_used: string[]
+  created_by: string
+  sent_at?: string
+  notes?: string
+  occurrence_id?: number
+  created_at: string
+  updated_at: string
+  student: Student
+}
+
+interface KanbanColumn {
+  id: string
+  title: string
+  status: string[]
+  color: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+const COLUMNS: KanbanColumn[] = [
+  {
+    id: 'pending',
+    title: 'Pendente',
+    status: ['pending'],
+    color: 'bg-yellow-100 border-yellow-300 border-2',
+    icon: Clock
+  },
+  {
+    id: 'due_today',
+    title: 'Para Hoje',
+    status: ['due_today'],
+    color: 'bg-blue-100 border-blue-300 border-2',
+    icon: Calendar
+  },
+  {
+    id: 'sent',
+    title: 'Enviadas',
+    status: ['sent'],
+    color: 'bg-green-100 border-green-300 border-2',
+    icon: CheckCircle
+  },
+  {
+    id: 'snoozed_skipped',
+    title: 'Adiadas/Puladas',
+    status: ['snoozed', 'skipped'],
+    color: 'bg-gray-100 border-gray-300 border-2',
+    icon: Pause
+  }
+]
+
+const ANCHOR_OPTIONS = [
+  { value: 'all', label: 'Todas as Âncoras' },
+  { value: 'sale_close', label: 'Fechamento da Venda' },
+  { value: 'first_workout', label: 'Primeiro Treino' },
+  { value: 'weekly_followup', label: 'Acompanhamento Semanal' },
+  { value: 'monthly_review', label: 'Revisão Mensal' },
+  { value: 'birthday', label: 'Aniversário' },
+  { value: 'renewal_window', label: 'Janela de Renovação' },
+  { value: 'occurrence_followup', label: 'Follow-up de Ocorrência' }
+]
+
+const CHANNEL_OPTIONS = [
+  { value: 'all', label: 'Todos os Canais' },
+  { value: 'whatsapp', label: 'WhatsApp' },
+  { value: 'email', label: 'E-mail' },
+  { value: 'manual', label: 'Manual' }
+]
+
+const STATUS_OPTIONS = [
+  { value: 'all', label: 'Todos os Status' },
+  { value: 'pending', label: 'Pendente' },
+  { value: 'due_today', label: 'Para Hoje' },
+  { value: 'sent', label: 'Enviadas' },
+  { value: 'snoozed', label: 'Snoozed' },
+  { value: 'skipped', label: 'Skipped' }
+]
+
+interface RelationshipKanbanProps {
+  onTaskUpdate?: () => void
+}
+
+export interface RelationshipKanbanRef {
+  refresh: () => void
+}
+
+const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanProps>(({ onTaskUpdate }, ref) => {
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState(true)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    page_size: 20,
+    total: 0,
+    total_pages: 0
+  })
+  
+  const { 
+    debouncedFilters, 
+    updateFilters, 
+    resetFilters, 
+    hasActiveFilters,
+    getApiFilters 
+  } = useRelationshipFilters()
+
+  // Buscar tarefas
+  const fetchTasks = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: pagination.page.toString(),
+        page_size: pagination.page_size.toString(),
+        ...getApiFilters()
+      })
+
+      const response = await fetch(`/api/relationship/tasks?${params}`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao buscar tarefas')
+      }
+
+      console.log(`📋 [FETCH] Tarefas recebidas: ${data.data?.length || 0}`)
+      setTasks(data.data || [])
+      setPagination(data.pagination || pagination)
+    } catch (error) {
+      console.error('Erro ao buscar tarefas:', error)
+      toast.error('Erro ao buscar tarefas')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Atualizar status da tarefa
+  const updateTaskStatus = async (taskId: string, status: string, notes?: string) => {
+    try {
+      const response = await fetch('/api/relationship/tasks', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          task_id: taskId,
+          status,
+          notes
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao atualizar tarefa')
+      }
+
+      // Atualizar estado local
+      setTasks(prev => prev.map(task => 
+        task.id === taskId 
+          ? { ...task, status: status as any, notes: notes || task.notes }
+          : task
+      ))
+
+      toast.success('Tarefa atualizada com sucesso')
+    } catch (error) {
+      console.error('Erro ao atualizar tarefa:', error)
+      toast.error('Erro ao atualizar tarefa')
+    }
+  }
+
+  // Copiar mensagem
+  const copyMessage = (message: string) => {
+    navigator.clipboard.writeText(message)
+    toast.success('Mensagem copiada para a área de transferência')
+  }
+
+  // Abrir WhatsApp Web
+  const openWhatsApp = (phone: string, message: string) => {
+    const encodedMessage = encodeURIComponent(message)
+    const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`
+    window.open(whatsappUrl, '_blank')
+  }
+
+  // Snooze tarefa
+  const snoozeTask = (taskId: string, days: number) => {
+    const newDate = new Date()
+    newDate.setDate(newDate.getDate() + days)
+    
+    updateTaskStatus(taskId, 'snoozed', `Snoozed por ${days} dia(s) até ${format(newDate, 'dd/MM/yyyy', { locale: ptBR })}`)
+  }
+
+  // Expor função de refresh para componentes pai
+  useImperativeHandle(ref, () => ({
+    refresh: fetchTasks
+  }))
+
+  // Buscar tarefas quando filtros mudarem
+  useEffect(() => {
+    fetchTasks()
+  }, [debouncedFilters, pagination.page])
+
+  // Agrupar tarefas por coluna
+  const getTasksByColumn = (columnId: string) => {
+    const column = COLUMNS.find(c => c.id === columnId)
+    if (!column) return []
+
+    return tasks.filter(task => {
+      // Lógica especial para "Para Hoje" - baseada na data, não no status
+      if (columnId === 'due_today') {
+        const taskDate = new Date(task.scheduled_for)
+        const today = new Date()
+        const isToday = taskDate.toDateString() === today.toDateString()
+        return task.status === 'pending' && isToday
+      }
+      
+      // Para coluna "Pendente" - excluir tarefas de hoje (que vão para "Para Hoje")
+      if (columnId === 'pending') {
+        const taskDate = new Date(task.scheduled_for)
+        const today = new Date()
+        const isToday = taskDate.toDateString() === today.toDateString()
+        return task.status === 'pending' && !isToday
+      }
+      
+      // Outras colunas usam status normal
+      return column.status.includes(task.status)
+    })
+  }
+
+  // Excluir tarefa
+  const deleteTask = async (taskId: string) => {
+    try {
+      console.log(`🗑️ [DELETE] Iniciando exclusão da tarefa: ${taskId}`)
+      
+      const response = await fetch(`/api/relationship/tasks/${taskId}`, {
+        method: 'DELETE'
+      })
+      
+      console.log(`🗑️ [DELETE] Status da resposta: ${response.status}`)
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error(`🗑️ [DELETE] Erro na resposta:`, errorData)
+        throw new Error('Erro ao excluir tarefa')
+      }
+      
+      const result = await response.json()
+      console.log(`🗑️ [DELETE] Resposta da API:`, result)
+      
+      toast.success('Tarefa excluída com sucesso')
+      
+      // Atualizar lista
+      console.log(`🗑️ [DELETE] Atualizando lista de tarefas...`)
+      
+      // Forçar atualização imediata do estado local
+      setTasks(prevTasks => {
+        const filtered = prevTasks.filter(task => task.id !== taskId)
+        console.log(`🗑️ [DELETE] Estado local: ${prevTasks.length} → ${filtered.length} tarefas`)
+        return filtered
+      })
+      
+      // Buscar dados atualizados do servidor imediatamente
+      console.log(`🗑️ [DELETE] Buscando dados atualizados do servidor...`)
+      await fetchTasks()
+      console.log(`🗑️ [DELETE] Lista sincronizada com servidor`)
+      
+    } catch (error) {
+      console.error('❌ [DELETE] Erro ao excluir tarefa:', error)
+      toast.error('Erro ao excluir tarefa')
+    }
+  }
+
+  // Renderizar card da tarefa usando componente simplificado
+  const renderTaskCard = (task: Task) => (
+    <TaskCard
+      key={task.id}
+      task={task}
+      onCopyMessage={copyMessage}
+      onOpenWhatsApp={openWhatsApp}
+      onUpdateStatus={updateTaskStatus}
+      onSnoozeTask={snoozeTask}
+      onDeleteTask={deleteTask}
+    />
+  )
+
+  return (
+    <div className="space-y-4">
+      {/* Header simplificado */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-900">Tarefas de Relacionamento</h2>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchTasks}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Atualizar
+          </Button>
+        </div>
+      </div>
+
+
+      {/* Kanban Board Simplificado */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {COLUMNS.map(column => {
+          const columnTasks = getTasksByColumn(column.id)
+          
+          return (
+            <div key={column.id} className="space-y-3">
+              {/* Header da coluna colorido */}
+              <div className={`p-3 rounded-lg border-2 ${column.color}`}>
+                <div className="flex items-center gap-2">
+                  <column.icon className="h-4 w-4" />
+                  <h3 className="font-medium text-sm">{column.title}</h3>
+                  <Badge variant="secondary" className="ml-auto">
+                    {columnTasks.length}
+                  </Badge>
+                </div>
+              </div>
+              
+              {/* Lista de tarefas */}
+              <div className="space-y-2 min-h-[300px]">
+                {loading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <RefreshCw className="h-5 w-5 animate-spin text-gray-400" />
+                  </div>
+                ) : columnTasks.length === 0 ? (
+                  <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
+                    Nenhuma tarefa
+                  </div>
+                ) : (
+                  columnTasks.map(renderTaskCard)
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Paginação */}
+      {pagination.total_pages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+            disabled={pagination.page === 1}
+          >
+            Anterior
+          </Button>
+          
+          <span className="text-sm text-gray-600">
+            Página {pagination.page} de {pagination.total_pages}
+          </span>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+            disabled={pagination.page === pagination.total_pages}
+          >
+            Próxima
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+})
+
+export default RelationshipKanban

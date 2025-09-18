@@ -7,6 +7,11 @@ export async function middleware(request: NextRequest) {
   // Redirect landing pós-login para /app
   try {
     const url = new URL(request.url)
+    // Redirect legado: /students -> /app/students
+    if (url.pathname === "/students" || url.pathname.startsWith("/students/")) {
+      const redirectTo = url.pathname.replace("/students", "/app/students") + url.search
+      return NextResponse.redirect(new URL(redirectTo, request.url), { status: 301 })
+    }
     const env = process.env.NEXT_PUBLIC_ENV || process.env.NODE_ENV
     // Congelamento de produção: bloquear login em prod
     if (env === 'production' && url.pathname.startsWith('/api/auth')) {

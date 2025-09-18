@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/toast"
-import { useConfirmDialog } from "@/components/ui/confirm-dialog"
+import { useConfirmDialog, ConfirmDialog } from "@/components/ui/confirm-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,

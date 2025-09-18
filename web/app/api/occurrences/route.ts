@@ -178,7 +178,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/occurrences
 export async function POST(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.create', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, tenant_id }) => {
     try {
       const supabase = await createClient()
       const startTime = Date.now()
@@ -309,6 +309,44 @@ export async function POST(request: NextRequest) {
       if (error) {
         console.error('Erro ao criar ocorrência:', error)
         return NextResponse.json({ error: 'Erro ao criar ocorrência' }, { status: 500 })
+      }
+
+      // GATILHO DE RELACIONAMENTO - Criar tarefa de follow-up se houver lembrete
+      if (reminder_at && reminder_status === 'PENDING') {
+        try {
+          // Buscar dados do tipo de ocorrência para o gatilho
+          const { data: occurrenceType } = await supabase
+            .from('occurrence_types')
+            .select('name')
+            .eq('id', type_id)
+            .eq('tenant_id', tenant_id)
+            .single()
+
+          // Disparar gatilho de relacionamento
+          const triggerResponse = await fetch(`${request.nextUrl.origin}/api/relationship/occurrence-trigger`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': request.headers.get('Authorization') || '',
+              'Cookie': request.headers.get('Cookie') || ''
+            },
+            body: JSON.stringify({
+              student_id: student_id,
+              occurrence_id: newOccurrence.id,
+              reminder_at: reminder_at,
+              occurrence_type: occurrenceType?.name || 'Ocorrência',
+              occurrence_notes: notes.trim(),
+              tenant_id: tenant_id
+            })
+          })
+
+          if (!triggerResponse.ok) {
+            console.warn('Falha ao criar tarefa de follow-up:', await triggerResponse.text())
+          }
+        } catch (triggerError) {
+          console.warn('Erro no gatilho de relacionamento:', triggerError)
+          // Não falhar a criação da ocorrência por causa do gatilho
+        }
       }
 
       const endTime = Date.now()

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { resolveRequestContext } from '@/server/context'
 import { z } from 'zod'
+import { normalizeToE164DigitsBR } from '@/lib/phone-normalize'
 
 const WRITERS = new Set(['admin', 'manager'])
 
-// Schema de validação para atualização
+// Schema de validação para atualização completa
 const updateProfessionalSchema = z.object({
   full_name: z.string().min(1, 'Nome completo é obrigatório'),
   cpf: z.string().min(1, 'CPF é obrigatório'),
@@ -16,6 +17,11 @@ const updateProfessionalSchema = z.object({
   email: z.string().email('E-mail inválido'),
   profile_id: z.number().int().positive('Perfil é obrigatório'),
   notes: z.string().optional()
+})
+
+// Schema de validação para toggle de status (apenas is_active)
+const toggleStatusSchema = z.object({
+  is_active: z.boolean()
 })
 
 // Função para validar CPF
@@ -78,7 +84,54 @@ export async function PATCH(
   try {
     const body = await request.json()
     
-    // Validar dados
+    // Detectar se é uma atualização de status (apenas is_active)
+    const isStatusUpdate = body.hasOwnProperty('is_active') && Object.keys(body).length === 1
+    
+    if (isStatusUpdate) {
+      // Atualização apenas de status
+      const statusData = toggleStatusSchema.parse(body)
+      
+      // Verificar se o profissional existe e pertence ao tenant
+      const { data: existingProfessional, error: fetchError } = await supabase
+        .from('professionals')
+        .select('id, tenant_id, full_name')
+        .eq('id', professionalId)
+        .eq('tenant_id', ctx.tenantId)
+        .single()
+
+      if (fetchError || !existingProfessional) {
+        return NextResponse.json({ error: "professional_not_found" }, { status: 404 })
+      }
+
+      // Atualizar apenas is_active
+      const { data: updatedProfessional, error: updateError } = await supabase
+        .from('professionals')
+        .update({
+          is_active: statusData.is_active,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', professionalId)
+        .eq('tenant_id', ctx.tenantId)
+        .select(`
+          id,
+          full_name,
+          is_active,
+          professional_profiles!inner(name)
+        `)
+        .single()
+
+      if (updateError) {
+        console.error('Erro ao atualizar status do profissional:', updateError)
+        return NextResponse.json({ error: "database_error" }, { status: 500 })
+      }
+
+      return NextResponse.json({ 
+        professional: updatedProfessional,
+        message: `Profissional ${statusData.is_active ? 'ativado' : 'inativado'} com sucesso`
+      })
+    }
+    
+    // Atualização completa (validação existente)
     const validatedData = updateProfessionalSchema.parse(body)
     
     // Validar CPF
@@ -86,14 +139,16 @@ export async function PATCH(
       return NextResponse.json({ error: "invalid_cpf" }, { status: 400 })
     }
     
-    // Validar WhatsApp profissional
-    if (!validateWhatsApp(validatedData.whatsapp_work)) {
+    // Normalizar WhatsApp profissional (aceita 10/11 dígitos BR)
+    const workNorm = normalizeToE164DigitsBR(validatedData.whatsapp_work)
+    if (!workNorm.ok || !workNorm.value) {
       return NextResponse.json({ error: "invalid_whatsapp_work" }, { status: 400 })
     }
-    
-    // Validar WhatsApp pessoal se fornecido
-    if (validatedData.whatsapp_personal && !validateWhatsApp(validatedData.whatsapp_personal)) {
-      return NextResponse.json({ error: "invalid_whatsapp_personal" }, { status: 400 })
+    // Normalizar WhatsApp pessoal se fornecido
+    let personalNorm: string | null = null
+    if (validatedData.whatsapp_personal) {
+      const p = normalizeToE164DigitsBR(validatedData.whatsapp_personal)
+      if (p.ok && p.value) personalNorm = p.value
     }
 
     // Verificar se o profissional existe e pertence ao tenant
@@ -146,8 +201,8 @@ export async function PATCH(
         cpf: validatedData.cpf,
         sex: validatedData.sex,
         birth_date: validatedData.birth_date,
-        whatsapp_personal: validatedData.whatsapp_personal || null,
-        whatsapp_work: validatedData.whatsapp_work,
+        whatsapp_personal: personalNorm,
+        whatsapp_work: workNorm.value,
         email: validatedData.email,
         profile_id: validatedData.profile_id,
         notes: validatedData.notes || null,

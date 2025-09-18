@@ -20,16 +20,23 @@ import {
   GraduationCap,
   Trash2,
   UserCheck,
-  Paperclip
+  Paperclip,
+  UserPlus,
+  Users
 } from "lucide-react"
 import { StudentOccurrenceModal } from "../StudentOccurrenceModal"
+import StudentRelationshipModal from "../StudentRelationshipModal"
 import PlaceholderModal from "../modals/PlaceholderModal"
 import MatricularModal from "../modals/MatricularModal"
 import OnboardingModal from "../modals/OnboardingModal"
+import MessageComposer from "../../relationship/MessageComposer"
+import WhatsAppContactModal from "../modals/WhatsAppContactModal"
+import WhatsAppCreateGroupModal from "../modals/WhatsAppCreateGroupModal"
 
 interface StudentActionsProps {
   studentId: string
   studentName: string
+  studentPhone?: string // Telefone do aluno
   variant?: 'card' | 'edit' // Variante para card ou página de edição
   onActionComplete?: () => void // Callback para atualizar dados após ação
 }
@@ -37,18 +44,24 @@ interface StudentActionsProps {
 export default function StudentActions({ 
   studentId, 
   studentName, 
+  studentPhone,
   variant = 'card',
   onActionComplete 
 }: StudentActionsProps) {
   const [open, setOpen] = useState(false)
   const [occurrenceModalOpen, setOccurrenceModalOpen] = useState(false)
+  const [relacionamentoModalOpen, setRelacionamentoModalOpen] = useState(false)
   const [gerarAnamneseModalOpen, setGerarAnamneseModalOpen] = useState(false)
   const [gerarDiretrizModalOpen, setGerarDiretrizModalOpen] = useState(false)
   const [whatsappModalOpen, setWhatsappModalOpen] = useState(false)
   const [emailModalOpen, setEmailModalOpen] = useState(false)
   const [matricularModalOpen, setMatricularModalOpen] = useState(false)
   const [onboardingModalOpen, setOnboardingModalOpen] = useState(false)
+  const [messageComposerOpen, setMessageComposerOpen] = useState(false)
+  const [arquivosModalOpen, setArquivosModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [whatsappContactModalOpen, setWhatsappContactModalOpen] = useState(false)
+  const [whatsappCreateGroupOpen, setWhatsappCreateGroupOpen] = useState(false)
 
   const handleAction = (action: () => void) => {
     setOpen(false)
@@ -75,7 +88,7 @@ export default function StudentActions({
     return (
       <>
         {/* Ações do Card */}
-        <div className="flex items-center gap-1 pt-1.5 border-t">
+        <div className="flex items-center gap-1">
           {/* Anexos */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -88,6 +101,11 @@ export default function StudentActions({
                 <AlertTriangle className="h-4 w-4 mr-2 text-red-600" />
                 Ocorrências
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAction(() => setRelacionamentoModalOpen(true))}>
+                <MessageSquare className="h-4 w-4 mr-2 text-orange-600" />
+                Relacionamento
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => handleAction(() => setGerarAnamneseModalOpen(true))}>
                 <FileText className="h-4 w-4 mr-2 text-blue-600" />
                 Anamnese
@@ -99,6 +117,11 @@ export default function StudentActions({
               <DropdownMenuItem onClick={() => handleAction(() => setGerarDiretrizModalOpen(true))}>
                 <Target className="h-4 w-4 mr-2 text-purple-600" />
                 Treino
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleAction(() => setArquivosModalOpen(true))}>
+                <Paperclip className="h-4 w-4 mr-2 text-gray-600" />
+                Arquivos
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -134,7 +157,7 @@ export default function StudentActions({
                 Nova Ocorrência
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleAction(() => setWhatsappModalOpen(true))}>
+              <DropdownMenuItem onClick={() => handleAction(() => setMessageComposerOpen(true))}>
                 <MessageSquare className="h-4 w-4 mr-2 text-green-600" />
                 Enviar Mensagem
               </DropdownMenuItem>
@@ -239,6 +262,11 @@ export default function StudentActions({
               <AlertTriangle className="h-4 w-4 mr-2 text-red-600" />
               Ocorrências
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleAction(() => setRelacionamentoModalOpen(true))}>
+              <MessageSquare className="h-4 w-4 mr-2 text-orange-600" />
+              Relacionamento
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleAction(() => setGerarAnamneseModalOpen(true))}>
               <FileText className="h-4 w-4 mr-2 text-blue-600" />
               Anamnese
@@ -250,6 +278,11 @@ export default function StudentActions({
             <DropdownMenuItem onClick={() => handleAction(() => setGerarDiretrizModalOpen(true))}>
               <Target className="h-4 w-4 mr-2 text-purple-600" />
               Treino
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleAction(() => setArquivosModalOpen(true))}>
+              <Paperclip className="h-4 w-4 mr-2 text-gray-600" />
+              Arquivos
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -287,7 +320,7 @@ export default function StudentActions({
               Nova Ocorrência
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleAction(() => setWhatsappModalOpen(true))}>
+            <DropdownMenuItem onClick={() => handleAction(() => setMessageComposerOpen(true))}>
               <MessageSquare className="h-4 w-4 mr-2 text-green-600" />
               Enviar Mensagem
             </DropdownMenuItem>
@@ -295,6 +328,28 @@ export default function StudentActions({
               <Mail className="h-4 w-4 mr-2 text-blue-600" />
               Enviar E-mail
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <MessageSquare className="h-4 w-4 mr-2 text-green-600" />
+                  WhatsApp ▸
+                </DropdownMenuItem>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="start" className="w-48">
+                <DropdownMenuItem onClick={() => handleAction(() => setWhatsappContactModalOpen(true))}>
+                  <UserPlus className="h-4 w-4 mr-2 text-green-600" />
+                  Criar contato
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  console.log('🔍 WhatsApp Create Group clicked!')
+                  handleAction(() => setWhatsappCreateGroupOpen(true))
+                }}>
+                  <Users className="h-4 w-4 mr-2 text-green-600" />
+                  Criar grupo
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               onClick={() => handleAction(() => setDeleteModalOpen(true))}
@@ -369,6 +424,59 @@ export default function StudentActions({
         title="Excluir Aluno"
         description="Funcionalidade de exclusão em desenvolvimento."
         icon={<Trash2 className="h-5 w-5 text-red-600" />}
+      />
+
+      {/* Relacionamento Modal */}
+      <StudentRelationshipModal
+        open={relacionamentoModalOpen}
+        onOpenChange={setRelacionamentoModalOpen}
+        studentId={studentId}
+        studentName={studentName}
+        studentPhone={studentPhone}
+        onSuccess={() => {
+          onActionComplete?.()
+        }}
+      />
+
+      {/* MessageComposer Modal */}
+      <MessageComposer
+        open={messageComposerOpen}
+        onOpenChange={setMessageComposerOpen}
+        studentId={studentId}
+        studentName={studentName}
+        studentPhone={studentPhone}
+        onSuccess={() => {
+          onActionComplete?.()
+        }}
+      />
+
+      {/* WhatsApp Contact Modal */}
+      <WhatsAppContactModal
+        open={whatsappContactModalOpen}
+        onClose={() => setWhatsappContactModalOpen(false)}
+        studentId={studentId}
+        studentName={studentName}
+        studentPhone={studentPhone}
+      />
+
+      {/* WhatsApp Create Group Modal */}
+      { (process.env.NEXT_PUBLIC_WA_CREATE_GROUP_ENABLED === 'true') && (
+        <WhatsAppCreateGroupModal
+          open={whatsappCreateGroupOpen}
+          onOpenChange={setWhatsappCreateGroupOpen}
+          studentId={studentId}
+          studentName={studentName}
+          studentPhone={studentPhone}
+        />
+      )}
+
+      {/* Arquivos Modal */}
+      <PlaceholderModal
+        open={arquivosModalOpen}
+        onClose={() => setArquivosModalOpen(false)}
+        title="Arquivos do Aluno"
+        description="Funcionalidade de gerenciamento de arquivos em desenvolvimento."
+        icon={<Paperclip className="h-5 w-5 text-gray-600" />}
       />
     </>
   )

@@ -11,8 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { X, Upload, Download, Trash2, Save, AlertCircle } from "lucide-react"
+import { X, Upload, Download, Trash2, Save, AlertCircle, MessageSquare } from "lucide-react"
 import { useOccurrencesPermissions } from "@/lib/use-occurrences-permissions"
+import MessageComposer from "../relationship/MessageComposer"
 
 type OccurrenceDetails = {
   id: number
@@ -60,6 +61,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
   const [hasChanges, setHasChanges] = useState(false)
   const [canEdit, setCanEdit] = useState(false)
   const [unsavedConfirmOpen, setUnsavedConfirmOpen] = useState(false)
+  const [messageComposerOpen, setMessageComposerOpen] = useState(false)
 
   // Fontes para selects
   const [groups, setGroups] = useState<Array<{id:number; name:string}>>([])
@@ -250,6 +252,10 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
       return
     }
     onClose()
+  }
+
+  const handleFollowUp = () => {
+    setMessageComposerOpen(true)
   }
 
   useEffect(() => {
@@ -493,16 +499,27 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
         )}
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={handleClose}>
-            {hasChanges ? 'Cancelar' : 'Fechar'}
+        <div className="flex justify-between items-center pt-4 border-t">
+          <Button 
+            variant="outline" 
+            onClick={handleFollowUp}
+            className="flex items-center gap-2"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Enviar follow-up
           </Button>
-          {canEdit && hasChanges && (
-            <Button onClick={handleSave} disabled={saving}>
-              <Save className="w-4 h-4 mr-1" />
-              {saving ? 'Salvando...' : 'Salvar'}
+          
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleClose}>
+              {hasChanges ? 'Cancelar' : 'Fechar'}
             </Button>
-          )}
+            {canEdit && hasChanges && (
+              <Button onClick={handleSave} disabled={saving}>
+                <Save className="w-4 h-4 mr-1" />
+                {saving ? 'Salvando...' : 'Salvar'}
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
       {/* Confirmação customizada para alterações não salvas */}
@@ -525,6 +542,21 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* MessageComposer Modal */}
+      {data && (
+        <MessageComposer
+          open={messageComposerOpen}
+          onOpenChange={setMessageComposerOpen}
+          studentId={data.student_id}
+          studentName={data.student_name || 'Aluno'}
+          initialMessage={`Follow-up da ocorrência #${data.id}: ${data.notes || 'Sem descrição'}`}
+          onSuccess={() => {
+            toast.success('Follow-up enviado com sucesso!')
+            onSave?.()
+          }}
+        />
+      )}
     </Dialog>
   )
 }

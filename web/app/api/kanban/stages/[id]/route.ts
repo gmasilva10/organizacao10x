@@ -157,11 +157,47 @@ export async function DELETE(
       return NextResponse.json({ error: 'Não é possível excluir colunas fixas' }, { status: 403 })
     }
 
+    // Encontrar coluna padrão ("Novo Aluno" ou posição 1)
+    const { data: defaultStage } = await supabase
+      .from('kanban_stages')
+      .select('id, name, position, is_fixed')
+      .eq('org_id', membership.tenant_id)
+      .or('position.eq.1,name.eq.Novo Aluno')
+      .order('position', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    const defaultStageId = defaultStage?.id
+
+    // Se houver cards na coluna, mover para a coluna padrão antes de excluir
+    if (defaultStageId) {
+      const { error: moveErr } = await supabase
+        .from('kanban_items')
+        .update({ stage_id: defaultStageId })
+        .eq('stage_id', id)
+        .eq('org_id', membership.tenant_id)
+      if (moveErr) {
+        console.error('Erro ao mover cards para coluna padrão:', moveErr)
+        return NextResponse.json({ error: 'Erro ao mover cards para a coluna padrão' }, { status: 500 })
+      }
+    } else {
+      // Se não houver coluna padrão, impedir exclusão caso existam cards
+      const { count } = await supabase
+        .from('kanban_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('stage_id', id)
+        .eq('org_id', membership.tenant_id)
+      if ((count || 0) > 0) {
+        return NextResponse.json({ error: 'not_empty', message: 'Não há coluna padrão para receber os cards' }, { status: 422 })
+      }
+    }
+
     // Excluir coluna
     const { error: deleteError } = await supabase
       .from('kanban_stages')
       .delete()
       .eq('id', id)
+      .eq('org_id', membership.tenant_id)
 
     if (deleteError) {
       console.error('Erro ao excluir coluna:', deleteError)
@@ -188,10 +224,7 @@ export async function DELETE(
       // Não falha a operação se o log falhar
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Coluna excluída com sucesso'
-    })
+    return NextResponse.json({ success: true, message: 'Coluna excluída com sucesso', movedTo: defaultStageId || null })
 
   } catch (error) {
     console.error('Erro inesperado:', error)

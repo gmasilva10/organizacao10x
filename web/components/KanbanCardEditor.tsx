@@ -581,6 +581,7 @@ export function KanbanCardEditor({
       {/* Modais de Confirmação */}
       <ConfirmDialog
         open={advanceConfirmOpen}
+        onOpenChange={setAdvanceConfirmOpen}
         title="Avançar para próxima etapa"
         description="Tarefas concluídas. Deseja avançar para a próxima etapa?"
         onCancel={() => setAdvanceConfirmOpen(false)}
@@ -591,13 +592,14 @@ export function KanbanCardEditor({
 
       <ConfirmDialog
         open={completeConfirmOpen}
+        onOpenChange={setCompleteConfirmOpen}
         title="Encerrar onboarding"
         description="Treino entregue. Deseja encerrar o onboarding e enviar para o Histórico?"
         onCancel={() => setCompleteConfirmOpen(false)}
         onConfirm={handleComplete}
         confirmText={isCompleting ? "Encerrando..." : "Encerrar"}
         cancelText="Manter aqui"
-        destructive
+        variant="destructive"
       />
 
       {/* Log Drawer */}

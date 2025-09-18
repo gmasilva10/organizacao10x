@@ -69,7 +69,7 @@ export default function StudentsPage() {
   // Prefetch para detalhe do aluno
   const prefetchStudent = usePrefetchStudent()
   
-  const students = studentsData?.students || []
+  const students = (studentsData as any)?.students || []
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -99,11 +99,8 @@ export default function StudentsPage() {
     })
   }
 
-  const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.phone.includes(searchTerm)
-  )
+  // A busca agora é feita pela API, não no frontend
+  const filteredStudents = students
 
   async function handleCreate(payload: {
     name: string
@@ -125,19 +122,7 @@ export default function StudentsPage() {
       }
       const data = await res.json()
       const created = data?.student || data
-      // Atualiza listagem local (mantendo compatibilidade com mock)
-      setStudents(prev => [
-        {
-          id: created.id || String(Date.now()),
-          name: created.name,
-          email: created.email,
-          phone: created.phone || '',
-          status: created.status || 'onboarding',
-          created_at: created.created_at || new Date().toISOString(),
-          trainer: created.trainer_id ? { id: created.trainer_id, name: created.trainer_name || '' } : null
-        },
-        ...prev,
-      ])
+      // A listagem será atualizada automaticamente pelo React Query
       showStudentUpdated()
     } catch (e: any) {
       showStudentError("criar")
@@ -248,7 +233,7 @@ export default function StudentsPage() {
       ) : viewMode === 'cards' ? (
         /* Visualização em Cards - GATE 10.4.2 Densidade Visual */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-          {filteredStudents.map((student) => (
+          {filteredStudents.map((student: Student) => (
             <Card key={student.id} className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-1.5">
                 <div className="flex items-start justify-between">
@@ -341,7 +326,7 @@ export default function StudentsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredStudents.map((student) => (
+                  {filteredStudents.map((student: Student) => (
                     <tr key={student.id} className="border-b hover:bg-muted/50">
                       <td className="p-3">
                         <div className="flex items-center gap-2">

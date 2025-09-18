@@ -1,0 +1,46 @@
+Atividades – 19/09/2025 (Organização10x)
+
+1) Auditoria dos modais de responsável
+   - Padronizar responsible_user_id (UUID profiles).
+   - Confirmar auditoria completa em todos os modais.
+   - Evidência: Atividades.txt + screenshots.
+
+2) Adicionar correlationId em logs
+   - Padrão: YYYYMMDDTHHMMSS-<tenant>-<req>-<route>.
+   - Implementar em Ocorrências/Diretrizes.
+
+3) GATE D3 – motor real do Preview
+   - Implementar fórmulas dos 8 protocolos antropométricos.
+   - Estruturar métodos aeróbios (FCR, PSE, vVO2, MFEL) e RIR → %1RM.
+   - QA inicial comparando com planilha “Anamnese - TOMADA DE DECISÃO.xlsx”.
+   - Evidência: web/evidencias/D3_motor_resultados.json.
+
+4) WhatsApp (Z-API)
+   - Confirmar endpoints finais (create-group/add-participant/add-admin/leave-group).
+   - Validar normalização E.164 + DDD 11.
+   - Definir rate limit/TTL.
+   - Evidência: web/evidencias/zapi_logs.json.
+
+5) UI/UX Premium
+   - Revisão global: cards vidro, sidebar, split, skeleton.
+   - Checklist: zero scroll indevido, loading feedback, toasts consistentes.
+   - Painel de Variáveis (Relacionamento): aplicar design premium com busca, contadores, estados vazios, atalhos (Ctrl+1-4), animações suaves.
+
+6) Smoke tests (happy path)
+   - Cobrir: abrir modal → salvar → visualizar.
+   - Evidência: web/evidencias/smoke/ (prints Playwright).
+
+7) /api/students – N+1 e cache seguro
+   - Revisar selects e implementar cache com ETag forte.
+
+8) Feature flags & documentação
+   - Tabela de FLAGS no README (client/server, default, owner).
+
+9) Governança Financeiro
+   - Redigir Governanca_Financeiro.txt com papéis, regras e SLA.
+   - Validar com sponsor antes de DEV iniciar.
+
+Registros obrigatórios:
+- Atividades.txt: cada entrega com timestamp real.
+- Pendencias_Setembro2025.txt: bloqueios/dependências.
+- Checklist_Release_Validation.txt: atualizar após QA.

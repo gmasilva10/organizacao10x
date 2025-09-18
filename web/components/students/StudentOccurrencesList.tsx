@@ -4,11 +4,12 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AlertTriangle, Eye, Edit, Calendar, User, Filter } from "lucide-react"
+import { AlertTriangle, Eye, Edit, Calendar, User, Filter, MessageSquare } from "lucide-react"
 import { OccurrenceDetailsModal } from "@/components/occurrences/OccurrenceDetailsModal"
 import { toast } from "sonner"
 import EmptyState from "@/components/ui/EmptyState"
 import { showNoOccurrencesFound } from "@/lib/toast-utils"
+import MessageComposer from "../relationship/MessageComposer"
 
 type OccurrenceRow = {
   id: number
@@ -39,6 +40,8 @@ export default function StudentOccurrencesList({ studentId, studentName }: Stude
   const [loading, setLoading] = useState(false)
   const [selectedOccurrenceId, setSelectedOccurrenceId] = useState<number | undefined>()
   const [detailsModalOpen, setDetailsModalOpen] = useState(false)
+  const [messageComposerOpen, setMessageComposerOpen] = useState(false)
+  const [selectedOccurrence, setSelectedOccurrence] = useState<OccurrenceRow | null>(null)
 
   const fetchOccurrences = async () => {
     setLoading(true)
@@ -72,6 +75,11 @@ export default function StudentOccurrencesList({ studentId, studentName }: Stude
   const handleViewEdit = (occurrence: OccurrenceRow) => {
     setSelectedOccurrenceId(occurrence.id)
     setDetailsModalOpen(true)
+  }
+
+  const handleFollowUp = (occurrence: OccurrenceRow) => {
+    setSelectedOccurrence(occurrence)
+    setMessageComposerOpen(true)
   }
 
   const handleCloseModal = () => {
@@ -198,14 +206,26 @@ export default function StudentOccurrencesList({ studentId, studentName }: Stude
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewEdit(occurrence)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewEdit(occurrence)}
+                          className="h-8 w-8 p-0"
+                          title="Ver detalhes"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleFollowUp(occurrence)}
+                          className="h-8 w-8 p-0"
+                          title="Enviar follow-up"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -221,6 +241,21 @@ export default function StudentOccurrencesList({ studentId, studentName }: Stude
           occurrenceId={selectedOccurrenceId}
           open={detailsModalOpen}
           onClose={handleCloseModal}
+        />
+      )}
+
+      {/* MessageComposer Modal */}
+      {selectedOccurrence && (
+        <MessageComposer
+          open={messageComposerOpen}
+          onOpenChange={setMessageComposerOpen}
+          studentId={selectedOccurrence.student_id}
+          studentName={selectedOccurrence.student_name || 'Aluno'}
+          initialMessage={`Follow-up da ocorrência #${selectedOccurrence.id}: ${selectedOccurrence.notes || 'Sem descrição'}`}
+          onSuccess={() => {
+            toast.success('Follow-up enviado com sucesso!')
+            fetchOccurrences()
+          }}
         />
       )}
     </>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Ocorrências - Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug de Ocorrências</h1>
+    
+    <div class="section info">
+        <h3>1. Verificar Permissões</h3>
+        <button onclick="checkPermissions()">Verificar Permissões</button>
+        <div id="permissions-result"></div>
+    </div>
+    
+    <div class="section info">
+        <h3>2. Testar Criação de Ocorrência</h3>
+        <button onclick="testCreateOccurrence()">Testar Criação</button>
+        <div id="create-result"></div>
+    </div>
+    
+    <div class="section info">
+        <h3>3. Verificar Dados Necessários</h3>
+        <button onclick="checkRequiredData()">Verificar Dados</button>
+        <div id="data-result"></div>
+    </div>
+
+    <script>
+        async function checkPermissions() {
+            const resultDiv = document.getElementById('permissions-result')
+            resultDiv.innerHTML = '⏳ Verificando...'
+            
+            try {
+                const response = await fetch('/api/debug/occurrences-permissions')
+                const data = await response.json()
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Usuário Autenticado</h4>
+                            <p><strong>Email:</strong> ${data.user.email}</p>
+                            <p><strong>Role:</strong> ${data.membership.role}</p>
+                            <p><strong>Tenant:</strong> ${data.membership.tenant_id}</p>
+                            <h4>📋 Permissões:</h4>
+                            <ul>
+                                <li>Read: ${data.permissions.read ? '✅' : '❌'}</li>
+                                <li>Write: ${data.permissions.write ? '✅' : '❌'}</li>
+                                <li>Close: ${data.permissions.close ? '✅' : '❌'}</li>
+                                <li>Manage: ${data.permissions.manage ? '✅' : '❌'}</li>
+                            </ul>
+                            <h4>📊 Dados Disponíveis:</h4>
+                            <ul>
+                                <li>Grupos de Ocorrência: ${data.data.occurrenceGroups}</li>
+                                <li>Tipos de Ocorrência: ${data.data.occurrenceTypes}</li>
+                                <li>Alunos: ${data.data.students}</li>
+                            </ul>
+                        </div>
+                    `
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro de Autenticação</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de Conexão</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `
+            }
+        }
+        
+        async function testCreateOccurrence() {
+            const resultDiv = document.getElementById('create-result')
+            resultDiv.innerHTML = '⏳ Testando criação...'
+            
+            try {
+                // Primeiro, vamos buscar dados necessários
+                const debugResponse = await fetch('/api/debug/occurrences-permissions')
+                const debugData = await debugResponse.json()
+                
+                if (!debugData.success) {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Não foi possível obter dados de debug</h4>
+                            <pre>${JSON.stringify(debugData, null, 2)}</pre>
+                        </div>
+                    `
+                    return
+                }
+                
+                // Usar dados do debug para criar ocorrência
+                const occurrenceData = {
+                    student_id: debugData.details.students[0]?.id || 'test-student-id',
+                    group_id: debugData.details.occurrenceGroups[0]?.id || 1,
+                    type_id: debugData.details.occurrenceTypes[0]?.id || 1,
+                    occurred_at: new Date().toISOString(),
+                    notes: 'Teste de ocorrência via debug',
+                    priority: 'medium',
+                    is_sensitive: false,
+                    owner_user_id: debugData.user.id
+                }
+                
+                const response = await fetch('/api/occurrences', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(occurrenceData)
+                })
+                
+                const data = await response.json()
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Ocorrência Criada com Sucesso!</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro ao Criar Ocorrência</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de Conexão</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `
+            }
+        }
+        
+        async function checkRequiredData() {
+            const resultDiv = document.getElementById('data-result')
+            resultDiv.innerHTML = '⏳ Verificando dados...'
+            
+            try {
+                const response = await fetch('/api/debug/occurrences-permissions')
+                const data = await response.json()
+                
+                if (data.success) {
+                    const issues = []
+                    
+                    if (data.data.occurrenceGroups === 0) {
+                        issues.push('❌ Nenhum grupo de ocorrência encontrado')
+                    }
+                    
+                    if (data.data.occurrenceTypes === 0) {
+                        issues.push('❌ Nenhum tipo de ocorrência encontrado')
+                    }
+                    
+                    if (data.data.students === 0) {
+                        issues.push('❌ Nenhum aluno encontrado')
+                    }
+                    
+                    if (!data.permissions.write) {
+                        issues.push('❌ Usuário não tem permissão occurrences.write')
+                    }
+                    
+                    if (issues.length === 0) {
+                        resultDiv.innerHTML = `
+                            <div class="success">
+                                <h4>✅ Todos os dados necessários estão disponíveis</h4>
+                                <p>O sistema está pronto para criar ocorrências.</p>
+                            </div>
+                        `
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="error">
+                                <h4>❌ Problemas encontrados:</h4>
+                                <ul>
+                                    ${issues.map(issue => `<li>${issue}</li>`).join('')}
+                                </ul>
+                                <h4>🔧 Soluções:</h4>
+                                <ul>
+                                    <li>Verificar se o usuário tem role correto (admin, manager, seller, trainer)</li>
+                                    <li>Criar grupos e tipos de ocorrência</li>
+                                    <li>Criar alunos no sistema</li>
+                                </ul>
+                            </div>
+                        `
+                    }
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro ao verificar dados</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de Conexão</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `
+            }
+        }
+    </script>
+</body>
+</html>

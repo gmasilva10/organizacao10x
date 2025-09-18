@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Loader2, Plus, Edit, Trash2, Search, Filter } from "lucide-react"
 import { toast } from "sonner"
-import { useConfirmDialog } from "@/components/ui/confirm-dialog"
+import { useConfirmDialog, ConfirmDialog } from "@/components/ui/confirm-dialog"
 
 interface OccurrenceGroup {
   id: number

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Correções de Erros</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug - Correções de Erros</h1>
+    
+    <div class="grid">
+        <div class="section info">
+            <h3>1. Problema: "Responsável inválido"</h3>
+            <p>Erro ao criar ocorrência - falta de profissionais cadastrados</p>
+            <button onclick="checkProfessionals()">Verificar Profissionais</button>
+            <button onclick="createTestProfessional()">Criar Profissional de Teste</button>
+            <div id="professionals-result"></div>
+        </div>
+        
+        <div class="section info">
+            <h3>2. Problema: "ConfirmDialog is not defined"</h3>
+            <p>Erro na página Equipe - componente não importado</p>
+            <button onclick="testTeamPage()">Testar Página Equipe</button>
+            <div id="team-result"></div>
+        </div>
+    </div>
+    
+    <div class="section warning">
+        <h3>3. Status Geral do Sistema</h3>
+        <button onclick="checkSystemStatus()">Verificar Status</button>
+        <div id="status-result"></div>
+    </div>
+
+    <script>
+        async function checkProfessionals() {
+            const resultDiv = document.getElementById('professionals-result')
+            resultDiv.innerHTML = '⏳ Verificando profissionais...'
+            
+            try {
+                const response = await fetch('/api/debug/professionals')
+                const data = await response.json()
+                
+                if (data.success) {
+                    const { professionals, users, memberships, tenants } = data.data
+                    
+                    let status = ''
+                    if (professionals === 0) {
+                        status = `
+                            <div class="error">
+                                <h4>❌ Nenhum Profissional Encontrado</h4>
+                                <p>Este é o motivo do erro "Responsável inválido"</p>
+                                <p><strong>Usuários:</strong> ${users}</p>
+                                <p><strong>Memberships:</strong> ${memberships}</p>
+                                <p><strong>Tenants:</strong> ${tenants}</p>
+                                <p><strong>Solução:</strong> Clique em "Criar Profissional de Teste"</p>
+                            </div>
+                        `
+                    } else {
+                        status = `
+                            <div class="success">
+                                <h4>✅ Profissionais Encontrados</h4>
+                                <p><strong>Total:</strong> ${professionals}</p>
+                                <p>O sistema deve funcionar normalmente</p>
+                            </div>
+                        `
+                    }
+                    
+                    resultDiv.innerHTML = status
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro ao Verificar</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de Conexão</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `
+            }
+        }
+        
+        async function createTestProfessional() {
+            const resultDiv = document.getElementById('professionals-result')
+            resultDiv.innerHTML = '⏳ Criando profissional de teste...'
+            
+            try {
+                const response = await fetch('/api/debug/create-test-professional', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                
+                const data = await response.json()
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Profissional de Teste Criado!</h4>
+                            <p><strong>Nome:</strong> ${data.data.professional.full_name}</p>
+                            <p><strong>Role:</strong> ${data.data.professional.role}</p>
+                            <p><strong>Tenant:</strong> ${data.data.tenant.name}</p>
+                            <p><strong>Membership criado:</strong> ${data.data.membership_created ? 'Sim' : 'Já existia'}</p>
+                            <p><strong>Próximo passo:</strong> Teste criar uma ocorrência novamente</p>
+                        </div>
+                    `
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro ao Criar Profissional</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de Conexão</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `
+            }
+        }
+        
+        async function testTeamPage() {
+            const resultDiv = document.getElementById('team-result')
+            resultDiv.innerHTML = '⏳ Testando página Equipe...'
+            
+            try {
+                // Simular navegação para a página de equipe
+                const response = await fetch('/app/team')
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Página Equipe Funcionando!</h4>
+                            <p>O erro "ConfirmDialog is not defined" foi corrigido</p>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Próximo passo:</strong> Acesse o menu Equipe para confirmar</p>
+                        </div>
+                    `
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro na Página Equipe</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p>Verifique se o servidor está rodando</p>
+                        </div>
+                    `
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de Conexão</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `
+            }
+        }
+        
+        async function checkSystemStatus() {
+            const resultDiv = document.getElementById('status-result')
+            resultDiv.innerHTML = '⏳ Verificando status do sistema...'
+            
+            try {
+                // Verificar múltiplos endpoints
+                const [professionalsRes, occurrencesRes, teamRes] = await Promise.all([
+                    fetch('/api/debug/professionals'),
+                    fetch('/api/debug/occurrences-permissions'),
+                    fetch('/app/team')
+                ])
+                
+                const professionalsData = await professionalsRes.json()
+                const occurrencesData = await occurrencesRes.json()
+                
+                let status = '<div class="info"><h4>📊 Status do Sistema</h4><ul>'
+                
+                // Status dos profissionais
+                if (professionalsRes.ok && professionalsData.success) {
+                    status += `<li>✅ Profissionais: ${professionalsData.data.professionals} encontrados</li>`
+                } else {
+                    status += `<li>❌ Profissionais: Erro na verificação</li>`
+                }
+                
+                // Status das ocorrências
+                if (occurrencesRes.ok && occurrencesData.success) {
+                    status += `<li>✅ Ocorrências: Permissões OK (${occurrencesData.membership.role})</li>`
+                } else {
+                    status += `<li>❌ Ocorrências: Erro nas permissões</li>`
+                }
+                
+                // Status da página de equipe
+                if (teamRes.ok) {
+                    status += `<li>✅ Página Equipe: Funcionando (${teamRes.status})</li>`
+                } else {
+                    status += `<li>❌ Página Equipe: Erro (${teamRes.status})</li>`
+                }
+                
+                status += '</ul></div>'
+                
+                resultDiv.innerHTML = status
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro ao Verificar Status</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `
+            }
+        }
+        
+        // Executar verificação inicial
+        window.onload = function() {
+            checkProfessionals()
+            testTeamPage()
+        }
+    </script>
+</body>
+</html>
