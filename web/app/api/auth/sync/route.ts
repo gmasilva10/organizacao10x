@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server"
 
+// Forçar execução no Node.js para evitar problemas de edge runtime
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(request: Request) {
   try {
     const { access_token, refresh_token } = await request.json()
