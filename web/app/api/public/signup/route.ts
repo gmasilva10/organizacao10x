@@ -8,9 +8,9 @@ function validateEmail(email: string): boolean {
 }
 
 function validatePhone(phone: string): boolean {
-  // E.164 format: +[country][number]
-  const regex = /^\+?[1-9]\d{1,14}$/
-  return regex.test(phone)
+  // Aceitar formatos brasileiros: (11) 99999-9999, 11999999999, +5511999999999
+  const cleanPhone = phone.replace(/\D/g, '')
+  return cleanPhone.length >= 10 && cleanPhone.length <= 15
 }
 
 function validatePassword(password: string): boolean {
@@ -25,8 +25,17 @@ function validatePlan(plan: string): boolean {
 
 export async function POST(request: Request) {
   try {
+    console.log("🚀 [SIGNUP] Iniciando processo de criação de conta")
     const supabase = await createClient()
     const body = await request.json()
+    
+    console.log("📝 [SIGNUP] Dados recebidos:", { 
+      org_name: body.org_name, 
+      full_name: body.full_name, 
+      email: body.email, 
+      phone: body.phone, 
+      plan: body.plan 
+    })
     
     const { org_name, full_name, email, phone, password, plan } = body
 
@@ -46,7 +55,23 @@ export async function POST(request: Request) {
     }
     
     if (phone && !validatePhone(phone)) {
-      errors.push("Telefone deve estar no formato E.164 (+55...)")
+      errors.push("Telefone deve ter entre 10 e 15 dígitos")
+    }
+    
+    // Normalizar telefone para E.164 se válido
+    let normalizedPhone = phone
+    if (phone && validatePhone(phone)) {
+      const cleanPhone = phone.replace(/\D/g, '')
+      if (cleanPhone.length === 11 && cleanPhone.startsWith('11')) {
+        // Formato brasileiro: 11999999999 -> +5511999999999
+        normalizedPhone = `+55${cleanPhone}`
+      } else if (cleanPhone.length === 10) {
+        // Formato brasileiro sem DDD: 999999999 -> +5511999999999
+        normalizedPhone = `+5511${cleanPhone}`
+      } else if (!cleanPhone.startsWith('+')) {
+        // Adicionar + se não tiver
+        normalizedPhone = `+${cleanPhone}`
+      }
     }
     
     if (!password || !validatePassword(password)) {
@@ -95,7 +120,7 @@ export async function POST(request: Request) {
       email_confirm: true,
       user_metadata: {
         full_name: full_name.trim(),
-        phone: phone || null
+        phone: normalizedPhone || null
       }
     })
 
@@ -123,7 +148,7 @@ export async function POST(request: Request) {
       .upsert({
         user_id: user.id,
         full_name: full_name.trim(),
-        phone: phone || null,
+        phone: normalizedPhone || null,
         avatar_url: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -197,7 +222,7 @@ export async function POST(request: Request) {
           org_id: org.id,
           full_name: full_name.trim(),
           email: email,
-          phone: phone || null,
+          phone: normalizedPhone || null,
           role: "admin",
           status: "active",
           user_id: user.id,
