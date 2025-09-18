@@ -42,7 +42,15 @@ function LoginDrawerContent() {
         const password = String(form.get("password") || "")
         if (!email || !password) return
         try {
+            // Debug: verificar variáveis de ambiente
+            console.log("🔍 [LOGIN DEBUG] Variáveis de ambiente:", {
+                SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+                SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Presente" : "❌ Ausente"
+            })
+            
             const supabase = createClient()
+            console.log("🔍 [LOGIN DEBUG] Cliente Supabase criado:", supabase)
+            
             const { error } = await supabase.auth.signInWithPassword({ email, password })
             if (error) {
                 toast.error("Credenciais inválidas. Tente novamente.")
