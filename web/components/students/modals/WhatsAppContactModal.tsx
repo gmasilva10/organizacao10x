@@ -150,19 +150,39 @@ export default function WhatsAppContactModal({
         statusText: res.statusText
       })
       
-      // Capturar resposta como texto primeiro para debug
-      const responseText = await res.text()
-      console.log('🔍 [WHATSAPP CONTACT] Resposta bruta:', responseText)
-      
-      let data = {}
-      try {
-        data = JSON.parse(responseText)
-        console.log('🔍 [WHATSAPP CONTACT] Dados da resposta (JSON):', data)
-      } catch (parseError) {
-        console.error('❌ [WHATSAPP CONTACT] Erro ao fazer parse do JSON:', parseError)
-        console.log('🔍 [WHATSAPP CONTACT] Resposta não é JSON válido:', responseText)
-        data = { error: 'Resposta inválida do servidor', raw: responseText }
-      }
+        // Capturar resposta como texto primeiro para debug
+        const responseText = await res.text()
+        console.log('🔍 [WHATSAPP CONTACT] Resposta bruta:', responseText)
+        
+        let data = {}
+        try {
+          data = JSON.parse(responseText)
+          console.log('🔍 [WHATSAPP CONTACT] Dados da resposta (JSON):', data)
+          
+          // Mostrar logs de teste se disponíveis
+          if (data.testLogs) {
+            console.log('🧪 [WHATSAPP CONTACT] LOGS DE TESTE DOS ENDPOINTS:')
+            data.testLogs.forEach((log: any, index: number) => {
+              console.log(`🧪 [TESTE ${index + 1}] Endpoint: ${log.endpoint}`)
+              console.log(`🧪 [TESTE ${index + 1}] URL: ${log.url}`)
+              console.log(`🧪 [TESTE ${index + 1}] Sucesso: ${log.success}`)
+              if (log.error) {
+                console.log(`🧪 [TESTE ${index + 1}] Erro: ${log.error}`)
+              }
+              if (log.status) {
+                console.log(`🧪 [TESTE ${index + 1}] Status: ${log.status}`)
+              }
+              if (log.result) {
+                console.log(`🧪 [TESTE ${index + 1}] Resultado:`, log.result)
+              }
+              console.log('---')
+            })
+          }
+        } catch (parseError) {
+          console.error('❌ [WHATSAPP CONTACT] Erro ao fazer parse do JSON:', parseError)
+          console.log('🔍 [WHATSAPP CONTACT] Resposta não é JSON válido:', responseText)
+          data = { error: 'Resposta inválida do servidor', raw: responseText }
+        }
       
       if (res.ok && data?.success) {
         toast.success('Contato adicionado ao WhatsApp!')

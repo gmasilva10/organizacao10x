@@ -36,9 +36,16 @@ export async function POST(request: NextRequest) {
     
     let lastError = null
     let successfulResponse = null
+    const testLogs = []
     
     for (const endpoint of endpoints) {
       const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}${endpoint}`
+      const logEntry = {
+        endpoint,
+        url: zapiUrl,
+        timestamp: new Date().toISOString()
+      }
+      
       console.log(`🔄 [WHATSAPP CONTACT] Testando endpoint: ${endpoint}`)
       console.log('🔄 [WHATSAPP CONTACT] URL:', zapiUrl)
       
@@ -54,25 +61,30 @@ export async function POST(request: NextRequest) {
           })
         })
         
-        console.log(`🔄 [WHATSAPP CONTACT] Resposta ${endpoint}:`, {
+        const responseData = {
           status: response.status,
           ok: response.ok,
           statusText: response.statusText
-        })
+        }
+        
+        console.log(`🔄 [WHATSAPP CONTACT] Resposta ${endpoint}:`, responseData)
         
         if (response.ok) {
           const result = await response.json()
           console.log(`✅ [WHATSAPP CONTACT] Sucesso com ${endpoint}:`, result)
           successfulResponse = { endpoint, result, response }
+          testLogs.push({ ...logEntry, success: true, result })
           break
         } else {
           const errorText = await response.text()
           console.log(`❌ [WHATSAPP CONTACT] Erro com ${endpoint}:`, errorText)
           lastError = { endpoint, error: errorText, status: response.status }
+          testLogs.push({ ...logEntry, success: false, error: errorText, status: response.status })
         }
       } catch (error) {
         console.log(`❌ [WHATSAPP CONTACT] Exceção com ${endpoint}:`, error)
         lastError = { endpoint, error: error.message }
+        testLogs.push({ ...logEntry, success: false, error: error.message })
       }
     }
     
@@ -82,7 +94,8 @@ export async function POST(request: NextRequest) {
         { 
           error: 'Todos os endpoints da Z-API falharam', 
           details: lastError,
-          testedEndpoints: endpoints
+          testedEndpoints: endpoints,
+          testLogs: testLogs
         },
         { status: 400 }
       )
