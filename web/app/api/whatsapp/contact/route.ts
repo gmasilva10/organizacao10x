@@ -7,6 +7,75 @@ export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   console.log('🚀 [WHATSAPP CONTACT] GET endpoint chamado!')
+  
+  // Testar POST via GET para debug
+  const { searchParams } = new URL(request.url)
+  const testPost = searchParams.get('test_post')
+  
+  if (testPost === 'true') {
+    console.log('🧪 [WHATSAPP CONTACT] Testando POST via GET...')
+    
+    // Simular teste dos endpoints
+    const endpoints = [
+      `/send-contact`,
+      `/contact`, 
+      `/add-contact`,
+      `/create-contact`,
+      `/save-contact`
+    ]
+    
+    const testLogs = []
+    
+    for (const endpoint of endpoints) {
+      const instance = '3E7608F78BA2405A08E5EE5C772D9ACD'
+      const token = '8F670F193615706A0616496E'
+      const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}${endpoint}`
+      
+      try {
+        const response = await fetch(zapiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phone: '5584996499247',
+            name: 'Radamés'
+          })
+        })
+        
+        testLogs.push({
+          endpoint,
+          url: zapiUrl,
+          status: response.status,
+          ok: response.ok,
+          statusText: response.statusText,
+          success: response.ok
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          testLogs[testLogs.length - 1].result = result
+          break
+        } else {
+          const errorText = await response.text()
+          testLogs[testLogs.length - 1].error = errorText
+        }
+      } catch (error) {
+        testLogs.push({
+          endpoint,
+          url: zapiUrl,
+          error: error.message,
+          success: false
+        })
+      }
+    }
+    
+    return NextResponse.json({ 
+      message: 'WhatsApp Contact API funcionando!',
+      testLogs: testLogs
+    })
+  }
+  
   return NextResponse.json({ message: 'WhatsApp Contact API funcionando!' })
 }
 
