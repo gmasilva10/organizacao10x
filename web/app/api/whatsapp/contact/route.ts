@@ -25,42 +25,72 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Chamada para Z-API via backend (sem CORS)
-    // Usando o endpoint correto da Z-API
-    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/send-contact`
-    console.log('🔄 [WHATSAPP CONTACT] Chamando Z-API:', {
-      url: zapiUrl,
-      phone: phone,
-      name: name
-    })
+    // TESTE: Tentar múltiplos endpoints da Z-API
+    const endpoints = [
+      `/send-contact`,
+      `/contact`, 
+      `/add-contact`,
+      `/create-contact`,
+      `/save-contact`
+    ]
     
-    const response = await fetch(zapiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        phone: phone,
-        name: name
-      })
-    })
+    let lastError = null
+    let successfulResponse = null
     
-    console.log('🔄 [WHATSAPP CONTACT] Resposta Z-API:', {
-      status: response.status,
-      ok: response.ok,
-      statusText: response.statusText
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Erro Z-API:', errorText)
+    for (const endpoint of endpoints) {
+      const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}${endpoint}`
+      console.log(`🔄 [WHATSAPP CONTACT] Testando endpoint: ${endpoint}`)
+      console.log('🔄 [WHATSAPP CONTACT] URL:', zapiUrl)
+      
+      try {
+        const response = await fetch(zapiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phone: phone,
+            name: name
+          })
+        })
+        
+        console.log(`🔄 [WHATSAPP CONTACT] Resposta ${endpoint}:`, {
+          status: response.status,
+          ok: response.ok,
+          statusText: response.statusText
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          console.log(`✅ [WHATSAPP CONTACT] Sucesso com ${endpoint}:`, result)
+          successfulResponse = { endpoint, result, response }
+          break
+        } else {
+          const errorText = await response.text()
+          console.log(`❌ [WHATSAPP CONTACT] Erro com ${endpoint}:`, errorText)
+          lastError = { endpoint, error: errorText, status: response.status }
+        }
+      } catch (error) {
+        console.log(`❌ [WHATSAPP CONTACT] Exceção com ${endpoint}:`, error)
+        lastError = { endpoint, error: error.message }
+      }
+    }
+    
+    if (!successfulResponse) {
+      console.error('❌ [WHATSAPP CONTACT] Todos os endpoints falharam. Último erro:', lastError)
       return NextResponse.json(
-        { error: 'Erro ao criar contato no WhatsApp', details: errorText },
-        { status: response.status }
+        { 
+          error: 'Todos os endpoints da Z-API falharam', 
+          details: lastError,
+          testedEndpoints: endpoints
+        },
+        { status: 400 }
       )
     }
-
-    const result = await response.json()
+    
+    const { endpoint: successfulEndpoint, result, response } = successfulResponse
+    
+    console.log(`✅ [WHATSAPP CONTACT] Endpoint funcionando: ${successfulEndpoint}`)
     console.log('Resposta Z-API contato:', result)
     
     // Verificar se realmente foi criado
