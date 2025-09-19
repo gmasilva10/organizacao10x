@@ -46,8 +46,22 @@ export async function POST(request: NextRequest) {
     
     // Verificar se realmente foi criado
     if (result.error || result.message?.includes('error')) {
+      console.error('❌ [WHATSAPP GROUP] Z-API retornou erro:', result)
+      
+      // Mapear erros específicos do Z-API
+      let errorMessage = 'Falha na criação do grupo'
+      if (result.message?.includes('already exists') || result.message?.includes('já existe')) {
+        errorMessage = 'Este grupo já existe no WhatsApp'
+      } else if (result.message?.includes('invalid participants') || result.message?.includes('participantes inválidos')) {
+        errorMessage = 'Participantes inválidos para o grupo'
+      } else if (result.message?.includes('unauthorized') || result.message?.includes('não autorizado')) {
+        errorMessage = 'Erro de autorização com a API do WhatsApp'
+      } else if (result.message) {
+        errorMessage = `Erro: ${result.message}`
+      }
+      
       return NextResponse.json(
-        { error: 'Falha na criação do grupo', details: result },
+        { error: errorMessage, details: result },
         { status: 400 }
       )
     }

@@ -21,7 +21,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Chamada para Z-API via backend (sem CORS)
-    const response = await fetch(`https://api.z-api.io/instance/${instance}/token/${token}/contact`, {
+    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/contact`
+    console.log('🔄 [WHATSAPP CONTACT] Chamando Z-API:', {
+      url: zapiUrl,
+      phone: phone,
+      name: name
+    })
+    
+    const response = await fetch(zapiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -30,6 +37,12 @@ export async function POST(request: NextRequest) {
         phone: phone,
         name: name
       })
+    })
+    
+    console.log('🔄 [WHATSAPP CONTACT] Resposta Z-API:', {
+      status: response.status,
+      ok: response.ok,
+      statusText: response.statusText
     })
 
     if (!response.ok) {
@@ -46,8 +59,22 @@ export async function POST(request: NextRequest) {
     
     // Verificar se realmente foi criado
     if (result.error || result.message?.includes('error')) {
+      console.error('❌ [WHATSAPP CONTACT] Z-API retornou erro:', result)
+      
+      // Mapear erros específicos do Z-API
+      let errorMessage = 'Falha na criação do contato'
+      if (result.message?.includes('already exists') || result.message?.includes('já existe')) {
+        errorMessage = 'Este contato já existe no WhatsApp'
+      } else if (result.message?.includes('invalid phone') || result.message?.includes('telefone inválido')) {
+        errorMessage = 'Número de telefone inválido'
+      } else if (result.message?.includes('unauthorized') || result.message?.includes('não autorizado')) {
+        errorMessage = 'Erro de autorização com a API do WhatsApp'
+      } else if (result.message) {
+        errorMessage = `Erro: ${result.message}`
+      }
+      
       return NextResponse.json(
-        { error: 'Falha na criação do contato', details: result },
+        { error: errorMessage, details: result },
         { status: 400 }
       )
     }
