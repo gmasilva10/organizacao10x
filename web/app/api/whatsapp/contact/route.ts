@@ -11,6 +11,11 @@ export async function POST(request: NextRequest) {
     const { phone, name, instance, token } = body
 
     console.log('📱 [WHATSAPP CONTACT] Dados recebidos:', { phone, name, instance: instance ? '***' : 'undefined', token: token ? '***' : 'undefined' })
+    console.log('📱 [WHATSAPP CONTACT] Ambiente:', {
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL: process.env.VERCEL,
+      VERCEL_ENV: process.env.VERCEL_ENV
+    })
 
     if (!phone || !name || !instance || !token) {
       console.error('❌ [WHATSAPP CONTACT] Parâmetros faltando:', { phone: !!phone, name: !!name, instance: !!instance, token: !!token })
@@ -21,8 +26,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Chamada para Z-API via backend (sem CORS)
-    // Z-API usa /send-contact para enviar contatos, não criar
-    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/send-contact`
+    // Testando com a URL original que funcionava offline
+    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/contact`
     console.log('🔄 [WHATSAPP CONTACT] Chamando Z-API:', {
       url: zapiUrl,
       phone: phone,
@@ -35,9 +40,8 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        phone: phone, // Número do destinatário (quem vai receber o contato)
-        contactName: name, // Nome do contato a ser compartilhado
-        contactPhone: phone // Número do contato a ser compartilhado
+        phone: phone,
+        name: name
       })
     })
     

@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Chamada para Z-API via backend (sem CORS)
-    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/create-group`
+    // Testando com a URL original que funcionava offline
+    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/group`
     console.log('🔄 [WHATSAPP GROUP] Chamando Z-API:', {
       url: zapiUrl,
       name: name,
@@ -35,8 +36,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         name: name,
-        participants: participants,
-        autoInvite: true // Enviar convites privados para participantes que não puderam ser adicionados
+        participants: participants
       })
     })
     
