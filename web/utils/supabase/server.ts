@@ -5,7 +5,18 @@ export async function createClient() {
   const cookieStore = await cookies()
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnon = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  console.log('🔍 [SUPABASE SERVER] Variáveis de ambiente:', {
+    SUPABASE_URL: supabaseUrl ? '✅ Presente' : '❌ Ausente',
+    SUPABASE_ANON_KEY: supabaseAnon ? '✅ Presente' : '❌ Ausente',
+    NODE_ENV: process.env.NODE_ENV
+  })
+  
   if (!supabaseUrl || !supabaseAnon) {
+    console.error('❌ [SUPABASE SERVER] Variáveis de ambiente faltando:', {
+      SUPABASE_URL: !!supabaseUrl,
+      SUPABASE_ANON_KEY: !!supabaseAnon
+    })
     throw new Error('Supabase envs ausentes: SUPABASE_URL / SUPABASE_ANON_KEY')
   }
   return createServerClient(
