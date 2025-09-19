@@ -3,6 +3,12 @@ import { resolveRequestContext } from "@/server/context"
 import { createClient } from "@/utils/supabase/server"
 
 // GET /api/anamnesis/audit-logs - Buscar logs de auditoria
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })

@@ -5,6 +5,12 @@ import { QueryMonitor } from '@/lib/query-monitor'
 
 // GET /api/occurrences
 // Suporta filtros básicos para GATE 2 (escopo student)
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
     try {

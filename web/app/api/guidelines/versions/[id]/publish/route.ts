@@ -3,6 +3,12 @@ import { createClient } from "@/utils/supabase/server"
 import { resolveRequestContext } from "@/server/context"
 import { AuditLogger } from "@/lib/audit-logger"
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }

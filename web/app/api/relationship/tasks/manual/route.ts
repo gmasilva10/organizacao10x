@@ -1,3 +1,9 @@
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * GATE 10.6.7.2 - API Manual para Tarefas de Relacionamento
  * 

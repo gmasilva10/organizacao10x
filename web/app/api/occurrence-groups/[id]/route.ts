@@ -5,6 +5,12 @@ import { z } from 'zod'
 import { auditLogger } from '@/lib/audit-logger'
 
 // Schema para atualização (todos os campos opcionais)
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const UpdateOccurrenceGroupSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres').optional(),
   description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),

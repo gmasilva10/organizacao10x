@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 type Membership = { organization_id: string; organization_name: string; role: string }
 
 export async function GET(request: Request) {

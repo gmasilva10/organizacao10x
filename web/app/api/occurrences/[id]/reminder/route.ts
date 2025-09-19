@@ -5,6 +5,12 @@ import { z } from 'zod'
 import { auditLogger } from '@/lib/audit-logger'
 
 // Schema para atualização de lembrete
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const UpdateReminderSchema = z.object({
   reminder_at: z.string().datetime().optional(),
   reminder_status: z.enum(['PENDING', 'DONE', 'CANCELLED']).optional()

@@ -5,6 +5,12 @@ import { z } from "zod"
 import { calculateAnthropometry, calculateRIR } from "@/lib/anthro-protocols"
 
 // Função para processar métodos aeróbios
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 function processAerobicMethod(aerobio_metodo: string, fc: any, answers: any) {
   const result: any = {
     metodo: aerobio_metodo,

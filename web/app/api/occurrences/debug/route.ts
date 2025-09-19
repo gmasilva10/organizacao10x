@@ -3,6 +3,12 @@ import { createClient } from '@/utils/supabase/server'
 
 // GET /api/occurrences/debug
 // Versão simplificada para debug
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()

@@ -3,6 +3,12 @@ import { createClient } from "@/utils/supabase/server"
 import { resolveRequestContext } from "@/server/context"
 import { z } from "zod"
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 const updateRuleSchema = z.object({
   priority_clinical: z.enum(['critica', 'alta', 'media', 'baixa']),
   condition: z.object({

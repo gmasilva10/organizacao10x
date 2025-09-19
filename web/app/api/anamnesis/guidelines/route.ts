@@ -3,6 +3,12 @@ import { resolveRequestContext } from "@/server/context"
 import { z } from "zod"
 import { createClient } from "@/utils/supabase/server"
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 const createGuidelineSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional()

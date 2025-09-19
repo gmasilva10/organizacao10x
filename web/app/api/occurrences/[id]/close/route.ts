@@ -4,6 +4,12 @@ import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { z } from 'zod'
 import { auditLogger } from '@/lib/audit-logger'
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 const closeSchema = z.object({
   resolved_at: z.string().datetime(),
   resolution_outcome: z.enum(['resolved','notified','no_response','rescheduled','cancelled','other']),

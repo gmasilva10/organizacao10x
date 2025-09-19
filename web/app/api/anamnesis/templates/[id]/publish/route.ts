@@ -4,6 +4,12 @@ import { createClient } from "@/utils/supabase/server"
 import { AuditLogger } from "@/lib/audit-logger"
 
 // POST /api/anamnesis/templates/[id]/publish - Publicar template
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })

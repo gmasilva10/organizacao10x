@@ -3,6 +3,12 @@ import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { RELATIONSHIP_TEMPLATE_SEEDS } from '@/lib/relationship/template-seeds'
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 export async function POST(request: NextRequest) {
   return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, tenant_id }) => {
     try {

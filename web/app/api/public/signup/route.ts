@@ -2,6 +2,12 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 
 // Validações helpers
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 function validateEmail(email: string): boolean {
   const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
   return regex.test(email)

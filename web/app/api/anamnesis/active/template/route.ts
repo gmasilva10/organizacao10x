@@ -4,6 +4,12 @@ import { z } from "zod"
 import { createClient } from "@/utils/supabase/server"
 import { AuditLogger } from "@/lib/audit-logger"
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 const setDefaultTemplateSchema = z.object({
   template_version_id: z.string().uuid("ID da versão do template deve ser um UUID válido")
 })

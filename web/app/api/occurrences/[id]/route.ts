@@ -5,6 +5,12 @@ import { z } from "zod"
 import { auditLogger } from "@/lib/audit-logger"
 import { createAdminClient } from "@/utils/supabase/admin"
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 const updateOccurrenceSchema = z.object({
 	group_id: z.number().optional(),
 	type_id: z.number().optional(),

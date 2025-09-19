@@ -3,6 +3,12 @@ import { createClient } from '@/utils/supabase/server'
 import { z } from 'zod'
 import { auditLogger } from '@/lib/audit-logger'
 
+// Forçar execução dinâmica para evitar problemas de renderização estática
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 const createOccurrenceSchema = z.object({
   group_id: z.number().int().positive('ID do grupo deve ser um número positivo'),
   type_id: z.number().int().positive('ID do tipo deve ser um número positivo'),
