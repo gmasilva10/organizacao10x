@@ -125,8 +125,7 @@ export async function POST(request: NextRequest) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Client-Token': token,  // Cabeçalho obrigatório conforme documentação
-            'Authorization': `Bearer ${token}`  // Tentar também com Authorization
+            'Client-Token': 'F31db8854d41742a7a08625204dc7a618S'  // Client-Token correto da conta
           },
           body: JSON.stringify({
             phone: phone,
