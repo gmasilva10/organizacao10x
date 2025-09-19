@@ -5,7 +5,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, participants, instance, token } = body
 
+    console.log('👥 [WHATSAPP GROUP] Dados recebidos:', { name, participants, instance: instance ? '***' : 'undefined', token: token ? '***' : 'undefined' })
+
     if (!name || !participants || !instance || !token) {
+      console.error('❌ [WHATSAPP GROUP] Parâmetros faltando:', { name: !!name, participants: !!participants, instance: !!instance, token: !!token })
       return NextResponse.json(
         { error: 'Parâmetros obrigatórios: name, participants, instance, token' },
         { status: 400 }
@@ -34,6 +37,16 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await response.json()
+    console.log('Resposta Z-API grupo:', result)
+    
+    // Verificar se realmente foi criado
+    if (result.error || result.message?.includes('error')) {
+      return NextResponse.json(
+        { error: 'Falha na criação do grupo', details: result },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json({ success: true, data: result })
 
   } catch (error) {

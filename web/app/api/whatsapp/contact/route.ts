@@ -5,7 +5,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { phone, name, instance, token } = body
 
+    console.log('📱 [WHATSAPP CONTACT] Dados recebidos:', { phone, name, instance: instance ? '***' : 'undefined', token: token ? '***' : 'undefined' })
+
     if (!phone || !name || !instance || !token) {
+      console.error('❌ [WHATSAPP CONTACT] Parâmetros faltando:', { phone: !!phone, name: !!name, instance: !!instance, token: !!token })
       return NextResponse.json(
         { error: 'Parâmetros obrigatórios: phone, name, instance, token' },
         { status: 400 }
@@ -34,6 +37,16 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await response.json()
+    console.log('Resposta Z-API contato:', result)
+    
+    // Verificar se realmente foi criado
+    if (result.error || result.message?.includes('error')) {
+      return NextResponse.json(
+        { error: 'Falha na criação do contato', details: result },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json({ success: true, data: result })
 
   } catch (error) {
