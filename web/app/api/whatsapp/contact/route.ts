@@ -171,10 +171,17 @@ export async function POST(request: NextRequest) {
         
         if (response.ok) {
           const result = await response.json()
-          console.log(`✅ [WHATSAPP CONTACT] Sucesso com ${endpoint}:`, result)
-          successfulResponse = { endpoint, result, response }
-          testLogs.push({ ...logEntry, success: true, result })
-          break
+          console.log(`✅ [WHATSAPP CONTACT] Resposta ${endpoint}:`, result)
+          
+          // Verificar se realmente foi criado (sem erro interno da Z-API)
+          if (!result.error && !result.message?.includes('error')) {
+            successfulResponse = { endpoint, result, response }
+            testLogs.push({ ...logEntry, success: true, result })
+            break // Só parar se realmente funcionou
+          } else {
+            // HTTP 200 mas com erro interno da Z-API
+            testLogs.push({ ...logEntry, success: false, result, status: response.status, statusText: response.statusText, ok: response.ok })
+          }
         } else {
           const errorText = await response.text()
           console.log(`❌ [WHATSAPP CONTACT] Erro com ${endpoint}:`, errorText)
