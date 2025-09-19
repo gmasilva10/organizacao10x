@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Chamada para Z-API via backend (sem CORS)
-    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/contact`
+    // Z-API usa /send-contact para enviar contatos, não criar
+    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/send-contact`
     console.log('🔄 [WHATSAPP CONTACT] Chamando Z-API:', {
       url: zapiUrl,
       phone: phone,
@@ -34,8 +35,9 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        phone: phone,
-        name: name
+        phone: phone, // Número do destinatário (quem vai receber o contato)
+        contactName: name, // Nome do contato a ser compartilhado
+        contactPhone: phone // Número do contato a ser compartilhado
       })
     })
     

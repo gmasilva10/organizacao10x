@@ -21,15 +21,29 @@ export async function POST(request: NextRequest) {
     }
 
     // Chamada para Z-API via backend (sem CORS)
-    const response = await fetch(`https://api.z-api.io/instance/${instance}/token/${token}/group`, {
+    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/create-group`
+    console.log('🔄 [WHATSAPP GROUP] Chamando Z-API:', {
+      url: zapiUrl,
+      name: name,
+      participants: participants
+    })
+    
+    const response = await fetch(zapiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         name: name,
-        participants: participants
+        participants: participants,
+        autoInvite: true // Enviar convites privados para participantes que não puderam ser adicionados
       })
+    })
+    
+    console.log('🔄 [WHATSAPP GROUP] Resposta Z-API:', {
+      status: response.status,
+      ok: response.ok,
+      statusText: response.statusText
     })
 
     if (!response.ok) {
