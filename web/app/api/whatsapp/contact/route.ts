@@ -5,7 +5,13 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+export async function GET(request: NextRequest) {
+  console.log('🚀 [WHATSAPP CONTACT] GET endpoint chamado!')
+  return NextResponse.json({ message: 'WhatsApp Contact API funcionando!' })
+}
+
 export async function POST(request: NextRequest) {
+  console.log('🚀 [WHATSAPP CONTACT] POST endpoint chamado!')
   try {
     const body = await request.json()
     const { phone, name, instance, token } = body
