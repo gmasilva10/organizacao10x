@@ -125,6 +125,7 @@ export async function POST(request: NextRequest) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Client-Token': token  // Cabeçalho obrigatório conforme documentação
           },
           body: JSON.stringify({
             phone: phone,
