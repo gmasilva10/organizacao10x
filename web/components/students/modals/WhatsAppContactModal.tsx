@@ -146,11 +146,23 @@ export default function WhatsAppContactModal({
       
       console.log('🔍 [WHATSAPP CONTACT] Resposta da API:', {
         status: res.status,
-        ok: res.ok
+        ok: res.ok,
+        statusText: res.statusText
       })
       
-      const data = await res.json().catch(() => ({}))
-      console.log('🔍 [WHATSAPP CONTACT] Dados da resposta:', data)
+      // Capturar resposta como texto primeiro para debug
+      const responseText = await res.text()
+      console.log('🔍 [WHATSAPP CONTACT] Resposta bruta:', responseText)
+      
+      let data = {}
+      try {
+        data = JSON.parse(responseText)
+        console.log('🔍 [WHATSAPP CONTACT] Dados da resposta (JSON):', data)
+      } catch (parseError) {
+        console.error('❌ [WHATSAPP CONTACT] Erro ao fazer parse do JSON:', parseError)
+        console.log('🔍 [WHATSAPP CONTACT] Resposta não é JSON válido:', responseText)
+        data = { error: 'Resposta inválida do servidor', raw: responseText }
+      }
       
       if (res.ok && data?.success) {
         toast.success('Contato adicionado ao WhatsApp!')

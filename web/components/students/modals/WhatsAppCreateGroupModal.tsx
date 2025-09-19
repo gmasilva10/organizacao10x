@@ -109,11 +109,23 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
       
       console.log('🔍 [WHATSAPP GROUP] Resposta da API:', {
         status: res.status,
-        ok: res.ok
+        ok: res.ok,
+        statusText: res.statusText
       })
       
-      const data = await res.json().catch(() => ({}))
-      console.log('🔍 [WHATSAPP GROUP] Dados da resposta:', data)
+      // Capturar resposta como texto primeiro para debug
+      const responseText = await res.text()
+      console.log('🔍 [WHATSAPP GROUP] Resposta bruta:', responseText)
+      
+      let data = {}
+      try {
+        data = JSON.parse(responseText)
+        console.log('🔍 [WHATSAPP GROUP] Dados da resposta (JSON):', data)
+      } catch (parseError) {
+        console.error('❌ [WHATSAPP GROUP] Erro ao fazer parse do JSON:', parseError)
+        console.log('🔍 [WHATSAPP GROUP] Resposta não é JSON válido:', responseText)
+        data = { error: 'Resposta inválida do servidor', raw: responseText }
+      }
       
       if (!res.ok || !data?.success) {
         setError(data?.error || 'Falha na criação do grupo')
