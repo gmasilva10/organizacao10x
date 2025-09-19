@@ -100,14 +100,39 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // TESTE: Tentar múltiplos endpoints da Z-API
-    const endpoints = [
-      `/send-contact`,
-      `/contact`, 
-      `/add-contact`,
-      `/create-contact`,
-      `/save-contact`
-    ]
+        // TESTE: Tentar múltiplos endpoints da Z-API
+        const endpoints = [
+          `/send-contact`,
+          `/contact`, 
+          `/add-contact`,
+          `/create-contact`,
+          `/save-contact`,
+          `/send-message`,
+          `/message`,
+          `/send`,
+          `/create`,
+          `/add`,
+          `/save`,
+          `/contact/send`,
+          `/contact/add`,
+          `/contact/create`,
+          `/contact/save`,
+          `/message/send`,
+          `/message/create`,
+          `/message/add`,
+          `/message/save`,
+          `/api/send-contact`,
+          `/api/contact`,
+          `/api/add-contact`,
+          `/api/create-contact`,
+          `/api/save-contact`,
+          `/api/send-message`,
+          `/api/message`,
+          `/api/send`,
+          `/api/create`,
+          `/api/add`,
+          `/api/save`
+        ]
     
     let lastError = null
     let successfulResponse = null
