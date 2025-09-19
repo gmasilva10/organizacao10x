@@ -13,8 +13,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(redirectTo, request.url), { status: 301 })
     }
     const env = process.env.NEXT_PUBLIC_ENV || process.env.NODE_ENV
-    // Congelamento de produção: bloquear login em prod
-    if (env === 'production' && url.pathname.startsWith('/api/auth')) {
+    // Congelamento de produção: bloquear apenas login público, não sync
+    if (env === 'production' && url.pathname === '/api/auth/signin') {
       return NextResponse.json({ code: 'MAINTENANCE', message: 'Login temporariamente indisponível' }, { status: 503 })
     }
     const isRoot = url.pathname === "/"
