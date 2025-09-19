@@ -83,6 +83,18 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
     try {
       setLoading(true)
       
+      // Debug: verificar variáveis de ambiente
+      console.log('🔍 [WHATSAPP GROUP] Variáveis de ambiente:', {
+        instance: process.env.NEXT_PUBLIC_ZAPI_INSTANCE,
+        token: process.env.NEXT_PUBLIC_ZAPI_TOKEN ? '✅ Presente' : '❌ Ausente'
+      })
+      
+      console.log('🔍 [WHATSAPP GROUP] Dados do grupo:', {
+        name: groupName,
+        participants: normalized,
+        selectedPhones
+      })
+      
       // Usar a nova API que resolve o CORS
       const res = await fetch('/api/whatsapp/group', {
         method: 'POST',
@@ -95,13 +107,22 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
         })
       })
       
+      console.log('🔍 [WHATSAPP GROUP] Resposta da API:', {
+        status: res.status,
+        ok: res.ok
+      })
+      
       const data = await res.json().catch(() => ({}))
+      console.log('🔍 [WHATSAPP GROUP] Dados da resposta:', data)
       
       if (!res.ok || !data?.success) {
         setError(data?.error || 'Falha na criação do grupo')
       } else {
         setResult(data)
       }
+    } catch (error) {
+      console.error('❌ [WHATSAPP GROUP] Erro:', error)
+      setError('Erro ao criar grupo: ' + (error as Error).message)
     } finally {
       setLoading(false)
     }

@@ -120,6 +120,18 @@ export default function WhatsAppContactModal({
     try {
       setAdding(true)
       
+      // Debug: verificar variáveis de ambiente
+      console.log('🔍 [WHATSAPP CONTACT] Variáveis de ambiente:', {
+        instance: process.env.NEXT_PUBLIC_ZAPI_INSTANCE,
+        token: process.env.NEXT_PUBLIC_ZAPI_TOKEN ? '✅ Presente' : '❌ Ausente'
+      })
+      
+      console.log('🔍 [WHATSAPP CONTACT] Dados do contato:', {
+        name: firstName,
+        phone: normalized.value,
+        studentId
+      })
+      
       // Usar a nova API que resolve o CORS
       const res = await fetch('/api/whatsapp/contact', {
         method: 'POST',
@@ -132,7 +144,13 @@ export default function WhatsAppContactModal({
         })
       })
       
+      console.log('🔍 [WHATSAPP CONTACT] Resposta da API:', {
+        status: res.status,
+        ok: res.ok
+      })
+      
       const data = await res.json().catch(() => ({}))
+      console.log('🔍 [WHATSAPP CONTACT] Dados da resposta:', data)
       
       if (res.ok && data?.success) {
         toast.success('Contato adicionado ao WhatsApp!')
@@ -143,7 +161,7 @@ export default function WhatsAppContactModal({
         logContactAction('wa_add_contact_error', { studentId, phone: normalized.value, reason })
       }
     } catch (e: any) {
-      console.error('Erro ao adicionar contato:', e)
+      console.error('❌ [WHATSAPP CONTACT] Erro:', e)
       toast.error('Falha ao adicionar contato: erro de rede')
       logContactAction('wa_add_contact_error', { studentId, reason: 'network_error' })
     } finally {
