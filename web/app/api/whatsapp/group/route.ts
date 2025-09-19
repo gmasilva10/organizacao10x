@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Chamada para Z-API via backend (sem CORS)
-    // Testando com a URL original que funcionava offline
-    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/group`
+    // Usando o endpoint correto da Z-API
+    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/create-group`
     console.log('🔄 [WHATSAPP GROUP] Chamando Z-API:', {
       url: zapiUrl,
       name: name,
