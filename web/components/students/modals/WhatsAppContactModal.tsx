@@ -40,6 +40,7 @@ export default function WhatsAppContactModal({
 }: WhatsAppContactModalProps) {
   const [phone, setPhone] = useState(studentPhone || '')
   const [firstName, setFirstName] = useState(studentName.split(' ')[0] || studentName)
+  const [lastName, setLastName] = useState(studentName.split(' ').slice(1).join(' ') || '')
   const [isValidPhone, setIsValidPhone] = useState(false)
 
   // Validar telefone
