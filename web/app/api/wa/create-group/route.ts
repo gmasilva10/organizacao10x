@@ -40,13 +40,18 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json()
-    const { name, participants, instance, token } = body
+    const { name, participants } = body
+
+    // Dados fixos para garantir funcionamento
+    const instance = '3E7608F78BA2405A08E5EE5C772D9ACD'
+    const token = '8F670F193615706A0616496E'
+    const clientToken = 'F31db8854d41742a7a08625204dc7a618S'
 
     // Validação de parâmetros obrigatórios
-    if (!name || !participants || !instance || !token) {
-      logAction('CREATE_GROUP_ERROR', { name, participants, instance: !!instance, token: !!token }, 400)
+    if (!name || !participants) {
+      logAction('CREATE_GROUP_ERROR', { name, participants }, 400)
       return NextResponse.json(
-        { error: 'Parâmetros obrigatórios: name, participants, instance, token' },
+        { error: 'Parâmetros obrigatórios: name, participants' },
         { status: 400 }
       )
     }
@@ -59,13 +64,29 @@ export async function POST(request: NextRequest) {
       `+5511${phone.replace(/\D/g, '')}`
     )
 
-    // URL da Z-API com HTTPS garantido
+    // URL da Z-API com HTTPS garantido - usando documentação oficial
     const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/create-group`
     
     const payload = {
       name,
       participants: normalizedParticipants
     }
+
+    // Debug detalhado
+    console.log('=== DEBUG Z-API GROUP ===')
+    console.log('URL:', zapiUrl)
+    console.log('Instance:', instance)
+    console.log('Token:', token)
+    console.log('Client Token:', clientToken)
+    console.log('Group Name:', name)
+    console.log('Original Participants:', participants)
+    console.log('Normalized Participants:', normalizedParticipants)
+    console.log('Payload:', JSON.stringify(payload, null, 2))
+    console.log('Headers:', {
+      'Content-Type': 'application/json',
+      'client-token': clientToken,
+      'User-Agent': 'Organizacao10x/1.0'
+    })
 
     logAction('CREATE_GROUP_START', {
       url: zapiUrl,
@@ -79,12 +100,21 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'client-token': clientToken,
         'User-Agent': 'Organizacao10x/1.0'
       },
       body: JSON.stringify(payload)
     })
 
     const responseData = await response.json()
+    
+    // Debug detalhado da resposta
+    console.log('=== RESPOSTA Z-API GROUP ===')
+    console.log('Status:', response.status)
+    console.log('OK:', response.ok)
+    console.log('Status Text:', response.statusText)
+    console.log('Response Data:', JSON.stringify(responseData, null, 2))
+    console.log('Response Headers:', Object.fromEntries(response.headers.entries()))
     
     logAction('CREATE_GROUP_RESPONSE', {
       status: response.status,
