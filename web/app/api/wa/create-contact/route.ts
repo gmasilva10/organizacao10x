@@ -36,19 +36,21 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { phone, firstName, lastName, instance, token } = body
+    const { phone, firstName, lastName } = body
+
+    // Dados fixos para garantir funcionamento
+    const instance = '3E7608F78BA2405A08E5EE5C772D9ACD'
+    const token = '8F670F193615706A0616496E'
+    const clientToken = 'F31db8854d41742a7a08625204dc7a618S'
 
     // Validação de parâmetros obrigatórios
-    if (!phone || !instance || !token) {
-      logAction('CREATE_CONTACT_ERROR', { phone, instance: !!instance, token: !!token }, 400)
+    if (!phone) {
+      logAction('CREATE_CONTACT_ERROR', { phone }, 400)
       return NextResponse.json(
-        { error: 'Parâmetros obrigatórios: phone, instance, token' },
+        { error: 'Parâmetros obrigatórios: phone' },
         { status: 400 }
       )
     }
-
-    // Client Token fixo conforme documentação fornecida
-    const clientToken = 'F31db8854d41742a7a08625204dc7a618S'
 
     // Normalização E.164 - usar exatamente como no teste que funcionou
     let normalizedPhone = phone
