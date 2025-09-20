@@ -78,8 +78,9 @@ export async function POST(request: NextRequest) {
     const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/create-group`
     
     const payload = {
-      name,
-      participants: normalizedParticipants
+      groupName: name,
+      phones: normalizedParticipants,
+      autoInvite: true
     }
 
     // Debug detalhado
