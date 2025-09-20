@@ -102,8 +102,8 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
         body: JSON.stringify({ 
           name: groupName,
           participants: normalized,
-          instance: process.env.NEXT_PUBLIC_ZAPI_INSTANCE,
-          token: process.env.NEXT_PUBLIC_ZAPI_TOKEN
+          instance: process.env.NEXT_PUBLIC_ZAPI_INSTANCE || '3E7608F78BA2405A08E5EE5C772D9ACD',
+          token: process.env.NEXT_PUBLIC_ZAPI_TOKEN || 'F31db8854d41742a7a08625204dc7a618S'
         })
       })
       
