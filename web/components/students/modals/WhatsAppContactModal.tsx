@@ -132,12 +132,13 @@ export default function WhatsAppContactModal({
         studentId
       })
       
-      // Usar a nova API que resolve o CORS
-      const res = await fetch('/api/whatsapp/contact', {
+      // Usar a nova API interna /api/wa/ que resolve CORS e garante Node runtime
+      const res = await fetch('/api/wa/create-contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          name: firstName,
+          firstName,
+          lastName: lastName || '',
           phone: normalized.value,
           instance: process.env.NEXT_PUBLIC_ZAPI_INSTANCE,
           token: process.env.NEXT_PUBLIC_ZAPI_TOKEN
