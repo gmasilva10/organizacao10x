@@ -42,6 +42,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, participants } = body
 
+    // Debug detalhado do payload recebido
+    console.log('=== PAYLOAD RECEBIDO ===')
+    console.log('Body completo:', JSON.stringify(body, null, 2))
+    console.log('Name extraído:', name)
+    console.log('Name type:', typeof name)
+    console.log('Name length:', name ? name.length : 'undefined')
+    console.log('Name trim:', name ? name.trim() : 'undefined')
+    console.log('Participants:', participants)
+
     // Dados fixos para garantir funcionamento
     const instance = '3E7608F78BA2405A08E5EE5C772D9ACD'
     const token = '8F670F193615706A0616496E'
@@ -49,6 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Validação de parâmetros obrigatórios
     if (!name || !participants) {
+      console.log('❌ VALIDAÇÃO FALHOU:', { name, participants })
       logAction('CREATE_GROUP_ERROR', { name, participants }, 400)
       return NextResponse.json(
         { error: 'Parâmetros obrigatórios: name, participants' },
