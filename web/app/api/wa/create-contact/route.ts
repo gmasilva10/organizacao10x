@@ -53,13 +53,14 @@ export async function POST(request: NextRequest) {
                            phone.startsWith('11') ? `+55${phone}` :
                            `+5511${phone.replace(/\D/g, '')}`
 
-    // URL da Z-API com HTTPS garantido - tentando formato alternativo
-    const zapiUrl = `https://api.z-api.io/instance/${instance}/token/${token}/add-contact`
+    // URL da Z-API com HTTPS garantido - usando documentação oficial
+    const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/contacts/add`
     
-    const payload = {
-      phone: normalizedPhone,
-      name: `${firstName || 'Contato'} ${lastName || 'Sistema'}`.trim()
-    }
+    const payload = [{
+      firstName: firstName || 'Contato',
+      lastName: lastName || 'Sistema',
+      phone: normalizedPhone
+    }]
 
     logAction('CREATE_CONTACT_START', {
       url: zapiUrl,
@@ -73,6 +74,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Client-Token': token,
         'User-Agent': 'Organizacao10x/1.0'
       },
       body: JSON.stringify(payload)
