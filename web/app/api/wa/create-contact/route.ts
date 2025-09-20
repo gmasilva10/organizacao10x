@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
                            `+5511${phone.replace(/\D/g, '')}`
 
     // URL da Z-API com HTTPS garantido
-    const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/send-contact`
+    const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/add-contact`
     
     const payload = {
       phone: normalizedPhone,
