@@ -2,132 +2,117 @@
   "tech_stack": [
     "TypeScript",
     "Next.js 14",
-    "React 18",
+    "React",
     "Tailwind CSS",
-    "Shadcn/ui",
     "Supabase",
     "PostgreSQL",
-    "Vercel",
-    "Lucide React",
-    "Sonner",
-    "Date-fns",
+    "Radix UI",
+    "shadcn/ui",
     "Zod",
-    "React Query",
-    "Vaul",
-    "Radix UI"
+    "Vitest"
   ],
   "features": [
     {
       "name": "Sistema de Autenticação",
-      "description": "Sistema completo de autenticação com Supabase Auth, login, cadastro, recuperação de senha e gerenciamento de sessão",
+      "description": "Sistema completo de login, registro e gestão de sessões com Supabase Auth",
       "files": [
-        "web/lib/use-auth-sync.ts",
-        "web/app/login/page.tsx",
-        "web/app/signup/page.tsx",
-        "web/app/login-simple/page.tsx",
-        "web/middleware.ts"
+        "web/components/LoginDrawer.tsx",
+        "web/app/api/auth/sync/route.ts",
+        "web/app/api/auth/signout/route.ts",
+        "web/utils/supabase/server.ts",
+        "web/utils/supabase/middleware.ts"
       ]
     },
     {
-      "name": "Módulo de Alunos",
-      "description": "Sistema completo de gerenciamento de alunos com cadastro, edição, listagem, anexos e processos",
+      "name": "Sistema de Alunos V2",
+      "description": "CRUD completo de alunos com anexos, processos e responsáveis",
       "files": [
-        "web/app/app/students/page.tsx",
-        "web/app/app/students/[id]/edit/page.tsx",
-        "web/components/students/StudentEditTabsV6.tsx",
-        "web/components/students/StudentCardActions.tsx",
-        "web/components/students/StudentTableActions.tsx",
-        "web/components/students/StudentAttachments.tsx",
-        "web/components/students/shared/StudentActions.tsx",
-        "web/components/students/modals/MatricularModal.tsx",
-        "web/components/students/modals/OnboardingModal.tsx",
+        "web/app/(app)/students/page.tsx",
+        "web/app/(app)/students/[id]/edit/page.tsx",
+        "web/components/students/StudentEditTabs.tsx",
+        "web/components/students/StudentFullModal.tsx",
         "web/app/api/students/route.ts",
-        "web/app/api/students/[id]/route.ts",
-        "web/hooks/useStudents.ts"
+        "web/app/api/students/[id]/route.ts"
       ]
     },
     {
-      "name": "Módulo de Relacionamento",
-      "description": "Sistema de relacionamento com alunos incluindo templates, tarefas, Kanban, calendário e timeline",
+      "name": "Sistema de Diretrizes",
+      "description": "Editor de diretrizes com regra 'mais restritivo vence' e preview",
       "files": [
-        "web/app/app/relacionamento/page.tsx",
-        "web/components/relationship/RelationshipKanban.tsx",
-        "web/components/relationship/RelationshipCalendar.tsx",
-        "web/components/relationship/RelationshipTimeline.tsx",
-        "web/components/relationship/RelationshipFilters.tsx",
-        "web/hooks/useRelationshipFilters.ts",
-        "web/lib/relationship/event-registry.ts",
-        "web/lib/relationship/template-seeds.ts",
-        "web/app/api/relationship/tasks/route.ts",
-        "web/app/api/relationship/job/route.ts",
-        "web/app/api/relationship/recalculate/route.ts",
-        "web/app/api/relationship/occurrence-trigger/route.ts",
-        "web/app/api/students/[id]/relationship-logs/route.ts"
+        "web/app/(app)/services/anamnesis/page.tsx",
+        "web/app/api/guidelines/versions/route.ts",
+        "web/app/api/guidelines/versions/[id]/preview/route.ts",
+        "web/components/guidelines/GuidelineEditor.tsx"
+      ]
+    },
+    {
+      "name": "Sistema Kanban/Onboarding",
+      "description": "Kanban interativo com drag-and-drop, colunas dinâmicas e histórico",
+      "files": [
+        "web/app/(app)/onboarding/page.tsx",
+        "web/app/(app)/onboarding/history/page.tsx",
+        "web/app/app/kanban/page.tsx",
+        "web/app/api/kanban/move/route.ts",
+        "web/app/api/kanban/stages/route.ts",
+        "web/app/api/kanban/history/route.ts",
+        "web/components/KanbanCardEditor.tsx"
+      ]
+    },
+    {
+      "name": "Sistema de Relacionamento/CRM",
+      "description": "CRM com threads, eventos, Kanban, templates de mensagem e motor de lembretes",
+      "files": [
+        "web/app/(app)/relacionamento/page.tsx",
+        "web/app/(app)/relationship/page.tsx",
+        "web/app/api/relationship/analytics/route.ts",
+        "web/app/api/relationship/templates/route.ts",
+        "web/components/relationship/RelationshipBoard.tsx"
       ]
     },
     {
       "name": "Sistema de Ocorrências",
-      "description": "Gerenciamento de ocorrências dos alunos com tipos, status, lembretes e anexos",
+      "description": "Gestão de ocorrências com anexos e workflow",
       "files": [
+        "web/app/(app)/workflow/occurrences/page.tsx",
         "web/app/api/occurrences/route.ts",
-        "web/app/api/students/[id]/occurrences/route.ts",
-        "web/components/students/StudentOccurrencesListContent.tsx"
+        "web/app/api/occurrences/[id]/route.ts",
+        "web/components/occurrences/OccurrenceForm.tsx"
       ]
     },
     {
-      "name": "Sistema de Kanban",
-      "description": "Sistema de Kanban para gerenciamento de fluxo de trabalho e onboarding",
+      "name": "Sistema de Anamnese",
+      "description": "Motor de decisão para anamnese baseado em planilha Excel",
       "files": [
-        "web/app/api/kanban/resync/route.ts",
-        "web/components/kanban/KanbanBoard.tsx"
+        "web/app/(app)/services/anamnesis/page.tsx",
+        "web/app/api/anamnesis/active/route.ts",
+        "web/app/api/anamnesis/guidelines/route.ts",
+        "Planilha/Anamnese_DECISAO.xlsx"
       ]
     },
     {
-      "name": "Sistema de Performance",
-      "description": "Sistema de monitoramento de performance com métricas, lazy loading e otimizações",
+      "name": "Sistema de Upload de Fotos",
+      "description": "Upload de fotos para Supabase Storage",
       "files": [
-        "web/lib/perfClient.ts",
-        "web/hooks/usePreload.ts",
-        "web/hooks/useIcons.ts",
-        "web/components/ui/OptimizedIcon.tsx",
-        "web/scripts/performance-baseline.js"
+        "web/app/api/upload/photo/route.ts",
+        "web/components/ui/PhotoUpload.tsx"
       ]
     },
     {
-      "name": "Sistema de Cache e Estado",
-      "description": "Gerenciamento de estado global com React Query, cache inteligente e sincronização",
+      "name": "Sistema de Validação",
+      "description": "Validação de dados com Zod schemas",
       "files": [
-        "web/lib/query-client.ts",
-        "web/components/providers/QueryProvider.tsx",
-        "web/hooks/useDebounce.ts"
-      ]
-    },
-    {
-      "name": "Sistema de UI/UX",
-      "description": "Componentes de interface padronizados, modais, toasts e feedback visual",
-      "files": [
-        "web/components/ui/",
-        "web/lib/toast-utils.ts",
-        "web/components/AppShell.tsx",
-        "web/app/layout.tsx"
-      ]
-    },
-    {
-      "name": "Sistema de Banco de Dados",
-      "description": "Migrations, RLS, funções e triggers do PostgreSQL via Supabase",
-      "files": [
-        "supabase/migrations/",
-        "web/supabase/migrations/"
+        "web/lib/schemas/kanban.ts",
+        "web/lib/schemas/students.ts",
+        "web/lib/schemas/guidelines.ts"
       ]
     },
     {
       "name": "Sistema de Testes",
-      "description": "Testes automatizados, evidências e documentação de qualidade",
+      "description": "Testes automatizados com Vitest e TestSprite",
       "files": [
-        "web/__tests__/",
-        "web/tests/",
-        "web/evidencias/",
-        "testsprite_tests/"
+        "web/vitest.config.ts",
+        "testsprite_tests/",
+        "web/__tests__/"
       ]
     }
   ]

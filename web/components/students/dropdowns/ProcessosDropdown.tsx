@@ -17,15 +17,20 @@ import {
   Plus,
   Link as LinkIcon,
   UserPlus,
-  Users
+  Users,
+  Calculator
 } from "lucide-react"
+import { AnamneseInviteModal } from "../modals/AnamneseInviteModal"
 
 type ProcessosDropdownProps = {
   studentId: string
+  studentName?: string
+  studentPhone?: string
 }
 
-export default function ProcessosDropdown({ studentId }: ProcessosDropdownProps) {
+export default function ProcessosDropdown({ studentId, studentName, studentPhone }: ProcessosDropdownProps) {
   const [open, setOpen] = useState(false)
+  const [anamneseModalOpen, setAnamneseModalOpen] = useState(false)
 
   const handleNovaOcorrencia = () => {
     setOpen(false)
@@ -35,8 +40,7 @@ export default function ProcessosDropdown({ studentId }: ProcessosDropdownProps)
 
   const handleGerarAnamnese = () => {
     setOpen(false)
-    // Implementar geração de link de anamnese
-    console.log('Gerar link anamnese para aluno:', studentId)
+    setAnamneseModalOpen(true)
   }
 
   const handleGerarDiretriz = () => {
@@ -58,6 +62,7 @@ export default function ProcessosDropdown({ studentId }: ProcessosDropdownProps)
   }
 
   return (
+    <>
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
@@ -75,8 +80,8 @@ export default function ProcessosDropdown({ studentId }: ProcessosDropdownProps)
         
         <DropdownMenuItem onClick={handleGerarAnamnese} className="flex items-center gap-3">
           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <LinkIcon className="h-4 w-4 text-blue-600" />
-          <span>Gerar anamnese</span>
+          <Calculator className="h-4 w-4 text-blue-600" />
+          <span>Gerar Anamnese</span>
         </DropdownMenuItem>
         
         <DropdownMenuSeparator />
@@ -102,5 +107,15 @@ export default function ProcessosDropdown({ studentId }: ProcessosDropdownProps)
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    {/* Modal de Gerar Anamnese */}
+    <AnamneseInviteModal
+      open={anamneseModalOpen}
+      onOpenChange={setAnamneseModalOpen}
+      studentId={studentId}
+      studentName={studentName}
+      studentPhone={studentPhone}
+    />
+  </>
   )
 }

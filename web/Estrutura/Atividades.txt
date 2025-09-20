@@ -275,6 +275,8 @@ Notas do dia:
 
 [2025-01-29 23:45] DEV — BOTÕES SALVAR/OK — Students — UX MELHORADA: implementados dois botões de ação na edição de aluno - botão "Salvar" (outline) que salva e mantém na edição, botão "OK" (primary) que salva e fecha a edição, modificada função handleSave para não redirecionar automaticamente, adicionada função handleSaveAndRedirect para botão OK, interface mais intuitiva para diferentes fluxos de trabalho — evidência: web/evidencias/correcao-salvamento-foto.md
 
+[2025-09-20T10:20-03] FIX — Relationship — Saneamento Dynamic server usage: verificado que todas as rotas já possuem export const dynamic = 'force-dynamic' configurado corretamente, build verde sem erros de Dynamic server usage, rotas /api/relationship/analytics e /api/occurrences/test já configuradas adequadamente — evidência: build output verde, branch fix/gate-relationship-dynamic-usage criada
+
 [2025-01-29 18:00] DEV — GATE 10.5 — Students — FUNCIONALIDADES MÍNIMAS: iniciado GATE 10.5 com foco em funcionalidades mínimas obrigatórias para manter consistência sem travar fluxos, priorizando roadmap estratégico (Relacionamento + Financeiro), escopo limitado a anexos no cadastro e processos prioritários — evidência: web/evidencias/gate10-5-func-alunos.md
 
 [2025-01-29 18:00] DEV — GATE 10.5 — Students — ANEXOS CADASTRO: implementado componente StudentAttachments para upload de anexos no cadastro do aluno, suporte a PDF/JPG/PNG até 10MB com preview simples, funcionalidade de remoção e download, integração com formulário de edição do aluno — evidência: web/components/students/StudentAttachments.tsx
@@ -284,3 +286,21 @@ Notas do dia:
 [2025-01-29 18:00] DEV — GATE 10.5 — Students — PROCESSOS ONBOARDING: implementado modal OnboardingModal funcional para envio de links de onboarding, geração de links tokenizados com validade configurável, opções de envio via WhatsApp e E-mail, reenvio de links existentes, integração completa com sistema — evidência: web/components/students/modals/OnboardingModal.tsx
 
 [2025-01-29 18:00] DEV — GATE 10.5 — Students — INTEGRAÇÃO PROCESSOS: atualizado ProcessosDropdown para usar modais funcionais em vez de placeholders, substituídos MatricularModal e OnboardingModal funcionais, mantidos placeholders para WhatsApp/E-mail/Excluir conforme escopo, funcionalidades prioritárias operacionais — evidência: web/components/students/ProcessosDropdown.tsx
+
+[2025-09-20 09:00] DEV — BUGFIX — Dynamic Server Usage — Saneamento completo das rotas com cookies()/headers() e configuração de 'force-dynamic', build verde confirmado — evidência: build output clean
+
+[2025-09-20 09:15] DEV — D1 — Kanban — Correção crítica ERR-KAN-0004: implementada validação Zod, fetch paralelo, verificação de consistência organizacional e função PostgreSQL move_kanban_card para transação atômica — evidência: web/app/api/kanban/move/route.ts, web/lib/schemas/kanban.ts
+
+[2025-09-20 09:30] DEV — D1 — Kanban — Correção ERR-2025-08-20-VAL01: garantido que items sempre seja array no endpoint /api/kanban/history — evidência: web/app/api/kanban/history/route.ts
+
+[2025-09-20 09:45] DEV — D3 — Anamnese Motor — Implementação completa do motor de anamnese com engine, API de cálculo, preview e geração de PDF mínimo — evidência: web/lib/anamnese/engine.ts, web/app/api/anamnesis/calculate/route.ts, web/components/anamnese/AnamneseMotor.tsx
+
+[2025-09-20 10:00] DEV — D4 — Flags/UX — Implementação de feature flags e componente FeaturePlaceholder para funcionalidades em desenvolvimento — evidência: web/lib/features.ts, web/components/ui/FeaturePlaceholder.tsx
+
+[2025-09-20T10:40-03] FIX — WA — Forçar Node runtime + rotas internas /api/wa/* — migração completa das APIs WhatsApp para /api/wa/ com runtime nodejs, dynamic force-dynamic, cache no-store, logs mascarados e normalização E.164 — evidência: web/app/api/wa/create-contact/route.ts, web/app/api/wa/create-group/route.ts, web/app/api/wa/send-template/route.ts, web/app/api/wa/webhook/route.ts
+
+[2025-09-20T10:45-03] FIX — WA — Remoção de URLs absolutas localhost; HTTPS garantido — todas as chamadas Z-API agora usam HTTPS, normalização E.164 com DDD 11 fallback, logs estruturados com correlation ID — evidência: web/evidencias/wa/payloads/create-contact_prod_20250920.json, web/evidencias/wa/payloads/create-group_prod_20250920.json
+
+[2025-09-20T12:40-03] FEAT — Anamnese — Invite + link seguro + WA — implementação completa do processo de geração de anamnese com tabelas anamnese_invites e anamnese_responses, API de convite com token único, normalização E.164, envio via WhatsApp, wizard modal integrado ao dropdown Processos — evidência: web/app/api/anamnese/invite/route.ts, web/components/students/modals/AnamneseInviteModal.tsx, supabase/migrations/20250920_anamnese_invites.sql
+
+[2025-09-20T14:20-03] FEAT — Anamnese — Form público + submit + PDF anexo — formulário público responsivo com 5 etapas, autosave em localStorage, validação de convite por token, processamento com motor existente, geração de hash para rastreabilidade, ocorrências automáticas — evidência: web/app/p/anamnese/[token]/page.tsx, web/app/api/anamnese/invite/[token]/route.ts, web/app/api/anamnese/submit/[token]/route.ts

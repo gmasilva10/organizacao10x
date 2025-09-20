@@ -30,7 +30,8 @@ export async function GET(request: Request) {
   const resp = await fetch(`${url}/rest/v1/onboarding_cards?${filters.join('&')}&completed_at=is.not.null&select=id,student_id,trainer_id,completed_at&order=completed_at.desc`, {
     headers: { apikey: key!, Authorization: `Bearer ${key}`!, Range: `${rangeStart}-${rangeEnd}`, Prefer: 'count=exact' }, cache: 'no-store'
   })
-  const items = await resp.json().catch(()=>[])
+  const data = await resp.json().catch(()=>[])
+  const items = Array.isArray(data) ? data : []
   const contentRange = resp.headers.get('content-range') || '0-0/0'
   const total = Number(contentRange.split('/').pop() || 0)
   return NextResponse.json({ items, page, pageSize, total })

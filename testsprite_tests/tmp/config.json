@@ -9,10 +9,10 @@
     "projectName": "Organizacao10x",
     "projectPath": "C:\\Projetos\\Organizacao10x",
     "testIds": [],
-    "additionalInstruction": "Focar nos testes do módulo de Relacionamento (GATE 10.6) incluindo Kanban, Calendário, Timeline e integração com alunos. Validar performance, UX Premium e funcionalidades críticas.",
+    "additionalInstruction": "Executar todos os testes do plano frontend para gerar evidências formais de QA",
     "envs": {
       "API_KEY": "sk-user-L_Ma3VW6CGxvUlXstg766pouZj7dIgTPIVL2YtCqhDLEOQ5V1XGfBco9rWFJe_BtAl9M0QK3Nqtq4-V1HN2m7mG-_ddmOR0cyH-l6aDXnFI0ncTEsZVTOCkf9zY9visvp2A"
     }
   },
-  "proxy": "http://b7722075-9376-4b8f-a4b3-a57ecaa91152:OjDJiMCYyxPxYcJRqwKuDKuEy7HvwO4x@tun.testsprite.com:8080"
+  "proxy": "http://7438dcaf-3898-40e2-a39b-9ea6838424bf:y5dKuUhfcVR6jekNcy42mHN6iagK8oAX@tun.testsprite.com:8080"
 }

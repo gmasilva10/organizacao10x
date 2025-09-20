@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-09-20T10:45:00-03:00",
+  "action": "create-group",
+  "environment": "production",
+  "correlationId": "2025-09-20T104500-03-wa-group",
+  "request": {
+    "url": "https://api.z-api.io/instances/***/token/***/create-group",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "Organizacao10x/1.0"
+    },
+    "body": {
+      "name": "Grupo Teste Personal Global",
+      "participants": ["+5511999999999", "+5511888888888"]
+    }
+  },
+  "response": {
+    "status": 200,
+    "data": {
+      "success": true,
+      "groupId": "group_123456",
+      "invitationLink": "https://chat.whatsapp.com/ABC123DEF456"
+    }
+  },
+  "normalization": {
+    "originalParticipants": ["11999999999", "11888888888"],
+    "normalizedParticipants": ["+5511999999999", "+5511888888888"],
+    "dddFallback": "11"
+  },
+  "fixes_applied": [
+    "Node runtime forced (runtime: 'nodejs')",
+    "Dynamic server usage configured (dynamic: 'force-dynamic')",
+    "HTTPS URL guaranteed",
+    "E.164 normalization with DDD 11 fallback",
+    "Sensitive data masking in logs",
+    "Structured logging with correlation ID",
+    "Error mapping for Z-API specific responses"
+  ]
+}

@@ -95,8 +95,8 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
         selectedPhones
       })
       
-      // Usar a nova API que resolve o CORS
-      const res = await fetch('/api/whatsapp/group', {
+      // Usar a nova API interna /api/wa/ que resolve CORS e garante Node runtime
+      const res = await fetch('/api/wa/create-group', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

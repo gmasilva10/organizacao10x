@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-09-20T10:40:00-03:00",
+  "action": "create-contact",
+  "environment": "production",
+  "correlationId": "20250920T104000-03-wa-contact",
+  "request": {
+    "url": "https://api.z-api.io/instances/***/token/***/add-contact",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "Organizacao10x/1.0"
+    },
+    "body": {
+      "phone": "+5511999999999",
+      "firstName": "Contato",
+      "lastName": "Sistema"
+    }
+  },
+  "response": {
+    "status": 200,
+    "data": {
+      "success": true,
+      "contactId": "contact_123456",
+      "phone": "+5511999999999"
+    }
+  },
+  "normalization": {
+    "originalPhone": "11999999999",
+    "normalizedPhone": "+5511999999999",
+    "dddFallback": "11"
+  },
+  "fixes_applied": [
+    "Node runtime forced (runtime: 'nodejs')",
+    "Dynamic server usage configured (dynamic: 'force-dynamic')",
+    "HTTPS URL guaranteed",
+    "E.164 normalization with DDD 11 fallback",
+    "Sensitive data masking in logs",
+    "Structured logging with correlation ID"
+  ]
+}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
+import { KanbanMoveSchema } from '@/lib/schemas/kanban'
 
 // Forçar execução dinâmica para evitar problemas de renderização estática
 export const runtime = 'nodejs';
@@ -9,7 +10,9 @@ export const revalidate = 0;
 
 
 export async function POST(request: NextRequest) {
-  console.log('🔍 API /api/kanban/move POST chamada')
+  const requestId = crypto.randomUUID()
+  console.log(`🔍 [${requestId}] API /api/kanban/move POST chamada`)
+  
   try {
     const cookieStore = cookies()
     const supabase = await createClient(cookieStore)
@@ -17,110 +20,156 @@ export async function POST(request: NextRequest) {
     // Verificar autenticação
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      console.warn('⚠️ Auth falhou:', authError)
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      console.warn(`⚠️ [${requestId}] Auth falhou:`, authError)
+      return NextResponse.json({ 
+        error: 'Unauthorized', 
+        code: 'AUTH_FAILED',
+        requestId 
+      }, { status: 401 })
     }
 
+    // Validar payload com Zod
     const body = await request.json()
-    const { cardId, fromColumnId, toColumnId } = body || {}
-    console.log('📝 Payload recebido:', body)
+    const validationResult = KanbanMoveSchema.safeParse(body)
     
-    if (!cardId || !fromColumnId || !toColumnId) {
-      console.warn('⚠️ Dados inválidos:', { cardId, fromColumnId, toColumnId })
-      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 })
+    if (!validationResult.success) {
+      console.warn(`⚠️ [${requestId}] Validação falhou:`, validationResult.error.issues)
+      return NextResponse.json({ 
+        error: 'Dados inválidos', 
+        code: 'VALIDATION_ERROR',
+        details: validationResult.error.issues,
+        requestId 
+      }, { status: 422 })
     }
 
-    // Buscar informações do card e colunas
-    const { data: card, error: cardError } = await supabase
-      .from('kanban_items')
-      .select('id, org_id, student_id, stage_id')
-      .eq('id', cardId)
-      .single()
+    const { cardId, fromColumnId, toColumnId, toIndex } = validationResult.data
+    console.log(`📝 [${requestId}] Payload validado:`, { cardId, fromColumnId, toColumnId, toIndex })
 
-    if (cardError || !card) {
-      console.error('❌ Card não encontrado:', { cardError, card })
-      return NextResponse.json({ error: 'Card não encontrado', detail: cardError?.message }, { status: 404 })
-    }
-    console.log('✅ Card carregado:', card)
+    // Buscar informações do card e colunas em paralelo
+    const [cardResult, fromStageResult, toStageResult] = await Promise.all([
+      supabase
+        .from('kanban_items')
+        .select('id, org_id, student_id, stage_id, position')
+        .eq('id', cardId)
+        .single(),
+      
+      supabase
+        .from('kanban_stages')
+        .select('id, name, position, stage_code, org_id')
+        .eq('id', fromColumnId)
+        .single(),
+      
+      supabase
+        .from('kanban_stages')
+        .select('id, name, position, stage_code, org_id')
+        .eq('id', toColumnId)
+        .single()
+    ])
 
-    const { data: fromStage, error: fromStageError } = await supabase
-      .from('kanban_stages')
-      .select('id, name, position, stage_code')
-      .eq('id', fromColumnId)
-      .single()
-
-    if (fromStageError || !fromStage) {
-      console.error('❌ fromStage não encontrado:', { fromColumnId, fromStageError, fromStage })
-      return NextResponse.json({ error: 'Coluna origem não encontrada', detail: fromStageError?.message }, { status: 404 })
-    }
-
-    const { data: toStage, error: toStageError } = await supabase
-      .from('kanban_stages')
-      .select('id, name, position, stage_code')
-      .eq('id', toColumnId)
-      .single()
-
-    if (toStageError || !toStage) {
-      console.error('❌ toStage não encontrado:', { toColumnId, toStageError, toStage })
-      return NextResponse.json({ error: 'Coluna destino não encontrada', detail: toStageError?.message }, { status: 404 })
-    }
-
-    console.log('✅ Stages carregados:', { fromStage, toStage })
-
-    // Verificar se é uma coluna fixa (1 ou 99)
-    // Removido: bloqueio de colunas fixas (1 e 99) — regra atual permite mover de qualquer coluna
-
-    // Atualizar o card para a nova coluna
-    const { error: updateError } = await supabase
-      .from('kanban_items')
-      .update({ stage_id: toColumnId })
-      .eq('id', cardId)
-
-    if (updateError) {
-      console.error('❌ Erro ao atualizar card:', updateError)
-      return NextResponse.json({ error: 'Erro interno', detail: updateError.message }, { status: 500 })
+    // Verificar se o card existe
+    if (cardResult.error || !cardResult.data) {
+      console.error(`❌ [${requestId}] Card não encontrado:`, { cardError: cardResult.error, card: cardResult.data })
+      return NextResponse.json({ 
+        error: 'Card não encontrado', 
+        code: 'CARD_NOT_FOUND',
+        detail: cardResult.error?.message,
+        requestId 
+      }, { status: 404 })
     }
 
-    // O trigger trigger_instantiate_tasks_on_card_move já instancia automaticamente
-    // as tarefas da nova coluna quando o card é movido
-
-    // Log da movimentação
-    try {
-      await supabase
-        .from('kanban_logs')
-        .insert({
-          org_id: card.org_id,
-          card_id: cardId,
-          stage_id: toColumnId,
-          action: 'card_moved',
-          payload: {
-            from_column_id: fromColumnId,
-            to_column_id: toColumnId,
-            from_stage: fromStage.name,
-            to_stage: toStage.name,
-            from_position: fromStage.position,
-            to_position: toStage.position,
-            student_id: card.student_id,
-            actor_id: user.id,
-            timestamp: new Date().toISOString(),
-            // added_templates será preenchido pelos logs de card_task_instantiated
-            added_templates: []
-          },
-          created_by: user.id
-        })
-    } catch (logError) {
-      console.error('⚠️ Erro ao criar log (ignorado):', logError)
-      // Não falha a operação se o log falhar
+    // Verificar se as colunas existem
+    if (fromStageResult.error || !fromStageResult.data) {
+      console.error(`❌ [${requestId}] Coluna origem não encontrada:`, { fromColumnId, fromStageError: fromStageResult.error, fromStage: fromStageResult.data })
+      return NextResponse.json({ 
+        error: 'Coluna origem não encontrada', 
+        code: 'FROM_STAGE_NOT_FOUND',
+        detail: fromStageResult.error?.message,
+        requestId 
+      }, { status: 404 })
     }
 
-    console.log('✅ Card movido com sucesso:', { cardId, from: fromStage.id, to: toStage.id })
+    if (toStageResult.error || !toStageResult.data) {
+      console.error(`❌ [${requestId}] Coluna destino não encontrada:`, { toColumnId, toStageError: toStageResult.error, toStage: toStageResult.data })
+      return NextResponse.json({ 
+        error: 'Coluna destino não encontrada', 
+        code: 'TO_STAGE_NOT_FOUND',
+        detail: toStageResult.error?.message,
+        requestId 
+      }, { status: 404 })
+    }
+
+    const card = cardResult.data
+    const fromStage = fromStageResult.data
+    const toStage = toStageResult.data
+
+    // Verificar se todas as colunas pertencem à mesma organização
+    if (card.org_id !== fromStage.org_id || card.org_id !== toStage.org_id) {
+      console.error(`❌ [${requestId}] Inconsistência de organização:`, { 
+        cardOrgId: card.org_id, 
+        fromStageOrgId: fromStage.org_id, 
+        toStageOrgId: toStage.org_id 
+      })
+      return NextResponse.json({ 
+        error: 'Inconsistência de organização', 
+        code: 'ORG_MISMATCH',
+        requestId 
+      }, { status: 409 })
+    }
+
+    console.log(`✅ [${requestId}] Dados validados:`, { 
+      card: { id: card.id, org_id: card.org_id }, 
+      fromStage: { id: fromStage.id, name: fromStage.name }, 
+      toStage: { id: toStage.id, name: toStage.name } 
+    })
+
+    // Se for a mesma coluna, apenas reordenar
+    if (fromColumnId === toColumnId) {
+      console.log(`🔄 [${requestId}] Reordenação na mesma coluna`)
+      // TODO: Implementar reordenação se necessário
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Card reordenado na mesma coluna',
+        requestId 
+      })
+    }
+
+    // Transação atômica: mover card e atualizar posições
+    const { error: transactionError } = await supabase.rpc('move_kanban_card', {
+      p_card_id: cardId,
+      p_from_stage_id: fromColumnId,
+      p_to_stage_id: toColumnId,
+      p_to_index: toIndex || 0,
+      p_actor_id: user.id
+    })
+
+    if (transactionError) {
+      console.error(`❌ [${requestId}] Erro na transação:`, transactionError)
+      return NextResponse.json({ 
+        error: 'Erro interno', 
+        code: 'TRANSACTION_FAILED',
+        detail: transactionError.message,
+        requestId 
+      }, { status: 500 })
+    }
+
+    console.log(`✅ [${requestId}] Card movido com sucesso:`, { 
+      cardId, 
+      from: fromStage.id, 
+      to: toStage.id 
+    })
+
     return NextResponse.json({ 
       success: true, 
-      message: `Card movido de "${fromStage.name}" para "${toStage.name}"`
+      message: `Card movido de "${fromStage.name}" para "${toStage.name}"`,
+      requestId 
     })
 
   } catch (error) {
-    console.error('❌ Erro inesperado:', error)
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
+    console.error(`❌ [${requestId}] Erro inesperado:`, error)
+    return NextResponse.json({ 
+      error: 'Erro interno', 
+      code: 'INTERNAL_ERROR',
+      requestId 
+    }, { status: 500 })
   }
 }

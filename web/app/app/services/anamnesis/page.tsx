@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
-import { FileText, Brain, Settings } from "lucide-react"
+import { FileText, Brain, Settings, Calculator } from "lucide-react"
 import { AnamnesisTemplatesManager } from "@/components/anamnesis/AnamnesisTemplatesManager"
 import { TrainingGuidelinesManager } from "@/components/anamnesis/TrainingGuidelinesManager"
 import { ActiveVersionsManager } from "@/components/anamnesis/ActiveVersionsManager"
+import { AnamneseMotor } from "@/components/anamnese/AnamneseMotor"
 
-type TabType = 'student' | 'guidelines' | 'active'
+type TabType = 'student' | 'guidelines' | 'active' | 'motor'
 
 export default function AnamnesisPage() {
   const searchParams = useSearchParams()
@@ -19,6 +20,8 @@ export default function AnamnesisPage() {
       setActiveTab('guidelines')
     } else if (tab === 'active') {
       setActiveTab('active')
+    } else if (tab === 'motor') {
+      setActiveTab('motor')
     } else {
       setActiveTab('student')
     }
@@ -31,7 +34,7 @@ export default function AnamnesisPage() {
         <p className="text-muted-foreground mt-2">Configure templates de perguntas e diretrizes de treino para seus alunos.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <button
           onClick={() => setActiveTab('student')}
           className={`block rounded-lg border p-6 text-left transition-colors ${
@@ -76,6 +79,21 @@ export default function AnamnesisPage() {
           </div>
           <p className="text-sm opacity-80">Gerencie as versões padrão da organização.</p>
         </button>
+
+        <button
+          onClick={() => setActiveTab('motor')}
+          className={`block rounded-lg border p-6 text-left transition-colors ${
+            activeTab === 'motor'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-card hover:bg-accent'
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <Calculator className="h-4 w-4" />
+            <h3 className="font-semibold">Motor da Anamnese</h3>
+          </div>
+          <p className="text-sm opacity-80">Calcule protocolos e zonas de treino automaticamente.</p>
+        </button>
       </div>
 
       {/* Tab Content */}
@@ -107,6 +125,10 @@ export default function AnamnesisPage() {
         )}
         
         {activeTab === 'active' && <ActiveVersionsManager />}
+        
+        {activeTab === 'motor' && (
+          <AnamneseMotor />
+        )}
       </div>
     </div>
   )
