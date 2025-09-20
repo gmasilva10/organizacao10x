@@ -50,11 +50,19 @@ export async function POST(request: NextRequest) {
     // Client Token fixo conforme documentação fornecida
     const clientToken = 'F31db8854d41742a7a08625204dc7a618S'
 
-    // Normalização E.164 com DDD 11 fallback
-    const normalizedPhone = phone.startsWith('+55') ? phone : 
-                           phone.startsWith('55') ? `+${phone}` :
-                           phone.startsWith('11') ? `+55${phone}` :
-                           `+5511${phone.replace(/\D/g, '')}`
+    // Normalização E.164 - usar exatamente como no teste que funcionou
+    let normalizedPhone = phone
+    
+    // Se não começar com +55, adicionar
+    if (!normalizedPhone.startsWith('+55')) {
+      if (normalizedPhone.startsWith('55')) {
+        normalizedPhone = `+${normalizedPhone}`
+      } else {
+        // Remover todos os caracteres não numéricos e adicionar +55
+        const cleanPhone = normalizedPhone.replace(/\D/g, '')
+        normalizedPhone = `+55${cleanPhone}`
+      }
+    }
 
     // URL da Z-API com HTTPS garantido - usando documentação oficial
     const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/contacts/add`
@@ -71,6 +79,8 @@ export async function POST(request: NextRequest) {
     console.log('Instance:', instance)
     console.log('Token:', token)
     console.log('Client Token:', clientToken)
+    console.log('Original Phone:', phone)
+    console.log('Normalized Phone:', normalizedPhone)
     console.log('Payload:', JSON.stringify(payload, null, 2))
     console.log('Headers:', {
       'Content-Type': 'application/json',
