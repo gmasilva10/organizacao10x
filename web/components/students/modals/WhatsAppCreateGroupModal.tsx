@@ -59,16 +59,25 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
   }, [open])
 
   const selectedPhones = useMemo(() => {
-    return trainers
+    const allSelected = trainers
       .filter(t => selected[t.id])
       .map(t => (t.phone || (t as any).whatsapp_work || ''))
       .filter(Boolean)
-      .filter(phone => {
-        // Filtrar o número do usuário logado (não pode ser participante do próprio grupo)
-        const cleanPhone = phone.replace(/\D/g, '')
-        const userPhone = '5517996693499' // Seu número
-        return cleanPhone !== userPhone
-      })
+    
+    // Filtrar o número do usuário logado (não pode ser participante do próprio grupo)
+    const filtered = allSelected.filter(phone => {
+      const cleanPhone = phone.replace(/\D/g, '')
+      const userPhone = '5517996693499' // Seu número
+      return cleanPhone !== userPhone
+    })
+    
+    // Se após filtrar não sobrou ninguém, mas havia seleções, 
+    // significa que só o usuário estava selecionado
+    if (filtered.length === 0 && allSelected.length > 0) {
+      console.log('⚠️ Apenas o usuário logado estava selecionado. Adicione outros participantes.')
+    }
+    
+    return filtered
   }, [selected, trainers])
 
   const adminPhones = useMemo(() => {
@@ -84,7 +93,10 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
     if (!groupName.trim()) { setError('Informe um nome para o grupo.'); return }
     // valida servidor também, mas dá feedback precoce
     const normalized = selectedPhones.map(p => normalizeToE164DigitsBR(p)).filter(r => r.ok && r.value).map(r => r.value as string)
-    if (normalized.length < 1) { setError('Selecione ao menos um participante válido.'); return }
+    if (normalized.length < 1) { 
+      setError('Selecione ao menos um participante válido. Você não pode ser participante do próprio grupo.'); 
+      return 
+    }
 
     try {
       setLoading(true)
