@@ -58,8 +58,7 @@ export async function POST(request: NextRequest) {
     
     const payload = {
       phone: normalizedPhone,
-      firstName: firstName || 'Contato',
-      lastName: lastName || 'Sistema'
+      name: `${firstName || 'Contato'} ${lastName || 'Sistema'}`.trim()
     }
 
     logAction('CREATE_CONTACT_START', {
