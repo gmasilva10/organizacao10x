@@ -33,7 +33,7 @@ function logAction(action: string, data: any, status?: number) {
 
 export async function POST(request: NextRequest) {
   const correlationId = `${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}-wa-contact`
-  
+
   try {
     const body = await request.json()
     const { phone, firstName, lastName, instance, token } = body
@@ -46,6 +46,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Client Token fixo conforme documentação fornecida
+    const clientToken = 'F31db8854d41742a7a08625204dc7a618S'
 
     // Normalização E.164 com DDD 11 fallback
     const normalizedPhone = phone.startsWith('+55') ? phone : 
@@ -67,14 +70,15 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       body: payload,
       originalPhone: phone,
-      normalizedPhone
+      normalizedPhone,
+      clientToken: clientToken.substring(0, 8) + '...' // Mascarado para logs
     })
 
     const response = await fetch(zapiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'client-token': token,
+        'client-token': clientToken,
         'User-Agent': 'Organizacao10x/1.0'
       },
       body: JSON.stringify(payload)
