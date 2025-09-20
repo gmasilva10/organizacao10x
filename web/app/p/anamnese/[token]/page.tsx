@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Progress } from '@/components/ui/progress'
+// Progress component será implementado inline
 import { Badge } from '@/components/ui/badge'
 import { Loader2, Save, CheckCircle, AlertCircle, User, Phone, Calendar } from 'lucide-react'
 
@@ -269,7 +269,12 @@ export default function AnamneseFormPage() {
             <span>Etapa {currentStep} de {totalSteps}</span>
             <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
           </div>
-          <Progress value={(currentStep / totalSteps) * 100} className="h-2" />
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            />
+          </div>
         </div>
 
         {/* Form Steps */}
