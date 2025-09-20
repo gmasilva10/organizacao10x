@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Client-Token': token,
+        'client-token': token,
         'User-Agent': 'Organizacao10x/1.0'
       },
       body: JSON.stringify(payload)
