@@ -63,6 +63,12 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
       .filter(t => selected[t.id])
       .map(t => (t.phone || (t as any).whatsapp_work || ''))
       .filter(Boolean)
+      .filter(phone => {
+        // Filtrar o número do usuário logado (não pode ser participante do próprio grupo)
+        const cleanPhone = phone.replace(/\D/g, '')
+        const userPhone = '5517996693499' // Seu número
+        return cleanPhone !== userPhone
+      })
   }, [selected, trainers])
 
   const adminPhones = useMemo(() => {
