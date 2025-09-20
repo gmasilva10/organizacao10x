@@ -58,12 +58,25 @@ export async function POST(request: NextRequest) {
 
     // URL da Z-API com HTTPS garantido - usando documentação oficial
     const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/contacts/add`
-    
+
     const payload = [{
       firstName: firstName || 'Contato',
       lastName: lastName || 'Sistema',
       phone: normalizedPhone
     }]
+
+    // Debug detalhado
+    console.log('=== DEBUG Z-API ===')
+    console.log('URL:', zapiUrl)
+    console.log('Instance:', instance)
+    console.log('Token:', token)
+    console.log('Client Token:', clientToken)
+    console.log('Payload:', JSON.stringify(payload, null, 2))
+    console.log('Headers:', {
+      'Content-Type': 'application/json',
+      'client-token': clientToken,
+      'User-Agent': 'Organizacao10x/1.0'
+    })
 
     logAction('CREATE_CONTACT_START', {
       url: zapiUrl,
@@ -85,6 +98,14 @@ export async function POST(request: NextRequest) {
     })
 
     const responseData = await response.json()
+    
+    // Debug detalhado da resposta
+    console.log('=== RESPOSTA Z-API ===')
+    console.log('Status:', response.status)
+    console.log('OK:', response.ok)
+    console.log('Status Text:', response.statusText)
+    console.log('Response Data:', JSON.stringify(responseData, null, 2))
+    console.log('Response Headers:', Object.fromEntries(response.headers.entries()))
     
     logAction('CREATE_CONTACT_RESPONSE', {
       status: response.status,
