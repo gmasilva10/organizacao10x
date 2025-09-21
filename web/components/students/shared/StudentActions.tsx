@@ -65,8 +65,11 @@ export default function StudentActions({
   const [whatsappCreateGroupOpen, setWhatsappCreateGroupOpen] = useState(false)
 
   const handleAction = (action: () => void) => {
+    console.log('🔍 [DEBUG] handleAction chamado')
     setOpen(false)
+    console.log('🔍 [DEBUG] setOpen(false) executado')
     action()
+    console.log('🔍 [DEBUG] action() executado')
   }
 
   const handleOccurrenceSaved = () => {
@@ -309,7 +312,12 @@ export default function StudentActions({
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => {
               console.log('🔍 [DEBUG] Clicou em Gerar Anamnese, abrindo modal...')
-              handleAction(() => setGerarAnamneseModalOpen(true))
+              console.log('🔍 [DEBUG] gerarAnamneseModalOpen antes:', gerarAnamneseModalOpen)
+              handleAction(() => {
+                console.log('🔍 [DEBUG] setGerarAnamneseModalOpen(true) sendo chamado')
+                setGerarAnamneseModalOpen(true)
+                console.log('🔍 [DEBUG] setGerarAnamneseModalOpen(true) executado')
+              })
             }}>
               <FileText className="h-4 w-4 mr-2 text-blue-600" />
               Gerar Anamnese
