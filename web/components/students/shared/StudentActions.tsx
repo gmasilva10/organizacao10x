@@ -307,7 +307,10 @@ export default function StudentActions({
               Enviar Onboarding
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleAction(() => setGerarAnamneseModalOpen(true))}>
+            <DropdownMenuItem onClick={() => {
+              console.log('🔍 [DEBUG] Clicou em Gerar Anamnese, abrindo modal...')
+              handleAction(() => setGerarAnamneseModalOpen(true))
+            }}>
               <FileText className="h-4 w-4 mr-2 text-blue-600" />
               Gerar Anamnese
             </DropdownMenuItem>
