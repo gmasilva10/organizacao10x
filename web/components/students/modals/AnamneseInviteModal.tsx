@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Loader2, Send, Phone, User } from 'lucide-react'
 
 interface AnamneseInviteModalProps {
@@ -29,7 +29,6 @@ export function AnamneseInviteModal({
   const [phone, setPhone] = useState(studentPhone || '')
   const [serviceId, setServiceId] = useState('')
   const [customMessage, setCustomMessage] = useState('')
-  const { toast } = useToast()
 
   const handleSendInvite = async () => {
     if (!phone.trim()) {
