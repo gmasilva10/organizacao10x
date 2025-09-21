@@ -27,6 +27,7 @@ import {
 import { StudentOccurrenceModal } from "../StudentOccurrenceModal"
 import StudentRelationshipModal from "../StudentRelationshipModal"
 import PlaceholderModal from "../modals/PlaceholderModal"
+import { AnamneseInviteModal } from "../modals/AnamneseInviteModal"
 import MatricularModal from "../modals/MatricularModal"
 import OnboardingModal from "../modals/OnboardingModal"
 import MessageComposer from "../../relationship/MessageComposer"
@@ -201,12 +202,12 @@ export default function StudentActions({
           studentName={studentName}
         />
 
-        <PlaceholderModal
+        <AnamneseInviteModal
           open={gerarAnamneseModalOpen}
-          onClose={() => setGerarAnamneseModalOpen(false)}
-          title="Gerar Anamnese"
-          description="Funcionalidade de geração de anamnese em desenvolvimento."
-          icon={<FileText className="h-5 w-5 text-blue-600" />}
+          onOpenChange={setGerarAnamneseModalOpen}
+          studentId={studentId}
+          studentName={studentName}
+          studentPhone={studentPhone}
         />
 
         <PlaceholderModal
