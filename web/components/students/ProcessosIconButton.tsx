@@ -26,6 +26,7 @@ import {
 } from "lucide-react"
 import { StudentOccurrenceModal } from "./StudentOccurrenceModal"
 import PlaceholderModal from "./modals/PlaceholderModal"
+import { AnamneseInviteModal } from "./modals/AnamneseInviteModal"
 
 type ProcessosIconButtonProps = {
   studentId: string
@@ -142,12 +143,12 @@ export default function ProcessosIconButton({ studentId, studentName }: Processo
         onSaved={handleOccurrenceSaved}
       />
 
-      <PlaceholderModal
+      <AnamneseInviteModal
         open={gerarAnamneseModalOpen}
-        onClose={() => setGerarAnamneseModalOpen(false)}
-        title="Gerar Anamnese"
-        description="Funcionalidade de geração de anamnese em desenvolvimento. Em breve: geração de link único para preenchimento."
-        icon={<FileText className="h-5 w-5 text-blue-600" />}
+        onOpenChange={setGerarAnamneseModalOpen}
+        studentId={studentId}
+        studentName={studentName}
+        studentPhone={undefined}
       />
 
       <PlaceholderModal
