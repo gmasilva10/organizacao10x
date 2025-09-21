@@ -387,13 +387,6 @@ export default function StudentActions({
         studentName={studentName}
       />
 
-      <PlaceholderModal
-        open={gerarAnamneseModalOpen}
-        onClose={() => setGerarAnamneseModalOpen(false)}
-        title="Gerar Anamnese"
-        description="Funcionalidade de geração de anamnese em desenvolvimento."
-        icon={<FileText className="h-5 w-5 text-blue-600" />}
-      />
 
       <PlaceholderModal
         open={gerarDiretrizModalOpen}
