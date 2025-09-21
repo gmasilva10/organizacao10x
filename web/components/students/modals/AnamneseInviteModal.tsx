@@ -25,6 +25,7 @@ export function AnamneseInviteModal({
   studentName, 
   studentPhone 
 }: AnamneseInviteModalProps) {
+  console.log('🔍 [DEBUG] AnamneseInviteModal renderizado com open:', open)
   const [loading, setLoading] = useState(false)
   const [phone, setPhone] = useState(studentPhone || '')
   const [serviceId, setServiceId] = useState('')
