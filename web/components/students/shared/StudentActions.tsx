@@ -403,6 +403,19 @@ export default function StudentActions({
         studentName={studentName}
       />
 
+      {gerarAnamneseModalOpen && (
+        <>
+          {console.log('🔍 [DEBUG] Renderizando AnamneseInviteModal (edit) com open:', gerarAnamneseModalOpen)}
+          <AnamneseInviteModal
+            open={gerarAnamneseModalOpen}
+            onOpenChange={setGerarAnamneseModalOpen}
+            studentId={studentId}
+            studentName={studentName}
+            studentPhone={studentPhone}
+          />
+        </>
+      )}
+
 
       <PlaceholderModal
         open={gerarDiretrizModalOpen}
