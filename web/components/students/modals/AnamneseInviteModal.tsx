@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -80,6 +80,9 @@ export function AnamneseInviteModal({
             <Send className="h-5 w-5" />
             Gerar Anamnese
           </DialogTitle>
+          <DialogDescription>
+            Envie ao aluno um link seguro para responder a anamnese.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -113,12 +116,16 @@ export function AnamneseInviteModal({
           {/* Serviço (opcional) */}
           <div className="space-y-2">
             <Label htmlFor="service">Serviço (opcional)</Label>
-            <Select value={serviceId} onValueChange={setServiceId} disabled={loading}>
+            <Select
+              value={serviceId || 'default'}
+              onValueChange={(v) => setServiceId(v === 'default' ? '' : v)}
+              disabled={loading}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um serviço" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Usar serviço padrão</SelectItem>
+                <SelectItem value="default">Usar serviço padrão</SelectItem>
                 <SelectItem value="personal-training">Personal Training</SelectItem>
                 <SelectItem value="group-training">Treino em Grupo</SelectItem>
                 <SelectItem value="nutrition">Nutrição</SelectItem>
