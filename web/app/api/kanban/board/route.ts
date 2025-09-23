@@ -122,21 +122,26 @@ export async function GET(request: Request) {
 
   // Enriquecer com dados do aluno (status e nome)
   const studentIds = Array.from(new Set(cards.map(c => c.student_id))).filter(Boolean)
-  const studentsMap: Record<string, { status?: string; name?: string }> = {}
+  const studentsMap: Record<string, { status?: string; name?: string; phone?: string }> = {}
   if (studentIds.length > 0) {
     const inList = studentIds.map(encodeURIComponent).join(',')
-    const stuResp = await fetch(`${url}/rest/v1/students?tenant_id=eq.${ctx.tenantId}&id=in.(${inList})&select=id,name,status`, {
+    const stuResp = await fetch(`${url}/rest/v1/students?tenant_id=eq.${ctx.tenantId}&id=in.(${inList})&select=id,name,status,phone`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (!stuResp.ok) {
       const t = await stuResp.text().catch(()=>"")
       return NextResponse.json({ error: 'students_fetch_failed', status: stuResp.status, details: t }, { status: 500 })
     }
-    const rows: Array<{ id: string; name?: string|null; status?: string }> = await stuResp.json().catch(()=>[])
-    for (const r of rows) studentsMap[r.id] = { status: r.status, name: r.name || undefined }
+    const rows: Array<{ id: string; name?: string|null; status?: string; phone?: string }> = await stuResp.json().catch(()=>[])
+    for (const r of rows) studentsMap[r.id] = { status: r.status, name: r.name || undefined, phone: r.phone || undefined }
   }
 
-  const enriched = cards.map(c => ({ ...c, student_status: studentsMap[c.student_id]?.status || 'onboarding', student_name: studentsMap[c.student_id]?.name }))
+  const enriched = cards.map(c => ({ 
+    ...c, 
+    student_status: studentsMap[c.student_id]?.status || 'onboarding', 
+    student_name: studentsMap[c.student_id]?.name,
+    student_phone: studentsMap[c.student_id]?.phone
+  }))
   const ms = Date.now() - t0
   return NextResponse.json({ columns, cards: enriched }, { 
     headers: { 

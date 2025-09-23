@@ -104,7 +104,7 @@ export default function KanbanPage() {
     const url = new URL('/api/kanban/board', location.origin)
     if (trainerId) url.searchParams.set('trainerId', trainerId)
     const res = await fetch(url.toString(), { cache: 'no-store' })
-    const data: { columns?: Array<{ id: string; title: string }>; cards?: Array<{ id: string; student_id: string; column_id: string; completed_at?: string | null; student_status?: 'onboarding'|'active'|'paused' }> } = await res.json().catch(()=>({}))
+    const data: { columns?: Array<{ id: string; title: string }>; cards?: Array<{ id: string; student_id: string; column_id: string; completed_at?: string | null; student_status?: 'onboarding'|'active'|'paused'; student_phone?: string }> } = await res.json().catch(()=>({}))
     // Não deduplicar por título; cada coluna é distinta por id
     const cols: Column[] = (data.columns || []).map((c) => ({
       id: c.id,
@@ -121,7 +121,13 @@ export default function KanbanPage() {
     const historyBuffer: Card[] = []
     for (const k of data.cards || []) {
       const title = (k as any).student_name || k.student_id
-      const card: Card = { id: k.id, title, studentId: k.student_id, status: k.student_status }
+      const card: Card = { 
+        id: k.id, 
+        title, 
+        studentId: k.student_id, 
+        status: k.student_status,
+        studentPhone: (k as any).student_phone
+      }
       if (k.completed_at && doneColId) {
         historyBuffer.push(card)
       } else {

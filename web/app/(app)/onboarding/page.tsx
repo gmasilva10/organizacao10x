@@ -96,7 +96,13 @@ export default function OnboardingPage() {
     const historyBuffer: Card[] = []
     for (const k of data.cards || []) {
       const title = (k as any).student_name || k.student_id
-      const card: Card = { id: k.id, title, studentId: k.student_id, status: k.student_status }
+      const card: Card = { 
+        id: k.id, 
+        title, 
+        studentId: k.student_id, 
+        status: k.student_status,
+        studentPhone: (k as any).student_phone
+      }
       if (k.completed_at && doneColId) {
         historyBuffer.push(card)
       } else {

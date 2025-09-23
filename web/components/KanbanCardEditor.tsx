@@ -8,12 +8,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { KanbanChecklist } from './KanbanChecklist'
 import { KanbanLogDrawer } from './KanbanLogDrawer'
+import { QuickStudentActions } from '@/components/shared/QuickStudentActions'
 
 interface Card {
   id: string
   title: string
   studentId: string
   status?: 'onboarding' | 'active' | 'paused'
+  studentPhone?: string
 }
 
 interface Column {
@@ -275,6 +277,28 @@ export function KanbanCardEditor({
                 <div className="text-sm text-muted-foreground">
                   Coluna: {column.title}
                 </div>
+              </div>
+              
+              {/* Menu de Ações Rápidas */}
+              <div className="flex items-center gap-2">
+                <QuickStudentActions
+                  studentId={card.studentId}
+                  studentName={card.title}
+                  studentPhone={card.studentPhone}
+                  variant="modal"
+                  onActionComplete={() => {
+                    // Recarregar dados se necessário
+                    console.log('Ação completada no card:', card.id)
+                  }}
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  className="h-8 w-8 p-0 hover:bg-gray-100"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             </DialogTitle>
           </DialogHeader>
