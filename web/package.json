@@ -60,7 +60,7 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
-    "eslint-config-next": "14.2.5",
+    "eslint-config-next": "15.5.4",
     "framer-motion": "^11.0.0",
     "postcss": "^8",
     "puppeteer": "^24.22.0",
