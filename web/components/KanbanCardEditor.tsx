@@ -263,7 +263,7 @@ export function KanbanCardEditor({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden [&>button]:hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="flex-1">
