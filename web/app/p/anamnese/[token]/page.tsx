@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-// Progress component será implementado inline
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Save, CheckCircle, AlertCircle, User, Phone, Calendar } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Loader2, Save, CheckCircle, AlertCircle, User, Phone, Calendar, FileText, Check, ArrowRight } from 'lucide-react'
 
 interface AnamneseData {
   // Dados pessoais
@@ -290,55 +290,61 @@ export default function AnamneseFormPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Header Premium */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-6">
+            <FileText className="h-10 w-10 text-blue-600" />
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Anamnese Personal Global
           </h1>
-          <p className="text-gray-600">
-            Preencha os dados abaixo para personalizarmos seu treino
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Preencha os dados abaixo para personalizarmos seu treino e alcançarmos seus objetivos
           </p>
         </div>
 
-        {/* Progress */}
-        <div className="mb-8">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Etapa {currentStep} de {totalSteps}</span>
-            <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+        {/* Progress Premium */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
+            <span className="font-medium">Etapa {currentStep} de {totalSteps}</span>
+            <span className="font-semibold text-blue-600">{Math.round((currentStep / totalSteps) * 100)}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+              className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out" 
               style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             />
           </div>
         </div>
 
-        {/* Form Steps */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {currentStep === 1 && <User className="h-5 w-5" />}
-              {currentStep === 2 && <Phone className="h-5 w-5" />}
-              {currentStep === 3 && <Calendar className="h-5 w-5" />}
-              {currentStep === 4 && <Calendar className="h-5 w-5" />}
-              {currentStep === 5 && <Calendar className="h-5 w-5" />}
-              {currentStep === 1 && 'Dados Pessoais'}
-              {currentStep === 2 && 'Antropometria'}
-              {currentStep === 3 && 'Avaliação Aeróbia'}
-              {currentStep === 4 && 'Força e RIR'}
-              {currentStep === 5 && 'Objetivos e Observações'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        {/* Form Container Premium */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          {/* Form Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                <User className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">Formulário de Anamnese</h2>
+                <p className="text-blue-100">Complete todas as informações para personalizar seu treino</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Form Content */}
+          <div className="p-8">
             {/* Render dinâmico do snapshot */}
-            <div className="space-y-4">
+            <div className="space-y-8">
               {dynamicQuestions.length === 0 ? (
-                <p>Carregando perguntas...</p>
+                <div className="text-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+                  <p className="text-gray-600">Carregando perguntas...</p>
+                </div>
               ) : (
-                dynamicQuestions.map((q: any) => {
+                dynamicQuestions.map((q: any, index: number) => {
                   // Normalização de opções vindas do snapshot em formatos diversos
                   const raw = q.options
                   const candidateArrays: any[] = []
@@ -367,90 +373,124 @@ export default function AnamneseFormPage() {
                   const isMultiple = Boolean(meta.multiple || q.type === 'multi' || raw?.multiple || heuristicsMultiple)
                   const isRequired = Boolean(meta.required || raw?.required || q.required)
                   const hasOptions = Array.isArray(opts) && opts.length > 0
+                  
                   return (
-                    <div key={q.key} className="space-y-1">
-                      <Label>
-                        {q.label}
-                        {isRequired ? <span className="ml-1 text-red-500">*</span> : null}
-                        {isMultiple ? <span className="ml-2 text-xs text-gray-500">(múltipla escolha)</span> : null}
-                      </Label>
-                      {hasOptions && !isMultiple ? (
-                        <Select value={(dynamicAnswers[q.key] ?? '').toString()} onValueChange={(value) => setDynamicAnswers(prev => ({ ...prev, [q.key]: value }))}>
-                          <SelectTrigger className="bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500">
-                            <SelectValue placeholder="Selecione" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-gray-200 shadow-md">
-                            {opts.map((o: any, idx: number) => (
-                              <SelectItem key={`${q.key}-${idx}`} className="text-gray-900" value={String(o?.value ?? o)}>{String(o?.label ?? o)}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : hasOptions && isMultiple ? (
-                        <div className="space-y-2">
-                          {opts.map((o: any, idx: number) => {
-                            const val = String(o?.value ?? o)
-                            const arr = Array.isArray(dynamicAnswers[q.key]) ? dynamicAnswers[q.key] as any[] : []
-                            const checked = arr.includes(val)
-                            return (
-                              <label key={`${q.key}-${idx}`} className="flex items-center gap-2 text-sm">
-                                <input
-                                  type="checkbox"
-                                  checked={checked}
-                                  onChange={(e) => {
-                                    setDynamicAnswers(prev => {
-                                      const prevArr = Array.isArray(prev[q.key]) ? [...prev[q.key]] : []
-                                      if (e.target.checked) {
-                                        if (!prevArr.includes(val)) prevArr.push(val)
-                                      } else {
-                                        const i = prevArr.indexOf(val)
-                                        if (i >= 0) prevArr.splice(i, 1)
-                                      }
-                                      return { ...prev, [q.key]: prevArr }
-                                    })
-                                  }}
-                                />
-                                {String(o?.label ?? o)}
-                              </label>
-                            )
-                          })}
+                    <div key={q.key} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 font-semibold text-sm flex-shrink-0 mt-1">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <Label className="text-lg font-semibold text-gray-900">
+                              {q.label}
+                              {isRequired ? <span className="ml-1 text-red-500">*</span> : null}
+                            </Label>
+                            {isMultiple && (
+                              <p className="text-sm text-gray-500 mt-1">(múltipla escolha)</p>
+                            )}
+                          </div>
                         </div>
-                      ) : q.type === 'multi' ? (
-                        <Textarea value={dynamicAnswers[q.key] ?? ''} onChange={(e) => setDynamicAnswers(prev => ({ ...prev, [q.key]: e.target.value }))} />
-                      ) : (
-                        <Input value={dynamicAnswers[q.key] ?? ''} onChange={(e) => setDynamicAnswers(prev => ({ ...prev, [q.key]: e.target.value }))} />
-                      )}
+
+                        <div className="ml-11">
+                          {hasOptions && !isMultiple ? (
+                            <Select value={(dynamicAnswers[q.key] ?? '').toString()} onValueChange={(value) => setDynamicAnswers(prev => ({ ...prev, [q.key]: value }))}>
+                              <SelectTrigger className="h-12 bg-white border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg">
+                                <SelectValue placeholder="Selecione uma opção" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-white border-2 border-gray-200 shadow-xl rounded-lg">
+                                {opts.map((o: any, idx: number) => (
+                                  <SelectItem key={`${q.key}-${idx}`} className="text-gray-900 py-3" value={String(o?.value ?? o)}>
+                                    {String(o?.label ?? o)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : hasOptions && isMultiple ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {opts.map((o: any, idx: number) => {
+                                const val = String(o?.value ?? o)
+                                const arr = Array.isArray(dynamicAnswers[q.key]) ? dynamicAnswers[q.key] as any[] : []
+                                const checked = arr.includes(val)
+                                return (
+                                  <div key={`${q.key}-${idx}`} className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                                    <Checkbox
+                                      id={`${q.key}-${idx}`}
+                                      checked={checked}
+                                      onCheckedChange={(checked) => {
+                                        setDynamicAnswers(prev => {
+                                          const prevArr = Array.isArray(prev[q.key]) ? [...prev[q.key]] : []
+                                          if (checked) {
+                                            if (!prevArr.includes(val)) prevArr.push(val)
+                                          } else {
+                                            const i = prevArr.indexOf(val)
+                                            if (i >= 0) prevArr.splice(i, 1)
+                                          }
+                                          return { ...prev, [q.key]: prevArr }
+                                        })
+                                      }}
+                                    />
+                                    <label htmlFor={`${q.key}-${idx}`} className="text-sm font-medium text-gray-900 cursor-pointer flex-1">
+                                      {String(o?.label ?? o)}
+                                    </label>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          ) : q.type === 'multi' ? (
+                            <Textarea 
+                              value={dynamicAnswers[q.key] ?? ''} 
+                              onChange={(e) => setDynamicAnswers(prev => ({ ...prev, [q.key]: e.target.value }))}
+                              className="min-h-[120px] bg-white border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg"
+                              placeholder="Digite sua resposta aqui..."
+                            />
+                          ) : (
+                            <Input 
+                              value={dynamicAnswers[q.key] ?? ''} 
+                              onChange={(e) => setDynamicAnswers(prev => ({ ...prev, [q.key]: e.target.value }))}
+                              className="h-12 bg-white border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg"
+                              placeholder="Digite sua resposta aqui..."
+                            />
+                          )}
+                        </div>
+                      </div>
                     </div>
                   )
                 })
               )}
             </div>
 
-            {/* Navigation */}
-            <div className="flex justify-end pt-6">
-              <Button onClick={handleSubmit} disabled={saving}>
-                {saving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Enviando...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Enviar Anamnese
-                  </>
-                )}
-              </Button>
+            {/* Action Buttons Premium */}
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Save className="h-4 w-4" />
+                  <span>Salvamento automático ativo</span>
+                </div>
+                
+                <Button 
+                  onClick={handleSubmit} 
+                  disabled={saving}
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-5 w-5 mr-2" />
+                      Enviar Anamnese
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-
-            {/* Auto-save indicator */}
-            <div className="mt-4 text-center">
-              <Badge variant="outline" className="text-xs">
-                <Save className="h-3 w-3 mr-1" />
-                Salvamento automático ativo
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )
