@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { KanbanChecklist } from './KanbanChecklist'
 import { KanbanLogDrawer } from './KanbanLogDrawer'
-import { QuickStudentActions } from '@/components/shared/QuickStudentActions'
 
 interface Card {
   id: string
@@ -279,27 +278,15 @@ export function KanbanCardEditor({
                 </div>
               </div>
               
-              {/* Menu de Ações Rápidas */}
-              <div className="flex items-center gap-2">
-                <QuickStudentActions
-                  studentId={card.studentId}
-                  studentName={card.title}
-                  studentPhone={card.studentPhone}
-                  variant="modal"
-                  onActionComplete={() => {
-                    // Recarregar dados se necessário
-                    console.log('Ação completada no card:', card.id)
-                  }}
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onClose}
-                  className="h-8 w-8 p-0 hover:bg-gray-100"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
+              {/* Botão de Fechar */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="h-8 w-8 p-0 hover:bg-gray-100"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </DialogTitle>
           </DialogHeader>
 
@@ -575,6 +562,16 @@ export function KanbanCardEditor({
             </div>
             
             <div className="flex gap-2">
+              {/* Botão Editar Aluno */}
+              <Button 
+                variant="outline"
+                onClick={() => window.open(`/app/students/${card.studentId}/edit`, '_blank')}
+                className="gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                Editar Aluno
+              </Button>
+              
               {!isLastColumn && (
                 <Button 
                   onClick={() => setAdvanceConfirmOpen(true)}
