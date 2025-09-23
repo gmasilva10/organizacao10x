@@ -205,173 +205,231 @@ export function AnamneseInviteModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Send className="h-5 w-5" />
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="flex items-center gap-3 text-xl font-semibold">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+              <Send className="h-5 w-5 text-blue-600" />
+            </div>
             Gerar Anamnese
           </DialogTitle>
-          <DialogDescription>
-            Envie ao aluno um link seguro para responder a anamnese.
+          <DialogDescription className="text-base text-muted-foreground">
+            Envie ao aluno um link seguro para responder a anamnese personalizada.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Informações do aluno */}
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <User className="h-4 w-4" />
-              <span className="font-medium">{studentName}</span>
+        <div className="space-y-6">
+          {/* Identificação do Aluno */}
+          <div className="bg-card border rounded-lg p-6">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">Identificação do Aluno</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Confirme o aluno para esta anamnese
+                </p>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <User className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium text-foreground">{studentName}</p>
+                  <p className="text-sm text-muted-foreground">Aluno selecionado</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Destino do envio */}
-          <div className="space-y-2">
-            <Label>Destino do envio</Label>
-            <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input
-                  type="radio"
-                  name="destino"
-                  className="accent-blue-600"
-                  checked={destination === 'group'}
-                  onChange={() => setDestination('group')}
-                />
-                <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" /> Grupo (padrão)
-                </span>
-              </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input
-                  type="radio"
-                  name="destino"
-                  className="accent-blue-600"
-                  checked={destination === 'student'}
-                  onChange={() => setDestination('student')}
-                />
-                <span className="flex items-center gap-1">
-                  <Phone className="h-4 w-4" /> Aluno (telefone)
-                </span>
-              </label>
-            </div>
-          </div>
-
-          {destination === 'group' ? (
-            <div className="space-y-2">
-              <Label>Grupo do WhatsApp</Label>
-              <Select
-                value={groupId || (groups.length ? groupId : 'empty')}
-                onValueChange={(v) => setGroupId(v === 'empty' ? '' : v)}
-                disabled={!groups.length}
-              >
-                <SelectTrigger className="bg-white focus:ring-2 focus:ring-blue-500">
-                  <SelectValue placeholder={groups.length ? 'Selecione um grupo' : 'Nenhum grupo vinculado'} />
-                </SelectTrigger>
-                <SelectContent>
-                  {groups.length === 0 ? (
-                    <SelectItem value="empty" disabled>Nenhum grupo encontrado</SelectItem>
-                  ) : (
-                    groups.map((g) => (
-                      <SelectItem key={g.id} value={g.id}>
-                        {g.name}{g.is_primary ? '  [Padrão]' : ''}{g.external_id ? ` — ${g.external_id}` : ''}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <div className="text-xs text-gray-500">Não encontrou? <button type="button" className="text-blue-600 underline" onClick={() => toast.info('Abra o Criar Grupo no menu Processos › WhatsApp.')}>Criar grupo</button></div>
-            </div>
-          ) : (
-            // Telefone do aluno
-            <div className="space-y-2">
-              <Label htmlFor="phone" className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
-                Telefone para WhatsApp *
-              </Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="11999999999"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                disabled={loadingSend || loadingGenerate}
-              />
-              <p className="text-xs text-gray-500">Será normalizado automaticamente para formato E.164</p>
-              {entities.filter(e => e.type === 'CONTACT').length > 0 && (
-                <div className="text-xs text-gray-600">
-                  Contatos salvos:
-                  <div className="mt-1 flex flex-wrap gap-2">
-                    {entities.filter(e => e.type==='CONTACT').map((c) => (
-                      <button key={c.id} type="button" className="px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setPhone((c.phone_e164 || '').replace(/\D/g,''))}>
-                        {c.name} {(c.phone_e164 || '').replace('+','')}
-                      </button>
-                    ))}
+          {/* Configuração do Envio */}
+          <div className="bg-card border rounded-lg p-6">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">Configuração do Envio</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Escolha como a anamnese será enviada ao aluno
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Destino do envio</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <label className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                      <input
+                        type="radio"
+                        name="destino"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                        checked={destination === 'group'}
+                        onChange={() => setDestination('group')}
+                      />
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <div>
+                          <p className="font-medium text-sm">Grupo WhatsApp</p>
+                          <p className="text-xs text-muted-foreground">Recomendado</p>
+                        </div>
+                      </div>
+                    </label>
+                    <label className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                      <input
+                        type="radio"
+                        name="destino"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                        checked={destination === 'student'}
+                        onChange={() => setDestination('student')}
+                      />
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-green-600" />
+                        <div>
+                          <p className="font-medium text-sm">Telefone do Aluno</p>
+                          <p className="text-xs text-muted-foreground">Direto</p>
+                        </div>
+                      </div>
+                    </label>
                   </div>
                 </div>
-              )}
+
+                {destination === 'group' ? (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Grupo do WhatsApp *</Label>
+                    <Select
+                      value={groupId || (groups.length ? groupId : 'empty')}
+                      onValueChange={(v) => setGroupId(v === 'empty' ? '' : v)}
+                      disabled={!groups.length}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={groups.length ? 'Selecione um grupo' : 'Nenhum grupo vinculado'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {groups.length === 0 ? (
+                          <SelectItem value="empty" disabled>Nenhum grupo encontrado</SelectItem>
+                        ) : (
+                          groups.map((g) => (
+                            <SelectItem key={g.id} value={g.id}>
+                              {g.name}{g.is_primary ? ' [Padrão]' : ''}{g.external_id ? ` — ${g.external_id}` : ''}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <div className="text-xs text-muted-foreground">
+                      Não encontrou? <button type="button" className="text-blue-600 underline hover:text-blue-700" onClick={() => toast.info('Abra o Criar Grupo no menu Processos › WhatsApp.')}>Criar grupo</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      Telefone para WhatsApp *
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="11999999999"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      disabled={loadingSend || loadingGenerate}
+                    />
+                    <p className="text-xs text-muted-foreground">Será normalizado automaticamente para formato E.164</p>
+                    {entities.filter(e => e.type === 'CONTACT').length > 0 && (
+                      <div className="text-xs text-muted-foreground">
+                        Contatos salvos:
+                        <div className="mt-1 flex flex-wrap gap-2">
+                          {entities.filter(e => e.type==='CONTACT').map((c) => (
+                            <button key={c.id} type="button" className="px-2 py-1 rounded border hover:bg-muted/50 transition-colors" onClick={() => setPhone((c.phone_e164 || '').replace(/\D/g,''))}>
+                              {c.name} {(c.phone_e164 || '').replace('+','')}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-
-          {/* Serviço (opcional) */}
-          <div className="space-y-2">
-            <Label htmlFor="service" className="flex items-center gap-1">
-              Serviço (opcional)
-              <Info className="h-3.5 w-3.5 text-gray-500" aria-label="Ajuda" title="Usado para personalizar a mensagem e o protocolo gerado" />
-            </Label>
-            <Select
-              value={serviceId || ''}
-              onValueChange={(v) => setServiceId(v)}
-              disabled={loadingSend || loadingGenerate}
-            >
-              <SelectTrigger className="bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500">
-                <SelectValue placeholder={services.length ? 'Selecione um serviço' : 'Carregando serviços...'} />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 shadow-md">
-                {services.map(s => (
-                  <SelectItem key={s.id} className="text-gray-900" value={s.id}>{s.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-gray-500">Personaliza o texto do convite e o cabeçalho do PDF.</p>
           </div>
 
-          {/* Mensagem personalizada (opcional) */}
-          <div className="space-y-2">
-            <Label htmlFor="message">Mensagem personalizada (opcional)</Label>
-            <Textarea
-              id="message"
-              placeholder="Deixe em branco para usar mensagem padrão"
-              value={customMessage}
-              onChange={(e) => setCustomMessage(e.target.value)}
-              disabled={loadingSend || loadingGenerate}
-              rows={3}
-            />
+          {/* Personalização da Anamnese */}
+          <div className="bg-card border rounded-lg p-6">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">Personalização da Anamnese</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Configure o serviço e personalize a mensagem de convite
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="service" className="text-sm font-medium flex items-center gap-1">
+                    Serviço (opcional)
+                    <Info className="h-3.5 w-3.5 text-muted-foreground" aria-label="Ajuda" title="Usado para personalizar a mensagem e o protocolo gerado" />
+                  </Label>
+                  <Select
+                    value={serviceId || ''}
+                    onValueChange={(v) => setServiceId(v)}
+                    disabled={loadingSend || loadingGenerate}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={services.length ? 'Selecione um serviço' : 'Carregando serviços...'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {services.map(s => (
+                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Personaliza o texto do convite e o cabeçalho do PDF.</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="message" className="text-sm font-medium">Mensagem personalizada (opcional)</Label>
+                  <Textarea
+                    id="message"
+                    placeholder="Deixe em branco para usar mensagem padrão"
+                    value={customMessage}
+                    onChange={(e) => setCustomMessage(e.target.value)}
+                    disabled={loadingSend || loadingGenerate}
+                    rows={3}
+                    className="resize-none"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Esta mensagem será incluída no convite enviado ao aluno
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Aviso */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-sm text-blue-800"><strong>O que acontece:</strong></p>
-            <ul className="text-xs text-blue-700 mt-1 space-y-1">
-              <li>• Gerar cria uma versão RASCUNHO com snapshot</li>
-              <li>• Enviar manda o link (Grupo ou Aluno) via WhatsApp</li>
-              <li>• Aluno responde no celular (7–10 min) e o PDF é anexado</li>
-            </ul>
+          {/* Informações do Processo */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 flex-shrink-0 mt-0.5">
+                <Info className="h-3.5 w-3.5 text-blue-600" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-blue-900">Como funciona o processo:</p>
+                <ul className="text-xs text-blue-800 space-y-1">
+                  <li>• <strong>Gerar</strong> cria uma versão RASCUNHO com snapshot das perguntas</li>
+                  <li>• <strong>Enviar</strong> manda o link (Grupo ou Aluno) via WhatsApp</li>
+                  <li>• <strong>Aluno responde</strong> no celular (7–10 min) e o PDF é anexado automaticamente</li>
+                </ul>
+              </div>
+            </div>
           </div>
 
-          {/* Botões */}
-          <div className="flex justify-between gap-2 pt-4">
+          {/* Botões de Ação */}
+          <div className="flex justify-between items-center pt-4 border-t">
             <div>
               <Button
-                variant="secondary"
+                variant="outline"
                 onClick={handleGenerate}
                 disabled={loadingGenerate || loadingSend}
                 className="flex items-center gap-2"
               >
-                {loadingGenerate ? (<Loader2 className="h-4 w-4 animate-spin" />) : null}
-                Gerar
+                {loadingGenerate ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+                Gerar Anamnese
               </Button>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button
                 variant="outline"
                 onClick={() => onOpenChange(false)}
