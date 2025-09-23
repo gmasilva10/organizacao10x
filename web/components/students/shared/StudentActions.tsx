@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { 
   DropdownMenu,
@@ -40,6 +40,7 @@ interface StudentActionsProps {
   studentPhone?: string // Telefone do aluno
   variant?: 'card' | 'edit' // Variante para card ou página de edição
   onActionComplete?: () => void // Callback para atualizar dados após ação
+  openModal?: 'gerar-anamnese' | null // Modal específico para abrir
 }
 
 export default function StudentActions({ 
@@ -47,7 +48,8 @@ export default function StudentActions({
   studentName, 
   studentPhone,
   variant = 'card',
-  onActionComplete 
+  onActionComplete,
+  openModal = null
 }: StudentActionsProps) {
   const [open, setOpen] = useState(false)
   const [occurrenceModalOpen, setOccurrenceModalOpen] = useState(false)
@@ -63,6 +65,13 @@ export default function StudentActions({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [whatsappContactModalOpen, setWhatsappContactModalOpen] = useState(false)
   const [whatsappCreateGroupOpen, setWhatsappCreateGroupOpen] = useState(false)
+
+  // Detectar modal para abrir via prop
+  useEffect(() => {
+    if (openModal === 'gerar-anamnese') {
+      setGerarAnamneseModalOpen(true)
+    }
+  }, [openModal])
 
   const handleAction = (action: () => void) => {
     console.log('🔍 [DEBUG] handleAction chamado')
@@ -110,7 +119,7 @@ export default function StudentActions({
                 Relacionamento
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleAction(() => setGerarAnamneseModalOpen(true))}>
+              <DropdownMenuItem onClick={() => handleAction(() => window.location.href = `/students/${studentId}/anexos/anamnese`)}>
                 <FileText className="h-4 w-4 mr-2 text-blue-600" />
                 Anamnese
               </DropdownMenuItem>
@@ -276,7 +285,7 @@ export default function StudentActions({
               Relacionamento
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleAction(() => setGerarAnamneseModalOpen(true))}>
+            <DropdownMenuItem onClick={() => handleAction(() => window.location.href = `/students/${studentId}/anexos/anamnese`)}>
               <FileText className="h-4 w-4 mr-2 text-blue-600" />
               Anamnese
             </DropdownMenuItem>

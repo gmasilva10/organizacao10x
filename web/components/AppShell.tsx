@@ -68,7 +68,7 @@ const menuGroups: MenuGroup[] = [
         title: "Serviços",
         href: "/app/services",
         icon: PackageIcon
-      }
+      },
     ]
   },
   {

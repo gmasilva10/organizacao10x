@@ -91,12 +91,51 @@ export default function AnamneseFormPage() {
     goals: []
   })
 
-  const totalSteps = 5
+  const totalSteps = 1
 
   useEffect(() => {
     loadInvite()
     loadFromLocalStorage()
+    // carregar snapshot/answers reais por token
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/anamnese/version/by-token/${token}`)
+        const data = await res.json()
+        if (res.ok) {
+          // montar passos dinamicamente a partir das perguntas
+          const dynamic: any = {}
+          for (const q of data.questions || []) {
+            dynamic[q.key] = (data.answers || {})[q.key] ?? ''
+          }
+          setDynamicQuestions(data.questions || [])
+          setDynamicAnswers(dynamic)
+
+          // pré-preencher campos básicos (nome/idade/sexo)
+          const s = data.student
+          if (s) {
+            const age = (() => {
+              if (!s.birth_date) return 0
+              const birth = new Date(s.birth_date)
+              const now = new Date()
+              let a = now.getFullYear() - birth.getFullYear()
+              const m = now.getMonth() - birth.getMonth()
+              if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) a--
+              return a
+            })()
+            setDynamicAnswers(prev => ({
+              ...prev,
+              nome: prev.nome || s.name || '',
+              idade: prev.idade || age,
+              sexo: prev.sexo || s.gender || ''
+            }))
+          }
+        }
+      } catch {}
+    })()
   }, [token])
+
+  const [dynamicQuestions, setDynamicQuestions] = useState<any[]>([])
+  const [dynamicAnswers, setDynamicAnswers] = useState<Record<string, any>>({})
 
   const loadInvite = async () => {
     try {
@@ -165,7 +204,7 @@ export default function AnamneseFormPage() {
       const response = await fetch(`/api/anamnese/submit/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dynamicAnswers)
       })
 
       const data = await response.json()
@@ -294,251 +333,113 @@ export default function AnamneseFormPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Step 1: Dados Pessoais */}
-            {currentStep === 1 && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Nome completo *</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
-                      placeholder="Seu nome completo"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="age">Idade *</Label>
-                    <Input
-                      id="age"
-                      type="number"
-                      value={formData.age || ''}
-                      onChange={(e) => handleInputChange('age', parseInt(e.target.value) || 0)}
-                      placeholder="Sua idade"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="gender">Sexo *</Label>
-                    <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione seu sexo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Masculino</SelectItem>
-                        <SelectItem value="female">Feminino</SelectItem>
-                        <SelectItem value="other">Outro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Telefone</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      placeholder="11999999999"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Render dinâmico do snapshot */}
+            <div className="space-y-4">
+              {dynamicQuestions.length === 0 ? (
+                <p>Carregando perguntas...</p>
+              ) : (
+                dynamicQuestions.map((q: any) => {
+                  // Normalização de opções vindas do snapshot em formatos diversos
+                  const raw = q.options
+                  const candidateArrays: any[] = []
+                  if (Array.isArray(raw)) candidateArrays.push(raw)
+                  const shallowArrays = (obj: any) => {
+                    try {
+                      return Object.values(obj || {}).filter((v: any) => Array.isArray(v))
+                    } catch { return [] }
+                  }
+                  candidateArrays.push(...shallowArrays(raw))
+                  // Se options veio como objeto numerado (0,1,2,...), converte para array de labels
+                  const objectAsArray = (obj: any) => {
+                    if (!obj || Array.isArray(obj) || typeof obj !== 'object') return []
+                    const keys = Object.keys(obj).filter(k => /^\d+$/.test(k))
+                    if (keys.length === 0) return []
+                    return keys.sort((a,b)=> Number(a)-Number(b)).map(k => obj[k])
+                  }
+                  candidateArrays.push(objectAsArray(raw))
 
-            {/* Step 2: Antropometria */}
-            {currentStep === 2 && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="weight">Peso (kg) *</Label>
-                    <Input
-                      id="weight"
-                      type="number"
-                      step="0.1"
-                      value={formData.weight || ''}
-                      onChange={(e) => handleInputChange('weight', parseFloat(e.target.value) || 0)}
-                      placeholder="70.5"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="height">Altura (cm) *</Label>
-                    <Input
-                      id="height"
-                      type="number"
-                      value={formData.height || ''}
-                      onChange={(e) => handleInputChange('height', parseInt(e.target.value) || 0)}
-                      placeholder="175"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Dobras Cutâneas (mm)</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {Object.entries(formData.skinfolds).map(([key, value]) => (
-                      <div key={key}>
-                        <Label htmlFor={key}>{key.charAt(0).toUpperCase() + key.slice(1)}</Label>
-                        <Input
-                          id={key}
-                          type="number"
-                          step="0.1"
-                          value={value || ''}
-                          onChange={(e) => handleSkinfoldChange(key, parseFloat(e.target.value) || 0)}
-                          placeholder="0.0"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Aeróbio */}
-            {currentStep === 3 && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="fcr">FCR (bpm)</Label>
-                    <Input
-                      id="fcr"
-                      type="number"
-                      value={formData.fcr || ''}
-                      onChange={(e) => handleInputChange('fcr', parseInt(e.target.value) || 0)}
-                      placeholder="60"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="pse">PSE (1-10)</Label>
-                    <Input
-                      id="pse"
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={formData.pse || ''}
-                      onChange={(e) => handleInputChange('pse', parseInt(e.target.value) || 0)}
-                      placeholder="5"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="vvo2">vVO2 (km/h)</Label>
-                    <Input
-                      id="vvo2"
-                      type="number"
-                      step="0.1"
-                      value={formData.vvo2 || ''}
-                      onChange={(e) => handleInputChange('vvo2', parseFloat(e.target.value) || 0)}
-                      placeholder="12.5"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="mfel">MFEL (Limiar)</Label>
-                    <Input
-                      id="mfel"
-                      type="number"
-                      step="0.1"
-                      value={formData.mfel || ''}
-                      onChange={(e) => handleInputChange('mfel', parseFloat(e.target.value) || 0)}
-                      placeholder="8.5"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: RIR */}
-            {currentStep === 4 && (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="rir">RIR (Repetições na Reserva)</Label>
-                  <Select value={formData.rir.toString()} onValueChange={(value) => handleInputChange('rir', parseInt(value))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione seu RIR" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
-                        <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Quantas repetições você conseguiria fazer a mais na última série?
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Step 5: Objetivos */}
-            {currentStep === 5 && (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="goals">Objetivos</Label>
-                  <Textarea
-                    id="goals"
-                    value={formData.goals.join('\n')}
-                    onChange={(e) => handleInputChange('goals', e.target.value.split('\n').filter(Boolean))}
-                    placeholder="Descreva seus objetivos com o treino..."
-                    rows={3}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="contraindications">Contraindicações</Label>
-                  <Textarea
-                    id="contraindications"
-                    value={formData.contraindications.join('\n')}
-                    onChange={(e) => handleInputChange('contraindications', e.target.value.split('\n').filter(Boolean))}
-                    placeholder="Lesões, limitações, medicamentos..."
-                    rows={3}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="observations">Observações</Label>
-                  <Textarea
-                    id="observations"
-                    value={formData.observations.join('\n')}
-                    onChange={(e) => handleInputChange('observations', e.target.value.split('\n').filter(Boolean))}
-                    placeholder="Outras informações relevantes..."
-                    rows={3}
-                  />
-                </div>
-              </div>
-            )}
+                  const opts = (candidateArrays
+                    .filter((arr: any) => Array.isArray(arr) && arr.length > 0)
+                    .sort((a: any, b: any) => b.length - a.length)[0]) || []
+                  const meta = (raw && raw._meta) ? raw._meta : {}
+                  const labelText = (q.label || '').toString().toLowerCase()
+                  const heuristicsMultiple = labelText.includes('múltipla') || labelText.includes('multipla') || labelText.includes('quantos') || labelText.includes('quantas')
+                  const isMultiple = Boolean(meta.multiple || q.type === 'multi' || raw?.multiple || heuristicsMultiple)
+                  const isRequired = Boolean(meta.required || raw?.required || q.required)
+                  const hasOptions = Array.isArray(opts) && opts.length > 0
+                  return (
+                    <div key={q.key} className="space-y-1">
+                      <Label>
+                        {q.label}
+                        {isRequired ? <span className="ml-1 text-red-500">*</span> : null}
+                        {isMultiple ? <span className="ml-2 text-xs text-gray-500">(múltipla escolha)</span> : null}
+                      </Label>
+                      {hasOptions && !isMultiple ? (
+                        <Select value={(dynamicAnswers[q.key] ?? '').toString()} onValueChange={(value) => setDynamicAnswers(prev => ({ ...prev, [q.key]: value }))}>
+                          <SelectTrigger className="bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500">
+                            <SelectValue placeholder="Selecione" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-200 shadow-md">
+                            {opts.map((o: any, idx: number) => (
+                              <SelectItem key={`${q.key}-${idx}`} className="text-gray-900" value={String(o?.value ?? o)}>{String(o?.label ?? o)}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : hasOptions && isMultiple ? (
+                        <div className="space-y-2">
+                          {opts.map((o: any, idx: number) => {
+                            const val = String(o?.value ?? o)
+                            const arr = Array.isArray(dynamicAnswers[q.key]) ? dynamicAnswers[q.key] as any[] : []
+                            const checked = arr.includes(val)
+                            return (
+                              <label key={`${q.key}-${idx}`} className="flex items-center gap-2 text-sm">
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={(e) => {
+                                    setDynamicAnswers(prev => {
+                                      const prevArr = Array.isArray(prev[q.key]) ? [...prev[q.key]] : []
+                                      if (e.target.checked) {
+                                        if (!prevArr.includes(val)) prevArr.push(val)
+                                      } else {
+                                        const i = prevArr.indexOf(val)
+                                        if (i >= 0) prevArr.splice(i, 1)
+                                      }
+                                      return { ...prev, [q.key]: prevArr }
+                                    })
+                                  }}
+                                />
+                                {String(o?.label ?? o)}
+                              </label>
+                            )
+                          })}
+                        </div>
+                      ) : q.type === 'multi' ? (
+                        <Textarea value={dynamicAnswers[q.key] ?? ''} onChange={(e) => setDynamicAnswers(prev => ({ ...prev, [q.key]: e.target.value }))} />
+                      ) : (
+                        <Input value={dynamicAnswers[q.key] ?? ''} onChange={(e) => setDynamicAnswers(prev => ({ ...prev, [q.key]: e.target.value }))} />
+                      )}
+                    </div>
+                  )
+                })
+              )}
+            </div>
 
             {/* Navigation */}
-            <div className="flex justify-between pt-6">
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-              >
-                Anterior
+            <div className="flex justify-end pt-6">
+              <Button onClick={handleSubmit} disabled={saving}>
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Enviar Anamnese
+                  </>
+                )}
               </Button>
-              
-              {currentStep < totalSteps ? (
-                <Button onClick={nextStep}>
-                  Próximo
-                </Button>
-              ) : (
-                <Button onClick={handleSubmit} disabled={saving}>
-                  {saving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      Enviar Anamnese
-                    </>
-                  )}
-                </Button>
-              )}
             </div>
 
             {/* Auto-save indicator */}

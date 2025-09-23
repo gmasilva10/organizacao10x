@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -85,6 +86,7 @@ export default function StudentEditTabsV6({
   onCancel,
   onSaveAndRedirect
 }: StudentEditTabsV6Props) {
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState("identificacao")
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
@@ -128,6 +130,20 @@ export default function StudentEditTabsV6({
   // Estados para modais de busca
   const [searchModalOpen, setSearchModalOpen] = useState(false)
   const [searchModalType, setSearchModalType] = useState<'principal' | 'apoio' | 'especifico'>('principal')
+  
+  // Detectar parâmetro action da URL
+  const actionParam = searchParams.get('action')
+  const [openModal, setOpenModal] = useState<'gerar-anamnese' | null>(null)
+  
+  useEffect(() => {
+    if (actionParam === 'gerar-anamnese') {
+      setOpenModal('gerar-anamnese')
+      // Limpar o parâmetro da URL após abrir o modal
+      const url = new URL(window.location.href)
+      url.searchParams.delete('action')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [actionParam])
 
   // Carregar responsáveis do aluno
   const loadResponsaveis = async () => {
@@ -459,9 +475,11 @@ export default function StudentEditTabsV6({
               studentName={student.name} 
               studentPhone={student.phone}
               variant="edit"
+              openModal={openModal}
               onActionComplete={() => {
                 // Callback para atualizar dados após ações
                 console.log('Ação completada, dados podem ser atualizados')
+                setOpenModal(null) // Limpar modal após ação
               }}
             />
           </div>

@@ -1,6 +1,74 @@
 {
   "tech_stack": [
     "TypeScript",
+    "Next.js 14 (App Router)",
+    "React",
+    "Tailwind CSS",
+    "Radix UI",
+    "Supabase (Postgres/Auth/Storage)",
+    "Z-API (WhatsApp)"
+  ],
+  "features": [
+    {
+      "name": "Anamnese - Convite e Token Público",
+      "description": "Gera convites com token, envia via WhatsApp e valida token público",
+      "files": [
+        "web/app/api/anamnese/invite/route.ts",
+        "web/app/api/anamnese/invite/[token]/route.ts",
+        "web/app/api/anamnese/submit/[token]/route.ts",
+        "web/app/p/anamnese/[token]/page.tsx",
+        "web/lib/anamnese/tokens.ts"
+      ]
+    },
+    {
+      "name": "Anamnese - Versões, Editor e PDF",
+      "description": "Versionamento por aluno (seq/code), editor com autosave e geração de PDF (stub)",
+      "files": [
+        "web/app/api/anamnese/versions/[studentId]/route.ts",
+        "web/app/api/anamnese/version/[versionId]/route.ts",
+        "web/app/api/anamnese/version/[versionId]/send/route.ts",
+        "web/app/api/anamnese/version/[versionId]/pdf/route.ts",
+        "web/app/students/[id]/anamnese/page.tsx",
+        "web/app/students/[id]/anamnese/[versionId]/page.tsx"
+      ]
+    },
+    {
+      "name": "Modal Gerar Anamnese",
+      "description": "Modal com destino (Aluno/Grupo), seleção de grupos e serviço com tooltip; ações Gerar/Enviar",
+      "files": [
+        "web/components/students/modals/AnamneseInviteModal.tsx",
+        "web/components/students/shared/StudentActions.tsx"
+      ]
+    },
+    {
+      "name": "Relacionamento - WhatsApp & Histórico",
+      "description": "Vínculo de grupos WhatsApp com aluno, definir padrão e listar histórico de mensagens",
+      "files": [
+        "web/app/api/relacionamento/whatsapp/groups/route.ts",
+        "web/app/api/relacionamento/whatsapp/groups/link/route.ts",
+        "web/app/api/relacionamento/whatsapp/groups/unlink/route.ts",
+        "web/app/api/relacionamento/whatsapp/groups/set-primary/route.ts",
+        "web/app/api/relacionamento/messages/route.ts",
+        "web/app/students/[id]/relacionamento/page.tsx"
+      ]
+    },
+    {
+      "name": "WhatsApp - Integração Z-API",
+      "description": "Criação de contato e grupo, envio de templates e webhook (server-only)",
+      "files": [
+        "web/app/api/wa/create-contact/route.ts",
+        "web/app/api/wa/create-group/route.ts",
+        "web/app/api/wa/send-template/route.ts",
+        "web/app/api/wa/webhook/route.ts",
+        "web/app/api/wa/test-zapi/route.ts"
+      ]
+    }
+  ]
+}
+
+{
+  "tech_stack": [
+    "TypeScript",
     "Next.js 14",
     "React",
     "Tailwind CSS",

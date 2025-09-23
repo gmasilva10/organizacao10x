@@ -2,7 +2,7 @@
   {
     "id": "TC001",
     "title": "User Login Success",
-    "description": "Verify that a user can log in successfully with valid credentials and is routed to the dashboard with correct permissions.",
+    "description": "Verify that a user can log in successfully with valid credentials using the Supabase Auth system.",
     "category": "functional",
     "priority": "High",
     "steps": [
@@ -12,7 +12,7 @@
       },
       {
         "type": "action",
-        "description": "Enter valid username/email and password."
+        "description": "Input valid username/email and password."
       },
       {
         "type": "action",
@@ -20,18 +20,14 @@
       },
       {
         "type": "assertion",
-        "description": "Verify user is logged in, redirected to the dashboard, and modules are accessible based on role."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify UI loads in less than 2 seconds."
+        "description": "Verify that login is successful and user is redirected to the dashboard within 2 seconds."
       }
     ]
   },
   {
     "id": "TC002",
     "title": "User Login Failure with Invalid Credentials",
-    "description": "Ensure login is rejected with invalid credentials and appropriate error messages are displayed.",
+    "description": "Verify that login fails with incorrect username/email or password and appropriate error message is displayed.",
     "category": "error handling",
     "priority": "High",
     "steps": [
@@ -41,7 +37,7 @@
       },
       {
         "type": "action",
-        "description": "Enter invalid username/email or password."
+        "description": "Input invalid username/email or password."
       },
       {
         "type": "action",
@@ -49,24 +45,24 @@
       },
       {
         "type": "assertion",
-        "description": "Verify login fails and error message is shown."
+        "description": "Verify that login fails and error message is shown without page crash."
       }
     ]
   },
   {
     "id": "TC003",
-    "title": "Password Recovery Process",
-    "description": "Validate complete password recovery workflow including email request and reset form accessibility.",
+    "title": "Password Recovery Workflow",
+    "description": "Verify password recovery flow allows user to request password reset and send recovery email.",
     "category": "functional",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to the password recovery page."
+        "description": "Navigate to password recovery page."
       },
       {
         "type": "action",
-        "description": "Input registered user email."
+        "description": "Input registered email address."
       },
       {
         "type": "action",
@@ -74,381 +70,393 @@
       },
       {
         "type": "assertion",
-        "description": "Confirm success message prompting to check email."
-      },
-      {
-        "type": "action",
-        "description": "Open password reset link from email."
-      },
-      {
-        "type": "action",
-        "description": "Enter and confirm a new password."
-      },
-      {
-        "type": "action",
-        "description": "Submit reset form."
-      },
-      {
-        "type": "assertion",
-        "description": "Ensure user can log in with new password."
+        "description": "Verify confirmation message appears and recovery email is triggered."
       }
     ]
   },
   {
     "id": "TC004",
     "title": "Student CRUD Operations",
-    "description": "Test creation, reading, updating, and deletion of student profiles including validation and UI responsiveness.",
+    "description": "Verify that users can create, read, update, and delete student records with valid data and UI feedback.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to the student management module."
+        "description": "Navigate to the students module."
       },
       {
         "type": "action",
-        "description": "Create a new student with valid data including attachments."
+        "description": "Create a new student with complete required details."
       },
       {
         "type": "assertion",
-        "description": "Verify student is listed and details display correctly."
+        "description": "Verify the student appears in the list with correct data."
       },
       {
         "type": "action",
-        "description": "Update student details with valid modifications."
+        "description": "Edit the student’s profile including attachments."
       },
       {
         "type": "assertion",
-        "description": "Validate updates are saved and reflected in UI."
+        "description": "Verify edits are saved and displayed correctly."
       },
       {
         "type": "action",
-        "description": "Delete the created student."
+        "description": "Delete the student record."
       },
       {
         "type": "assertion",
-        "description": "Confirm student is removed from the listing."
+        "description": "Verify student is removed and audit log entry exists for deletion."
       }
     ]
   },
   {
     "id": "TC005",
-    "title": "Student CRUD Validation Errors",
-    "description": "Verify validation errors are triggered for incorrect or missing required fields during create or update.",
-    "category": "error handling",
-    "priority": "High",
+    "title": "Student Attachments Management",
+    "description": "Verify uploading, viewing, and removing attachments in student profiles works correctly with validation.",
+    "category": "functional",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Open new student form."
+        "description": "Open a student profile."
       },
       {
         "type": "action",
-        "description": "Attempt to submit form with missing mandatory fields."
+        "description": "Upload multiple valid attachments."
       },
       {
         "type": "assertion",
-        "description": "Ensure validation error messages are displayed per field."
+        "description": "Verify attachments appear correctly with preview where applicable."
       },
       {
         "type": "action",
-        "description": "Input invalid data formats (e.g. invalid email, incorrect file types for attachments)."
+        "description": "Delete an attachment."
       },
       {
         "type": "assertion",
-        "description": "Check for appropriate field-level error notifications."
+        "description": "Verify attachment removed from profile and audit log records the deletion."
       }
     ]
   },
   {
     "id": "TC006",
-    "title": "Training Directives Creation and Versioning",
-    "description": "Create, edit, version, and publish training directives with input validation and rule application.",
+    "title": "Create and Manage Training Directives with Version Control",
+    "description": "Verify users can create, edit, publish, version, and set default training directives with validations.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to the Training Directives module."
+        "description": "Navigate to Training Directives module."
       },
       {
         "type": "action",
-        "description": "Create a new training directive with mandatory fields."
+        "description": "Create a new training directive with valid parameters."
       },
       {
         "type": "assertion",
-        "description": "Validate directive saves and appears in the list."
+        "description": "Verify directive is saved and listed."
       },
       {
         "type": "action",
-        "description": "Edit the directive and create a new version."
+        "description": "Edit the directive and save as new version."
       },
       {
         "type": "assertion",
-        "description": "Confirm versioning system records changes and allows switching between versions."
+        "description": "Verify version increment and both versions are accessible."
       },
       {
         "type": "action",
-        "description": "Publish a directive and set it as default."
+        "description": "Set a directive version as default."
       },
       {
         "type": "assertion",
-        "description": "Verify published status and default directive flag."
+        "description": "Verify default status updates correctly in UI and backend."
       }
     ]
   },
   {
     "id": "TC007",
-    "title": "Training Directives Rule Creation and Application",
-    "description": "Test creation of tag-based rules with various operators and parameters, ensuring accurate decision outputs applied over student data.",
+    "title": "Training Directive Rule-Based Decision Engine",
+    "description": "Verify that rule conditions with tag-based, operator selection, and prioritization apply correctly to student data producing accurate decisions.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Open training directive rule creation interface."
+        "description": "Create rule conditions with various tag and parameter settings."
       },
       {
         "type": "action",
-        "description": "Define rules using different tags, operators (equals, greater than, less than), and priorities."
+        "description": "Apply rules to test student dataset."
       },
       {
         "type": "assertion",
-        "description": "Verify rules save successfully with no errors."
-      },
-      {
-        "type": "action",
-        "description": "Apply rules to sample student data."
-      },
-      {
-        "type": "assertion",
-        "description": "Confirm correct output parameters are computed and displayed."
+        "description": "Verify that output parameters reflect expected decision results consistently."
       }
     ]
   },
   {
     "id": "TC008",
-    "title": "Catalogues Rendering and Validation",
-    "description": "Validate rendering, input, and search functionalities for RIR scale, anthropometric protocols (with LaTeX formulas), readiness scales, and tag catalogs.",
+    "title": "Catalogs Rendering and Validation",
+    "description": "Verify that catalogs for RIR scale, anthropometric protocols with LaTeX formulas, readiness scales, and tag search render properly and validate inputs correctly.",
     "category": "functional",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Access each catalog module separately."
+        "description": "Navigate to various catalog sections."
       },
       {
         "type": "assertion",
-        "description": "Confirm correct rendering of visual elements including LaTeX formula display."
+        "description": "Verify correct rendering of LaTeX formulas and proper layout of lists."
       },
       {
         "type": "action",
-        "description": "Perform searches using text and tags in each catalog."
+        "description": "Attempt to input invalid data in catalog-related forms."
       },
       {
         "type": "assertion",
-        "description": "Verify search results are accurate and input validation blocks invalid entries."
+        "description": "Verify validation messages appear and prevent submission."
       }
     ]
   },
   {
     "id": "TC009",
-    "title": "Relationship Thread Lifecycle",
-    "description": "Verify full creation, modification, and closure of relationship threads with event logging for notes, tasks, templates, and reminders.",
+    "title": "Relationship Threads Lifecycle",
+    "description": "Verify creation, editing, and deletion of relationship threads linked to students and services including event types: notes, tasks, templates, and reminders.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Create a new relationship thread linked to a student and optionally a service."
+        "description": "Create a new relationship thread linked to a student and a service."
       },
       {
         "type": "action",
-        "description": "Add diverse event types: notes, create and close tasks, apply message templates with live preview."
+        "description": "Add diverse event types (note, task, reminder) to the thread."
       },
       {
         "type": "assertion",
-        "description": "Check thread events are logged properly with timestamps and user info."
+        "description": "Verify events display correctly in the thread timeline."
       },
       {
         "type": "action",
-        "description": "Close and archive the thread."
+        "description": "Apply a message template with live preview and commit it."
       },
       {
         "type": "assertion",
-        "description": "Verify thread status updates to closed and is no longer editable."
+        "description": "Verify template content inserted correctly and saved."
+      },
+      {
+        "type": "action",
+        "description": "Close and delete the thread."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify proper status change and removal with audit log entry."
       }
     ]
   },
   {
     "id": "TC010",
-    "title": "Kanban Workflow with WIP Limits",
-    "description": "Test kanban board functionality enforcing WIP limits, drag-and-drop between columns, and dynamic badge updates based on tasks.",
+    "title": "Kanban Board WIP Limits and Drag-and-Drop",
+    "description": "Verify Kanban board enforces WIP limits, supports drag-and-drop column movements and dynamically updates task badges.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Access the Kanban system for workflow management."
+        "description": "Open the Kanban board for student workflow management."
       },
       {
         "type": "action",
-        "description": "Create several tasks and move them between columns via drag-and-drop."
+        "description": "Attempt to move more cards into a column than its WIP limit allows."
       },
       {
         "type": "assertion",
-        "description": "Validate that WIP limits prevent moving tasks beyond allowed thresholds."
+        "description": "Verify movement is blocked or user is warned according to rules."
+      },
+      {
+        "type": "action",
+        "description": "Drag and drop cards between columns respecting WIP limits."
       },
       {
         "type": "assertion",
-        "description": "Check that task count badges update dynamically in real time."
+        "description": "Verify badges on tasks update dynamically and move is registered."
       }
     ]
   },
   {
     "id": "TC011",
-    "title": "Reminder Engine Rule Setup and Execution",
-    "description": "Validate creation of reminder rules, simulate their execution, and verify internal triggering of notifications with toast messages.",
+    "title": "Reminder Engine Rule Setup and Notification Trigger",
+    "description": "Verify users can set rules for reminders which trigger internal notifications and display toast messages and counters when executed.",
     "category": "functional",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to reminder engine UI and create rules for upcoming tasks or follow-ups."
+        "description": "Navigate to the reminder engine setup."
       },
       {
         "type": "action",
-        "description": "Simulate reminder execution for configured rules."
+        "description": "Configure reminder rules with valid conditions."
+      },
+      {
+        "type": "action",
+        "description": "Simulate or wait for reminder trigger."
       },
       {
         "type": "assertion",
-        "description": "Verify internal notifications are triggered accurately without external messaging."
-      },
-      {
-        "type": "assertion",
-        "description": "Confirm success toast notification displays with counters updating accordingly."
+        "description": "Verify toast notifications appear and counters update accordingly without external messaging."
       }
     ]
   },
   {
     "id": "TC012",
-    "title": "Accessibility and Keyboard Navigation",
-    "description": "Verify that all UI components including modals, buttons, lists, and forms have correct ARIA roles, data-testid markers, are keyboard navigable with proper focus order and visible focus states.",
+    "title": "UI Accessibility and Keyboard Navigation",
+    "description": "Verify all UI elements support keyboard navigation, focus order is logical, ARIA roles and data-testid attributes are present for accessibility and automated testing.",
     "category": "ui",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Manually navigate through key user flows using keyboard only."
+        "description": "Navigate through the application via keyboard tab and arrow keys."
       },
       {
         "type": "assertion",
-        "description": "Check that focus outlines are visible and logical in order."
+        "description": "Verify focus state is clearly visible and order is as expected."
       },
       {
         "type": "assertion",
-        "description": "Validate the presence of appropriate ARIA roles on interactive elements."
+        "description": "Verify ARIA roles assigned correctly for screen readers."
       },
       {
         "type": "assertion",
-        "description": "Ensure all QA automation selectors (data-testid) exist on relevant components."
+        "description": "Verify all interactive elements have data-testid attributes for QA."
       }
     ]
   },
   {
     "id": "TC013",
-    "title": "Performance Benchmarking of Core Functionalities",
-    "description": "Measure and validate that core functionality response times, including navigation, data loading, and action executions, are under 400ms for P95 latency as per performance criteria.",
+    "title": "Performance Check on Core Functionalities",
+    "description": "Verify that all key operations across modules complete within 400ms P95 response time with no UI lag and loading indicators shown when needed.",
     "category": "performance",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Execute sample queries and user actions on student CRUD, relationship threads, and directives."
+        "description": "Perform actions like login, student CRUD, training directive publishing, kanban move, and reminder creation."
       },
       {
         "type": "assertion",
-        "description": "Collect query timing logs and verify P95 latency is under 400ms."
+        "description": "Measure timing and confirm operations complete under 400ms at 95th percentile."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify loading spinners or toasts appear appropriately in UI."
       }
     ]
   },
   {
     "id": "TC014",
-    "title": "Role-Level Security Enforcement",
-    "description": "Test Row Level Security (RLS) policies by verifying data access is correctly restricted by user role and organization on all modules and API endpoints.",
+    "title": "Security Enforcement via RLS and Audit Logs",
+    "description": "Verify Row Level Security correctly restricts data access by roles and organizations and all create, update, delete, and state changes are consistently logged in audit trail.",
     "category": "security",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Log in as different user roles (trainer, admin, limited role)."
+        "description": "Log in as users with different roles and organizations."
       },
       {
         "type": "action",
-        "description": "Attempt to access student data, training directives, and relationship threads outside of assigned organization."
+        "description": "Attempt CRUD operations on data outside user's scope."
       },
       {
         "type": "assertion",
-        "description": "Ensure access is denied and no unauthorized data is exposed."
+        "description": "Verify access is denied as per RLS policies."
+      },
+      {
+        "type": "action",
+        "description": "Create, update, and delete records within permissions."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify audit logs record all actions accurately and incompletely."
       }
     ]
   },
   {
     "id": "TC015",
-    "title": "Audit Log Recording of All Data Operations",
-    "description": "Verify that every create, update, delete, and state change over students, directives, threads, tasks, and reminders is recorded correctly in audit logs.",
+    "title": "Automated Testing Suite Execution",
+    "description": "Verify that automated test suites (TestSprite, Puppeteer, Jest, Vitest) run without failures covering UI workflows, backend APIs, and performance checks.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Perform data operations for a variety of entities in the system."
+        "description": "Trigger full automated test suite run in CI environment."
       },
       {
         "type": "assertion",
-        "description": "Review audit logs to confirm accurate recording with timestamps, user IDs, and operation details."
+        "description": "Confirm all tests pass with 100% success rates."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify test coverage reports and performance metrics match expected thresholds."
       }
     ]
   },
   {
     "id": "TC016",
-    "title": "Automated Test Suite Pass and Regression Check",
-    "description": "Run all automated end-to-end and unit test suites using TestSprite, Puppeteer, Jest, and Vitest to confirm 100% pass rates and no regressions.",
-    "category": "functional",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Trigger complete automated tests using CI pipeline or local environment."
-      },
-      {
-        "type": "assertion",
-        "description": "Confirm all tests pass with no errors."
-      },
-      {
-        "type": "assertion",
-        "description": "Validate test coverage metrics meet or exceed requirements."
-      }
-    ]
-  },
-  {
-    "id": "TC017",
-    "title": "Responsive UI Layout and No Undue Scrolling",
-    "description": "Verify UI adapts well on different viewport sizes (desktop, tablet, mobile) and no unnecessary scrollbars appear on core screens and modals.",
+    "title": "UX/UI Responsiveness and Visual Feedback",
+    "description": "Verify that the UI is responsive across device sizes, no unwanted scrolling occurs, and consistent visual feedback such as toasts, loaders, and badges is displayed.",
     "category": "ui",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Resize viewport to representative device sizes."
+        "description": "Resize browser to various viewport widths including mobile and desktop."
       },
       {
         "type": "assertion",
-        "description": "Confirm layout components adjust responsively and maintain usability."
+        "description": "Verify layout adjusts responsively with no content overflow or unwanted scroll."
+      },
+      {
+        "type": "action",
+        "description": "Perform actions that trigger loaders, toasts, and badge updates."
       },
       {
         "type": "assertion",
-        "description": "Ensure zero undue scrollbars and proper content visibility on all main pages and popups."
+        "description": "Verify visual feedback elements appear in a consistent style and disappear appropriately."
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Message Template Application with Live Preview",
+    "description": "Verify that applying message templates in relationship threads shows a live preview and commits the correct content.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open a relationship thread and select a message template."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that live preview renders the template content correctly."
+      },
+      {
+        "type": "action",
+        "description": "Commit the template message to the thread."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the message content is saved and displayed in the conversation."
       }
     ]
   }
