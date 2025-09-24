@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Users, Briefcase, UserCheck, ClipboardList, Activity, ArrowRight, TrendingUp, Calendar, BarChart3, MessageSquare, Send } from "lucide-react"
+import { Users, Briefcase, UserCheck, ClipboardList, Activity, ArrowRight, TrendingUp, Calendar, BarChart3, MessageSquare, Send, Sparkles } from "lucide-react"
 import MessageComposer from "@/components/relationship/MessageComposer"
 
 interface DashboardStats {
@@ -323,6 +323,22 @@ export default function DashboardPage() {
                   <div className="text-sm font-medium text-green-600">✅ Onboarding Kanban</div>
                   <div className="text-sm font-medium text-green-600">✅ Performance Otimizada</div>
                   <p className="text-xs text-muted-foreground">GATE 10.5 Concluído</p>
+                  
+                  {/* Botão Novidades da Versão */}
+                  <div className="pt-3 mt-3 border-t border-gray-100">
+                    <Button 
+                      asChild 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-blue-200 text-blue-700 hover:text-blue-800"
+                    >
+                      <Link href="/app/novidades" className="flex items-center justify-center gap-2">
+                        <Sparkles className="h-3 w-3" />
+                        Novidades da Versão
+                        <ArrowRight className="h-3 w-3" />
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
