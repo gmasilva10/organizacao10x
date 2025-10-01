@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
-import type { GlobeMethods } from "react-globe.gl"
 
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false })
 
@@ -18,7 +17,6 @@ type Props = {
 
 export function GlobeBackground({ className, sizeDesktop = 640, sizeMobile = 320 }: Props) {
 	const containerRef = useRef<HTMLDivElement>(null)
-  const globeRef = useRef<GlobeMethods | undefined>(undefined)
 	const [size, setSize] = useState({ w: sizeMobile, h: sizeMobile })
 
 	useEffect(() => {
@@ -50,7 +48,6 @@ export function GlobeBackground({ className, sizeDesktop = 640, sizeMobile = 320
 	return (
 		<div ref={containerRef} className={className} style={{ pointerEvents: "none" }}>
       <Globe
-				ref={globeRef}
 				width={size.w}
 				height={size.h}
 				backgroundColor="rgba(0,0,0,0)"
