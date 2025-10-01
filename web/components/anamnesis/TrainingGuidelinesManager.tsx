@@ -152,13 +152,13 @@ export function TrainingGuidelinesManager({
   }
 
   const handleRename = async (versionId: string, newTitle: string) => {
-    await versionActions.handleRename(versionId, newTitle, async (title: string) => {
+    try {
       const response = await fetch(`/api/guidelines/versions/${versionId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ title })
+        body: JSON.stringify({ title: newTitle })
       })
       const data = await response.json()
       
@@ -167,7 +167,9 @@ export function TrainingGuidelinesManager({
       }
       
       loadGuidelineVersions() // Recarregar lista
-    })
+    } catch (error) {
+      console.error('Erro ao renomear versão:', error)
+    }
   }
 
   const handleCorrectVersion = async (versionId: string) => {
@@ -298,7 +300,7 @@ export function TrainingGuidelinesManager({
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="w-full">
+      <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="rules" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
@@ -410,7 +412,7 @@ export function TrainingGuidelinesManager({
       <GuidelinesViewModal
         open={!!viewingVersion}
         onClose={() => setViewingVersion(null)}
-        guideline={viewingVersion}
+        guideline={viewingVersion as any}
       />
     </div>
   )

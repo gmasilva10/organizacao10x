@@ -362,7 +362,7 @@ export default function ResponsaveisTab({ student, onSave }: ResponsaveisTabProp
               <Label>Colaborador</Label>
               <Select
                 value={newResponsavel.user_id}
-                onValueChange={(value) => setNewResponsavel(prev => ({ ...prev, user_id: value }))}
+                onValueChange={(value: string) => setNewResponsavel(prev => ({ ...prev, user_id: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um colaborador" />
@@ -381,7 +381,7 @@ export default function ResponsaveisTab({ student, onSave }: ResponsaveisTabProp
               <Label>Função</Label>
               <Select
                 value={newResponsavel.role}
-                onValueChange={(value) => setNewResponsavel(prev => ({ ...prev, role: value as Responsavel['role'] }))}
+                onValueChange={(value: string) => setNewResponsavel(prev => ({ ...prev, role: value as Responsavel['role'] }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a função" />

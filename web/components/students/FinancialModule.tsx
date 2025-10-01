@@ -90,7 +90,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
   const [newContractModal, setNewContractModal] = useState({ open: false })
   const [editContractModal, setEditContractModal] = useState<{ open: boolean; contract: Contract | null }>({ open: false, contract: null })
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{ open: boolean; contract: Contract | null }>({ open: false, contract: null })
-  const { toast } = useToast()
+  const { success: showSuccess, error: showError } = useToast()
 
   const [formData, setFormData] = useState({
     plan_code: '',
@@ -135,11 +135,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       calculateSummary()
     } catch (error) {
       console.error('Erro ao carregar dados financeiros:', error)
-      toast({
-        title: "Erro",
-        description: "Erro ao carregar dados financeiros",
-        variant: "destructive"
-      })
+      showError("Erro ao carregar dados financeiros")
     } finally {
       setLoading(false)
     }
@@ -229,32 +225,21 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       })
 
       if (response.ok) {
-        toast({
-          title: "Sucesso",
-          description: "Contrato criado com sucesso!"
-        })
+        showSuccess("Contrato criado com sucesso!")
         setNewContractModal({ open: false })
         resetForm()
         loadData()
       } else {
         const error = await response.json()
-        toast({
-          title: "Erro",
-          description: error.error === 'active_contract_exists' 
-            ? 'Já existe um contrato ativo para este plano' 
-            : error.error === 'plan_not_found_or_inactive'
-            ? 'Plano não encontrado ou inativo'
-            : 'Erro ao criar contrato',
-          variant: "destructive"
-        })
+        showError(error.error === 'active_contract_exists' 
+          ? 'Já existe um contrato ativo para este plano' 
+          : error.error === 'plan_not_found_or_inactive'
+          ? 'Plano não encontrado ou inativo'
+          : 'Erro ao criar contrato')
       }
     } catch (error) {
       console.error('Erro ao criar contrato:', error)
-      toast({
-        title: "Erro",
-        description: "Erro ao criar contrato",
-        variant: "destructive"
-      })
+      showError("Erro ao criar contrato")
     }
   }
 
@@ -277,27 +262,16 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       })
 
       if (response.ok) {
-        toast({
-          title: "Sucesso",
-          description: "Contrato atualizado com sucesso!"
-        })
+        showSuccess("Contrato atualizado com sucesso!")
         setEditContractModal({ open: false, contract: null })
         resetForm()
         loadData()
       } else {
-        toast({
-          title: "Erro",
-          description: "Erro ao atualizar contrato",
-          variant: "destructive"
-        })
+        showError("Erro ao atualizar contrato")
       }
     } catch (error) {
       console.error('Erro ao atualizar contrato:', error)
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar contrato",
-        variant: "destructive"
-      })
+      showError("Erro ao atualizar contrato")
     }
   }
 
@@ -310,29 +284,18 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       })
 
       if (response.ok) {
-        toast({
-          title: "Sucesso",
-          description: "Contrato deletado com sucesso!"
-        })
+        showSuccess("Contrato deletado com sucesso!")
         setDeleteConfirmModal({ open: false, contract: null })
         loadData()
       } else {
         const error = await response.json()
-        toast({
-          title: "Erro",
-          description: error.error === 'cannot_delete_contract_with_pending_billing'
-            ? 'Não é possível deletar contrato com cobranças pendentes'
-            : 'Erro ao deletar contrato',
-          variant: "destructive"
-        })
+        showError(error.error === 'cannot_delete_contract_with_pending_billing'
+          ? 'Não é possível deletar contrato com cobranças pendentes'
+          : 'Erro ao deletar contrato')
       }
     } catch (error) {
       console.error('Erro ao deletar contrato:', error)
-      toast({
-        title: "Erro",
-        description: "Erro ao deletar contrato",
-        variant: "destructive"
-      })
+      showError("Erro ao deletar contrato")
     }
   }
 
@@ -345,25 +308,14 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       })
 
       if (response.ok) {
-        toast({
-          title: "Sucesso",
-          description: `Contrato ${status === 'ativo' ? 'ativado' : status === 'encerrado' ? 'encerrado' : 'cancelado'} com sucesso!`
-        })
+        showSuccess(`Contrato ${status === 'ativo' ? 'ativado' : status === 'encerrado' ? 'encerrado' : 'cancelado'} com sucesso!`)
         loadData()
       } else {
-        toast({
-          title: "Erro",
-          description: "Erro ao atualizar status do contrato",
-          variant: "destructive"
-        })
+        showError("Erro ao atualizar status do contrato")
       }
     } catch (error) {
       console.error('Erro ao atualizar status:', error)
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar status do contrato",
-        variant: "destructive"
-      })
+      showError("Erro ao atualizar status do contrato")
     }
   }
 
@@ -700,7 +652,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       </Card>
 
       {/* Modal Nova Venda */}
-      <Dialog open={newContractModal.open} onOpenChange={(open) => setNewContractModal({ open })}>
+      <Dialog open={newContractModal.open} onOpenChange={(open: boolean) => setNewContractModal({ open })}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Nova Venda</DialogTitle>
@@ -817,7 +769,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       </Dialog>
 
       {/* Modal Editar Contrato */}
-      <Dialog open={editContractModal.open} onOpenChange={(open) => setEditContractModal({ open, contract: null })}>
+      <Dialog open={editContractModal.open} onOpenChange={(open: boolean) => setEditContractModal({ open, contract: null })}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar Contrato</DialogTitle>
@@ -928,7 +880,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       </Dialog>
 
       {/* Modal Confirmar Exclusão */}
-      <Dialog open={deleteConfirmModal.open} onOpenChange={(open) => setDeleteConfirmModal({ open, contract: null })}>
+      <Dialog open={deleteConfirmModal.open} onOpenChange={(open: boolean) => setDeleteConfirmModal({ open, contract: null })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>

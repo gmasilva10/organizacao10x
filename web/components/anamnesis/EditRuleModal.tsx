@@ -230,7 +230,7 @@ export function EditRuleModal({ isOpen, onClose, onSuccess, rule, versionId }: E
                           <p className="text-xs text-gray-500 mb-2">Selecione a característica a ser avaliada</p>
                           <TagSelect
                             value={cond.tag}
-                            onValueChange={(value) => handleConditionChange(index, 'tag', value)}
+                            onValueChange={(value: string) => handleConditionChange(index, 'tag', value)}
                             placeholder="Selecione a tag"
                           />
                         </div>

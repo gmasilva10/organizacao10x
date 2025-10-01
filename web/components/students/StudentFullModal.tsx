@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useToast } from "@/components/ui/toast"
 import { FinancialModule } from "./FinancialModule"
 import { StudentOccurrenceModal } from "./StudentOccurrenceModal"
@@ -168,34 +168,11 @@ export function StudentFullModal({
 
   const canSubmit = Boolean(name && /.+@.+\..+/.test(email))
 
-  const financialSummary = useMemo(() => {
-    const active = services.find((s) => !!s.is_active) || null
-    function addMonths(dateStr?: string|null, months?: string|null) {
-      if (!dateStr || !months) return null
-      const d = new Date(dateStr)
-      const m = months === 'monthly' ? 1 : months === 'quarterly' ? 3 : months === 'semiannual' ? 6 : months === 'annual' ? 12 : 0
-      if (m === 0) return null
-      d.setMonth(d.getMonth() + m)
-      return d.toISOString().slice(0,10)
-    }
-    function netPriceCents(s: Service) {
-      const base = Number(s.price_cents || 0)
-      const hasPct = s.discount_pct != null
-      const hasAmt = s.discount_amount_cents != null
-      if (hasPct) return Math.max(0, Math.round(base * (1 - Number(s.discount_pct)/100)))
-      if (hasAmt) return Math.max(0, base - Number(s.discount_amount_cents))
-      return base
-    }
-    const nextCharge = active ? addMonths(active.last_payment_at, active.billing_cycle) : null
-    const totalMonthly = services
-      .filter((s) => !!s.is_active && s.billing_cycle === 'monthly')
-      .reduce((acc:number, s) => acc + netPriceCents(s), 0)
-    return {
-      activeTitle: active ? `${active.name} (${active.billing_cycle || '—'})` : '—',
-      nextCharge: nextCharge || '—',
-      totalMonthlyBRL: (totalMonthly/100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-    }
-  }, [services])
+  const [financialSummary, setFinancialSummary] = useState({
+    activeTitle: 'Nenhum',
+    nextCharge: 'Nenhuma',
+    totalMonthlyBRL: 'R$ 0,00'
+  })
 
   if (!open) return null
 

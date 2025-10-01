@@ -536,9 +536,9 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           >
             <Filter className="h-4 w-4" />
             Filtros
-            {getActiveFiltersCount > 0 && (
+            {getActiveFiltersCount() > 0 && (
               <Badge variant="destructive" className="ml-1 px-1.5 py-0.5 text-xs">
-                {getActiveFiltersCount}
+                {getActiveFiltersCount()}
               </Badge>
             )}
           </Button>

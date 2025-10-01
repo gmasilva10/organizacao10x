@@ -181,7 +181,7 @@ export function OccurrencesFiltersDrawer({
             <Label>Grupo</Label>
             <Select 
               value={filters.groupId || 'all'} 
-              onValueChange={v => {
+              onValueChange={(v: string) => {
                 updateFilter('groupId', v === 'all' ? '' : v)
                 updateFilter('typeId', '') // Reset type when group changes
               }}
@@ -205,7 +205,7 @@ export function OccurrencesFiltersDrawer({
             <Label>Tipo</Label>
             <Select 
               value={filters.typeId || 'all'} 
-              onValueChange={v => updateFilter('typeId', v === 'all' ? '' : v)}
+              onValueChange={(v: string) => updateFilter('typeId', v === 'all' ? '' : v)}
               disabled={!filters.groupId}
             >
               <SelectTrigger>
@@ -227,7 +227,7 @@ export function OccurrencesFiltersDrawer({
             <Label>Status</Label>
             <Select 
               value={filters.status} 
-              onValueChange={v => updateFilter('status', v)}
+              onValueChange={(v: string) => updateFilter('status', v)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -244,8 +244,8 @@ export function OccurrencesFiltersDrawer({
           <div>
             <Label>Prioridade</Label>
             <Select 
-              value={filters.priority} 
-              onValueChange={v => updateFilter('priority', v)}
+              value={(filters as any).priority || 'all'} 
+              onValueChange={(v: string) => updateFilter('priority', v)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -263,8 +263,8 @@ export function OccurrencesFiltersDrawer({
           <div>
             <Label>Sensível</Label>
             <Select 
-              value={filters.sensitive} 
-              onValueChange={v => updateFilter('sensitive', v)}
+              value={(filters as any).sensitive || 'all'} 
+              onValueChange={(v: string) => updateFilter('sensitive', v)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -283,7 +283,7 @@ export function OccurrencesFiltersDrawer({
             <div className="mt-2 space-y-2">
               <Select 
                 value={filters.hasReminder} 
-                onValueChange={v => updateFilter('hasReminder', v)}
+                onValueChange={(v: string) => updateFilter('hasReminder', v)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -311,7 +311,7 @@ export function OccurrencesFiltersDrawer({
                   />
                   <Select 
                     value={filters.reminderStatus} 
-                    onValueChange={v => updateFilter('reminderStatus', v)}
+                    onValueChange={(v: string) => updateFilter('reminderStatus', v)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Status do lembrete" />

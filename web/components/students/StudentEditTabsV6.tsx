@@ -303,12 +303,12 @@ export default function StudentEditTabsV6({
       const saveData = {
         ...formData,
         address: addressData,
-        trainer_id: responsaveisData.trainer_principal_id,
+        trainer_id: (responsaveisData as any).trainer_principal_id,
         // Não enviar photo_url se for uma URL local (blob)
         ...(photoData.preview && !photoData.preview.startsWith('blob:') && { photo_url: photoData.preview })
       }
       
-      await onSave(saveData)
+      await onSave(saveData as any)
       setValidationErrors({})
       
       // Toast específico para inativação
@@ -597,7 +597,7 @@ export default function StudentEditTabsV6({
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="status" className="text-sm font-medium">Status *</Label>
-                        <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value as any})}>
+                        <Select value={formData.status} onValueChange={(value: string) => setFormData({...formData, status: value as any})}>
                           <SelectTrigger className={`h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors ${
                             validationErrors.status ? 'border-red-500 focus:border-red-500' : ''
                           }`}>
@@ -626,7 +626,7 @@ export default function StudentEditTabsV6({
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="gender" className="text-sm font-medium">Sexo</Label>
-                        <Select value={formData.gender} onValueChange={(value) => setFormData({...formData, gender: value})}>
+                        <Select value={formData.gender} onValueChange={(value: string) => setFormData({...formData, gender: value})}>
                           <SelectTrigger className="h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                             <SelectValue placeholder="Selecione o sexo" />
                           </SelectTrigger>
@@ -639,7 +639,7 @@ export default function StudentEditTabsV6({
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="marital_status" className="text-sm font-medium">Estado Civil</Label>
-                        <Select value={formData.marital_status} onValueChange={(value) => setFormData({...formData, marital_status: value})}>
+                        <Select value={formData.marital_status} onValueChange={(value: string) => setFormData({...formData, marital_status: value})}>
                           <SelectTrigger className="h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                             <SelectValue placeholder="Selecione o estado civil" />
                           </SelectTrigger>
@@ -673,7 +673,7 @@ export default function StudentEditTabsV6({
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="onboard_opt" className="text-sm font-medium">Onboarding</Label>
-                        <Select value={formData.onboard_opt} onValueChange={(value) => setFormData({...formData, onboard_opt: value as 'nao_enviar' | 'enviar' | 'enviado'})}>
+                        <Select value={formData.onboard_opt} onValueChange={(value: string) => setFormData({...formData, onboard_opt: value as 'nao_enviar' | 'enviar' | 'enviado'})}>
                           <SelectTrigger className="h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                             <SelectValue placeholder="Selecione a opção de onboarding" />
                           </SelectTrigger>
@@ -880,7 +880,7 @@ export default function StudentEditTabsV6({
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="state" className="text-sm font-medium">Estado</Label>
-                    <Select value={addressData.state} onValueChange={(value) => setAddressData({...addressData, state: value})}>
+                    <Select value={addressData.state} onValueChange={(value: string) => setAddressData({...addressData, state: value})}>
                       <SelectTrigger className={`h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors ${
                         validationErrors.state ? 'border-red-500 focus:border-red-500' : ''
                       }`}>

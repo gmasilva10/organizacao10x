@@ -302,7 +302,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
                 <Label>Grupo</Label>
                 <Select 
                   value={formData.group_id.toString()} 
-                  onValueChange={v => {
+                  onValueChange={(v: string) => {
                     handleFormChange('group_id', parseInt(v))
                     handleFormChange('type_id', 0) // Reset type when group changes
                   }}
@@ -323,7 +323,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
                 <Label>Tipo</Label>
                 <Select 
                   value={formData.type_id.toString()} 
-                  onValueChange={v => handleFormChange('type_id', parseInt(v))}
+                  onValueChange={(v: string) => handleFormChange('type_id', parseInt(v))}
                   disabled={!canEdit || !formData.group_id}
                 >
                   <SelectTrigger>
@@ -341,7 +341,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
                 <Label>Prioridade</Label>
                 <Select 
                   value={formData.priority} 
-                  onValueChange={v => handleFormChange('priority', v)}
+                  onValueChange={(v: string) => handleFormChange('priority', v)}
                   disabled={!canEdit}
                 >
                   <SelectTrigger>
@@ -359,7 +359,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
                 <Label>Responsável</Label>
                 <Select 
                   value={formData.owner_user_id} 
-                  onValueChange={v => handleFormChange('owner_user_id', v)}
+                  onValueChange={(v: string) => handleFormChange('owner_user_id', v)}
                   disabled={!canEdit}
                 >
                   <SelectTrigger>
@@ -379,7 +379,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
               <div className="flex items-center space-x-2">
                 <Switch
                   checked={formData.is_sensitive}
-                  onCheckedChange={v => handleFormChange('is_sensitive', v)}
+                  onCheckedChange={(v: boolean) => handleFormChange('is_sensitive', v)}
                   disabled={!canEdit}
                 />
                 <Label>Ocorrência sensível</Label>
@@ -397,7 +397,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
                   />
                   <Select 
                     value={formData.reminder_status} 
-                    onValueChange={v => handleFormChange('reminder_status', v)}
+                    onValueChange={(v: string) => handleFormChange('reminder_status', v)}
                     disabled={!canEdit}
                   >
                     <SelectTrigger className="w-32">

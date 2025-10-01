@@ -230,7 +230,7 @@ export default function EnderecoTab({ student, onSave }: EnderecoTabProps) {
               <Label htmlFor="state">Estado *</Label>
               <Select
                 value={formData.state}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, state: value }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, state: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o estado" />

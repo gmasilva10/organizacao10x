@@ -90,8 +90,8 @@ export default function TaskCard({
   onSnoozeTask,
   onDeleteTask
 }: TaskCardProps) {
-  const channelIcon = CHANNEL_ICONS[task.channel] || '📱'
-  const statusColor = STATUS_COLORS[task.status] || 'bg-gray-500'
+  const channelIcon = CHANNEL_ICONS[task.channel as keyof typeof CHANNEL_ICONS] || '📱'
+  const statusColor = STATUS_COLORS[task.status as keyof typeof STATUS_COLORS] || 'bg-gray-500'
   
   return (
     <Card className="w-full hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500">

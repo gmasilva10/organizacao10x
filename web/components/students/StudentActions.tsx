@@ -89,7 +89,7 @@ export default function StudentActions({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <DropdownMenuItem 
-              onSelect={(e) => e.preventDefault()}
+              onSelect={(e: any) => e.preventDefault()}
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="h-4 w-4 mr-2" />

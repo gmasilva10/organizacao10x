@@ -357,7 +357,7 @@ export default function StudentActions({
             <DropdownMenuSeparator />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuItem onSelect={(e: any) => e.preventDefault()}>
                   <MessageSquare className="h-4 w-4 mr-2 text-green-600" />
                   WhatsApp ▸
                 </DropdownMenuItem>

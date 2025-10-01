@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Plus, Edit, Trash2, Search, Filter } from "lucide-react"
+import { Loader2, Plus, Edit, Trash2, Search, Filter, Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
 import { useConfirmDialog, ConfirmDialog } from "@/components/ui/confirm-dialog"
 
@@ -425,7 +425,6 @@ export function OccurrenceTypesManager() {
         </CardContent>
       </Card>
 
-      <ConfirmDialog />
     </div>
   )
 }

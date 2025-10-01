@@ -154,8 +154,8 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
         data = { error: 'Resposta inválida do servidor', raw: responseText }
       }
       
-      if (!res.ok || !data?.success) {
-        setError(data?.error || 'Falha na criação do grupo')
+      if (!res.ok || !(data as any)?.success) {
+        setError((data as any)?.error || 'Falha na criação do grupo')
       } else {
         setResult(data)
       }
@@ -189,11 +189,11 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
               <Label>Nome do grupo</Label>
               <Input value={groupName} onChange={e => setGroupName(e.target.value)} placeholder={`PG – ${firstName}`} />
               <div className="flex items-center gap-2">
-                <Checkbox checked={autoInvite} onCheckedChange={(v:any)=> setAutoInvite(!!v)} id="autoinvite" />
+                <Checkbox checked={autoInvite} onCheckedChange={(v: boolean)=> setAutoInvite(!!v)} id="autoinvite" />
                 <Label htmlFor="autoinvite" className="text-sm text-muted-foreground">Auto-invite ativo (quem não entrar receberá convite privado)</Label>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox checked={consent} onCheckedChange={(v:any)=> setConsent(!!v)} id="consent" />
+                <Checkbox checked={consent} onCheckedChange={(v: boolean)=> setConsent(!!v)} id="consent" />
                 <Label htmlFor="consent" className="text-sm">Tenho consentimento para adicionar os participantes ao grupo.</Label>
               </div>
             </div>
@@ -231,11 +231,11 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
-                          <Checkbox checked={!!selected[t.id]} disabled={disabled} onCheckedChange={(v:any)=> setSelected(s => ({ ...s, [t.id]: !!v }))} id={`sel-${t.id}`} />
+                          <Checkbox checked={!!selected[t.id]} disabled={disabled} onCheckedChange={(v: boolean)=> setSelected(s => ({ ...s, [t.id]: !!v }))} id={`sel-${t.id}`} />
                           <Label htmlFor={`sel-${t.id}`} className="text-xs">Participar</Label>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Checkbox checked={!!admins[t.id]} disabled={disabled} onCheckedChange={(v:any)=> setAdmins(a => ({ ...a, [t.id]: !!v }))} id={`adm-${t.id}`} />
+                          <Checkbox checked={!!admins[t.id]} disabled={disabled} onCheckedChange={(v: boolean)=> setAdmins(a => ({ ...a, [t.id]: !!v }))} id={`adm-${t.id}`} />
                           <Label htmlFor={`adm-${t.id}`} className="text-xs">Admin</Label>
                         </div>
                       </div>

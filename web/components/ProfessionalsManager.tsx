@@ -646,7 +646,7 @@ export function ProfessionalsManager() {
                   activeTab === 'user'
                     ? 'bg-background text-foreground shadow-sm border'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                } ${(!editingProfessional && !formData.email) || (editingProfessional?.user_id) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                } ${(!editingProfessional && !formData.email) || (editingProfessional as any)?.user_id ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <Key className="h-4 w-4" />
                 Acesso ao Sistema
@@ -853,7 +853,7 @@ export function ProfessionalsManager() {
 
               {activeTab === 'user' && (
                 <div className="space-y-4">
-                  {editingProfessional?.user_id ? (
+                  {(editingProfessional as any)?.user_id ? (
                     <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                       <h3 className="font-medium text-sm text-green-800 mb-2">Usuário Já Vinculado</h3>
                       <p className="text-sm text-green-700">
@@ -869,7 +869,7 @@ export function ProfessionalsManager() {
                     </div>
                   )}
 
-                  {!editingProfessional?.user_id && (
+                  {!(editingProfessional as any)?.user_id && (
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="user_email">E-mail</Label>
@@ -949,7 +949,7 @@ export function ProfessionalsManager() {
                   {editingProfessional ? 'Salvar Alterações' : 'Cadastrar Profissional'}
                 </Button>
               )}
-              {activeTab === 'user' && !editingProfessional?.user_id && (
+              {activeTab === 'user' && !(editingProfessional as any)?.user_id && (
                 <Button
                   type="button"
                   onClick={handleUserSave}
@@ -978,7 +978,7 @@ export function ProfessionalsManager() {
               <Label className="text-sm font-medium">Senha Temporária:</Label>
               <div className="flex items-center gap-2 mt-2">
                 <Input
-                  value={tempPassword}
+                  value={tempPassword || ''}
                   readOnly
                   className="font-mono"
                 />
@@ -1011,10 +1011,6 @@ export function ProfessionalsManager() {
       <TeamUpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
-        onUpgrade={() => {
-          setShowUpgradeModal(false)
-          // Aqui você pode redirecionar para a página de upgrade
-        }}
       />
 
       <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
@@ -1042,7 +1038,6 @@ export function ProfessionalsManager() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <ConfirmDialog />
     </div>
   )
 }

@@ -610,8 +610,8 @@ export default function MessageComposer({
           toast.error('Aluno não encontrado')
           return
         }
-        phoneNumber = student.phone?.replace(/\D/g, '') || ''
-        console.log('🔍 Usando telefone da lista:', student.phone, '->', phoneNumber)
+        phoneNumber = (student as any).phone?.replace(/\D/g, '') || ''
+        console.log('🔍 Usando telefone da lista:', (student as any).phone, '->', phoneNumber)
       }
       
       if (!phoneNumber) {

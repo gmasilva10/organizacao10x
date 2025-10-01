@@ -113,8 +113,8 @@ export default function ProcessosDropdown({ studentId, studentName, studentPhone
       open={anamneseModalOpen}
       onOpenChange={setAnamneseModalOpen}
       studentId={studentId}
-      studentName={studentName}
-      studentPhone={studentPhone}
+      studentName={studentName || ''}
+      studentPhone={studentPhone || ''}
     />
   </>
   )

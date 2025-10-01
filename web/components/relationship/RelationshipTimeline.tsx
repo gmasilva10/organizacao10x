@@ -344,7 +344,7 @@ export default function RelationshipTimeline({ studentId, studentName }: Relatio
                       variant="ghost"
                       size="sm"
                       className="h-6 px-2 text-xs hover:bg-gray-100"
-                      onClick={() => copyMessage(log.task.payload.message)}
+                      onClick={() => copyMessage(log.task?.payload?.message || '')}
                     >
                       <Copy className="h-3 w-3" />
                     </Button>
@@ -353,7 +353,7 @@ export default function RelationshipTimeline({ studentId, studentName }: Relatio
                         variant="ghost"
                         size="sm"
                         className="h-6 px-2 text-xs hover:bg-gray-100"
-                        onClick={() => openWhatsApp(log.task.payload.student_phone, log.task.payload.message)}
+                        onClick={() => openWhatsApp(log.task?.payload?.student_phone || '', log.task?.payload?.message || '')}
                       >
                         <ExternalLink className="h-3 w-3" />
                       </Button>
@@ -553,7 +553,7 @@ export default function RelationshipTimeline({ studentId, studentName }: Relatio
               <label className="text-sm font-medium">Ação</label>
               <Select
                 value={filters.action}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, action: value }))}
+                onValueChange={(value: string) => setFilters(prev => ({ ...prev, action: value }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -574,7 +574,7 @@ export default function RelationshipTimeline({ studentId, studentName }: Relatio
               <label className="text-sm font-medium">Canal</label>
               <Select
                 value={filters.channel}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, channel: value }))}
+                onValueChange={(value: string) => setFilters(prev => ({ ...prev, channel: value }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -594,7 +594,7 @@ export default function RelationshipTimeline({ studentId, studentName }: Relatio
               <label className="text-sm font-medium">Template</label>
               <Select
                 value={filters.template_code}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, template_code: value }))}
+                onValueChange={(value: string) => setFilters(prev => ({ ...prev, template_code: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Todos os Templates" />
@@ -878,8 +878,6 @@ export default function RelationshipTimeline({ studentId, studentName }: Relatio
       <MessageComposer
         open={messageComposerOpen}
         onOpenChange={setMessageComposerOpen}
-        initialStudentId={studentId}
-        initialStudentName={studentName}
         onSuccess={() => {
           fetchLogs() // Atualizar a timeline após enviar mensagem
         }}

@@ -127,7 +127,7 @@ export function StudentOccurrenceModal({
           reminder_at: occurrence.reminder_at ? new Date(occurrence.reminder_at).toISOString().slice(0, 16) : '',
           reminder_notes: ''
         })
-        setAttachments(occurrence.attachments || [])
+        setAttachments((occurrence as any).attachments || [])
       } else {
         // Reset form for create mode
         setFormData({
@@ -479,7 +479,7 @@ export function StudentOccurrenceModal({
                         </SelectTrigger>
                         <SelectContent>
                           {trainers.map((trainer) => (
-                            <SelectItem key={trainer.id} value={trainer.user_id}>
+                            <SelectItem key={trainer.id} value={trainer.id}>
                               {trainer.name}
                             </SelectItem>
                           ))}

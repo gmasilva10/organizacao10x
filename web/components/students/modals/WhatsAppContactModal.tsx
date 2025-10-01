@@ -161,36 +161,18 @@ export default function WhatsAppContactModal({
           data = JSON.parse(responseText)
           console.log('🔍 [WHATSAPP CONTACT] Dados da resposta (JSON):', data)
           
-          // Mostrar logs de teste se disponíveis
-          if (data.testLogs) {
-            console.log('🧪 [WHATSAPP CONTACT] LOGS DE TESTE DOS ENDPOINTS:')
-            data.testLogs.forEach((log: any, index: number) => {
-              console.log(`🧪 [TESTE ${index + 1}] Endpoint: ${log.endpoint}`)
-              console.log(`🧪 [TESTE ${index + 1}] URL: ${log.url}`)
-              console.log(`🧪 [TESTE ${index + 1}] Sucesso: ${log.success}`)
-              if (log.error) {
-                console.log(`🧪 [TESTE ${index + 1}] Erro: ${log.error}`)
-              }
-              if (log.status) {
-                console.log(`🧪 [TESTE ${index + 1}] Status: ${log.status}`)
-              }
-              if (log.result) {
-                console.log(`🧪 [TESTE ${index + 1}] Resultado:`, log.result)
-              }
-              console.log('---')
-            })
-          }
+          // Debug logs removed to fix build issues
         } catch (parseError) {
           console.error('❌ [WHATSAPP CONTACT] Erro ao fazer parse do JSON:', parseError)
           console.log('🔍 [WHATSAPP CONTACT] Resposta não é JSON válido:', responseText)
           data = { error: 'Resposta inválida do servidor', raw: responseText }
         }
       
-      if (res.ok && data?.success) {
+      if (res.ok && (data as any)?.success) {
         toast.success('Contato adicionado ao WhatsApp!')
         logContactAction('wa_add_contact_success', { studentId, phone: normalized.value })
       } else {
-        const reason = data?.error || res.statusText || 'Falha desconhecida'
+        const reason = (data as any)?.error || res.statusText || 'Falha desconhecida'
         toast.error(`Falha ao adicionar contato: ${reason}`)
         logContactAction('wa_add_contact_error', { studentId, phone: normalized.value, reason })
       }

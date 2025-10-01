@@ -251,7 +251,7 @@ export default function StudentOccurrencesList({ studentId, studentName }: Stude
           onOpenChange={setMessageComposerOpen}
           studentId={selectedOccurrence.student_id}
           studentName={selectedOccurrence.student_name || 'Aluno'}
-          initialMessage={`Follow-up da ocorrência #${selectedOccurrence.id}: ${selectedOccurrence.notes || 'Sem descrição'}`}
+          initialMessage={`Follow-up da ocorrência #${selectedOccurrence.id}: ${(selectedOccurrence as any).notes || 'Sem descrição'}`}
           onSuccess={() => {
             toast.success('Follow-up enviado com sucesso!')
             fetchOccurrences()

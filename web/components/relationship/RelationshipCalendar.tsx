@@ -12,7 +12,7 @@
 
 import React, { useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader as ModalHeader, DialogTitle as ModalTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -558,9 +558,9 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
       {/* Modal com tarefas do dia */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-3xl" aria-describedby="calendar-day-tasks-desc">
-          <ModalHeader>
-            <ModalTitle>{modalDate ? `Tarefas de ${format(modalDate, 'dd/MM/yyyy', { locale: ptBR })}` : 'Tarefas do dia'}</ModalTitle>
-          </ModalHeader>\n          <p id="calendar-day-tasks-desc" className="sr-only">Lista de tarefas da data selecionada</p>
+          <DialogHeader>
+            <DialogTitle>{modalDate ? `Tarefas de ${format(modalDate, 'dd/MM/yyyy', { locale: ptBR })}` : 'Tarefas do dia'}</DialogTitle>
+          </DialogHeader>\n          <p id="calendar-day-tasks-desc" className="sr-only">Lista de tarefas da data selecionada</p>
           <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-3">
             {modalDate && getTasksForDate(modalDate).length > 0 ? (
               getTasksForDate(modalDate).map(renderTask)

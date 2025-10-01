@@ -365,7 +365,6 @@ export function ProfessionalProfilesManager() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <ConfirmDialog />
     </div>
   )
 }

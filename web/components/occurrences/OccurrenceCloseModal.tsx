@@ -168,7 +168,7 @@ export function OccurrenceCloseModal({ open, onClose, occurrenceId, onSuccess }:
               <Label>Motivo</Label>
               <Select 
                 value={formData.resolution_outcome} 
-                onValueChange={v => setFormData(prev => ({ ...prev, resolution_outcome: v as any }))}
+                onValueChange={(v: string) => setFormData(prev => ({ ...prev, resolution_outcome: v as any }))}
               >
                 <SelectTrigger>
                   <SelectValue />

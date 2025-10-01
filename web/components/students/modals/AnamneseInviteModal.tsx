@@ -257,7 +257,7 @@ export function AnamneseInviteModal({
                     <Label className="text-sm font-medium">Grupo do WhatsApp *</Label>
                     <Select
                       value={groupId || (groups.length ? groupId : 'empty')}
-                      onValueChange={(v) => setGroupId(v === 'empty' ? '' : v)}
+                      onValueChange={(v: string) => setGroupId(v === 'empty' ? '' : v)}
                       disabled={!groups.length}
                     >
                       <SelectTrigger>
@@ -326,11 +326,11 @@ export function AnamneseInviteModal({
                 <div className="space-y-2">
                   <Label htmlFor="service" className="text-sm font-medium flex items-center gap-1">
                     Servi  o (opcional)
-                    <Info className="h-3.5 w-3.5 text-muted-foreground" aria-label="Ajuda" title="Usado para personalizar a mensagem e o protocolo gerado" />
+                    <Info className="h-3.5 w-3.5 text-muted-foreground" aria-label="Ajuda" />
                   </Label>
                   <Select
                     value={serviceId || ''}
-                    onValueChange={(v) => setServiceId(v)}
+                    onValueChange={(v: string) => setServiceId(v)}
                     disabled={loadingSend || loadingGenerate}
                   >
                     <SelectTrigger>

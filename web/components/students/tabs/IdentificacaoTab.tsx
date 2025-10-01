@@ -59,7 +59,7 @@ export default function IdentificacaoTab({ student, onSave }: IdentificacaoTabPr
   const handleSave = async () => {
     try {
       setSaving(true)
-      await onSave(formData)
+      await onSave(formData as any)
       toast.success('Dados de identificação salvos com sucesso!')
     } catch (error) {
       toast.error('Erro ao salvar dados de identificação')
@@ -150,7 +150,7 @@ export default function IdentificacaoTab({ student, onSave }: IdentificacaoTabPr
               <Label htmlFor="status">Status *</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, status: value as any }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o status" />
@@ -178,7 +178,7 @@ export default function IdentificacaoTab({ student, onSave }: IdentificacaoTabPr
               <Label htmlFor="gender">Sexo</Label>
               <Select
                 value={formData.gender}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, gender: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o sexo" />
@@ -195,7 +195,7 @@ export default function IdentificacaoTab({ student, onSave }: IdentificacaoTabPr
               <Label htmlFor="marital_status">Estado Civil</Label>
               <Select
                 value={formData.marital_status}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, marital_status: value }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, marital_status: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o estado civil" />

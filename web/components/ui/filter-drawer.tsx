@@ -89,7 +89,7 @@ export function RelationshipFilters({ filters, onFiltersChange }: RelationshipFi
         <Label className="text-sm font-medium">Ação</Label>
         <Select
           value={filters.action}
-          onValueChange={(value) => onFiltersChange({ ...filters, action: value })}
+          onValueChange={(value: string) => onFiltersChange({ ...filters, action: value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Todas as Ações" />
@@ -111,7 +111,7 @@ export function RelationshipFilters({ filters, onFiltersChange }: RelationshipFi
         <Label className="text-sm font-medium">Canal</Label>
         <Select
           value={filters.channel}
-          onValueChange={(value) => onFiltersChange({ ...filters, channel: value })}
+          onValueChange={(value: string) => onFiltersChange({ ...filters, channel: value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Todos os Canais" />
@@ -132,7 +132,7 @@ export function RelationshipFilters({ filters, onFiltersChange }: RelationshipFi
         <Label className="text-sm font-medium">Template</Label>
         <Select
           value={filters.template_code}
-          onValueChange={(value) => onFiltersChange({ ...filters, template_code: value })}
+          onValueChange={(value: string) => onFiltersChange({ ...filters, template_code: value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Todos os Templates" />

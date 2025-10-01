@@ -33,7 +33,7 @@ export function ViewTemplateModal({ isOpen, onClose, template }: ViewTemplateMod
 
   const versions = template.versions || []
   const currentVersion = versions[currentVersionIndex]
-  const questions = currentVersion?.questions || []
+  const questions = (currentVersion as any)?.questions || []
 
   const getQuestionTypeIcon = (type: string) => {
     switch (type) {
@@ -173,7 +173,7 @@ export function ViewTemplateModal({ isOpen, onClose, template }: ViewTemplateMod
                       <p>Nenhuma pergunta cadastrada nesta versão</p>
                     </div>
                   ) : (
-                    questions.map((question, index) => (
+                    questions.map((question: any, index: number) => (
                       <div key={question.id} className="border rounded-lg p-4 space-y-3">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2">
@@ -220,7 +220,7 @@ export function ViewTemplateModal({ isOpen, onClose, template }: ViewTemplateMod
                               Opções:
                             </p>
                             <ul className="list-disc list-inside space-y-1">
-                              {question.options.map((option, optIndex) => (
+                              {question.options.map((option: any, optIndex: number) => (
                                 <li key={optIndex} className="text-sm text-muted-foreground">
                                   {option}
                                 </li>

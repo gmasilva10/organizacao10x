@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, Plus, Edit, Trash2, Search, Filter } from "lucide-react"
+import { Loader2, Plus, Edit, Trash2, Search, Filter, Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
 import { useConfirmDialog, ConfirmDialog } from "@/components/ui/confirm-dialog"
 
@@ -341,7 +341,6 @@ export function OccurrenceGroupsManager() {
         </CardContent>
       </Card>
 
-      <ConfirmDialog />
     </div>
   )
 }

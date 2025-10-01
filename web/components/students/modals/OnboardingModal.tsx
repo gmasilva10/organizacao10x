@@ -51,7 +51,7 @@ export default function OnboardingModal({
       
     } catch (error) {
       console.error('Erro ao enviar para onboarding:', error)
-      showErrorToast(`Erro ao enviar para onboarding: ${error.message}`)
+      showErrorToast(`Erro ao enviar para onboarding: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
     } finally {
       setLoading(false)
     }
