@@ -125,8 +125,7 @@ export default function KanbanPage() {
         id: k.id, 
         title, 
         studentId: k.student_id, 
-        status: k.student_status,
-        studentPhone: (k as any).student_phone
+        status: k.student_status
       }
       if (k.completed_at && doneColId) {
         historyBuffer.push(card)
