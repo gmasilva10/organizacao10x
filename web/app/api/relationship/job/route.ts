@@ -1,11 +1,11 @@
 ﻿/**
  * GATE 10.6.2 - Motor de Relacionamento
- * Job diÃ¡rio 03:00 para gerar/atualizar tarefas em lote
+ * Job diário 03:00 para gerar/atualizar tarefas em lote
  * 
  * Funcionalidades:
- * - Queries Ãºnicas por Ã¢ncora + Ã­ndices
- * - Rate limiting (mÃ¡x. N tarefas/dia por aluno)
- * - Dedup por chave lÃ³gica
+ * - Queries únicas por âncora + índices
+ * - Rate limiting (máx. N tarefas/dia por aluno)
+ * - Dedup por chave lógica
  * - Telemetria e logs
  */
 
@@ -21,7 +21,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Rate limiting: mÃ¡ximo de tarefas por aluno por dia
+// Rate limiting: máximo de tarefas por aluno por dia
 const MAX_TASKS_PER_STUDENT_PER_DAY = 3
 
 type EventCode =
@@ -66,7 +66,7 @@ interface TaskStats {
 }
 
 /**
- * Aplicar filtros de audiÃªncia em memÃ³ria
+ * Aplicar filtros de audiência em memória
  */
 function applyAudienceFilter(students: StudentData[], filter: any): StudentData[] {
   if (!filter || Object.keys(filter).length === 0) {
@@ -76,18 +76,18 @@ function applyAudienceFilter(students: StudentData[], filter: any): StudentData[
   return students.filter(student => {
     // Filtro por status (se especificado)
     if (filter.status && Array.isArray(filter.status)) {
-      // Para simplificar, assumimos que todos os alunos retornados sÃ£o 'active'
-      // Em implementaÃ§Ã£o real, vocÃª verificaria o status real do aluno
+      // Para simplificar, assumimos que todos os alunos retornados são 'active'
+      // Em implementação real, você verificaria o status real do aluno
     }
 
     // Filtro por tags (se especificado)
     if (filter.tags && Array.isArray(filter.tags)) {
-      // Implementar filtro por tags quando disponÃ­vel
+      // Implementar filtro por tags quando disponível
     }
 
     // Filtro por trainer_id (se especificado)
     if (filter.trainer_id) {
-      // Implementar filtro por trainer quando disponÃ­vel
+      // Implementar filtro por trainer quando disponível
     }
 
     return true
@@ -117,12 +117,12 @@ function calculateScheduledDate(anchorDate: string, offset: string): Date {
 }
 
 /**
- * Renderizar mensagem com variÃ¡veis
+ * Renderizar mensagem com variáveis
  */
 function renderMessage(template: string, student: StudentData): string {
   let message = template
   
-  // Substituir variÃ¡veis bÃ¡sicas
+  // Substituir variáveis básicas
   message = message.replace(/\[Nome do Cliente\]/g, student.name)
   message = message.replace(/\[Nome\]/g, student.name)
   message = message.replace(/\[PrimeiroNome\]/g, student.name.split(' ')[0])
@@ -164,7 +164,7 @@ function endOfDayISO(date = new Date()) {
   return d.toISOString()
 }
 
-// Buscar alunos elegÃ­veis por Ã¢ncora sem usar RPCs
+// Buscar alunos elegíveis por âncora sem usar RPCs
 async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Promise<StudentData[]> {
   // New implementation without RPC execute_sql
   const students = await fetchStudentsForAnchor(anchor, tenantId)
@@ -347,7 +347,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
     }
 
     // first_workout, weekly_followup, monthly_review, renewal_window
-    // Campos podem nÃ£o existir ainda; retornar vazio
+    // Campos podem não existir ainda; retornar vazio
     return []
   } catch {
     return []
@@ -383,14 +383,14 @@ async function fetchActiveTemplates(tenantId: string): Promise<TemplateData[]> {
         active: true,
       })
     } catch {
-      // ignora linhas invÃ¡lidas
+      // ignora linhas inválidas
     }
   }
   return templates
 }
 
 /**
- * Processar uma Ã¢ncora especÃ­fica
+ * Processar uma âncora específica
  */
 async function processAnchor(
   anchor: EventCode,
@@ -408,11 +408,11 @@ async function processAnchor(
   const errors: string[] = []
 
   try {
-    // Buscar alunos para esta Ã¢ncora
+    // Buscar alunos para esta âncora
     const { data: students, error: studentsError } = await supabase
 
     if (studentsError) {
-      errors.push(`Erro ao buscar alunos para Ã¢ncora ${anchor}: ${studentsError.message}`)
+      errors.push(`Erro ao buscar alunos para âncora ${anchor}: ${studentsError.message}`)
       return { created, updated, skipped, errors }
     }
 
@@ -420,9 +420,9 @@ async function processAnchor(
       return { created, updated, skipped, errors }
     }
 
-    // Processar cada template desta Ã¢ncora
+    // Processar cada template desta âncora
     for (const template of anchorTemplates) {
-      // Aplicar filtros de audiÃªncia
+      // Aplicar filtros de audiência
       const filteredStudents = applyAudienceFilter(students, template.audience_filter)
 
       for (const student of filteredStudents) {
@@ -437,7 +437,7 @@ async function processAnchor(
           // Calcular data agendada
           const scheduledDate = calculateScheduledDate(student.anchor_date, template.suggested_offset)
           
-          // Verificar se jÃ¡ existe tarefa para este aluno/template/data
+          // Verificar se já existe tarefa para este aluno/template/data
           const { data: existingTask } = await supabase
             .from('relationship_tasks')
             .select('id')
@@ -506,7 +506,7 @@ async function processAnchor(
       }
     }
   } catch (error) {
-    errors.push(`Erro geral ao processar Ã¢ncora ${anchor}: ${error.message}`)
+    errors.push(`Erro geral ao processar âncora ${anchor}: ${error.message}`)
   }
 
   return { created, updated, skipped, errors }
@@ -516,7 +516,7 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    // Verificar se Ã© chamada autorizada (cron job ou admin)
+    // Verificar se é chamada autorizada (cron job ou admin)
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET || 'default-secret'
     
@@ -548,7 +548,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Processar cada Ã¢ncora
+    // Processar cada âncora
     const stats: TaskStats = {
       templates_processed: templates.length,
       students_found: 0,
