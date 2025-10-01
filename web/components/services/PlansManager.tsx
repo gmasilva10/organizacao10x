@@ -5,13 +5,13 @@
 
 'use client'
 
-import dynamic from 'next/dynamic'
-
-// Importar o conteúdo da página de planos
-const PlansPage = dynamic(() => import('@/app/(app)/app/services/plans/page'), {
-  ssr: false
-})
-
 export default function PlansManager() {
-  return <PlansPage />
+  return (
+    <div className="rounded-md border p-4 bg-card">
+      <h3 className="font-semibold mb-1">Planos</h3>
+      <p className="text-sm text-muted-foreground">
+        Gerenciamento de planos disponível em breve nesta seção.
+      </p>
+    </div>
+  )
 }
