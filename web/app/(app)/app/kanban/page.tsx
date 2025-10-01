@@ -655,7 +655,6 @@ export default function KanbanPage() {
         open={confirm.open}
         title={confirm.title || ''}
         description={confirm.description}
-        destructive={/excluir|remover|delete/i.test(confirm.title || '')}
         onCancel={()=> setConfirm({ open:false, title:'' })}
         onConfirm={()=>{ try { confirm.onConfirm?.() } finally { setConfirm({ open:false, title:'' }) } }}
       />
