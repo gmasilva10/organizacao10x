@@ -50,10 +50,7 @@ function LoginDrawerContent() {
             })
             
             const supabase = createClient()
-            console.log("🔍 [LOGIN DEBUG] Cliente Supabase criado:", {
-                supabaseUrl: supabase.supabaseUrl,
-                supabaseKey: supabase.supabaseKey ? "Present" : "Missing"
-            })
+            console.log("🔍 [LOGIN DEBUG] Cliente Supabase criado")
             
             console.log("🔍 [LOGIN DEBUG] Tentando autenticar com:", { email, hasPassword: !!password })
             const { data, error } = await supabase.auth.signInWithPassword({ email, password })
