@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -52,7 +52,7 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
   const [activeTab, setActiveTab] = useState<'summary' | 'preview'>('summary')
   const [isLoading, setIsLoading] = useState(false)
 
-  // Extrair tags únicas das condições
+  // Extrair tags Ãºnicas das condiÃ§Ãµes
   const getUniqueTags = () => {
     if (!guideline?.guideline_rules) return []
     
@@ -67,18 +67,18 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
     return Array.from(tags)
   }
 
-  // Extrair seções afetadas pelos outputs
+  // Extrair seÃ§Ãµes afetadas pelos outputs
   const getAffectedSections = () => {
     if (!guideline?.guideline_rules) return []
     
     const sections = new Set<string>()
     guideline.guideline_rules.forEach(rule => {
       if (rule.outputs) {
-        if (rule.outputs.aerobio) sections.add('Aeróbio')
+        if (rule.outputs.aerobio) sections.add('AerÃ³bio')
         if (rule.outputs.pesos) sections.add('Pesos')
         if (rule.outputs.flex_mob) sections.add('Flex/Mob')
-        if (rule.outputs.contraindicacoes?.length > 0) sections.add('Contraindicações')
-        if (rule.outputs.observacoes?.length > 0) sections.add('Observações')
+        if (rule.outputs.contraindicacoes?.length > 0) sections.add('ContraindicaÃ§Ãµes')
+        if (rule.outputs.observacoes?.length > 0) sections.add('ObservaÃ§Ãµes')
       }
     })
     return Array.from(sections)
@@ -98,7 +98,7 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
       }
       
       await navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2))
-      toast.success("JSON copiado para a área de transferência!")
+      toast.success("JSON copiado para a Ã¡rea de transferÃªncia!")
     } catch (error) {
       console.error("Erro ao copiar JSON:", error)
       toast.error("Erro ao copiar JSON")
@@ -131,7 +131,7 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
   }
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Não publicado'
+    if (!dateString) return 'NÃ£o publicado'
     return new Date(dateString).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -150,7 +150,7 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
 
   const getDefaultBadge = () => {
     if (guideline?.is_default) {
-      return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Padrão</Badge>
+      return <Badge className="bg-blue-100 text-blue-800 border-blue-200">PadrÃ£o</Badge>
     }
     return null
   }
@@ -181,29 +181,29 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'summary' | 'preview')} className="px-6">
+        <Tabs value={activeTab} onValueChange={(value: "summary" | "preview") => setActiveTab(value as 'summary' | 'preview')} className="px-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="summary">Resumo da Versão</TabsTrigger>
+            <TabsTrigger value="summary">Resumo da VersÃ£o</TabsTrigger>
             <TabsTrigger value="preview">Preview</TabsTrigger>
           </TabsList>
 
           <TabsContent value="summary" className="space-y-6 mt-6 overflow-y-auto max-h-[calc(95vh-200px)] pr-2">
-            {/* Metadados da versão */}
+            {/* Metadados da versÃ£o */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Informações da Versão
+                  InformaÃ§Ãµes da VersÃ£o
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Título</label>
+                    <label className="text-sm font-medium text-muted-foreground">TÃ­tulo</label>
                     <p className="text-sm">{guideline.title}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Versão</label>
+                    <label className="text-sm font-medium text-muted-foreground">VersÃ£o</label>
                     <p className="text-sm">v{guideline.version}</p>
                   </div>
                   <div>
@@ -224,12 +224,12 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
               </CardContent>
             </Card>
 
-            {/* Estatísticas das regras */}
+            {/* EstatÃ­sticas das regras */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Hash className="h-5 w-5" />
-                  Estatísticas das Regras
+                  EstatÃ­sticas das Regras
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -247,7 +247,7 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
                 {/* Tags utilizadas */}
                 {getUniqueTags().length > 0 && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Tags nas Condições</label>
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Tags nas CondiÃ§Ãµes</label>
                     <div className="flex flex-wrap gap-2">
                       {getUniqueTags().map(tag => (
                         <Badge key={tag} variant="outline" className="flex items-center gap-1">
@@ -259,18 +259,18 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
                   </div>
                 )}
 
-                {/* Seções afetadas */}
+                {/* SeÃ§Ãµes afetadas */}
                 {getAffectedSections().length > 0 && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Seções Afetadas</label>
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">SeÃ§Ãµes Afetadas</label>
                     <div className="flex flex-wrap gap-2">
                       {getAffectedSections().map(section => {
                         const icons = {
-                          'Aeróbio': Activity,
+                          'AerÃ³bio': Activity,
                           'Pesos': Dumbbell,
                           'Flex/Mob': StretchHorizontal,
-                          'Contraindicações': AlertTriangle,
-                          'Observações': FileText
+                          'ContraindicaÃ§Ãµes': AlertTriangle,
+                          'ObservaÃ§Ãµes': FileText
                         }
                         const Icon = icons[section as keyof typeof icons] || FileText
                         return (
@@ -286,10 +286,10 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
               </CardContent>
             </Card>
 
-            {/* Ações */}
+            {/* AÃ§Ãµes */}
             <Card>
               <CardHeader>
-                <CardTitle>Ações</CardTitle>
+                <CardTitle>AÃ§Ãµes</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">

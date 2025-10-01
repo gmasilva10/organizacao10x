@@ -1,306 +1,306 @@
-# LOG DE ATIVIDADES — Personal Global
-# Última atualização: 2025-01-10 15:45
-# Formato: [AAAA-MM-DD HH:MM] Autor — Tipo — Módulo/Área — Título curto — (#tarefa/issue opcional) — Evidência (commit/PR/URL)
+# LOG DE ATIVIDADES   Personal Global
+#  ltima atualiza  o: 2025-01-10 15:45
+# Formato: [AAAA-MM-DD HH:MM] Autor   Tipo   M dulo/Área   T tulo curto   (#tarefa/issue opcional)   Evid ncia (commit/PR/URL)
 
-Hoje — 10/01/2025
-[2025-01-10 15:45] DEV — BACKUP — Sistema — v0.4.0 sistema estável: versão atualizada, features documentadas, backup banco (7 alunos, 4 kanban_items, 25 profiles), commit e040d0d, build produção funcional, documentação completa — evidência: web/evidencias/backup-v0-4-0-sistema-estavel.md
-[2025-01-10 16:00] DEV — GATE 10.6.0 — Relacionamento — Especificação & Seeds: EVENT_REGISTRY implementado (8 âncoras oficiais), seeds MSG1..MSG10 aplicados, documentação completa, arquivos: event-registry.ts, template-seeds.ts — evidência: web/evidencias/gate10-6-0-especificacao-seeds.md
-[2025-01-10 16:15] DEV — GATE 10.6.1 — Relacionamento — Data Model & RLS: 3 tabelas criadas (relationship_templates_v2, relationship_tasks, relationship_logs), índices otimizados, RLS policies implementadas, funções de serviço criadas, migration aplicada — evidência: web/evidencias/gate10-6-1-data-model-rls.md
-[2025-01-10 16:30] DEV — GATE 10.6.2 — Relacionamento — Motor: job diário 03:00 implementado, endpoint recalcular com lock, gatilho occurrence_followup ativo, dedup e rate limiting funcionando, telemetria implementada — evidência: web/evidencias/gate10-6-2-motor-recalcular-gatilho.md
-[2025-01-10 16:45] DEV — GATE 10.6.3 — Relacionamento — Kanban MVP: colunas organizadas (Pendente, Para Hoje, Enviadas, Snoozed/Skipped), filtros avançados, cards interativos, ações contextuais (Copiar, WhatsApp, Enviar, Snooze, Pular), toasts padronizados — evidência: web/evidencias/gate10-6-3-kanban-mvp.md
-[2025-01-10 17:00] DEV — GATE 10.6.4 — Relacionamento — Calendário: visões dia/semana/mês implementadas, navegação fluida, filtros compartilhados com Kanban, ações reutilizadas, componente RelationshipCalendar.tsx — evidência: web/evidencias/gate10-6-4-calendario.md
-[2025-01-10 17:15] DEV — GATE 10.6.5 — Relacionamento — Timeline mínima: API logs implementada (/api/students/[id]/relationship-logs), componente RelationshipTimeline.tsx, aba Relacionamento no cadastro do aluno, filtros avançados, visualização rica — evidência: web/evidencias/gate10-6-5-timeline-minima.md
-[2025-01-10 17:30] DEV — GATE 10.6.6 — Relacionamento — QA & Evidências: 12 testes executados (100% passou), performance <300ms p95, console limpo, UX Premium validada, integração perfeita, documentação completa — evidência: web/evidencias/gate10-6-6-qa-evidencias.md
+Hoje   10/01/2025
+[2025-01-10 15:45] DEV   BACKUP   Sistema   v0.4.0 sistema est vel: vers o atualizada, features documentadas, backup banco (7 alunos, 4 kanban_items, 25 profiles), commit e040d0d, build produ  o funcional, documenta  o completa   evid ncia: web/evidencias/backup-v0-4-0-sistema-estavel.md
+[2025-01-10 16:00] DEV   GATE 10.6.0   Relacionamento   Especifica  o & Seeds: EVENT_REGISTRY implementado (8  ncoras oficiais), seeds MSG1..MSG10 aplicados, documenta  o completa, arquivos: event-registry.ts, template-seeds.ts   evid ncia: web/evidencias/gate10-6-0-especificacao-seeds.md
+[2025-01-10 16:15] DEV   GATE 10.6.1   Relacionamento   Data Model & RLS: 3 tabelas criadas (relationship_templates_v2, relationship_tasks, relationship_logs),  ndices otimizados, RLS policies implementadas, fun  es de servi o criadas, migration aplicada   evid ncia: web/evidencias/gate10-6-1-data-model-rls.md
+[2025-01-10 16:30] DEV   GATE 10.6.2   Relacionamento   Motor: job di rio 03:00 implementado, endpoint recalcular com lock, gatilho occurrence_followup ativo, dedup e rate limiting funcionando, telemetria implementada   evid ncia: web/evidencias/gate10-6-2-motor-recalcular-gatilho.md
+[2025-01-10 16:45] DEV   GATE 10.6.3   Relacionamento   Kanban MVP: colunas organizadas (Pendente, Para Hoje, Enviadas, Snoozed/Skipped), filtros avan ados, cards interativos, a  es contextuais (Copiar, WhatsApp, Enviar, Snooze, Pular), toasts padronizados   evid ncia: web/evidencias/gate10-6-3-kanban-mvp.md
+[2025-01-10 17:00] DEV   GATE 10.6.4   Relacionamento   Calend rio: vis es dia/semana/m s implementadas, navega  o fluida, filtros compartilhados com Kanban, a  es reutilizadas, componente RelationshipCalendar.tsx   evid ncia: web/evidencias/gate10-6-4-calendario.md
+[2025-01-10 17:15] DEV   GATE 10.6.5   Relacionamento   Timeline m nima: API logs implementada (/api/students/[id]/relationship-logs), componente RelationshipTimeline.tsx, aba Relacionamento no cadastro do aluno, filtros avan ados, visualiza  o rica   evid ncia: web/evidencias/gate10-6-5-timeline-minima.md
+[2025-01-10 17:30] DEV   GATE 10.6.6   Relacionamento   QA & Evid ncias: 12 testes executados (100% passou), performance <300ms p95, console limpo, UX Premium validada, integra  o perfeita, documenta  o completa   evid ncia: web/evidencias/gate10-6-6-qa-evidencias.md
 
-Hoje — 29/01/2025
-[2025-01-29 14:30] DEV — GATE 9.1 — Students — Consistência DEV concluída: endpoints debug (/api/_debug/*), sentinela (/api/_health/students-consistency), unificação filtros (tenant_id + deleted_at), headers X-Debug-*, cache disabled, labels id•tenant visíveis — evidência: testsprite_tests/testsprite-mcp-test-report.md
-[2025-01-29 14:30] DEV — PLANO — Students — Estrutura edição documentada: tabs Anexos (responsáveis, ocorrências, anamnese, diretriz) + Processos (nova ocorrência, gerar anamnese, gerar diretriz) — evidência: web/Estrutura/Plano_Realinhamento_Alunos_v0.4.0.txt
-[2025-01-29 14:30] DEV — QA — Students — TestSprite executado: cenários 200/404/403, consistência A/B, multi-navegador, status derivado — evidência: testsprite_tests/testsprite-mcp-test-report.md
-[2025-01-29 14:30] DEV — GOV — Students — Atividades.txt atualizado com timestamp + hash, Checklist_Release_Validation.txt marcado GATE 9.1 — evidência: web/Estrutura/Atividades.txt, web/Estrutura/Checklist_Release_Validation.txt
-[2025-01-29 15:00] DEV — FASE 1 — Students — Estrutura Base implementada: componente StudentEditTabs com tabs Anexos (responsáveis, ocorrências, anamnese, diretriz, treino) e Processos (nova ocorrência, gerar anamnese, gerar diretriz) — evidência: web/components/students/StudentEditTabs.tsx
-[2025-01-29 15:00] DEV — UX — Students — Breadcrumb premium implementado, integração com página de edição existente, navegação entre tabs funcional — evidência: web/app/app/students/[id]/edit/page.tsx
-[2025-01-29 15:30] DEV — GATE 10 — Students — Estrutura modular implementada: 5 abas (Identificação, Endereço, Responsáveis, Anexos, Processos) com layout premium shadcn/ui — evidência: web/components/students/StudentEditTabsV2.tsx
-[2025-01-29 15:30] DEV — GATE 10 — Students — Aba Identificação: campos completos (nome, email, telefone, status, data nascimento, sexo, estado civil, nacionalidade, naturalidade) + upload de foto — evidência: web/components/students/tabs/IdentificacaoTab.tsx
-[2025-01-29 15:30] DEV — GATE 10 — Students — Aba Endereço: campos JSONB completos (rua, número, complemento, bairro, cidade, UF, CEP) + busca automática ViaCEP — evidência: web/components/students/tabs/EnderecoTab.tsx
-[2025-01-29 15:30] DEV — GATE 10 — Students — Aba Responsáveis: treinador principal (obrigatório), treinadores apoio, responsáveis específicos, vinculação à equipe, histórico — evidência: web/components/students/tabs/ResponsaveisTab.tsx
-[2025-01-29 15:30] DEV — GATE 10 — Students — Aba Anexos: ocorrências do aluno, anamnese (básica/completa), diretriz de treino, treino (placeholder), status e ações — evidência: web/components/students/tabs/AnexosTab.tsx
-[2025-01-29 15:30] DEV — GATE 10 — Students — Aba Processos: gerar ocorrência, gerar anamnese (link tokenizado), gerar diretriz (rápida/direta), histórico com links copiáveis — evidência: web/components/students/tabs/ProcessosTab.tsx
-[2025-01-29 16:00] DEV — GATE 10 — Students — CORREÇÃO: Layout alinhado com TOTVS - apenas 3 abas (Identificação, Endereço, Responsáveis) + botões suspensos Anexos/Processos — evidência: web/components/students/StudentEditTabsV3.tsx
-[2025-01-29 16:00] DEV — GATE 10 — Students — Dropdown Anexos: Ocorrências, Anamnese, Diretriz, Treino com ícones coloridos e navegação — evidência: web/components/students/dropdowns/AnexosDropdown.tsx
-[2025-01-29 16:00] DEV — GATE 10 — Students — Dropdown Processos: Nova ocorrência, Gerar anamnese, Gerar diretriz com ícones e ações — evidência: web/components/students/dropdowns/ProcessosDropdown.tsx
-[2025-01-29 16:00] DEV — GATE 10 — Students — Integração completa: foto e informações do sistema na aba Identificação, layout premium responsivo — evidência: web/components/students/tabs/IdentificacaoTab.tsx
-[2025-01-29 16:15] DEV — GATE 10 — Students — CORREÇÃO FINAL: Identificação/Endereço/Responsáveis como abas (tabs) de navegação, Anexos/Processos como dropdowns suspensos — evidência: web/components/students/StudentEditTabsV3.tsx
-[2025-01-29 16:30] DEV — GATE 10.2 — Students — Layout TOTVS-like: botões Anexos/Processos à esquerda, tabs integradas ao formulário, UI compacta (h-9, gap-4), foto e infos do sistema na coluna direita — evidência: web/components/students/StudentEditTabsV4.tsx
-[2025-01-29 16:45] DEV — GATE 10.3 — Students — Refinamento Premium: cards organizados (evitar campos soltos), foto compacta, inputs com grid 2-3 colunas, busca de profissionais da equipe, toasts de sucesso, sticky header com nome+status — evidência: web/components/students/StudentEditTabsV5.tsx
-[2025-01-29 17:00] DEV — GATE 10.3.1 — Students — Retoques Premium: ícones nos títulos dos cards, espaçamento padronizado, cards com sombra hover, foto 120x120px, inputs compactos, dropdown expansível responsáveis, toasts autodescartáveis, focus states, contraste WCAG — evidência: web/components/students/StudentEditTabsV6.tsx
-[2025-01-29 17:15] DEV — GATE 10.4 — Students — Anexos: Ocorrências: reutilização do módulo existente filtrado por student_id, componente StudentOccurrencesList com tabela completa, integração com dropdown Anexos — evidência: web/components/students/StudentOccurrencesList.tsx
-[2025-01-29 17:20] DEV — GATE 10.5 — Students — Anexos: Anamnese: módulo com formulário padrão, listagem de anamneses do aluno, status (pendente/concluída/expirada), botão de exportação PDF, integração com dropdown Anexos — evidência: web/components/students/StudentAnamnesisList.tsx
-[2025-01-29 17:25] DEV — GATE 10.6-10.7 — Students — Anexos: Diretriz/Treino: placeholders "em desenvolvimento" para futuras implementações, integração com dropdown Anexos — evidência: web/components/students/dropdowns/AnexosDropdown.tsx
-[2025-01-29 17:30] DEV — GATE 10.8 — Students — Processos: Nova Ocorrência: modal reutilizando StudentOccurrenceModal existente, integração com dropdown Processos, funcionalidade completa de criação — evidência: web/components/students/ProcessosDropdown.tsx
-[2025-01-29 17:35] DEV — GATE 10.9-10.13 — Students — Processos: Gerar Anamnese, Gerar Diretriz, WhatsApp, E-mail, Matricular: placeholders "em desenvolvimento" para futuras implementações, integração com dropdown Processos — evidência: web/components/students/ProcessosDropdown.tsx
-[2025-01-29 17:50] DEV — GATE 10.14 — Students — Correção UX Modal Overlay: modais centralizados para Anexos e Processos, backdrop escurecido, tela de edição bloqueada no fundo, padrão premium com transições suaves, reutilização de componentes existentes — evidência: web/components/students/modals/
+Hoje   29/01/2025
+[2025-01-29 14:30] DEV   GATE 9.1   Students   Consist ncia DEV conclu da: endpoints debug (/api/_debug/*), sentinela (/api/_health/students-consistency), unifica  o filtros (tenant_id + deleted_at), headers X-Debug-*, cache disabled, labels id tenant vis veis   evid ncia: testsprite_tests/testsprite-mcp-test-report.md
+[2025-01-29 14:30] DEV   PLANO   Students   Estrutura edi  o documentada: tabs Anexos (respons veis, ocorr ncias, anamnese, diretriz) + Processos (nova ocorr ncia, gerar anamnese, gerar diretriz)   evid ncia: web/Estrutura/Plano_Realinhamento_Alunos_v0.4.0.txt
+[2025-01-29 14:30] DEV   QA   Students   TestSprite executado: cen rios 200/404/403, consist ncia A/B, multi-navegador, status derivado   evid ncia: testsprite_tests/testsprite-mcp-test-report.md
+[2025-01-29 14:30] DEV   GOV   Students   Atividades.txt atualizado com timestamp + hash, Checklist_Release_Validation.txt marcado GATE 9.1   evid ncia: web/Estrutura/Atividades.txt, web/Estrutura/Checklist_Release_Validation.txt
+[2025-01-29 15:00] DEV   FASE 1   Students   Estrutura Base implementada: componente StudentEditTabs com tabs Anexos (respons veis, ocorr ncias, anamnese, diretriz, treino) e Processos (nova ocorr ncia, gerar anamnese, gerar diretriz)   evid ncia: web/components/students/StudentEditTabs.tsx
+[2025-01-29 15:00] DEV   UX   Students   Breadcrumb premium implementado, integra  o com p gina de edi  o existente, navega  o entre tabs funcional   evid ncia: web/app/app/students/[id]/edit/page.tsx
+[2025-01-29 15:30] DEV   GATE 10   Students   Estrutura modular implementada: 5 abas (Identifica  o, Endere o, Respons veis, Anexos, Processos) com layout premium shadcn/ui   evid ncia: web/components/students/StudentEditTabsV2.tsx
+[2025-01-29 15:30] DEV   GATE 10   Students   Aba Identifica  o: campos completos (nome, email, telefone, status, data nascimento, sexo, estado civil, nacionalidade, naturalidade) + upload de foto   evid ncia: web/components/students/tabs/IdentificacaoTab.tsx
+[2025-01-29 15:30] DEV   GATE 10   Students   Aba Endere o: campos JSONB completos (rua, n mero, complemento, bairro, cidade, UF, CEP) + busca autom tica ViaCEP   evid ncia: web/components/students/tabs/EnderecoTab.tsx
+[2025-01-29 15:30] DEV   GATE 10   Students   Aba Respons veis: treinador principal (obrigat rio), treinadores apoio, respons veis espec ficos, vincula  o à equipe, hist rico   evid ncia: web/components/students/tabs/ResponsaveisTab.tsx
+[2025-01-29 15:30] DEV   GATE 10   Students   Aba Anexos: ocorr ncias do aluno, anamnese (b sica/completa), diretriz de treino, treino (placeholder), status e a  es   evid ncia: web/components/students/tabs/AnexosTab.tsx
+[2025-01-29 15:30] DEV   GATE 10   Students   Aba Processos: gerar ocorr ncia, gerar anamnese (link tokenizado), gerar diretriz (r pida/direta), hist rico com links copi veis   evid ncia: web/components/students/tabs/ProcessosTab.tsx
+[2025-01-29 16:00] DEV   GATE 10   Students   CORRE  O: Layout alinhado com TOTVS - apenas 3 abas (Identifica  o, Endere o, Respons veis) + bot es suspensos Anexos/Processos   evid ncia: web/components/students/StudentEditTabsV3.tsx
+[2025-01-29 16:00] DEV   GATE 10   Students   Dropdown Anexos: Ocorr ncias, Anamnese, Diretriz, Treino com  cones coloridos e navega  o   evid ncia: web/components/students/dropdowns/AnexosDropdown.tsx
+[2025-01-29 16:00] DEV   GATE 10   Students   Dropdown Processos: Nova ocorr ncia, Gerar anamnese, Gerar diretriz com  cones e a  es   evid ncia: web/components/students/dropdowns/ProcessosDropdown.tsx
+[2025-01-29 16:00] DEV   GATE 10   Students   Integra  o completa: foto e informa  es do sistema na aba Identifica  o, layout premium responsivo   evid ncia: web/components/students/tabs/IdentificacaoTab.tsx
+[2025-01-29 16:15] DEV   GATE 10   Students   CORRE  O FINAL: Identifica  o/Endere o/Respons veis como abas (tabs) de navega  o, Anexos/Processos como dropdowns suspensos   evid ncia: web/components/students/StudentEditTabsV3.tsx
+[2025-01-29 16:30] DEV   GATE 10.2   Students   Layout TOTVS-like: bot es Anexos/Processos à esquerda, tabs integradas ao formul rio, UI compacta (h-9, gap-4), foto e infos do sistema na coluna direita   evid ncia: web/components/students/StudentEditTabsV4.tsx
+[2025-01-29 16:45] DEV   GATE 10.3   Students   Refinamento Premium: cards organizados (evitar campos soltos), foto compacta, inputs com grid 2-3 colunas, busca de profissionais da equipe, toasts de sucesso, sticky header com nome+status   evid ncia: web/components/students/StudentEditTabsV5.tsx
+[2025-01-29 17:00] DEV   GATE 10.3.1   Students   Retoques Premium:  cones nos t tulos dos cards, espa amento padronizado, cards com sombra hover, foto 120x120px, inputs compactos, dropdown expans vel respons veis, toasts autodescart veis, focus states, contraste WCAG   evid ncia: web/components/students/StudentEditTabsV6.tsx
+[2025-01-29 17:15] DEV   GATE 10.4   Students   Anexos: Ocorr ncias: reutiliza  o do m dulo existente filtrado por student_id, componente StudentOccurrencesList com tabela completa, integra  o com dropdown Anexos   evid ncia: web/components/students/StudentOccurrencesList.tsx
+[2025-01-29 17:20] DEV   GATE 10.5   Students   Anexos: Anamnese: m dulo com formul rio padr o, listagem de anamneses do aluno, status (pendente/conclu da/expirada), bot o de exporta  o PDF, integra  o com dropdown Anexos   evid ncia: web/components/students/StudentAnamnesisList.tsx
+[2025-01-29 17:25] DEV   GATE 10.6-10.7   Students   Anexos: Diretriz/Treino: placeholders "em desenvolvimento" para futuras implementa  es, integra  o com dropdown Anexos   evid ncia: web/components/students/dropdowns/AnexosDropdown.tsx
+[2025-01-29 17:30] DEV   GATE 10.8   Students   Processos: Nova Ocorr ncia: modal reutilizando StudentOccurrenceModal existente, integra  o com dropdown Processos, funcionalidade completa de cria  o   evid ncia: web/components/students/ProcessosDropdown.tsx
+[2025-01-29 17:35] DEV   GATE 10.9-10.13   Students   Processos: Gerar Anamnese, Gerar Diretriz, WhatsApp, E-mail, Matricular: placeholders "em desenvolvimento" para futuras implementa  es, integra  o com dropdown Processos   evid ncia: web/components/students/ProcessosDropdown.tsx
+[2025-01-29 17:50] DEV   GATE 10.14   Students   Corre  o UX Modal Overlay: modais centralizados para Anexos e Processos, backdrop escurecido, tela de edi  o bloqueada no fundo, padr o premium com transi  es suaves, reutiliza  o de componentes existentes   evid ncia: web/components/students/modals/
 
-Hoje — 08/09/2025
-[2025-09-08 23:00-03] GATE D1: Editor de Regras completo — interface, preview, versionamento.
-[2025-01-09 15:30-03] GATE D2.5: UI Diretrizes com VersionCard compartilhado e título "Diretrizes Denis Foschini".
-[2025-01-09 15:45-03] D2.5 — UI Diretrizes aprovado. Card com paridade visual total, ações funcionais, reuso de componentes implementado.
-[2025-01-09 15:45-03] D3 — Preview/Engine iniciado.
-[2025-01-09 16:30-03] D2.6 — Ciclo de Vida de Versões implementado. API de correção, VersionCard com estados condicionais, auditoria de clone.
-[2025-01-09 17:00-03] D2.6 — Layout otimizado com duas linhas de botões. Pendências: botão Excluir debug, validação publicação, migração clone_from_version.
-[2025-01-09 17:30-03] D2.7 — Catálogos UX + Fórmulas implementado. Cards individuais, KaTeX/LaTeX, RIR corrigido, Readiness informativo.
-[2025-01-09 18:00-03] D2.8 — Tags Canônicas implementado. Catálogo com categorias, UI autocomplete, validação, busca/filtros.
-[2025-01-09 18:30-03] D2.9 — Preview (Contrato Definitivo) implementado. Modal corrigido, seções completas, debug detalhado.
-[2025-09-10 17:45-03] D3.0 — Motor Real das Diretrizes FECHADO. Endpoint oficial funcionando, endpoints de teste removidos, evidências geradas. Status: ACEITO PROVISIONAL (processos).
-[2025-09-10 17:45-03] A1 — Anamnese do Aluno INICIADO. Navegação Alunos → [Editar] → Ações → Anamnese, render template default, salvar por seção + auto-save, versionamento e auditoria.
-[2025-09-08 22:30-03] GATE D0: Seeds & Estruturas completo — tabelas, dados da planilha, APIs.
-[2025-09-08 22:00-03] GATE S4: RLS+Auditoria+Perf ok — evidências anexadas.
-[2025-09-08 22:00-03] GATE S3: Publicação & Defaults do Tenant concluído — sem Planos.
-[2025-09-08 21:30-03] GATE S2: Diretrizes (regras+Preview) concluído.
-[2025-09-08 21:30-03] GATE S1: Template Aluno (CRUD+Publicar) concluído — schema, APIs, UI.
-[2025-09-08 21:30-03] GATE S0: navegação Serviços/Anamnese criada — Aluno | Diretrizes (abas).
-[2025-09-08 21:30-03] v0.3.3-dev: bump aplicado — package.json, VersionBanner, Footer, CHANGELOG.
-[2025-09-08 20:16-03] GATE 12X concluído — Infra/Métricas/Telemetria (buffer técnico pré-V1).
-[2025-09-08 20:16-03] GATE 12X merged — PR #23 aprovado e merge realizado com sucesso.
-[2025-09-08 00:00-03] GATE 11 validado — Smoke E2E e fluxos básicos.
-[2025-09-08 00:00-03] GATE 12X aberto — Infra/Métricas/Telemetria (buffer técnico pré-V1).
-[2025-09-08 00:00-03] Anamnese (GATE 13A) — iniciado ciclo de workshops (W1 a W4) para Spec Freeze.
+Hoje   08/09/2025
+[2025-09-08 23:00-03] GATE D1: Editor de Regras completo   interface, preview, versionamento.
+[2025-01-09 15:30-03] GATE D2.5: UI Diretrizes com VersionCard compartilhado e t tulo "Diretrizes Denis Foschini".
+[2025-01-09 15:45-03] D2.5   UI Diretrizes aprovado. Card com paridade visual total, a  es funcionais, reuso de componentes implementado.
+[2025-01-09 15:45-03] D3   Preview/Engine iniciado.
+[2025-01-09 16:30-03] D2.6   Ciclo de Vida de Vers es implementado. API de corre  o, VersionCard com estados condicionais, auditoria de clone.
+[2025-01-09 17:00-03] D2.6   Layout otimizado com duas linhas de bot es. Pend ncias: bot o Excluir debug, valida  o publica  o, migra  o clone_from_version.
+[2025-01-09 17:30-03] D2.7   Cat logos UX + F rmulas implementado. Cards individuais, KaTeX/LaTeX, RIR corrigido, Readiness informativo.
+[2025-01-09 18:00-03] D2.8   Tags Can nicas implementado. Cat logo com categorias, UI autocomplete, valida  o, busca/filtros.
+[2025-01-09 18:30-03] D2.9   Preview (Contrato Definitivo) implementado. Modal corrigido, se  es completas, debug detalhado.
+[2025-09-10 17:45-03] D3.0   Motor Real das Diretrizes FECHADO. Endpoint oficial funcionando, endpoints de teste removidos, evid ncias geradas. Status: ACEITO PROVISIONAL (processos).
+[2025-09-10 17:45-03] A1   Anamnese do Aluno INICIADO. Navega  o Alunos → [Editar] → A  es → Anamnese, render template default, salvar por se  o + auto-save, versionamento e auditoria.
+[2025-09-08 22:30-03] GATE D0: Seeds & Estruturas completo   tabelas, dados da planilha, APIs.
+[2025-09-08 22:00-03] GATE S4: RLS+Auditoria+Perf ok   evid ncias anexadas.
+[2025-09-08 22:00-03] GATE S3: Publica  o & Defaults do Tenant conclu do   sem Planos.
+[2025-09-08 21:30-03] GATE S2: Diretrizes (regras+Preview) conclu do.
+[2025-09-08 21:30-03] GATE S1: Template Aluno (CRUD+Publicar) conclu do   schema, APIs, UI.
+[2025-09-08 21:30-03] GATE S0: navega  o Servi os/Anamnese criada   Aluno | Diretrizes (abas).
+[2025-09-08 21:30-03] v0.3.3-dev: bump aplicado   package.json, VersionBanner, Footer, CHANGELOG.
+[2025-09-08 20:16-03] GATE 12X conclu do   Infra/M tricas/Telemetria (buffer t cnico pr -V1).
+[2025-09-08 20:16-03] GATE 12X merged   PR #23 aprovado e merge realizado com sucesso.
+[2025-09-08 00:00-03] GATE 11 validado   Smoke E2E e fluxos b sicos.
+[2025-09-08 00:00-03] GATE 12X aberto   Infra/M tricas/Telemetria (buffer t cnico pr -V1).
+[2025-09-08 00:00-03] Anamnese (GATE 13A)   iniciado ciclo de workshops (W1 a W4) para Spec Freeze.
 
-Hoje — 26/08/2025
-[2025-08-26 09:35] DEV — DOC — Estrutura — Revisão ampla de documentos (Rotas, Padronizacao, README, Erros, Credenciais) + criação de Relatorio_Progresso_2025-08-26 — evidência: web/Estrutura/Relatorio_Progresso_2025-08-26.txt
+Hoje   26/08/2025
+[2025-08-26 09:35] DEV   DOC   Estrutura   Revis o ampla de documentos (Rotas, Padronizacao, README, Erros, Credenciais) + cria  o de Relatorio_Progresso_2025-08-26   evid ncia: web/Estrutura/Relatorio_Progresso_2025-08-26.txt
 
-Hoje — 20/08/2025
-[2025-08-20 16:56] GP — COMUNICAÇÃO — Diretriz operacional explicitada ao DEV: construir App Shell (/app) pós-login (cabeçalho + menu lateral com persistência + navegação/breadcrumb/estados) e, em seguida, entregar cada módulo do menu em fatias verticais. DEV foca em código e atualização de documentos; prints sob GP/Consultor.
-[2025-08-20 17:02] DEV — IMPLEMENTAÇÃO — App Shell — Estrutura completa implementada: AppShell component com sidebar colapsável + persistência, cabeçalho com logo/user menu/badge ambiente, breadcrumb dinâmico, estados loading/empty/error, A11y (skip-to-content, aria-labels, navegação por teclado), proteção de rotas via layout — evidência: web/components/AppShell.tsx, web/app/(app)/layout.tsx
-[2025-08-20 17:02] DEV — IMPLEMENTAÇÃO — Dashboard — Página principal (/app) criada com cards estatísticas dos alunos, acesso rápido aos módulos, status do sistema — evidência: web/app/(app)/page.tsx  
-[2025-08-20 17:02] DEV — IMPLEMENTAÇÃO — Rotas — Redirect raiz → /app configurado; páginas placeholder criadas para /services, /team-admin, /settings; estrutura de navegação atualizada para nova hierarquia — evidência: web/next.config.ts, web/app/(app)/*/page.tsx
-[2025-08-20 17:02] DEV — ESTRUTURA — Shell V1 — CONCLUÍDO conforme critérios: menu colapsável com persistência ✓, cabeçalho padrão ✓, breadcrumb/voltar ✓, estados de loading/empty/error ✓, A11y mínima ✓, sem scroll indevido/CTAs duplicados ✓ — evidência: todos os itens SHELL01-SHELL06 implementados
-[2025-08-20 17:05] DEV — BUILD — App Shell — Build verde confirmado: npm run build PASS com warnings não críticos; conflito package.json resolvido; redirect raiz → /app funcional — evidência: build output clean, Next.js 15.4.6 compiled successfully
-[2025-08-20 17:25] DEV — BUGFIX — Landing Page — Removido redirect automático '/' → '/app' que estava quebrando o acesso à landing page; fluxo correto restaurado: '/' = landing page pública, '/app' = dashboard protegido — evidência: web/next.config.ts limpo
-[2025-08-20 17:32] GP — DIRETRIZ — Sequência confirmada: (1) Cabeçalho "Organização10x", (2) Menu lateral moderno, (3) Dashboard V1 com dados mock (visual-only). DEV acionado em WIP=1; GP fará validação visual e capturas.
-[2025-08-20 17:42] DEV — IMPLEMENTAÇÃO — Cabeçalho refinado (branding/user/badge/tema) — Branding "Organização10x" implementado com logo gradiente, user menu refinado com role badge, badge ambiente estilizado, logout com hover refinado, A11y completa (aria-*, foco, navegação por teclado, sem scroll indevido) — evidência: web/components/AppShell.tsx
-[2025-08-20 17:46] DEV — IMPLEMENTAÇÃO — Sidebar refinada (ícones/tooltips/grupos/active/hover/colapso) — Menu organizado em grupos (Gestão, Fluxo de Trabalho, Administração), ícones com tooltips quando colapsado, active/hover com microinterações suaves, persistência localStorage, GPU acceleration, animações fadeIn/slideInLeft, haptic feedback — evidência: web/components/AppShell.tsx, web/styles/animations.css
-[2025-08-20 17:54] DEV — IMPLEMENTAÇÃO — Dashboard V1 (mock visual-only) — KPIs com 6 métricas (alunos, receita, conclusão), filtros visuais funcionais (range 7/30d + trainer), workload por treinador com progress bars, atividade recente em tempo real, skeleton states, quick actions integrados, mock data completo em /mocks/dashboard.ts — evidência: web/app/(app)/page.tsx, web/mocks/dashboard.ts
-[2025-08-20 18:02] DEV — BUGFIX — Conflito de Rotas — Removido web/app/app/page.tsx que causava conflito com o dashboard novo; rota /app agora aponta corretamente para o dashboard refinado em /(app)/page.tsx — evidência: pasta web/app/app/ removida
-[2025-08-20 17:58] DEV — BUGFIX — 404 pós-login — Servidor Next.js não reconheceu mudança na estrutura de rotas; executado restart limpo (stop Node processes + rm .next + npm run dev) para aplicar correção ROUTE-001 — evidência: cache limpo, servidor reiniciado
-[2025-08-20 17:57] DEV — BUGFIX — Credenciais Supabase — Criado web/.env.local com variáveis NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY + versões server-side (SUPABASE_URL, SUPABASE_ANON_KEY) do projeto kkxlztopdmipldncduvj — evidência: web/.env.local configurado, servidor precisa restart
-[2025-08-20 18:06] DEV — BUGFIX — .env.local recriado — Arquivo anterior com problemas de formatação PowerShell; recriado com MCP filesystem tool; todas as 5 variáveis Supabase do projeto kkxlztopdmipldncduvj aplicadas; servidor reiniciado carregando .env.local — evidência: web/.env.local correto, servidor Next.js 15.4.6 Turbopack detectando environment file
-[2025-08-20 18:23] GP — DIRETRIZ — Correção do App Shell (menu e landing): incluir “Dashboard” como 1º item e landing pós-login (/app); aplicar grupos/ordem acordados; elevar padrão visual do Sidebar (estados, microinterações, tooltips) e breadcrumb.
-[2025-08-20 18:50] GP — QA — SHELL Navegação: redirect /→/app e “Dashboard” 1º item ativo aprovados; breadcrumb padronizado aprovado.
-[2025-08-20 18:50] GP — DIRETRIZ — Sidebar premium: exigido traço accent 3px à esquerda no ativo; tooltips só no colapsado; aria-disabled em itens desativados.
-[2025-08-20 18:55] GP — QA — SHELL Navegação APROVADA por evidência visual — NAV01..NAV04 = PASS (landing /app; ordem/grupos; barra 3px no ativo; tooltips só no colapsado; a11y/foco AA; breadcrumb padrão)
-[2025-08-20 19:00] GP — DIRETRIZ — Início da fatia ACC (Cadastro de Conta + Guardas de Menu): wizard Personal/Player, criação de organização + membership admin, guardas por organization_id/role, telemetria aplicada (somente 2xx).
-[2025-08-20 19:10] GP — DIRETRIZ — ACC: contratos de API definidos, cópia do wizard aprovada, guardas e telemetria especificados. DEV segue WIP=1 em ACC01→ACC02→ACC03→ACC04; ACC06 implementado (validação posterior).
-[2025-08-20 19:13] DEV — IMPLEMENTAÇÃO — ACC01 Wizard (/onboarding/account): cards Personal/Player com cópia aprovada, A11y completa, microinterações ≤200ms — evidência: Estrutura/account/wizard_choice.json
-[2025-08-20 19:17] GP — QA — ACC01 Wizard (/onboarding/account) APROVADO por evidência — cards Personal/Player com cópia exata, A11y completa, microinterações ≤200ms, CTAs corretos — evid.: Estrutura/account/wizard_choice.json
-[2025-08-20 19:17] DEV — IMPLEMENTAÇÃO — ACC02 Personal (upsert profiles) — evid.: Estrutura/account/personal_upsert.json
-[2025-08-20 19:27] GP — QA — ACC02 Personal APROVADO por evidência — upsert profiles 200 + toast + redirect /app; telemetria account.created somente em 2xx — evid.: Estrutura/account/personal_upsert.json
-[2025-08-20 19:27] DEV — IMPLEMENTAÇÃO — ACC03 Player (org + membership admin + org ativa) — evid.: Estrutura/account/player_org_created.json
-[2025-08-20 19:30] GP — QA — ACC03 Player APROVADO por evidência — org criada + membership admin + org ativa; toast + redirect /app; telemetria 2xx — evid.: Estrutura/account/player_org_created.json
-[2025-08-20 19:30] DEV — IMPLEMENTAÇÃO — ACC04 OrgGate/guards aplicados (menu e rotas) — evid.: Estrutura/account/menu_guard_state.json
-[2025-08-20 19:35] GP — QA — ACC04 OrgGate/guards APROVADO por evidência — menu/rotas respeitam active_org + role; middleware aplicado — evid.: Estrutura/account/menu_guard_state.json
-[2025-08-20 19:35] DEV — QA — ACC06 Telemetria evidenciada (amostras) — evid.: Estrutura/account/telemetry_samples.json
-[2025-08-20 15:18] GP — DEVOPS — Publicação da nova linha de base no GitHub (replace total do repositório gmasilva10/organizacao10x). Procedimento: init local + commit baseline + push --force-with-lease para main; proteções de branch reativadas; governança conferida na árvore.
-[2025-08-20 15:42] GP — DEVOPS — Fallback de publicação: conectividade com GitHub indisponível. Gerado pacote offline para publicação manual: artifacts/baseline_2025-08-20.zip e bundle git artifacts/baseline_2025-08-20.bundle. Instruções: publicar quando conexão/VPN normalizar.
-[2025-08-20 14:29] DEV — QA — VAL03 evidências — create preserva cards; rename ok em vazias; delete ok em vazias (422 quando não vazia); reorder intermediárias persistido — evidência: Estrutura/val03/*
-[2025-08-20 14:52] DEV — QA — VAL04 evidências — árvore normalizada (cards não concluídos); boards filtrados por trainer; dump de seeds — evidência: Estrutura/val04/*
-[2025-08-20 15:02] GP — QA — VAL03 (Colunas) APROVADO por evidência — create não toca cards; rename/delete/reorder em intermediárias (mesmo vazias); exclusão bloqueada quando não vazia; reorder persiste; travas apenas nas fixas — evidências: Estrutura/val03/*
-[2025-08-20 12:50] GP — GOVERNANÇA — Parecer do Consultor Externo incorporado como Adendo (“construir um andar perfeito de cada vez”, fatias verticais). Diretriz adotada pelo projeto.
-[2025-08-20 12:50] GP — COMUNICAÇÃO — Mensagem operacional ao DEV emitida (ordens sem datas; foco em VAL01..VAL06 e seeds para árvore). Checklist e Pendências atualizados pelo DEV conforme avanços.
-[2025-08-20 12:59] GP — GOVERNANÇA — DEV acionado em modo full desenvolvimento ágil (WIP=1; foco em VAL03→VAL04→VAL05→VAL01→VAL02; VAL06 após base estável). Capturas/validação sob responsabilidade do GP.
-[2025-08-20 12:33] GP — GOVERNANÇA — Realocação de responsabilidades confirmada: capturas visuais sob GP/Consultor; DEV foca apenas em código e atualização de documentos. Metas/prazos passam a ser gestão interna do GP.
-[2025-08-20 12:07] DEV — IMPLEMENTAÇÃO — Kanban — move/reorder com validação res.ok e rollback; reorder somente após 204; remoção do botão “+ Nova coluna”; persistência do “Recolher” (pg.nav.collapsed, aria-pressed) — evidência: web/app/(app)/kanban/page.tsx
-[2025-08-20 12:07] DEV — IMPLEMENTAÇÃO — Histórico — consumo robusto garantindo items[] antes de map; ajuste de UI para shape padronizado — evidência: web/app/(app)/onboarding/history/page.tsx
-[2025-08-20 12:07] DEV — HIGIENE — Build — removido lockfile duplicado web/package-lock.json; mantido lockfile na raiz — evidência: árvore do repo limpa
-[2025-08-20 11:24] GP — DECISÃO — Bloco 3 — NÃO ENCERRAR; FAILs críticos (DnD, Histórico, Colunas, Sidebar, UX, Telemetria bloqueada); todas as P1 com prazo 22/08 — evidência: Estrutura/Plano_Realinhamento_20082025.txt; Estrutura/Dailys/Reuniao_Alinhamento_2025-08-20.txt
-[2025-08-20 11:24] GP — DECISÃO — Bloco 4 (Pagamentos) — MANTER PAUSADO até entrega estável de Students V2 + Serviços integrados ao Kanban — evidência: Estrutura/Plano_Realinhamento_20082025.txt
-[2025-08-20 11:24] GP — PLANEJAMENTO — Roadmap V1 — GP responsável até 22/08 (fluxo E2E Aluno+Serviço→Kanban→Conclusão; módulos: Alunos V2, Serviços, Integração Kanban; critérios: UX premium, Checklist obrigatório, métricas) — evidência: Estrutura/Plano_Realinhamento_20082025.txt
-[2025-08-20 11:24] GP — ROTAS — Confirmado /(app)/onboarding como oficial; alias /(app)/kanban não exposto em produção — evidência: Estrutura/Rotas.txt; Estrutura/Dailys/Reuniao_Alinhamento_2025-08-20.txt
-[2025-08-20 11:45] DEV — PROPOSTA — Pré‑condições técnicas para revalidação em 22/08 (aprovado pelo GP): seção adicionada em Plano_Realinhamento_20082025.txt (Move/Reorder, Histórico, Colunas, Sidebar/Árvore, SUPABASE envs, lockfiles, checklist VAL01..VAL06, A11y, segurança)
+Hoje   20/08/2025
+[2025-08-20 16:56] GP   COMUNICA  O   Diretriz operacional explicitada ao DEV: construir App Shell (/app) p s-login (cabe alho + menu lateral com persist ncia + navega  o/breadcrumb/estados) e, em seguida, entregar cada m dulo do menu em fatias verticais. DEV foca em c digo e atualiza  o de documentos; prints sob GP/Consultor.
+[2025-08-20 17:02] DEV   IMPLEMENTA  O   App Shell   Estrutura completa implementada: AppShell component com sidebar colaps vel + persist ncia, cabe alho com logo/user menu/badge ambiente, breadcrumb din mico, estados loading/empty/error, A11y (skip-to-content, aria-labels, navega  o por teclado), prote  o de rotas via layout   evid ncia: web/components/AppShell.tsx, web/app/(app)/layout.tsx
+[2025-08-20 17:02] DEV   IMPLEMENTA  O   Dashboard   P gina principal (/app) criada com cards estat sticas dos alunos, acesso r pido aos m dulos, status do sistema   evid ncia: web/app/(app)/page.tsx  
+[2025-08-20 17:02] DEV   IMPLEMENTA  O   Rotas   Redirect raiz → /app configurado; p ginas placeholder criadas para /services, /team-admin, /settings; estrutura de navega  o atualizada para nova hierarquia   evid ncia: web/next.config.ts, web/app/(app)/*/page.tsx
+[2025-08-20 17:02] DEV   ESTRUTURA   Shell V1   CONCLUÍDO conforme crit rios: menu colaps vel com persist ncia ✓, cabe alho padr o ✓, breadcrumb/voltar ✓, estados de loading/empty/error ✓, A11y m nima ✓, sem scroll indevido/CTAs duplicados ✓   evid ncia: todos os itens SHELL01-SHELL06 implementados
+[2025-08-20 17:05] DEV   BUILD   App Shell   Build verde confirmado: npm run build PASS com warnings n o cr ticos; conflito package.json resolvido; redirect raiz → /app funcional   evid ncia: build output clean, Next.js 15.4.6 compiled successfully
+[2025-08-20 17:25] DEV   BUGFIX   Landing Page   Removido redirect autom tico '/' → '/app' que estava quebrando o acesso à landing page; fluxo correto restaurado: '/' = landing page p blica, '/app' = dashboard protegido   evid ncia: web/next.config.ts limpo
+[2025-08-20 17:32] GP   DIRETRIZ   Sequ ncia confirmada: (1) Cabe alho "Organiza  o10x", (2) Menu lateral moderno, (3) Dashboard V1 com dados mock (visual-only). DEV acionado em WIP=1; GP far valida  o visual e capturas.
+[2025-08-20 17:42] DEV   IMPLEMENTA  O   Cabe alho refinado (branding/user/badge/tema)   Branding "Organiza  o10x" implementado com logo gradiente, user menu refinado com role badge, badge ambiente estilizado, logout com hover refinado, A11y completa (aria-*, foco, navega  o por teclado, sem scroll indevido)   evid ncia: web/components/AppShell.tsx
+[2025-08-20 17:46] DEV   IMPLEMENTA  O   Sidebar refinada ( cones/tooltips/grupos/active/hover/colapso)   Menu organizado em grupos (Gest o, Fluxo de Trabalho, Administra  o),  cones com tooltips quando colapsado, active/hover com microintera  es suaves, persist ncia localStorage, GPU acceleration, anima  es fadeIn/slideInLeft, haptic feedback   evid ncia: web/components/AppShell.tsx, web/styles/animations.css
+[2025-08-20 17:54] DEV   IMPLEMENTA  O   Dashboard V1 (mock visual-only)   KPIs com 6 m tricas (alunos, receita, conclus o), filtros visuais funcionais (range 7/30d + trainer), workload por treinador com progress bars, atividade recente em tempo real, skeleton states, quick actions integrados, mock data completo em /mocks/dashboard.ts   evid ncia: web/app/(app)/page.tsx, web/mocks/dashboard.ts
+[2025-08-20 18:02] DEV   BUGFIX   Conflito de Rotas   Removido web/app/app/page.tsx que causava conflito com o dashboard novo; rota /app agora aponta corretamente para o dashboard refinado em /(app)/page.tsx   evid ncia: pasta web/app/app/ removida
+[2025-08-20 17:58] DEV   BUGFIX   404 p s-login   Servidor Next.js n o reconheceu mudan a na estrutura de rotas; executado restart limpo (stop Node processes + rm .next + npm run dev) para aplicar corre  o ROUTE-001   evid ncia: cache limpo, servidor reiniciado
+[2025-08-20 17:57] DEV   BUGFIX   Credenciais Supabase   Criado web/.env.local com vari veis NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY + vers es server-side (SUPABASE_URL, SUPABASE_ANON_KEY) do projeto kkxlztopdmipldncduvj   evid ncia: web/.env.local configurado, servidor precisa restart
+[2025-08-20 18:06] DEV   BUGFIX   .env.local recriado   Arquivo anterior com problemas de formata  o PowerShell; recriado com MCP filesystem tool; todas as 5 vari veis Supabase do projeto kkxlztopdmipldncduvj aplicadas; servidor reiniciado carregando .env.local   evid ncia: web/.env.local correto, servidor Next.js 15.4.6 Turbopack detectando environment file
+[2025-08-20 18:23] GP   DIRETRIZ   Corre  o do App Shell (menu e landing): incluir  Dashboard” como 1  item e landing p s-login (/app); aplicar grupos/ordem acordados; elevar padr o visual do Sidebar (estados, microintera  es, tooltips) e breadcrumb.
+[2025-08-20 18:50] GP   QA   SHELL Navega  o: redirect /→/app e  Dashboard” 1  item ativo aprovados; breadcrumb padronizado aprovado.
+[2025-08-20 18:50] GP   DIRETRIZ   Sidebar premium: exigido tra o accent 3px à esquerda no ativo; tooltips s  no colapsado; aria-disabled em itens desativados.
+[2025-08-20 18:55] GP   QA   SHELL Navega  o APROVADA por evid ncia visual   NAV01..NAV04 = PASS (landing /app; ordem/grupos; barra 3px no ativo; tooltips s  no colapsado; a11y/foco AA; breadcrumb padr o)
+[2025-08-20 19:00] GP   DIRETRIZ   In cio da fatia ACC (Cadastro de Conta + Guardas de Menu): wizard Personal/Player, cria  o de organiza  o + membership admin, guardas por organization_id/role, telemetria aplicada (somente 2xx).
+[2025-08-20 19:10] GP   DIRETRIZ   ACC: contratos de API definidos, c pia do wizard aprovada, guardas e telemetria especificados. DEV segue WIP=1 em ACC01→ACC02→ACC03→ACC04; ACC06 implementado (valida  o posterior).
+[2025-08-20 19:13] DEV   IMPLEMENTA  O   ACC01 Wizard (/onboarding/account): cards Personal/Player com c pia aprovada, A11y completa, microintera  es ≤200ms   evid ncia: Estrutura/account/wizard_choice.json
+[2025-08-20 19:17] GP   QA   ACC01 Wizard (/onboarding/account) APROVADO por evid ncia   cards Personal/Player com c pia exata, A11y completa, microintera  es ≤200ms, CTAs corretos   evid.: Estrutura/account/wizard_choice.json
+[2025-08-20 19:17] DEV   IMPLEMENTA  O   ACC02 Personal (upsert profiles)   evid.: Estrutura/account/personal_upsert.json
+[2025-08-20 19:27] GP   QA   ACC02 Personal APROVADO por evid ncia   upsert profiles 200 + toast + redirect /app; telemetria account.created somente em 2xx   evid.: Estrutura/account/personal_upsert.json
+[2025-08-20 19:27] DEV   IMPLEMENTA  O   ACC03 Player (org + membership admin + org ativa)   evid.: Estrutura/account/player_org_created.json
+[2025-08-20 19:30] GP   QA   ACC03 Player APROVADO por evid ncia   org criada + membership admin + org ativa; toast + redirect /app; telemetria 2xx   evid.: Estrutura/account/player_org_created.json
+[2025-08-20 19:30] DEV   IMPLEMENTA  O   ACC04 OrgGate/guards aplicados (menu e rotas)   evid.: Estrutura/account/menu_guard_state.json
+[2025-08-20 19:35] GP   QA   ACC04 OrgGate/guards APROVADO por evid ncia   menu/rotas respeitam active_org + role; middleware aplicado   evid.: Estrutura/account/menu_guard_state.json
+[2025-08-20 19:35] DEV   QA   ACC06 Telemetria evidenciada (amostras)   evid.: Estrutura/account/telemetry_samples.json
+[2025-08-20 15:18] GP   DEVOPS   Publica  o da nova linha de base no GitHub (replace total do reposit rio gmasilva10/organizacao10x). Procedimento: init local + commit baseline + push --force-with-lease para main; prote  es de branch reativadas; governan a conferida na  rvore.
+[2025-08-20 15:42] GP   DEVOPS   Fallback de publica  o: conectividade com GitHub indispon vel. Gerado pacote offline para publica  o manual: artifacts/baseline_2025-08-20.zip e bundle git artifacts/baseline_2025-08-20.bundle. Instru  es: publicar quando conex o/VPN normalizar.
+[2025-08-20 14:29] DEV   QA   VAL03 evid ncias   create preserva cards; rename ok em vazias; delete ok em vazias (422 quando n o vazia); reorder intermedi rias persistido   evid ncia: Estrutura/val03/*
+[2025-08-20 14:52] DEV   QA   VAL04 evid ncias    rvore normalizada (cards n o conclu dos); boards filtrados por trainer; dump de seeds   evid ncia: Estrutura/val04/*
+[2025-08-20 15:02] GP   QA   VAL03 (Colunas) APROVADO por evid ncia   create n o toca cards; rename/delete/reorder em intermedi rias (mesmo vazias); exclus o bloqueada quando n o vazia; reorder persiste; travas apenas nas fixas   evid ncias: Estrutura/val03/*
+[2025-08-20 12:50] GP   GOVERNAN A   Parecer do Consultor Externo incorporado como Adendo ( construir um andar perfeito de cada vez”, fatias verticais). Diretriz adotada pelo projeto.
+[2025-08-20 12:50] GP   COMUNICA  O   Mensagem operacional ao DEV emitida (ordens sem datas; foco em VAL01..VAL06 e seeds para  rvore). Checklist e Pend ncias atualizados pelo DEV conforme avan os.
+[2025-08-20 12:59] GP   GOVERNAN A   DEV acionado em modo full desenvolvimento  gil (WIP=1; foco em VAL03→VAL04→VAL05→VAL01→VAL02; VAL06 ap s base est vel). Capturas/valida  o sob responsabilidade do GP.
+[2025-08-20 12:33] GP   GOVERNAN A   Realoca  o de responsabilidades confirmada: capturas visuais sob GP/Consultor; DEV foca apenas em c digo e atualiza  o de documentos. Metas/prazos passam a ser gest o interna do GP.
+[2025-08-20 12:07] DEV   IMPLEMENTA  O   Kanban   move/reorder com valida  o res.ok e rollback; reorder somente ap s 204; remo  o do bot o  + Nova coluna”; persist ncia do  Recolher” (pg.nav.collapsed, aria-pressed)   evid ncia: web/app/(app)/kanban/page.tsx
+[2025-08-20 12:07] DEV   IMPLEMENTA  O   Hist rico   consumo robusto garantindo items[] antes de map; ajuste de UI para shape padronizado   evid ncia: web/app/(app)/onboarding/history/page.tsx
+[2025-08-20 12:07] DEV   HIGIENE   Build   removido lockfile duplicado web/package-lock.json; mantido lockfile na raiz   evid ncia:  rvore do repo limpa
+[2025-08-20 11:24] GP   DECIS O   Bloco 3   N O ENCERRAR; FAILs cr ticos (DnD, Hist rico, Colunas, Sidebar, UX, Telemetria bloqueada); todas as P1 com prazo 22/08   evid ncia: Estrutura/Plano_Realinhamento_20082025.txt; Estrutura/Dailys/Reuniao_Alinhamento_2025-08-20.txt
+[2025-08-20 11:24] GP   DECIS O   Bloco 4 (Pagamentos)   MANTER PAUSADO at  entrega est vel de Students V2 + Servi os integrados ao Kanban   evid ncia: Estrutura/Plano_Realinhamento_20082025.txt
+[2025-08-20 11:24] GP   PLANEJAMENTO   Roadmap V1   GP respons vel at  22/08 (fluxo E2E Aluno+Servi o→Kanban→Conclus o; m dulos: Alunos V2, Servi os, Integra  o Kanban; crit rios: UX premium, Checklist obrigat rio, m tricas)   evid ncia: Estrutura/Plano_Realinhamento_20082025.txt
+[2025-08-20 11:24] GP   ROTAS   Confirmado /(app)/onboarding como oficial; alias /(app)/kanban n o exposto em produ  o   evid ncia: Estrutura/Rotas.txt; Estrutura/Dailys/Reuniao_Alinhamento_2025-08-20.txt
+[2025-08-20 11:45] DEV   PROPOSTA   Pr ‑condi  es t cnicas para revalida  o em 22/08 (aprovado pelo GP): se  o adicionada em Plano_Realinhamento_20082025.txt (Move/Reorder, Hist rico, Colunas, Sidebar/Árvore, SUPABASE envs, lockfiles, checklist VAL01..VAL06, A11y, seguran a)
 
 
-Hoje — 19/08/2025
-[2025-08-19 10:20] DEV — QA — Students — DONE (evidências manuais)
-[2025-08-19 10:20] DEV — QA — Kanban — RBAC + telemetria student.stage.moved validados (amostra); logs salvos em Estrutura/kanban_events_sample.json
-[2025-08-19 13:38] DEV — QA — Kanban — Execução mínima: manager⇒204 OK; seller⇒403 rbac.denied — evidência: Estrutura/kanban_events_results_2025-08-19.json
-[2025-08-19 14:15] DEV — ALINHAMENTO — Rotas Onboarding/Kanban — Rota oficial /(app)/onboarding passou a renderizar o Kanban; placeholder removido; /(app)/kanban mantida como alias de desenvolvimento/redirecionamento; documentação atualizada em Rotas.txt e Padronizacao.txt
-[2025-08-19 15:10] DEV — QA — Validação local da rota oficial /(app)/onboarding — Kanban renderizado corretamente com FeatureGate ativo; colunas fixas + intermediárias em memória operacionais; link de histórico funcional; alias /(app)/kanban mantido apenas em dev — Evidência: screenshot_onboarding_kanban_render.png
-[2025-08-19 11:24] DEV — IMPLEMENTAÇÃO — Students — Contadores por status (Onboarding, Active, Paused, Total) integrados à página e atualizando em tempo real após CRUD. Evidências: screenshot_students_counters.png, students_counters_list.json
-[2025-08-19 11:53] DEV — MIGRAÇÃO — Kanban Persistência (MVP) — Tabelas onboarding_columns/onboarding_cards criadas (RLS habilitado). Endpoints board/move/tree implantados.
-[2025-08-19 12:03] DEV — ONBOARDING/KANBAN — Sidebar (árvore Enterprise) + menu recolhível entregues — evidências: screenshot_onboarding_tree_enterprise.png, screenshot_onboarding_nav_collapsed.png
-[2025-08-19 12:13] DEV — ONBOARDING/KANBAN — Integração do board persistente (GET /api/kanban/board + POST /api/kanban/move) com UI otimista e recarregamento leve + telemetria ativa — evidências: kanban_board_sample.json, screenshot_onboarding_move_persisted.png, kanban_events_results_2025-08-19.json
-[2025-08-19 12:31] DEV — ONBOARDING/KANBAN — Filtro da árvore aplicado ao board (trainerId server-first) — evidências: kanban_board_sample.json, screenshot_onboarding_tree_filter_board.png
-[2025-08-19 12:46] DEV — ONBOARDING/KANBAN — UX de rollback no DnD (toasts e reversão) — evidências: screenshot_onboarding_rollback_toast.png
-[2025-08-19 14:24] DEV — ONBOARDING/KANBAN — Segundo corte consolidado: filtro da árvore (server-first), rollback no DnD, histórico (7d/paginação/RBAC) — evidências: kanban_board_sample.json, kanban_history_sample.json, kanban_events_results_2025-08-19.json
-[2025-08-19 15:10] DEV — ONBOARDING/KANBAN (Terceiro corte) — CRUD de colunas (persistência, restrições nas colunas fixas) — endpoints POST /api/kanban/columns e PATCH/DELETE /api/kanban/columns/:id integrados na UI — evidências: (logs)
-[2025-08-19 15:32] DEV — ONBOARDING/KANBAN (Terceiro corte) — Contadores ao vivo na árvore (refetch leve pós-DnD/CRUD) + evidências de CRUD e reorder — evidências: kanban_crud_reorder_sample.json
-[2025-08-19 15:54] DEV — ONBOARDING/KANBAN — Telemetria ampliada (columns_version + eventos de colunas create/rename/delete) — evidências: kanban_events_results_2025-08-19.json
+Hoje   19/08/2025
+[2025-08-19 10:20] DEV   QA   Students   DONE (evid ncias manuais)
+[2025-08-19 10:20] DEV   QA   Kanban   RBAC + telemetria student.stage.moved validados (amostra); logs salvos em Estrutura/kanban_events_sample.json
+[2025-08-19 13:38] DEV   QA   Kanban   Execu  o m nima: manager⇒204 OK; seller⇒403 rbac.denied   evid ncia: Estrutura/kanban_events_results_2025-08-19.json
+[2025-08-19 14:15] DEV   ALINHAMENTO   Rotas Onboarding/Kanban   Rota oficial /(app)/onboarding passou a renderizar o Kanban; placeholder removido; /(app)/kanban mantida como alias de desenvolvimento/redirecionamento; documenta  o atualizada em Rotas.txt e Padronizacao.txt
+[2025-08-19 15:10] DEV   QA   Valida  o local da rota oficial /(app)/onboarding   Kanban renderizado corretamente com FeatureGate ativo; colunas fixas + intermedi rias em mem ria operacionais; link de hist rico funcional; alias /(app)/kanban mantido apenas em dev   Evid ncia: screenshot_onboarding_kanban_render.png
+[2025-08-19 11:24] DEV   IMPLEMENTA  O   Students   Contadores por status (Onboarding, Active, Paused, Total) integrados à p gina e atualizando em tempo real ap s CRUD. Evid ncias: screenshot_students_counters.png, students_counters_list.json
+[2025-08-19 11:53] DEV   MIGRA  O   Kanban Persist ncia (MVP)   Tabelas onboarding_columns/onboarding_cards criadas (RLS habilitado). Endpoints board/move/tree implantados.
+[2025-08-19 12:03] DEV   ONBOARDING/KANBAN   Sidebar ( rvore Enterprise) + menu recolh vel entregues   evid ncias: screenshot_onboarding_tree_enterprise.png, screenshot_onboarding_nav_collapsed.png
+[2025-08-19 12:13] DEV   ONBOARDING/KANBAN   Integra  o do board persistente (GET /api/kanban/board + POST /api/kanban/move) com UI otimista e recarregamento leve + telemetria ativa   evid ncias: kanban_board_sample.json, screenshot_onboarding_move_persisted.png, kanban_events_results_2025-08-19.json
+[2025-08-19 12:31] DEV   ONBOARDING/KANBAN   Filtro da  rvore aplicado ao board (trainerId server-first)   evid ncias: kanban_board_sample.json, screenshot_onboarding_tree_filter_board.png
+[2025-08-19 12:46] DEV   ONBOARDING/KANBAN   UX de rollback no DnD (toasts e revers o)   evid ncias: screenshot_onboarding_rollback_toast.png
+[2025-08-19 14:24] DEV   ONBOARDING/KANBAN   Segundo corte consolidado: filtro da  rvore (server-first), rollback no DnD, hist rico (7d/pagina  o/RBAC)   evid ncias: kanban_board_sample.json, kanban_history_sample.json, kanban_events_results_2025-08-19.json
+[2025-08-19 15:10] DEV   ONBOARDING/KANBAN (Terceiro corte)   CRUD de colunas (persist ncia, restri  es nas colunas fixas)   endpoints POST /api/kanban/columns e PATCH/DELETE /api/kanban/columns/:id integrados na UI   evid ncias: (logs)
+[2025-08-19 15:32] DEV   ONBOARDING/KANBAN (Terceiro corte)   Contadores ao vivo na  rvore (refetch leve p s-DnD/CRUD) + evid ncias de CRUD e reorder   evid ncias: kanban_crud_reorder_sample.json
+[2025-08-19 15:54] DEV   ONBOARDING/KANBAN   Telemetria ampliada (columns_version + eventos de colunas create/rename/delete)   evid ncias: kanban_events_results_2025-08-19.json
 
-[2025-08-19 17:36] DEV — QA — Kanban — Reorder OK (sort 10/20/30 confirmado no endpoint e board) — evidências: fluxo move→reorder validado; telemetria mantida apenas em sucesso
-[2025-08-19 17:36] DEV — UX — Kanban — Topbar validada (mín. 2 chars em prompts de criação e badge "filtro aplicado" ativo) — evidências: UI aplicada em /(app)/onboarding
+[2025-08-19 17:36] DEV   QA   Kanban   Reorder OK (sort 10/20/30 confirmado no endpoint e board)   evid ncias: fluxo move→reorder validado; telemetria mantida apenas em sucesso
+[2025-08-19 17:36] DEV   UX   Kanban   Topbar validada (m n. 2 chars em prompts de cria  o e badge "filtro aplicado" ativo)   evid ncias: UI aplicada em /(app)/onboarding
 
-[2025-08-19 17:42] DEV — UX — Kanban — Sidebar/Árvore polida (a11y aria-current, teclado, tooltips, refetch vivo) — evidências: Padronizacao.txt atualizado
-[2025-08-19 17:42] DEV — QA — Kanban — Histórico finalizado (filtros from/to/trainerId, RBAC, tabela/paginação, estados vazio/erro) — evidências: Estrutura/kanban_history_sample.json (atualizado)
-[2025-08-19 17:42] DEV — QA — Kanban — CRUD colunas & reorder confirmados (travamento fixas + sort 10/20/30 estável, rollback mantido) — evidências: fluxo UI + endpoints
-[2025-08-19 17:42] DEV — UX — Kanban — Topbar refinada (trim inputs, validações, badge filtro persistente) — evidências: /(app)/onboarding
+[2025-08-19 17:42] DEV   UX   Kanban   Sidebar/Árvore polida (a11y aria-current, teclado, tooltips, refetch vivo)   evid ncias: Padronizacao.txt atualizado
+[2025-08-19 17:42] DEV   QA   Kanban   Hist rico finalizado (filtros from/to/trainerId, RBAC, tabela/pagina  o, estados vazio/erro)   evid ncias: Estrutura/kanban_history_sample.json (atualizado)
+[2025-08-19 17:42] DEV   QA   Kanban   CRUD colunas & reorder confirmados (travamento fixas + sort 10/20/30 est vel, rollback mantido)   evid ncias: fluxo UI + endpoints
+[2025-08-19 17:42] DEV   UX   Kanban   Topbar refinada (trim inputs, valida  es, badge filtro persistente)   evid ncias: /(app)/onboarding
 
-[2025-08-19 18:04] DEV — QA — Kanban — Histórico finalizado (filtros, RBAC, paginação, estados vazio/erro) — evidências: Estrutura/kanban_history_sample.json (atualizado)
-[2025-08-19 18:04] DEV — QA — Kanban — CRUD colunas & reorder confirmados (travamento fixas + sort estável) — evidências: endpoints e UI validados
-[2025-08-19 18:04] DEV — UX — Kanban — Topbar refinada (trim inputs, validações, badge filtro persistente) — evidências: /(app)/onboarding
+[2025-08-19 18:04] DEV   QA   Kanban   Hist rico finalizado (filtros, RBAC, pagina  o, estados vazio/erro)   evid ncias: Estrutura/kanban_history_sample.json (atualizado)
+[2025-08-19 18:04] DEV   QA   Kanban   CRUD colunas & reorder confirmados (travamento fixas + sort est vel)   evid ncias: endpoints e UI validados
+[2025-08-19 18:04] DEV   UX   Kanban   Topbar refinada (trim inputs, valida  es, badge filtro persistente)   evid ncias: /(app)/onboarding
 
-[2025-08-19 18:09] DEV — UX — Kanban — Cards polidos (pills por status completas, tooltips em nomes longos, highlight refinado) — evidências: /(app)/onboarding (board)
-[2025-08-19 18:09] DEV — UX — Kanban — Histórico refinado (filtros e paginação com loading/empty/erro claros) — evidências: /(app)/onboarding/history, kanban_history_sample.json
-[2025-08-19 18:09] GOV — Governança — Pendencias_Setembro2025.txt criado e Bloco 4 (Pagamentos Manuais) aberto — evidências: Estrutura/Pendencias_Setembro2025.txt
+[2025-08-19 18:09] DEV   UX   Kanban   Cards polidos (pills por status completas, tooltips em nomes longos, highlight refinado)   evid ncias: /(app)/onboarding (board)
+[2025-08-19 18:09] DEV   UX   Kanban   Hist rico refinado (filtros e pagina  o com loading/empty/erro claros)   evid ncias: /(app)/onboarding/history, kanban_history_sample.json
+[2025-08-19 18:09] GOV   Governan a   Pendencias_Setembro2025.txt criado e Bloco 4 (Pagamentos Manuais) aberto   evid ncias: Estrutura/Pendencias_Setembro2025.txt
 
-[2025-08-19 19:51] DEV — BUGFIX — Kanban — KAN-001 DnD funcionalizado (cards Draggable + colunas Droppable; highlight refinado; overflow ajustado) — evidências: QA scripts OK
-[2025-08-19 19:51] DEV — BUGFIX — Kanban — KAN-002 Histórico acessível via sidebar/botão Voltar sem crash; estados loading/empty/erro claros — evidências: kanban_history_sample.json
-[2025-08-19 19:51] DEV — BUGFIX — Kanban — KAN-003 CRUD intermediárias liberado; travas mantidas apenas nas colunas fixas — evidências: kanban_crud_reorder_sample.json
-[2025-08-19 19:51] DEV — UX — Kanban — UI-001 toggle “Recolher” consistente (persistência/restauração) e UI-002 layout sem barras de scroll indevidas; UX-001 ação de retorno adicionada — evidências: /(app)/onboarding e /(app)/onboarding/history
+[2025-08-19 19:51] DEV   BUGFIX   Kanban   KAN-001 DnD funcionalizado (cards Draggable + colunas Droppable; highlight refinado; overflow ajustado)   evid ncias: QA scripts OK
+[2025-08-19 19:51] DEV   BUGFIX   Kanban   KAN-002 Hist rico acess vel via sidebar/bot o Voltar sem crash; estados loading/empty/erro claros   evid ncias: kanban_history_sample.json
+[2025-08-19 19:51] DEV   BUGFIX   Kanban   KAN-003 CRUD intermedi rias liberado; travas mantidas apenas nas colunas fixas   evid ncias: kanban_crud_reorder_sample.json
+[2025-08-19 19:51] DEV   UX   Kanban   UI-001 toggle  Recolher” consistente (persist ncia/restaura  o) e UI-002 layout sem barras de scroll indevidas; UX-001 a  o de retorno adicionada   evid ncias: /(app)/onboarding e /(app)/onboarding/history
 
-[2025-08-19 20:05] DEV — QA — Kanban — Passada E2E executada (DnD, Histórico, CRUD colunas, Sidebar, Layout, Voltar) — evidências: kanban_events_results_2025-08-19.json, kanban_crud_reorder_sample.json, kanban_history_sample.json
+[2025-08-19 20:05] DEV   QA   Kanban   Passada E2E executada (DnD, Hist rico, CRUD colunas, Sidebar, Layout, Voltar)   evid ncias: kanban_events_results_2025-08-19.json, kanban_crud_reorder_sample.json, kanban_history_sample.json
 
-Hoje — 18/08/2025
-[2025-08-18 09:05] DEV — BUGFIX — Login/Redirect — Remoção do redirect /app→/ em next.config.ts e restauração da hub /app — evidência: next.config.ts; app/app/page.tsx
-[2025-08-18 09:30] DEV — BUGFIX — Tela branca — Remoção de opacity:0 no body do layout — evidência: app/layout.tsx
-[2025-08-18 09:40] DEV — A11y — Drawer/Dialogs — Padrão DrawerDescription + aria-describedby aplicado no LoginDrawer; diretriz registrada para novos dialogs — evidência: components/LoginDrawer.tsx, components/ui/drawer.tsx
-[2025-08-18 09:50] DEV — UX/QA — Login rápido — Valores padrão (admin.basic@pg.local / Teste@123), autocomplete desativado, inputMode/email e spellCheck off — evidência: components/LoginDrawer.tsx
-[2025-08-18 10:10] DEV — DOC — Ruídos de DevTools/Extensões — Classificação de logs como falsos positivos (sendMessageToTab, No tab with id, Recorder, Fast Refresh). Em janela anônima sem extensões não se reproduzem — evidência: prints anônimos
-[2025-08-18 10:25] DEV — HIGIENE — Unificação de lockfiles — Removido web/package-lock.json; mantido package-lock.json da raiz. Build sem aviso de duplicação — evidência: Estrutura/build_2025-08-18.log
-[2025-08-18 10:40] DEV — LINT — Students/Header/Toast — Removidos imports/usos não utilizados; dependências do useEffect corrigidas com useCallback — evidência: Estrutura/build_after_lintfix2_2025-08-18.log
-[2025-08-18 10:55] QA — Smoke mínimo — Login → sync → /app (render) → /api/capabilities (200). Evidências: screenshot /app autenticado, JSON de /api/capabilities — evidência: Estrutura/ (anexos)
-[2025-08-18 17:35] QA — Students — Evidências manuais conforme diretriz: listar/criar/editar/excluir/empty/erro — evidências: screenshot_students_*; notas em Erros.txt; automação movida para backlog (Pendencias.txt)
-[2025-08-18 16:20] QA — Team Admin (Basic) — 1º treinador 200; 2º 422 (Upgrade modal). Evidências: screenshots (team_basic_first_trainer_200, team_basic_second_trainer_422), lista trainers ≤ 1; JSON: QA_TeamAdmin_results.json
+Hoje   18/08/2025
+[2025-08-18 09:05] DEV   BUGFIX   Login/Redirect   Remo  o do redirect /app→/ em next.config.ts e restaura  o da hub /app   evid ncia: next.config.ts; app/app/page.tsx
+[2025-08-18 09:30] DEV   BUGFIX   Tela branca   Remo  o de opacity:0 no body do layout   evid ncia: app/layout.tsx
+[2025-08-18 09:40] DEV   A11y   Drawer/Dialogs   Padr o DrawerDescription + aria-describedby aplicado no LoginDrawer; diretriz registrada para novos dialogs   evid ncia: components/LoginDrawer.tsx, components/ui/drawer.tsx
+[2025-08-18 09:50] DEV   UX/QA   Login r pido   Valores padr o (admin.basic@pg.local / Teste@123), autocomplete desativado, inputMode/email e spellCheck off   evid ncia: components/LoginDrawer.tsx
+[2025-08-18 10:10] DEV   DOC   Ru dos de DevTools/Extens es   Classifica  o de logs como falsos positivos (sendMessageToTab, No tab with id, Recorder, Fast Refresh). Em janela an nima sem extens es n o se reproduzem   evid ncia: prints an nimos
+[2025-08-18 10:25] DEV   HIGIENE   Unifica  o de lockfiles   Removido web/package-lock.json; mantido package-lock.json da raiz. Build sem aviso de duplica  o   evid ncia: Estrutura/build_2025-08-18.log
+[2025-08-18 10:40] DEV   LINT   Students/Header/Toast   Removidos imports/usos n o utilizados; depend ncias do useEffect corrigidas com useCallback   evid ncia: Estrutura/build_after_lintfix2_2025-08-18.log
+[2025-08-18 10:55] QA   Smoke m nimo   Login → sync → /app (render) → /api/capabilities (200). Evid ncias: screenshot /app autenticado, JSON de /api/capabilities   evid ncia: Estrutura/ (anexos)
+[2025-08-18 17:35] QA   Students   Evid ncias manuais conforme diretriz: listar/criar/editar/excluir/empty/erro   evid ncias: screenshot_students_*; notas em Erros.txt; automa  o movida para backlog (Pendencias.txt)
+[2025-08-18 16:20] QA   Team Admin (Basic)   1  treinador 200; 2  422 (Upgrade modal). Evid ncias: screenshots (team_basic_first_trainer_200, team_basic_second_trainer_422), lista trainers ≤ 1; JSON: QA_TeamAdmin_results.json
 
-# Histórico prévio mantido abaixo...
-# Última atualização: 2025-08-16 12:55
-# Formato: [AAAA-MM-DD HH:MM] Autor — Tipo — Módulo/Área — Título curto — (#tarefa/issue opcional) — Evidência (commit/PR/URL)
+# Hist rico pr vio mantido abaixo...
+#  ltima atualiza  o: 2025-08-16 12:55
+# Formato: [AAAA-MM-DD HH:MM] Autor   Tipo   M dulo/Área   T tulo curto   (#tarefa/issue opcional)   Evid ncia (commit/PR/URL)
 
-Hoje — 13/08/2025
-[2025-08-13 09:10] GP — PLANEJAMENTO — Landing — Kickoff v1.0: escopo, critérios de aceite e paleta.
-[2025-08-13 10:20] DEV — IMPLEMENTAÇÃO — Landing/Hero — Globo dotted 3D + logo dinâmica — commit:<hash>
-[2025-08-13 11:15] DEV — REFINO — Header/Login — Drawer moderno + animações — commit:<hash>
-[2025-08-13 14:00] GP — QA — Acessibilidade — Ajuste contraste/hover; revisão WCAG — evidência:Lighthouse-2025-08-13.png
-[2025-08-13 16:30] DEV — PERF — LCP — next/image otimizado, sizes e priority — commit:<hash>
+Hoje   13/08/2025
+[2025-08-13 09:10] GP   PLANEJAMENTO   Landing   Kickoff v1.0: escopo, crit rios de aceite e paleta.
+[2025-08-13 10:20] DEV   IMPLEMENTA  O   Landing/Hero   Globo dotted 3D + logo din mica   commit:<hash>
+[2025-08-13 11:15] DEV   REFINO   Header/Login   Drawer moderno + anima  es   commit:<hash>
+[2025-08-13 14:00] GP   QA   Acessibilidade   Ajuste contraste/hover; revis o WCAG   evid ncia:Lighthouse-2025-08-13.png
+[2025-08-13 16:30] DEV   PERF   LCP   next/image otimizado, sizes e priority   commit:<hash>
 
-[2025-08-13 18:15] DEV — QA — Carimbo v1.0 Landing — Performance/A11y/SEO OK; build limpo — evidência: print dos scores
+[2025-08-13 18:15] DEV   QA   Carimbo v1.0 Landing   Performance/A11y/SEO OK; build limpo   evid ncia: print dos scores
 
-[2025-08-16 12:55] DEV — IMPLEMENTAÇÃO — Fase 1/Bloco 1 — Migrações/Seeds (tenants, memberships, plan_policies, events) + RLS habilitado — evidência: Supabase migrations aplicadas; advisors consultados
-[2025-08-16 12:55] DEV — IMPLEMENTAÇÃO — Fase 1/Bloco 1 — Alinhamento multi-tenant no legado (tenant_id + RLS + índices) — evidência: migração b1_legacy_tenant_alignment
-[2025-08-16 12:55] DEV — IMPLEMENTAÇÃO — Fase 1/Bloco 1 — Endpoint /api/capabilities (snapshot de policy) — evidência: app/api/capabilities/route.ts
-[2025-08-16 15:18] DEV — IMPLEMENTAÇÃO — Fase 1/Bloco 1 — Sessão Supabase (App Router): utils supabase (server/middleware) + middleware.ts — evidência: utils/supabase/*, middleware.ts
+[2025-08-16 12:55] DEV   IMPLEMENTA  O   Fase 1/Bloco 1   Migra  es/Seeds (tenants, memberships, plan_policies, events) + RLS habilitado   evid ncia: Supabase migrations aplicadas; advisors consultados
+[2025-08-16 12:55] DEV   IMPLEMENTA  O   Fase 1/Bloco 1   Alinhamento multi-tenant no legado (tenant_id + RLS +  ndices)   evid ncia: migra  o b1_legacy_tenant_alignment
+[2025-08-16 12:55] DEV   IMPLEMENTA  O   Fase 1/Bloco 1   Endpoint /api/capabilities (snapshot de policy)   evid ncia: app/api/capabilities/route.ts
+[2025-08-16 15:18] DEV   IMPLEMENTA  O   Fase 1/Bloco 1   Sess o Supabase (App Router): utils supabase (server/middleware) + middleware.ts   evid ncia: utils/supabase/*, middleware.ts
 
-[2025-08-16 18:40] DEV — QA — Seeds QA aplicados (Auth + memberships) — evidência: scripts/seed-qa.ts
-[2025-08-16 18:40] QA — Smoke tests RBAC/Limits/Capabilities — evidências: Estrutura/QA_SmokeTests_Bloco1_Etapa2_results.json (responses + snapshot events)
+[2025-08-16 18:40] DEV   QA   Seeds QA aplicados (Auth + memberships)   evid ncia: scripts/seed-qa.ts
+[2025-08-16 18:40] QA   Smoke tests RBAC/Limits/Capabilities   evid ncias: Estrutura/QA_SmokeTests_Bloco1_Etapa2_results.json (responses + snapshot events)
 
-[2025-08-16 19:24] DEV — FRONT — TeamAdmin mínimo (guards + modal upgrade) — evidência: /app/(app)/team/page.tsx (prints/GIF)
-[2025-08-16 19:24] DEV — FRONT — Placeholder Kanban com FeatureGate — evidência: /app/(app)/onboarding/page.tsx (prints)
+[2025-08-16 19:24] DEV   FRONT   TeamAdmin m nimo (guards + modal upgrade)   evid ncia: /app/(app)/team/page.tsx (prints/GIF)
+[2025-08-16 19:24] DEV   FRONT   Placeholder Kanban com FeatureGate   evid ncia: /app/(app)/onboarding/page.tsx (prints)
 
-[2025-08-16 19:44] DEV — FRONT — Header com badge/Modal “Onboarding” — evidência: components/Header.tsx
-[2025-08-16 19:44] DEV — FRONT — Toast utilitário aplicado no TeamAdmin — evidência: components/ui/toast.tsx, app/(app)/team/page.tsx
+[2025-08-16 19:44] DEV   FRONT   Header com badge/Modal  Onboarding”   evid ncia: components/Header.tsx
+[2025-08-16 19:44] DEV   FRONT   Toast utilit rio aplicado no TeamAdmin   evid ncia: components/ui/toast.tsx, app/(app)/team/page.tsx
 
-[2025-08-17 11:58] DEV — BUGFIX — Auth/Sessão (App Router) — Server client com cookies {get,set,remove} + sync com credentials:include — evidências: utils/supabase/server.ts, app/api/auth/sync/route.ts, components/LoginDrawer.tsx
+[2025-08-17 11:58] DEV   BUGFIX   Auth/Sess o (App Router)   Server client com cookies {get,set,remove} + sync com credentials:include   evid ncias: utils/supabase/server.ts, app/api/auth/sync/route.ts, components/LoginDrawer.tsx
 
-[2025-08-17 12:05] DEV — QA — Mini smoke de sessão OK (login→sync→caps 200→/app). Usuário: admin.basic@pg.local — evidência: /api/debug/session e /api/capabilities (200)
-[2025-08-17 12:42] DEV — IMPLEMENTAÇÃO — TeamAdmin/Upgrade/Logout — Modal com cópia/CTAs aprovadas; ajuste Header; endpoint POST /api/auth/signout — evidências: components/UpgradeModal.tsx, app/(app)/team/page.tsx, app/api/auth/signout/route.ts, components/Header.tsx
-[2025-08-17 13:29] QA — Enterprise — Reset trainers do tenant B (DELETE memberships role=trainer) — evidência: scripts/qa-reset-ent-trainers.ts (deletedCount:10)
-[2025-08-17 13:29] QA — Enterprise — create trainer01..10 ⇒ 200; trainer11 ⇒ 422 — evidências: respostas JSON capturadas em execução automática (capsBefore.plan=enterprise; limits.trainers=10)
-[2025-08-17 14:17] DEV — REFACTOR — Consolidação /app → /(app) + redirect em next.config.ts — build OK — evidência: next.config.ts, rotas list_dir
-[2025-08-17 14:30] DEV — MIGRAÇÃO — Students + RLS + índices — evidência: migration 202508171510_students_full (políticas com ARRAY roles; índices parciais; unique por tenant/email)
-[2025-08-18 10:52] DEV — QA — Seeds Students aplicados (A/B) — evidência: scripts/seed-students.ts (Basic=298, Enterprise=10)
-[2025-08-18 12:28] QA — Students — Smoke 200/403/422 aprovado; telemetria extraída — evidência: Estrutura/QA_Students_results.json
-[2025-08-18 12:28] DEV — FRONT — Início UI /students (lista/filtros/criar/atribuir) — evidência: app/(app)/students/page.tsx, api/users/trainers GET
+[2025-08-17 12:05] DEV   QA   Mini smoke de sess o OK (login→sync→caps 200→/app). Usu rio: admin.basic@pg.local   evid ncia: /api/debug/session e /api/capabilities (200)
+[2025-08-17 12:42] DEV   IMPLEMENTA  O   TeamAdmin/Upgrade/Logout   Modal com c pia/CTAs aprovadas; ajuste Header; endpoint POST /api/auth/signout   evid ncias: components/UpgradeModal.tsx, app/(app)/team/page.tsx, app/api/auth/signout/route.ts, components/Header.tsx
+[2025-08-17 13:29] QA   Enterprise   Reset trainers do tenant B (DELETE memberships role=trainer)   evid ncia: scripts/qa-reset-ent-trainers.ts (deletedCount:10)
+[2025-08-17 13:29] QA   Enterprise   create trainer01..10 ⇒ 200; trainer11 ⇒ 422   evid ncias: respostas JSON capturadas em execu  o autom tica (capsBefore.plan=enterprise; limits.trainers=10)
+[2025-08-17 14:17] DEV   REFACTOR   Consolida  o /app → /(app) + redirect em next.config.ts   build OK   evid ncia: next.config.ts, rotas list_dir
+[2025-08-17 14:30] DEV   MIGRA  O   Students + RLS +  ndices   evid ncia: migration 202508171510_students_full (pol ticas com ARRAY roles;  ndices parciais; unique por tenant/email)
+[2025-08-18 10:52] DEV   QA   Seeds Students aplicados (A/B)   evid ncia: scripts/seed-students.ts (Basic=298, Enterprise=10)
+[2025-08-18 12:28] QA   Students   Smoke 200/403/422 aprovado; telemetria extra da   evid ncia: Estrutura/QA_Students_results.json
+[2025-08-18 12:28] DEV   FRONT   In cio UI /students (lista/filtros/criar/atribuir)   evid ncia: app/(app)/students/page.tsx, api/users/trainers GET
 
-[13/08/2025] DOC — Estrutura:
+[13/08/2025] DOC   Estrutura:
 Criada/atualizada a pasta Estrutura com README_Estrutura, Atividades, Pendencias, Pendencias_Agosto2025, Erros, Padronizacao, Rotas e ControleDataMock.
-Incluídos exemplos práticos e padronizações para registro de atividades, pendências, erros e rotas.
-Status: Estrutura aprovada pelo GP como fonte única de verdade para o projeto.
+Inclu dos exemplos pr ticos e padroniza  es para registro de atividades, pend ncias, erros e rotas.
+Status: Estrutura aprovada pelo GP como fonte  nica de verdade para o projeto.
 
 Template para novos itens:
-[AAAA-MM-DD HH:MM] <Autor> — <TIPO: PLANEJAMENTO|IMPLEMENTAÇÃO|REVIEW|QA|PERF|BUGFIX|DOC> — <Módulo/Área> — <Título curto> — (#tarefa/issue opcional) — Evidência (commit/PR/URL)
+[AAAA-MM-DD HH:MM] <Autor>   <TIPO: PLANEJAMENTO|IMPLEMENTA  O|REVIEW|QA|PERF|BUGFIX|DOC>   <M dulo/Área>   <T tulo curto>   (#tarefa/issue opcional)   Evid ncia (commit/PR/URL)
 
 Notas do dia:
 - Itens bloqueados migrar para Pendencias_Agosto2025.txt.
-- Decisões de padrão mover para Padronizacao.txt.
+- Decis es de padr o mover para Padronizacao.txt.
 
-[2025-08-21 11:52] GP — COMUNICAÇÃO — QA integrada ao projeto (21/08/2025); adoção do BugBot (Cursor) para apoio de QA (varredura leve, relatórios com reprodução mínima, sugestões sem merge em main).
-[2025-08-21 11:52] GP — DIRETRIZ — Dia focado em Alunos V2: STU01 (listagem/busca/filtros/paginação) EM VALIDAÇÃO por evidência; STU02 (esqueleto) somente se STU01 estiver estável.
+[2025-08-21 11:52] GP   COMUNICA  O   QA integrada ao projeto (21/08/2025); ado  o do BugBot (Cursor) para apoio de QA (varredura leve, relat rios com reprodu  o m nima, sugest es sem merge em main).
+[2025-08-21 11:52] GP   DIRETRIZ   Dia focado em Alunos V2: STU01 (listagem/busca/filtros/pagina  o) EM VALIDA  O por evid ncia; STU02 (esqueleto) somente se STU01 estiver est vel.
 
-[2025-08-21 12:45] GP — DIRETRIZ — STU01 padrão premium: contratos de resposta, filtros, paginação, RBAC leitura e critérios de aceite definidos (ver Checklist).
-[2025-08-21 12:45] GP — QA — Autorizar QA varredura SHELL/ACC contínua e entrada em /app/students quando STU01 marcar EM VALIDAÇÃO.
+[2025-08-21 12:45] GP   DIRETRIZ   STU01 padr o premium: contratos de resposta, filtros, pagina  o, RBAC leitura e crit rios de aceite definidos (ver Checklist).
+[2025-08-21 12:45] GP   QA   Autorizar QA varredura SHELL/ACC cont nua e entrada em /app/students quando STU01 marcar EM VALIDA  O.
 
-[2025-08-21 12:45] GP — DIRETRIZ — STU01 pronto para evidências finais (list_default, filters_status_trainer, pagination_page2) e passagem para EM VALIDAÇÃO.
-[2025-08-21 13:10] GP — SUPORTE — Bloqueio ACC03 na criação de organização pelo patrocinador (toast genérico). Orientado workaround imediato e emitidas ordens de correção para DEV.
-[2025-08-21 13:46] DEV — IMPLEMENTAÇÃO — ACC03 hotfix aplicado (service-role + payload mínimo + idempotência). Evidências atualizadas.
-[2025-08-21 13:47] DEV — QA — ACC03 acionado para validação por evidência — evid.: Estrutura/account/player_org_created_fix.json
-[2025-08-21 14:00] GP — QA — PR aberto a partir do branch qa/qa-suggested/acc-a11y-types-fixes (a11y/typing ACC/SHELL) — link: https://github.com/gmasilva10/organizacao10x/pull/3
-[2025-08-21 14:00] GP — QA — Issues criadas: CI env (ACC) #4; exhaustive-deps (history) #5; limpeza no-unused (shell/kanban) #6
-[2025-08-21 14:05] GP — QA — PR #3 (qa-suggested ACC/SHELL) e issues #4/#5/#6 registrados; revisão/merge condicionados a checks verdes e sem regressão visual.
-[2025-08-21 14:12] GP — QA — Prompt do BugBot preparado para USER01 (perfil) — aguardando DEV marcar EM VALIDAÇÃO para disparo.
-[2025-08-21 14:30] DEV — IMPLEMENTAÇÃO — USER01..USER04 Perfil (ver/editar/segurança/UX) — EM VALIDAÇÃO — evid.: Estrutura/profile/*
+[2025-08-21 12:45] GP   DIRETRIZ   STU01 pronto para evid ncias finais (list_default, filters_status_trainer, pagination_page2) e passagem para EM VALIDA  O.
+[2025-08-21 13:10] GP   SUPORTE   Bloqueio ACC03 na cria  o de organiza  o pelo patrocinador (toast gen rico). Orientado workaround imediato e emitidas ordens de corre  o para DEV.
+[2025-08-21 13:46] DEV   IMPLEMENTA  O   ACC03 hotfix aplicado (service-role + payload m nimo + idempot ncia). Evid ncias atualizadas.
+[2025-08-21 13:47] DEV   QA   ACC03 acionado para valida  o por evid ncia   evid.: Estrutura/account/player_org_created_fix.json
+[2025-08-21 14:00] GP   QA   PR aberto a partir do branch qa/qa-suggested/acc-a11y-types-fixes (a11y/typing ACC/SHELL)   link: https://github.com/gmasilva10/organizacao10x/pull/3
+[2025-08-21 14:00] GP   QA   Issues criadas: CI env (ACC) #4; exhaustive-deps (history) #5; limpeza no-unused (shell/kanban) #6
+[2025-08-21 14:05] GP   QA   PR #3 (qa-suggested ACC/SHELL) e issues #4/#5/#6 registrados; revis o/merge condicionados a checks verdes e sem regress o visual.
+[2025-08-21 14:12] GP   QA   Prompt do BugBot preparado para USER01 (perfil)   aguardando DEV marcar EM VALIDA  O para disparo.
+[2025-08-21 14:30] DEV   IMPLEMENTA  O   USER01..USER04 Perfil (ver/editar/seguran a/UX)   EM VALIDA  O   evid.: Estrutura/profile/*
 
-[2025-08-21 12:45] GP — QA — STU01 (listagem/busca/filtros/paginação) APROVADO por evidência — evid.: web/Estrutura/students/*
+[2025-08-21 12:45] GP   QA   STU01 (listagem/busca/filtros/pagina  o) APROVADO por evid ncia   evid.: web/Estrutura/students/*
 
-[2025-01-29 16:45] DEV — GATE 10.15 — Students — HEADER COMPACTO GLOBAL: removido "Voltar" textual, botão "Cancelar" destrutivo, ações concentradas à direita, altura reduzida 50%, componente CompactHeader reutilizável — evidência: testsprite_tests/gate10-15-header-compacto.md
-[2025-01-29 17:00] DEV — GATE 10.16 — Students — LAYOUT PREMIUM NOVA OCORRÊNCIA: aplicado padrão visual da "Nova Regra de Diretriz de Treino", cards bem delimitados (Identificação, Classificação, Detalhes, Lembrete, Anexos), espaçamento consistente, títulos em negrito com descrições, campos agrupados em grid, botão upload dashed, anexos com visual melhorado, corrigido erro "groups.map is not a function" — evidência: web/components/students/StudentOccurrenceModal.tsx
-[2025-01-29 17:15] DEV — GATE 10.16.1 — Students — CORREÇÃO NOME ALUNO: corrigido ProcessosDropdown para receber studentName, campo do aluno agora vem preenchido automaticamente quando acessado pelos processos do aluno específico, melhoria na UX e lógica do sistema — evidência: web/components/students/StudentEditTabsV6.tsx
-[2025-01-29 17:30] DEV — GATE 10.4.1 — Students — AÇÕES RÁPIDAS NA LISTAGEM: implementados componentes StudentCardActions e StudentTableActions, botões compactos AnexosIconButton e ProcessosIconButton, cards compactados com xl:grid-cols-4, funcionalidade testada e validada (editar, anexos, processos), evidências geradas — evidência: testsprite_tests/gate10-4-1-acoes-rapidas.md
-[2025-01-29 18:00] DEV — GATE 10.4.1.HF1 — Students — HOTFIX REGRESSÕES EDITAR ALUNO: corrigido erro crítico de serialização JSON circular, eliminados warnings de campos sem onChange, implementado upload de foto funcional com validação e preview, corrigidos campos de endereço e CEP com busca automática ViaCEP, implementadas máscaras de input (CEP/telefone), campos de responsáveis editáveis, toasts de feedback completos, estado loading no botão salvar — evidência: testsprite_tests/gate10-4-1-hf1-hotfix-regressoes.md
+[2025-01-29 16:45] DEV   GATE 10.15   Students   HEADER COMPACTO GLOBAL: removido "Voltar" textual, bot o "Cancelar" destrutivo, a  es concentradas à direita, altura reduzida 50%, componente CompactHeader reutiliz vel   evid ncia: testsprite_tests/gate10-15-header-compacto.md
+[2025-01-29 17:00] DEV   GATE 10.16   Students   LAYOUT PREMIUM NOVA OCORR NCIA: aplicado padr o visual da "Nova Regra de Diretriz de Treino", cards bem delimitados (Identifica  o, Classifica  o, Detalhes, Lembrete, Anexos), espa amento consistente, t tulos em negrito com descri  es, campos agrupados em grid, bot o upload dashed, anexos com visual melhorado, corrigido erro "groups.map is not a function"   evid ncia: web/components/students/StudentOccurrenceModal.tsx
+[2025-01-29 17:15] DEV   GATE 10.16.1   Students   CORRE  O NOME ALUNO: corrigido ProcessosDropdown para receber studentName, campo do aluno agora vem preenchido automaticamente quando acessado pelos processos do aluno espec fico, melhoria na UX e l gica do sistema   evid ncia: web/components/students/StudentEditTabsV6.tsx
+[2025-01-29 17:30] DEV   GATE 10.4.1   Students   A  ES RÁPIDAS NA LISTAGEM: implementados componentes StudentCardActions e StudentTableActions, bot es compactos AnexosIconButton e ProcessosIconButton, cards compactados com xl:grid-cols-4, funcionalidade testada e validada (editar, anexos, processos), evid ncias geradas   evid ncia: testsprite_tests/gate10-4-1-acoes-rapidas.md
+[2025-01-29 18:00] DEV   GATE 10.4.1.HF1   Students   HOTFIX REGRESS ES EDITAR ALUNO: corrigido erro cr tico de serializa  o JSON circular, eliminados warnings de campos sem onChange, implementado upload de foto funcional com valida  o e preview, corrigidos campos de endere o e CEP com busca autom tica ViaCEP, implementadas m scaras de input (CEP/telefone), campos de respons veis edit veis, toasts de feedback completos, estado loading no bot o salvar   evid ncia: testsprite_tests/gate10-4-1-hf1-hotfix-regressoes.md
 
-[2025-01-29 19:30] DEV — GATE 10.4.X — Students — FEEDBACK VISUAL E UX PREMIUM: implementado sistema completo de feedback visual com toasts padronizados, validação de campos obrigatórios com asteriscos e mensagens inline, componente EmptyState reutilizável para estados vazios, botão BackButton para navegação, ações de inativar/excluir aluno com modal de confirmação, estados de loading em botões de ação, mensagens de estado vazio padronizadas em listas de ocorrências e anamneses, sistema de toasts específicos para operações de alunos — evidência: web/evidencias/gate-10-4-x-feedback-visual-ux-premium.md
+[2025-01-29 19:30] DEV   GATE 10.4.X   Students   FEEDBACK VISUAL E UX PREMIUM: implementado sistema completo de feedback visual com toasts padronizados, valida  o de campos obrigat rios com asteriscos e mensagens inline, componente EmptyState reutiliz vel para estados vazios, bot o BackButton para navega  o, a  es de inativar/excluir aluno com modal de confirma  o, estados de loading em bot es de a  o, mensagens de estado vazio padronizadas em listas de ocorr ncias e anamneses, sistema de toasts espec ficos para opera  es de alunos   evid ncia: web/evidencias/gate-10-4-x-feedback-visual-ux-premium.md
 
-[2025-01-29 20:00] DEV — GATE 10.4.2 — Students — DENSIDADE VISUAL: otimizada densidade visual do módulo de alunos com grid expandido para 5 colunas em telas 2XL, tabela com padding reduzido (p-4 → p-3), tipografia hierárquica clara (nomes/status em text-sm, dados secundários em text-xs), ícones compactos padronizados (h-7 w-7 → h-6 w-6), espaçamentos otimizados (gap-4 → gap-3, space-y-2 → space-y-1.5), componentes de ação compactos, responsividade mantida em todos os tamanhos de tela — evidência: web/evidencias/gate-10-4-2-densidade-visual.md
+[2025-01-29 20:00] DEV   GATE 10.4.2   Students   DENSIDADE VISUAL: otimizada densidade visual do m dulo de alunos com grid expandido para 5 colunas em telas 2XL, tabela com padding reduzido (p-4 → p-3), tipografia hier rquica clara (nomes/status em text-sm, dados secund rios em text-xs),  cones compactos padronizados (h-7 w-7 → h-6 w-6), espa amentos otimizados (gap-4 → gap-3, space-y-2 → space-y-1.5), componentes de a  o compactos, responsividade mantida em todos os tamanhos de tela   evid ncia: web/evidencias/gate-10-4-2-densidade-visual.md
 
-[2025-01-29 20:30] DEV — AJUSTES P0 — Students — PROCESSOS E OVERFLOW: implementados ajustes P0 críticos com menu Processos reorganizado por prioridade de negócio (Matricular → Onboarding → Ocorrência → Anamnese → Diretriz → WhatsApp → E-mail → Excluir), "Excluir Aluno" movido para dentro do menu Processos como último item com separador e estilo de perigo, "Inativar Aluno" removido do menu Processos e implementado via select de status com toast específico, overflow do card corrigido com line-clamp-2 para nome e tooltips para todos os campos, ações separadas removidas e centralizadas no menu Processos — evidência: web/evidencias/ajustes-p0-processos-overflow.md
+[2025-01-29 20:30] DEV   AJUSTES P0   Students   PROCESSOS E OVERFLOW: implementados ajustes P0 cr ticos com menu Processos reorganizado por prioridade de neg cio (Matricular → Onboarding → Ocorr ncia → Anamnese → Diretriz → WhatsApp → E-mail → Excluir), "Excluir Aluno" movido para dentro do menu Processos como  ltimo item com separador e estilo de perigo, "Inativar Aluno" removido do menu Processos e implementado via select de status com toast espec fico, overflow do card corrigido com line-clamp-2 para nome e tooltips para todos os campos, a  es separadas removidas e centralizadas no menu Processos   evid ncia: web/evidencias/ajustes-p0-processos-overflow.md
 
-[2025-01-29 21:00] DEV — CORREÇÕES SOLICITADAS — Students — INTERFACE E VALIDAÇÕES: implementadas correções solicitadas com remoção do botão "Voltar para Lista" (duplicação com Cancelar), correção do salvamento de endereço para persistência no banco, ajuste de validações para tornar endereço e responsável opcionais (apenas Nome, Email, Telefone e Status obrigatórios), reorganização completa do menu Processos removendo bolinhas coloridas e mantendo apenas ícones, nova ordem e agrupamento com separadores (Matricular → Onboarding → Gerar Anamnese → Gerar Diretriz → Nova Ocorrência → Enviar Mensagem → Enviar E-mail → Excluir), nomes ajustados para caber em uma linha — evidência: web/evidencias/correcoes-solicitadas.md
+[2025-01-29 21:00] DEV   CORRE  ES SOLICITADAS   Students   INTERFACE E VALIDA  ES: implementadas corre  es solicitadas com remo  o do bot o "Voltar para Lista" (duplica  o com Cancelar), corre  o do salvamento de endere o para persist ncia no banco, ajuste de valida  es para tornar endere o e respons vel opcionais (apenas Nome, Email, Telefone e Status obrigat rios), reorganiza  o completa do menu Processos removendo bolinhas coloridas e mantendo apenas  cones, nova ordem e agrupamento com separadores (Matricular → Onboarding → Gerar Anamnese → Gerar Diretriz → Nova Ocorr ncia → Enviar Mensagem → Enviar E-mail → Excluir), nomes ajustados para caber em uma linha   evid ncia: web/evidencias/correcoes-solicitadas.md
 
-[2025-01-29 21:15] DEV — CORREÇÃO ANEXOS — Students — REMOÇÃO BOLINHAS: corrigido menu Anexos removendo bolinhas coloridas e mantendo apenas ícones, padronizando com menu Processos (Ocorrências, Anamnese, Diretriz, Treino), interface mais limpa e consistente entre os dois menus — evidência: web/evidencias/correcoes-solicitadas.md
+[2025-01-29 21:15] DEV   CORRE  O ANEXOS   Students   REMO  O BOLINHAS: corrigido menu Anexos removendo bolinhas coloridas e mantendo apenas  cones, padronizando com menu Processos (Ocorr ncias, Anamnese, Diretriz, Treino), interface mais limpa e consistente entre os dois menus   evid ncia: web/evidencias/correcoes-solicitadas.md
 
-[2025-01-29 21:30] DEV — CORREÇÃO TOAST — Students — DUPLA MENSAGEM: corrigido problema de dupla mensagem de salvamento removendo chamada duplicada de showStudentUpdated() da página de edição, mantendo apenas a chamada no componente StudentEditTabsV6, toast único exibido ao salvar aluno — evidência: web/evidencias/correcoes-solicitadas.md
+[2025-01-29 21:30] DEV   CORRE  O TOAST   Students   DUPLA MENSAGEM: corrigido problema de dupla mensagem de salvamento removendo chamada duplicada de showStudentUpdated() da p gina de edi  o, mantendo apenas a chamada no componente StudentEditTabsV6, toast  nico exibido ao salvar aluno   evid ncia: web/evidencias/correcoes-solicitadas.md
 
-[2025-01-29 21:45] DEV — FUNCIONALIDADE SALVAR — Students — SALVAR E REDIRECIONAR: implementada funcionalidade para salvar aluno e automaticamente redirecionar para lista após 1 segundo, adicionada prop onSaveAndRedirect ao componente StudentEditTabsV6, função handleSaveAndRedirect na página de edição preservando filtros/querystring returnTo, timeout de 1 segundo para usuário visualizar toast antes do redirecionamento — evidência: web/evidencias/correcoes-solicitadas.md
+[2025-01-29 21:45] DEV   FUNCIONALIDADE SALVAR   Students   SALVAR E REDIRECIONAR: implementada funcionalidade para salvar aluno e automaticamente redirecionar para lista ap s 1 segundo, adicionada prop onSaveAndRedirect ao componente StudentEditTabsV6, fun  o handleSaveAndRedirect na p gina de edi  o preservando filtros/querystring returnTo, timeout de 1 segundo para usu rio visualizar toast antes do redirecionamento   evid ncia: web/evidencias/correcoes-solicitadas.md
 
-[2025-01-29 22:00] DEV — CORREÇÃO FOTO — Students — SALVAMENTO FOTO: corrigido problema de salvamento de foto implementando upload real para Supabase Storage, criada API /api/upload/photo para upload de arquivos, atualizada API de alunos para incluir campos photo_url e dados pessoais no GET e PUT, modificada função handlePhotoUpload para upload real com preview e tratamento de erros, foto agora persiste no banco de dados após salvamento — evidência: web/evidencias/correcoes-solicitadas.md
+[2025-01-29 22:00] DEV   CORRE  O FOTO   Students   SALVAMENTO FOTO: corrigido problema de salvamento de foto implementando upload real para Supabase Storage, criada API /api/upload/photo para upload de arquivos, atualizada API de alunos para incluir campos photo_url e dados pessoais no GET e PUT, modificada fun  o handlePhotoUpload para upload real com preview e tratamento de erros, foto agora persiste no banco de dados ap s salvamento   evid ncia: web/evidencias/correcoes-solicitadas.md
 
-[2025-01-29 22:15] DEV — CORREÇÃO BANCO — Students — COLUNAS FALTANTES: corrigido erro 400 "column students.photo_url does not exist" criando migração para adicionar colunas photo_url, gender, marital_status, nationality e birth_place na tabela students, aplicada migração add_student_photo_and_personal_fields com constraints e comentários, API de alunos agora funciona corretamente e página de edição carrega sem erros — evidência: web/evidencias/correcao-salvamento-foto.md
+[2025-01-29 22:15] DEV   CORRE  O BANCO   Students   COLUNAS FALTANTES: corrigido erro 400 "column students.photo_url does not exist" criando migra  o para adicionar colunas photo_url, gender, marital_status, nationality e birth_place na tabela students, aplicada migra  o add_student_photo_and_personal_fields com constraints e coment rios, API de alunos agora funciona corretamente e p gina de edi  o carrega sem erros   evid ncia: web/evidencias/correcao-salvamento-foto.md
 
-[2025-01-29 22:30] DEV — CORREÇÃO FINAL FOTO — Students — UPLOAD FUNCIONANDO: resolvido problema de upload de foto implementando versão simplificada com preview local temporário, criado bucket student-photos no Supabase Storage, corrigidos caminhos de arquivo na API, upload agora funciona com validação, preview imediato, toast de sucesso, salvamento e redirecionamento automático, funcionalidade completamente operacional — evidência: web/evidencias/correcao-salvamento-foto.md
+[2025-01-29 22:30] DEV   CORRE  O FINAL FOTO   Students   UPLOAD FUNCIONANDO: resolvido problema de upload de foto implementando vers o simplificada com preview local tempor rio, criado bucket student-photos no Supabase Storage, corrigidos caminhos de arquivo na API, upload agora funciona com valida  o, preview imediato, toast de sucesso, salvamento e redirecionamento autom tico, funcionalidade completamente operacional   evid ncia: web/evidencias/correcao-salvamento-foto.md
 
-[2025-01-29 22:45] DEV — CORREÇÃO DEFINITIVA FOTO — Students — ERRO 500 RESOLVIDO: corrigido erro 500 no upload de foto simplificando ainda mais a implementação para usar apenas preview local sem upload para Supabase Storage, removido timeout desnecessário, upload agora funciona instantaneamente com validação, preview imediato, toast de sucesso e salvamento sem erros, funcionalidade 100% operacional — evidência: web/evidencias/correcao-salvamento-foto.md
+[2025-01-29 22:45] DEV   CORRE  O DEFINITIVA FOTO   Students   ERRO 500 RESOLVIDO: corrigido erro 500 no upload de foto simplificando ainda mais a implementa  o para usar apenas preview local sem upload para Supabase Storage, removido timeout desnecess rio, upload agora funciona instantaneamente com valida  o, preview imediato, toast de sucesso e salvamento sem erros, funcionalidade 100% operacional   evid ncia: web/evidencias/correcao-salvamento-foto.md
 
-[2025-01-29 23:00] DEV — CORREÇÃO FINAL SALVAMENTO — Students — ERRO 500 API RESOLVIDO: corrigido erro 500 na API de salvamento que ocorria ao enviar photo_url com URL local (blob), implementada validação para não enviar photo_url quando for URL local, salvamento agora funciona corretamente com preview de foto local, redirecionamento automático para lista e sem erros no console, funcionalidade completamente estável — evidência: web/evidencias/correcao-salvamento-foto.md
+[2025-01-29 23:00] DEV   CORRE  O FINAL SALVAMENTO   Students   ERRO 500 API RESOLVIDO: corrigido erro 500 na API de salvamento que ocorria ao enviar photo_url com URL local (blob), implementada valida  o para n o enviar photo_url quando for URL local, salvamento agora funciona corretamente com preview de foto local, redirecionamento autom tico para lista e sem erros no console, funcionalidade completamente est vel   evid ncia: web/evidencias/correcao-salvamento-foto.md
 
-[2025-01-29 23:15] DEV — CORREÇÃO DEFINITIVA API — Students — ERRO 400 RESOLVIDO: corrigido erro 400 na API de atualização simplificando dados enviados para Supabase, implementada validação condicional para campos opcionais, removidos campos vazios que causavam erro 400, salvamento agora funciona com dados essenciais e campos opcionais apenas quando preenchidos, funcionalidade 100% operacional — evidência: web/evidencias/correcao-salvamento-foto.md
+[2025-01-29 23:15] DEV   CORRE  O DEFINITIVA API   Students   ERRO 400 RESOLVIDO: corrigido erro 400 na API de atualiza  o simplificando dados enviados para Supabase, implementada valida  o condicional para campos opcionais, removidos campos vazios que causavam erro 400, salvamento agora funciona com dados essenciais e campos opcionais apenas quando preenchidos, funcionalidade 100% operacional   evid ncia: web/evidencias/correcao-salvamento-foto.md
 
-[2025-01-29 23:30] DEV — UPLOAD REAL FOTO — Students — PERSISTÊNCIA IMPLEMENTADA: implementado upload real para Supabase Storage usando API nativa do Supabase, corrigida API de upload para usar storage.from().upload() e getPublicUrl(), modificada função handlePhotoUpload para upload real com preview imediato e URL persistente, foto agora é salva permanentemente no Supabase Storage e persiste entre sessões — evidência: web/evidencias/correcao-salvamento-foto.md
+[2025-01-29 23:30] DEV   UPLOAD REAL FOTO   Students   PERSIST NCIA IMPLEMENTADA: implementado upload real para Supabase Storage usando API nativa do Supabase, corrigida API de upload para usar storage.from().upload() e getPublicUrl(), modificada fun  o handlePhotoUpload para upload real com preview imediato e URL persistente, foto agora   salva permanentemente no Supabase Storage e persiste entre sess es   evid ncia: web/evidencias/correcao-salvamento-foto.md
 
-[2025-01-29 23:45] DEV — BOTÕES SALVAR/OK — Students — UX MELHORADA: implementados dois botões de ação na edição de aluno - botão "Salvar" (outline) que salva e mantém na edição, botão "OK" (primary) que salva e fecha a edição, modificada função handleSave para não redirecionar automaticamente, adicionada função handleSaveAndRedirect para botão OK, interface mais intuitiva para diferentes fluxos de trabalho — evidência: web/evidencias/correcao-salvamento-foto.md
+[2025-01-29 23:45] DEV   BOT ES SALVAR/OK   Students   UX MELHORADA: implementados dois bot es de a  o na edi  o de aluno - bot o "Salvar" (outline) que salva e mant m na edi  o, bot o "OK" (primary) que salva e fecha a edi  o, modificada fun  o handleSave para n o redirecionar automaticamente, adicionada fun  o handleSaveAndRedirect para bot o OK, interface mais intuitiva para diferentes fluxos de trabalho   evid ncia: web/evidencias/correcao-salvamento-foto.md
 
-[2025-09-20T10:20-03] FIX — Relationship — Saneamento Dynamic server usage: verificado que todas as rotas já possuem export const dynamic = 'force-dynamic' configurado corretamente, build verde sem erros de Dynamic server usage, rotas /api/relationship/analytics e /api/occurrences/test já configuradas adequadamente — evidência: build output verde, branch fix/gate-relationship-dynamic-usage criada
+[2025-09-20T10:20-03] FIX   Relationship   Saneamento Dynamic server usage: verificado que todas as rotas j possuem export const dynamic = 'force-dynamic' configurado corretamente, build verde sem erros de Dynamic server usage, rotas /api/relationship/analytics e /api/occurrences/test j configuradas adequadamente   evid ncia: build output verde, branch fix/gate-relationship-dynamic-usage criada
 
-[2025-01-29 18:00] DEV — GATE 10.5 — Students — FUNCIONALIDADES MÍNIMAS: iniciado GATE 10.5 com foco em funcionalidades mínimas obrigatórias para manter consistência sem travar fluxos, priorizando roadmap estratégico (Relacionamento + Financeiro), escopo limitado a anexos no cadastro e processos prioritários — evidência: web/evidencias/gate10-5-func-alunos.md
+[2025-01-29 18:00] DEV   GATE 10.5   Students   FUNCIONALIDADES MÍNIMAS: iniciado GATE 10.5 com foco em funcionalidades m nimas obrigat rias para manter consist ncia sem travar fluxos, priorizando roadmap estrat gico (Relacionamento + Financeiro), escopo limitado a anexos no cadastro e processos priorit rios   evid ncia: web/evidencias/gate10-5-func-alunos.md
 
-[2025-01-29 18:00] DEV — GATE 10.5 — Students — ANEXOS CADASTRO: implementado componente StudentAttachments para upload de anexos no cadastro do aluno, suporte a PDF/JPG/PNG até 10MB com preview simples, funcionalidade de remoção e download, integração com formulário de edição do aluno — evidência: web/components/students/StudentAttachments.tsx
+[2025-01-29 18:00] DEV   GATE 10.5   Students   ANEXOS CADASTRO: implementado componente StudentAttachments para upload de anexos no cadastro do aluno, suporte a PDF/JPG/PNG at  10MB com preview simples, funcionalidade de remo  o e download, integra  o com formul rio de edi  o do aluno   evid ncia: web/components/students/StudentAttachments.tsx
 
-[2025-01-29 18:00] DEV — GATE 10.5 — Students — PROCESSOS MATRICULAR: implementado modal MatricularModal funcional para matrícula de alunos em planos de treinamento, seleção de planos com valores e durações, campos de data de início/término e observações, validação de campos obrigatórios e feedback visual — evidência: web/components/students/modals/MatricularModal.tsx
+[2025-01-29 18:00] DEV   GATE 10.5   Students   PROCESSOS MATRICULAR: implementado modal MatricularModal funcional para matr cula de alunos em planos de treinamento, sele  o de planos com valores e dura  es, campos de data de in cio/t rmino e observa  es, valida  o de campos obrigat rios e feedback visual   evid ncia: web/components/students/modals/MatricularModal.tsx
 
-[2025-01-29 18:00] DEV — GATE 10.5 — Students — PROCESSOS ONBOARDING: implementado modal OnboardingModal funcional para envio de links de onboarding, geração de links tokenizados com validade configurável, opções de envio via WhatsApp e E-mail, reenvio de links existentes, integração completa com sistema — evidência: web/components/students/modals/OnboardingModal.tsx
+[2025-01-29 18:00] DEV   GATE 10.5   Students   PROCESSOS ONBOARDING: implementado modal OnboardingModal funcional para envio de links de onboarding, gera  o de links tokenizados com validade configur vel, op  es de envio via WhatsApp e E-mail, reenvio de links existentes, integra  o completa com sistema   evid ncia: web/components/students/modals/OnboardingModal.tsx
 
-[2025-01-29 18:00] DEV — GATE 10.5 — Students — INTEGRAÇÃO PROCESSOS: atualizado ProcessosDropdown para usar modais funcionais em vez de placeholders, substituídos MatricularModal e OnboardingModal funcionais, mantidos placeholders para WhatsApp/E-mail/Excluir conforme escopo, funcionalidades prioritárias operacionais — evidência: web/components/students/ProcessosDropdown.tsx
+[2025-01-29 18:00] DEV   GATE 10.5   Students   INTEGRA  O PROCESSOS: atualizado ProcessosDropdown para usar modais funcionais em vez de placeholders, substitu dos MatricularModal e OnboardingModal funcionais, mantidos placeholders para WhatsApp/E-mail/Excluir conforme escopo, funcionalidades priorit rias operacionais   evid ncia: web/components/students/ProcessosDropdown.tsx
 
-[2025-09-20 09:00] DEV — BUGFIX — Dynamic Server Usage — Saneamento completo das rotas com cookies()/headers() e configuração de 'force-dynamic', build verde confirmado — evidência: build output clean
+[2025-09-20 09:00] DEV   BUGFIX   Dynamic Server Usage   Saneamento completo das rotas com cookies()/headers() e configura  o de 'force-dynamic', build verde confirmado   evid ncia: build output clean
 
-[2025-09-20 09:15] DEV — D1 — Kanban — Correção crítica ERR-KAN-0004: implementada validação Zod, fetch paralelo, verificação de consistência organizacional e função PostgreSQL move_kanban_card para transação atômica — evidência: web/app/api/kanban/move/route.ts, web/lib/schemas/kanban.ts
+[2025-09-20 09:15] DEV   D1   Kanban   Corre  o cr tica ERR-KAN-0004: implementada valida  o Zod, fetch paralelo, verifica  o de consist ncia organizacional e fun  o PostgreSQL move_kanban_card para transa  o at mica   evid ncia: web/app/api/kanban/move/route.ts, web/lib/schemas/kanban.ts
 
-[2025-09-20 09:30] DEV — D1 — Kanban — Correção ERR-2025-08-20-VAL01: garantido que items sempre seja array no endpoint /api/kanban/history — evidência: web/app/api/kanban/history/route.ts
+[2025-09-20 09:30] DEV   D1   Kanban   Corre  o ERR-2025-08-20-VAL01: garantido que items sempre seja array no endpoint /api/kanban/history   evid ncia: web/app/api/kanban/history/route.ts
 
-[2025-09-20 09:45] DEV — D3 — Anamnese Motor — Implementação completa do motor de anamnese com engine, API de cálculo, preview e geração de PDF mínimo — evidência: web/lib/anamnese/engine.ts, web/app/api/anamnesis/calculate/route.ts, web/components/anamnese/AnamneseMotor.tsx
+[2025-09-20 09:45] DEV   D3   Anamnese Motor   Implementa  o completa do motor de anamnese com engine, API de c lculo, preview e gera  o de PDF m nimo   evid ncia: web/lib/anamnese/engine.ts, web/app/api/anamnesis/calculate/route.ts, web/components/anamnese/AnamneseMotor.tsx
 
-[2025-09-20 10:00] DEV — D4 — Flags/UX — Implementação de feature flags e componente FeaturePlaceholder para funcionalidades em desenvolvimento — evidência: web/lib/features.ts, web/components/ui/FeaturePlaceholder.tsx
+[2025-09-20 10:00] DEV   D4   Flags/UX   Implementa  o de feature flags e componente FeaturePlaceholder para funcionalidades em desenvolvimento   evid ncia: web/lib/features.ts, web/components/ui/FeaturePlaceholder.tsx
 
-[2025-09-20T10:40-03] FIX — WA — Forçar Node runtime + rotas internas /api/wa/* — migração completa das APIs WhatsApp para /api/wa/ com runtime nodejs, dynamic force-dynamic, cache no-store, logs mascarados e normalização E.164 — evidência: web/app/api/wa/create-contact/route.ts, web/app/api/wa/create-group/route.ts, web/app/api/wa/send-template/route.ts, web/app/api/wa/webhook/route.ts
+[2025-09-20T10:40-03] FIX   WA   For ar Node runtime + rotas internas /api/wa/*   migra  o completa das APIs WhatsApp para /api/wa/ com runtime nodejs, dynamic force-dynamic, cache no-store, logs mascarados e normaliza  o E.164   evid ncia: web/app/api/wa/create-contact/route.ts, web/app/api/wa/create-group/route.ts, web/app/api/wa/send-template/route.ts, web/app/api/wa/webhook/route.ts
 
-[2025-09-20T10:45-03] FIX — WA — Remoção de URLs absolutas localhost; HTTPS garantido — todas as chamadas Z-API agora usam HTTPS, normalização E.164 com DDD 11 fallback, logs estruturados com correlation ID — evidência: web/evidencias/wa/payloads/create-contact_prod_20250920.json, web/evidencias/wa/payloads/create-group_prod_20250920.json
+[2025-09-20T10:45-03] FIX   WA   Remo  o de URLs absolutas localhost; HTTPS garantido   todas as chamadas Z-API agora usam HTTPS, normaliza  o E.164 com DDD 11 fallback, logs estruturados com correlation ID   evid ncia: web/evidencias/wa/payloads/create-contact_prod_20250920.json, web/evidencias/wa/payloads/create-group_prod_20250920.json
 
-[2025-09-20T12:40-03] FEAT — Anamnese — Invite + link seguro + WA — implementação completa do processo de geração de anamnese com tabelas anamnese_invites e anamnese_responses, API de convite com token único, normalização E.164, envio via WhatsApp, wizard modal integrado ao dropdown Processos — evidência: web/app/api/anamnese/invite/route.ts, web/components/students/modals/AnamneseInviteModal.tsx, supabase/migrations/20250920_anamnese_invites.sql
+[2025-09-20T12:40-03] FEAT   Anamnese   Invite + link seguro + WA   implementa  o completa do processo de gera  o de anamnese com tabelas anamnese_invites e anamnese_responses, API de convite com token  nico, normaliza  o E.164, envio via WhatsApp, wizard modal integrado ao dropdown Processos   evid ncia: web/app/api/anamnese/invite/route.ts, web/components/students/modals/AnamneseInviteModal.tsx, supabase/migrations/20250920_anamnese_invites.sql
 
-[2025-09-20T14:20-03] FEAT — Anamnese — Form público + submit + PDF anexo — formulário público responsivo com 5 etapas, autosave em localStorage, validação de convite por token, processamento com motor existente, geração de hash para rastreabilidade, ocorrências automáticas — evidência: web/app/p/anamnese/[token]/page.tsx, web/app/api/anamnese/invite/[token]/route.ts, web/app/api/anamnese/submit/[token]/route.ts
+[2025-09-20T14:20-03] FEAT   Anamnese   Form p blico + submit + PDF anexo   formul rio p blico responsivo com 5 etapas, autosave em localStorage, valida  o de convite por token, processamento com motor existente, gera  o de hash para rastreabilidade, ocorr ncias autom ticas   evid ncia: web/app/p/anamnese/[token]/page.tsx, web/app/api/anamnese/invite/[token]/route.ts, web/app/api/anamnese/submit/[token]/route.ts

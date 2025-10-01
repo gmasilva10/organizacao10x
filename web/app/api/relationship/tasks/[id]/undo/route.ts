@@ -1,4 +1,4 @@
-﻿// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
+﻿// For  ar execu   £o din ¢mica para evitar problemas de renderiza   £o est ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -6,7 +6,7 @@ export const revalidate = 0;
 /**
  * GATE 10.7 - Endpoint de Undo para Tarefas
  * 
- * Permite desfazer aÃ§Ãµes de:
+ * Permite desfazer a   µes de:
  * - DELETE (soft delete) - restaura status anterior
  * - SKIP - restaura status anterior
  * 
@@ -42,18 +42,18 @@ export async function POST(
       .single()
     
     if (fetchError || !task) {
-      console.error('âŒ Tarefa nÃ£o encontrada:', fetchError)
+      console.error(' Œ Tarefa n £o encontrada:', fetchError)
       return NextResponse.json({ 
-        error: 'Tarefa nÃ£o encontrada' 
+        error: 'Tarefa n £o encontrada' 
       }, { status: 404 })
     }
     
-    // 2. Validar se a tarefa estÃ¡ em estado que permite undo
+    // 2. Validar se a tarefa est ¡ em estado que permite undo
     const allowedStatuses = ['deleted', 'skipped']
     if (!allowedStatuses.includes(task.status)) {
-      console.error(`âŒ Status atual nÃ£o permite undo: ${task.status}`)
+      console.error(` Œ Status atual n £o permite undo: ${task.status}`)
       return NextResponse.json({ 
-        error: 'Esta tarefa nÃ£o pode ser restaurada',
+        error: 'Esta tarefa n £o pode ser restaurada',
         current_status: task.status
       }, { status: 400 })
     }
@@ -67,15 +67,15 @@ export async function POST(
     const UNDO_WINDOW_SECONDS = 5
     
     if (diffSeconds > UNDO_WINDOW_SECONDS) {
-      console.error(`âŒ Janela de undo expirada: ${diffSeconds}s (mÃ¡ximo: ${UNDO_WINDOW_SECONDS}s)`)
+      console.error(` Œ Janela de undo expirada: ${diffSeconds}s (m ¡ximo: ${UNDO_WINDOW_SECONDS}s)`)
       return NextResponse.json({ 
-        error: 'Tempo para desfazer a aÃ§Ã£o expirou',
+        error: 'Tempo para desfazer a a   £o expirou',
         elapsed_seconds: Math.floor(diffSeconds),
         max_seconds: UNDO_WINDOW_SECONDS
       }, { status: 400 })
     }
     
-    // 4. Preparar dados de restauraÃ§Ã£o
+    // 4. Preparar dados de restaura   £o
     const restoreData: any = {
       status: previous_status || 'pending',
       updated_at: new Date().toISOString()
@@ -98,9 +98,9 @@ export async function POST(
       .eq('id', params.id)
     
     if (undoError) {
-      console.error('âŒ Erro ao desfazer aÃ§Ã£o:', undoError)
+      console.error(' Œ Erro ao desfazer a   £o:', undoError)
       return NextResponse.json({ 
-        error: 'Erro ao desfazer aÃ§Ã£o' 
+        error: 'Erro ao desfazer a   £o' 
       }, { status: 500 })
     }
     
@@ -117,18 +117,18 @@ export async function POST(
           restored_status: restoreData.status,
           undone_scheduled_for: task.scheduled_for,
           restored_scheduled_for: restoreData.scheduled_for,
-          undo_performed_by: 'dev-user-id', // TODO: pegar do contexto de autenticaÃ§Ã£o
+          undo_performed_by: 'dev-user-id', // TODO: pegar do contexto de autentica   £o
           elapsed_seconds: Math.floor(diffSeconds),
           student_name: (Array.isArray((task as any).student) ? (task as any).student[0]?.name : (task as any).student?.name)
         }
       })
     
-    console.log(`âœ… Undo realizado: ${Array.isArray((task as any).student) ? (task as any).student[0]?.name : (task as any).student?.name || 'Aluno'} - ${params.id}`)
-    console.log(`   ${task.status} â†’ ${restoreData.status}`)
+    console.log(` œ  Undo realizado: ${Array.isArray((task as any).student) ? (task as any).student[0]?.name : (task as any).student?.name || 'Aluno'} - ${params.id}`)
+    console.log(`   ${task.status}  †  ${restoreData.status}`)
     
     return NextResponse.json({ 
       success: true, 
-      message: 'AÃ§Ã£o desfeita com sucesso',
+      message: 'A   £o desfeita com sucesso',
       task_id: params.id,
       previous_status: task.status,
       restored_status: restoreData.status,
@@ -136,7 +136,7 @@ export async function POST(
     })
     
   } catch (error) {
-    console.error('âŒ Erro no undo:', error)
+    console.error(' Œ Erro no undo:', error)
     return NextResponse.json({ 
       error: 'Erro interno',
       details: (error as any)?.message || String(error) 

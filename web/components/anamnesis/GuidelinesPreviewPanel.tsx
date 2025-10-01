@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -61,7 +61,7 @@ interface PreviewResult {
 
 export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
   const [isLoading, setIsLoading] = useState(false)
-  // Guardar valores como strings para preservar seleção ("sim"|"nao"|"")
+  // Guardar valores como strings para preservar seleÃ§Ã£o ("sim"|"nao"|"")
   const [formValues, setFormValues] = useState<Record<string, string>>({})
   const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null)
 
@@ -73,7 +73,7 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
     const payload: Record<string, any> = {}
     for (const [key, raw] of Object.entries(values)) {
       if (raw === "sim") payload[key] = true
-      else if (raw === "nao" || raw === "não") payload[key] = false
+      else if (raw === "nao" || raw === "nÃ£o") payload[key] = false
       else if (raw.trim() === "") continue
       else if (!Number.isNaN(Number(raw))) payload[key] = Number(raw)
       else payload[key] = raw
@@ -106,8 +106,8 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
   }
 
   const formatRange = (range: [number, number]) => {
-    if (range[0] === range[1]) return range[0] === 0 ? "Não definido" : range[0].toString()
-    return range[0] === 0 && range[1] === 0 ? "Não definido" : `${range[0]} - ${range[1]}`
+    if (range[0] === range[1]) return range[0] === 0 ? "NÃ£o definido" : range[0].toString()
+    return range[0] === 0 && range[1] === 0 ? "NÃ£o definido" : `${range[0]} - ${range[1]}`
   }
 
   const priorityBadge = (priority: string) => {
@@ -117,7 +117,7 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
       media: "bg-yellow-100 text-yellow-800",
       baixa: "bg-green-100 text-green-800",
     }
-    const label: Record<string, string> = { critica: "Crítica", alta: "Alta", media: "Média", baixa: "Baixa" }
+    const label: Record<string, string> = { critica: "CrÃ­tica", alta: "Alta", media: "MÃ©dia", baixa: "Baixa" }
     return <Badge className={map[priority] || map.media}>{label[priority] || priority}</Badge>
   }
 
@@ -142,7 +142,7 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
                   >
                     <option value="">Selecione</option>
                     <option value="sim">Sim</option>
-                    <option value="nao">Não</option>
+                    <option value="nao">NÃ£o</option>
                   </select>
                 ) : (
                   <Input
@@ -216,13 +216,13 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
             </Card>
           )}
 
-          {/* Seção Debug Detalhada */}
+          {/* SeÃ§Ã£o Debug Detalhada */}
           {previewResult?.debug_info && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <AlertCircle className="h-5 w-5 text-blue-600" />
-                  Debug - Informações do Motor
+                  Debug - InformaÃ§Ãµes do Motor
                 </CardTitle>
                 <CardDescription>Detalhes sobre como as regras foram processadas e combinadas</CardDescription>
               </CardHeader>
@@ -233,25 +233,25 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
                     <p className="text-sm text-muted-foreground">{(previewResult as any).debug_info?.total_rules}</p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">Regras Aplicáveis</Label>
+                    <Label className="text-sm font-medium">Regras AplicÃ¡veis</Label>
                     <p className="text-sm text-muted-foreground">{(previewResult as any).debug_info?.applicable_rules}</p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">Lógica de Combinação</Label>
+                    <Label className="text-sm font-medium">LÃ³gica de CombinaÃ§Ã£o</Label>
                     <p className="text-sm text-muted-foreground">{(previewResult as any).debug_info?.combination_logic}</p>
                   </div>
                 </div>
                 
                 {previewResult.debug_info.decisions && previewResult.debug_info.decisions.length > 0 && (
                   <div>
-                    <Label className="text-sm font-medium">Decisões por Regra</Label>
+                    <Label className="text-sm font-medium">DecisÃµes por Regra</Label>
                     <div className="space-y-2 mt-2">
-                      {previewResult.debug_info.decisions.map((decision, index) => (
+                      {previewResult.debug_info.decisions.map((decision: any, index: number) => (
                         <div key={index} className="p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium">Regra #{index + 1}</span>
-                            <Badge variant={decision.applied ? "default" : "secondary"}>
-                              {decision.applied ? "Aplicada" : "Não aplicada"}
+                            <Badge variant={decision?.applied ? "default" : "secondary"}>
+                              {decision.applied ? "Aplicada" : "NÃ£o aplicada"}
                             </Badge>
                           </div>
                           {decision.reason && (
@@ -266,39 +266,39 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
             </Card>
           )}
 
-          {/* Seção Aeróbio */}
+          {/* SeÃ§Ã£o AerÃ³bio */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Activity className="h-5 w-5 text-blue-600" />
-                Resistência Aeróbia
+                ResistÃªncia AerÃ³bia
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Duração</Label>
+                  <Label className="text-sm font-medium">DuraÃ§Ã£o</Label>
                   <p className="text-sm text-muted-foreground">{formatRange(previewResult.combined_outputs.aerobio.duracao_min)} min</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">Intensidade</Label>
                   <p className="text-sm text-muted-foreground">
                     {formatRange(previewResult.combined_outputs.aerobio.intensidade.faixa)}% {previewResult.combined_outputs.aerobio.intensidade.metodo}
-                    {previewResult.combined_outputs.aerobio.intensidade.texto && (
+                    {(previewResult.combined_outputs.aerobio.intensidade as any)?.texto && (
                       <span className="block text-xs text-muted-foreground mt-1">
-                        ({previewResult.combined_outputs.aerobio.intensidade.texto})
+                        ({(previewResult.combined_outputs.aerobio.intensidade as any)?.texto})
                       </span>
                     )}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Frequência</Label>
+                  <Label className="text-sm font-medium">FrequÃªncia</Label>
                   <p className="text-sm text-muted-foreground">{formatRange(previewResult.combined_outputs.aerobio.frequencia_sem)}x/sem</p>
                 </div>
               </div>
               {previewResult.combined_outputs.aerobio.obs && previewResult.combined_outputs.aerobio.obs.length > 0 && (
                 <div>
-                  <Label className="text-sm font-medium">Observações</Label>
+                  <Label className="text-sm font-medium">ObservaÃ§Ãµes</Label>
                   <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
                     {previewResult.combined_outputs.aerobio.obs.map((obs, i) => (
                       <li key={i}>{obs}</li>
@@ -309,7 +309,7 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
             </CardContent>
           </Card>
 
-          {/* Seção Pesos */}
+          {/* SeÃ§Ã£o Pesos */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -320,19 +320,19 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Exercícios</Label>
+                  <Label className="text-sm font-medium">ExercÃ­cios</Label>
                   <p className="text-sm text-muted-foreground">{formatRange(previewResult.combined_outputs.pesos.exercicios)}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Séries</Label>
+                  <Label className="text-sm font-medium">SÃ©ries</Label>
                   <p className="text-sm text-muted-foreground">{formatRange(previewResult.combined_outputs.pesos.series)}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Repetições</Label>
+                  <Label className="text-sm font-medium">RepetiÃ§Ãµes</Label>
                   <p className="text-sm text-muted-foreground">{formatRange(previewResult.combined_outputs.pesos.reps)}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Frequência</Label>
+                  <Label className="text-sm font-medium">FrequÃªncia</Label>
                   <p className="text-sm text-muted-foreground">{formatRange(previewResult.combined_outputs.pesos.frequencia_sem)}x/sem</p>
                 </div>
               </div>
@@ -344,7 +344,7 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
               </div>
               {previewResult.combined_outputs.pesos.obs && previewResult.combined_outputs.pesos.obs.length > 0 && (
                 <div>
-                  <Label className="text-sm font-medium">Observações</Label>
+                  <Label className="text-sm font-medium">ObservaÃ§Ãµes</Label>
                   <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
                     {previewResult.combined_outputs.pesos.obs.map((obs, i) => (
                       <li key={i}>{obs}</li>
@@ -355,7 +355,7 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
             </CardContent>
           </Card>
 
-          {/* Seção Flexibilidade e Mobilidade */}
+          {/* SeÃ§Ã£o Flexibilidade e Mobilidade */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -366,11 +366,11 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
             <CardContent className="space-y-4">
               <div>
                 <Label className="text-sm font-medium">Foco</Label>
-                <p className="text-sm text-muted-foreground">{previewResult.combined_outputs.flex_mob.foco || "Não especificado"}</p>
+                <p className="text-sm text-muted-foreground">{previewResult.combined_outputs.flex_mob.foco || "NÃ£o especificado"}</p>
               </div>
               {previewResult.combined_outputs.flex_mob.obs && previewResult.combined_outputs.flex_mob.obs.length > 0 && (
                 <div>
-                  <Label className="text-sm font-medium">Observações</Label>
+                  <Label className="text-sm font-medium">ObservaÃ§Ãµes</Label>
                   <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
                     {previewResult.combined_outputs.flex_mob.obs.map((obs, i) => (
                       <li key={i}>{obs}</li>
@@ -381,13 +381,13 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
             </CardContent>
           </Card>
 
-          {/* Seção Contraindicações */}
+          {/* SeÃ§Ã£o ContraindicaÃ§Ãµes */}
           {previewResult.combined_outputs.contraindicacoes.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Ban className="h-5 w-5 text-red-600" />
-                  Contraindicações
+                  ContraindicaÃ§Ãµes
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -400,13 +400,13 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
             </Card>
           )}
 
-          {/* Seção Observações Gerais */}
+          {/* SeÃ§Ã£o ObservaÃ§Ãµes Gerais */}
           {previewResult.combined_outputs.observacoes.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <FileText className="h-5 w-5 text-orange-600" />
-                  Observações Gerais
+                  ObservaÃ§Ãµes Gerais
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -425,5 +425,11 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
 }
 
 export default GuidelinesPreviewPanel
+
+
+
+
+
+
 
 

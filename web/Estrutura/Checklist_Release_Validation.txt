@@ -1,291 +1,291 @@
-[ACC06] Telemetria: PASS — evid.: Estrutura/account/telemetry_samples.json
+[ACC06] Telemetria: PASS   evid.: Estrutura/account/telemetry_samples.json
 
-## Gestão de Ocorrências — UI v0.1 (2025-09-04)
-- Filtros: período, grupo/tipo, status, prioridade, sensível, lembrete (com/sem/janela), responsável (multi), busca → PASS
-- Tabela: Prioridade (chip), Sensível (ícone), Lembrete (ícone + data) → PASS
-- ID clicável abre modal Detalhes/Editar → PASS
-- Modal Detalhes/Editar: campos editáveis, anexos, RBAC, validações → PASS
-- Modal Encerrar: campos resolução, PATCH /close, RBAC → PASS
-- Ações lembrete: concluir e alterar data funcionam → PASS
-- Chips premium com ícone X para limpar → PASS
-- Paginação mantém filtros → PASS
+## Gest o de Ocorr ncias   UI v0.1 (2025-09-04)
+- Filtros: per odo, grupo/tipo, status, prioridade, sens vel, lembrete (com/sem/janela), respons vel (multi), busca → PASS
+- Tabela: Prioridade (chip), Sens vel ( cone), Lembrete ( cone + data) → PASS
+- ID clic vel abre modal Detalhes/Editar → PASS
+- Modal Detalhes/Editar: campos edit veis, anexos, RBAC, valida  es → PASS
+- Modal Encerrar: campos resolu  o, PATCH /close, RBAC → PASS
+- A  es lembrete: concluir e alterar data funcionam → PASS
+- Chips premium com  cone X para limpar → PASS
+- Pagina  o mant m filtros → PASS
 - Estados loading/empty consistentes → PASS
 
-## Gestão de Ocorrências — UX Premium (2025-09-04)
-- Drawer lateral: filtros movidos para painel lateral (padrão Onboarding/Kanban) → PASS
-- Header compacto: título + contadores + botão Filtros → PASS
+## Gest o de Ocorr ncias   UX Premium (2025-09-04)
+- Drawer lateral: filtros movidos para painel lateral (padr o Onboarding/Kanban) → PASS
+- Header compacto: t tulo + contadores + bot o Filtros → PASS
 - Resumo filtros: "Filtros ativos: N" + "Limpar tudo" → PASS
 - Responsividade: desktop drawer 420-480px, mobile sheet full-height → PASS
 - Hotkeys: Esc para fechar drawer → PASS
-- Zero regressão: consultas, ações ⋮, modais, lembretes, anexos, RBAC → PASS
+- Zero regress o: consultas, a  es ⋮, modais, lembretes, anexos, RBAC → PASS
 
-# Checklist de Liberação para Validação (v1)
+# Checklist de Libera  o para Valida  o (v1)
 
-## Kanban — Fluxos críticos
-- First Run template visível (colunas iniciais configuradas)
-- Criar card em “Novo Aluno”
-- Drag para coluna intermediária → evento student.stage.moved registrado
-- Drag para “Entrega do Treino” → card some do board e aparece no Histórico
+## Kanban   Fluxos cr ticos
+- First Run template vis vel (colunas iniciais configuradas)
+- Criar card em  Novo Aluno”
+- Drag para coluna intermedi ria → evento student.stage.moved registrado
+- Drag para  Entrega do Treino” → card some do board e aparece no Hist rico
 - RBAC: seller/support bloqueados no move (403 + rbac.denied)
-- Contadores por coluna atualizam após drops
-- Busca rápida por nome filtra cards renderizados
-- Build/lint verdes; console limpo (janela anônima)
+- Contadores por coluna atualizam ap s drops
+- Busca r pida por nome filtra cards renderizados
+- Build/lint verdes; console limpo (janela an nima)
 
-Validações executadas em 2025-08-19 10:20
+Valida  es executadas em 2025-08-19 10:20
 - 200 OK: admin/manager/trainer conseguem mover cards.
 - 403 denied: seller/support bloqueados; evento rbac.denied registrado.
-- Histórico: cards concluídos aparecem em "Histórico" e somem do board.
+- Hist rico: cards conclu dos aparecem em "Hist rico" e somem do board.
 - Amostras de eventos anexadas em Estrutura/kanban_events_sample.json.
 
-Kanban — Persistência (Segundo Corte)
+Kanban   Persist ncia (Segundo Corte)
 - GET /api/kanban/board retorna {columns,cards} do banco (Supabase).
 - GET /api/kanban/board?trainerId=... filtra cards por trainer (server-first)
 - POST /api/kanban/move atualiza column_id do card e emite telemetria.
-- GET /api/kanban/tree retorna árvore (organização → trainers → alunos) com contagens.
-- RBAC na árvore: admin/manager veem todos; trainer vê apenas seus cartões.
-- Menu recolhível: estado em localStorage (pg.nav.collapsed), ARIA (aria-pressed), foco preservado.
+- GET /api/kanban/tree retorna  rvore (organiza  o → trainers → alunos) com contagens.
+- RBAC na  rvore: admin/manager veem todos; trainer v  apenas seus cart es.
+- Menu recolh vel: estado em localStorage (pg.nav.collapsed), ARIA (aria-pressed), foco preservado.
 - DnD com rollback: falha → reverte UI + toast informativo.
 
 PASS (Segundo Corte)
-- Filtro por trainer via árvore (UI → API ?trainerId).
+- Filtro por trainer via  rvore (UI → API ?trainerId).
 - DnD falha → rollback + toast; telemetria somente em sucesso.
-- Histórico default últimos 7 dias + paginação; RBAC preservado.
+- Hist rico default  ltimos 7 dias + pagina  o; RBAC preservado.
 - Build/lint verdes.
 
-Histórico (MVP)
-- /onboarding/history abre com últimos 7 dias.
-- Filtro por período (from/to) e por trainerId.
-- Paginação (page/pageSize) com ordenação por completed_at desc.
+Hist rico (MVP)
+- /onboarding/history abre com  ltimos 7 dias.
+- Filtro por per odo (from/to) e por trainerId.
+- Pagina  o (page/pageSize) com ordena  o por completed_at desc.
 
-PASS — Histórico (2025-08-19 17:42)
-- Carrega dados dos últimos 7 dias em ordem desc (completed_at)
+PASS   Hist rico (2025-08-19 17:42)
+- Carrega dados dos  ltimos 7 dias em ordem desc (completed_at)
 - Filtros from/to/trainerId aplicados (server-first)
-- RBAC: quando trainerId ausente e usuário for trainer, restringe a seus registros
-- Falhas 4xx/5xx exibem feedback e não disparam telemetria
+- RBAC: quando trainerId ausente e usu rio for trainer, restringe a seus registros
+- Falhas 4xx/5xx exibem feedback e n o disparam telemetria
 
-Kanban — Terceiro Corte (parcial)
-- CRUD de colunas persistente (restrições nas colunas fixas).
-- Reorder estável (sort sequencial) após DnD; refetch leve mantém contadores em sincronia.
-PASS — CRUD/Ordenação (2025-08-19 17:42)
-- Colunas fixas não podem ser renomeadas/removidas (client + server)
-- Reorder mantém sort 10/20/30 e faz rollback em erro
+Kanban   Terceiro Corte (parcial)
+- CRUD de colunas persistente (restri  es nas colunas fixas).
+- Reorder est vel (sort sequencial) ap s DnD; refetch leve mant m contadores em sincronia.
+PASS   CRUD/Ordena  o (2025-08-19 17:42)
+- Colunas fixas n o podem ser renomeadas/removidas (client + server)
+- Reorder mant m sort 10/20/30 e faz rollback em erro
 
-PASS — Terceiro Corte consolidado em 2025-08-19 18:04
+PASS   Terceiro Corte consolidado em 2025-08-19 18:04
 
-Validações adicionais (pós-realinhamento 2025-08-19 19:51)
+Valida  es adicionais (p s-realinhamento 2025-08-19 19:51)
 - DnD funcional (Draggable+Droppable), highlight claro e rollback em erro
-- Histórico acessível pela sidebar e com ação de voltar; filtros/paginação/estados refinados
-- Colunas fixas bloqueadas; intermediárias com CRUD liberado; reorder estável 10/20/30
+- Hist rico acess vel pela sidebar e com a  o de voltar; filtros/pagina  o/estados refinados
+- Colunas fixas bloqueadas; intermedi rias com CRUD liberado; reorder est vel 10/20/30
 - Layout sem barras de scroll indesejadas; toggle de sidebar persistente
 
-PASS — E2E 2025-08-19 20:05
+PASS   E2E 2025-08-19 20:05
 
-Próxima execução de QA (22/08)
-- Referenciar IDs de erros VAL01..VAL06 em cada item validado (DnD, Histórico, Colunas, Sidebar, UX, Telemetria).
-- Marcar explicitamente PASS/FAIL por ID (ex.: VAL01 PASS, VAL02 FAIL, ...), anexando evidências.
+Pr xima execu  o de QA (22/08)
+- Referenciar IDs de erros VAL01..VAL06 em cada item validado (DnD, Hist rico, Colunas, Sidebar, UX, Telemetria).
+- Marcar explicitamente PASS/FAIL por ID (ex.: VAL01 PASS, VAL02 FAIL, ...), anexando evid ncias.
 
-[VAL01] DnD — FAIL (20/08). Status: EM CORREÇÃO — Fix aplicado: validar res.ok; rollback !=2xx; reorder somente após 204. Evidência: web/app/(app)/kanban/page.tsx. Próximo: revalidar 22/08.
-[VAL02] Histórico — FAIL (20/08). Status: EM CORREÇÃO — Fix aplicado: garantir items[]; consumir shape padronizado. Evidência: web/app/(app)/onboarding/history/page.tsx. Próximo: revalidar 22/08.
-[VAL03] Colunas — PASS — evidências: Estrutura/val03/*
-[VAL04] Sidebar/Árvore — EM ANDAMENTO — Seeds/fixtures criados; árvore `{ root, nodes }` conta apenas não concluídos; evento `pg:kanban:refetchTree` integrado após DnD/CRUD; filtro por trainer aplicado. Evid.: Estrutura/val04/*
-[VAL05] Layout/UX — FAIL (20/08). Status: EM CORREÇÃO — Fix aplicado: remoção do CTA duplicado; persistência “Recolher”. Próximo: revalidar 22/08.
-[VAL06] Telemetria — BLOCKED (20/08). Status: AGUARDANDO BASE ESTÁVEL — Próximo: validar 204 + eventos (student.stage.moved; CRUD colunas com columns_version) após VAL01–VAL05 PASS.
+[VAL01] DnD   FAIL (20/08). Status: EM CORRE  O   Fix aplicado: validar res.ok; rollback !=2xx; reorder somente ap s 204. Evid ncia: web/app/(app)/kanban/page.tsx. Pr ximo: revalidar 22/08.
+[VAL02] Hist rico   FAIL (20/08). Status: EM CORRE  O   Fix aplicado: garantir items[]; consumir shape padronizado. Evid ncia: web/app/(app)/onboarding/history/page.tsx. Pr ximo: revalidar 22/08.
+[VAL03] Colunas   PASS   evid ncias: Estrutura/val03/*
+[VAL04] Sidebar/Árvore   EM ANDAMENTO   Seeds/fixtures criados;  rvore `{ root, nodes }` conta apenas n o conclu dos; evento `pg:kanban:refetchTree` integrado ap s DnD/CRUD; filtro por trainer aplicado. Evid.: Estrutura/val04/*
+[VAL05] Layout/UX   FAIL (20/08). Status: EM CORRE  O   Fix aplicado: remo  o do CTA duplicado; persist ncia  Recolher”. Pr ximo: revalidar 22/08.
+[VAL06] Telemetria   BLOCKED (20/08). Status: AGUARDANDO BASE ESTÁVEL   Pr ximo: validar 204 + eventos (student.stage.moved; CRUD colunas com columns_version) ap s VAL01 VAL05 PASS.
 
-- Jornada ponta-a-ponta validada (Login → Onboarding → DnD/CRUD/Reorder → Histórico → Voltar → Sidebar)
+- Jornada ponta-a-ponta validada (Login → Onboarding → DnD/CRUD/Reorder → Hist rico → Voltar → Sidebar)
 - Telemetria: student.stage.moved com columns_version; eventos de colunas (create/rename/delete) com {columnId, action, timestamp, columns_version}; checklist ampliado para CRUD de colunas.
 
-Adições validadas em 2025-08-19 17:36
-- Reorder com sort sequencial (10/20/30) aplicado corretamente após mover cards.
-- Rollback em falha de persistência mantido (UI revertida + toast informativo; sem telemetria em erro).
-- Topbar com validação mínima em prompts (≥2 chars) e badge “filtro aplicado” funcionando.
+Adi  es validadas em 2025-08-19 17:36
+- Reorder com sort sequencial (10/20/30) aplicado corretamente ap s mover cards.
+- Rollback em falha de persist ncia mantido (UI revertida + toast informativo; sem telemetria em erro).
+- Topbar com valida  o m nima em prompts (≥2 chars) e badge  filtro aplicado” funcionando.
 
 
-Fluxos obrigatórios
+Fluxos obrigat rios
 1) Login (Basic e Enterprise)
-   - Preencher email/senha válidos
+   - Preencher email/senha v lidos
    - Enviar
    - POST /api/auth/sync deve responder 204
    - Redirecionar para /app e renderizar hub
    - GET /api/capabilities na mesma aba: 200 com tenant/plan/role/limits/features
 
-2) Verificação de redirects
+2) Verifica  o de redirects
    - Acessar /app diretamente (autenticado): renderiza hub
-   - Acessar /app (anônimo): bloqueio/middleware conforme política (401/redirect)
-   - Não existir redirect /app → /
+   - Acessar /app (an nimo): bloqueio/middleware conforme pol tica (401/redirect)
+   - N o existir redirect /app → /
 
-3) Console limpo (ambiente anônimo)
-   - Abrir janela anônima sem extensões
+3) Console limpo (ambiente an nimo)
+   - Abrir janela an nima sem extens es
    - Navegar: login → /app
-   - Console sem erros críticos do app (ruídos de extensões/DevTools não se aplicam aqui)
+   - Console sem erros cr ticos do app (ru dos de extens es/DevTools n o se aplicam aqui)
 
-4) Build estável
+4) Build est vel
    - npm run build sem avisos de lockfiles duplicados
-   - Lint sem warnings críticos bloqueantes
+   - Lint sem warnings cr ticos bloqueantes
 
-Evidências esperadas
+Evid ncias esperadas
 - Screenshot /app autenticado
 - JSON de /api/capabilities (200)
 - Log do build salvo em Estrutura/ (ex.: build_YYYY-MM-DD.log)
 
-## SHELL — App Shell (/app) pós-login
-[SHELL01] Menu colapsável com persistência (pg.nav.collapsed) — PASS (2025-08-20 17:02)
-[SHELL02] Cabeçalho padrão (logo, user menu, badge ambiente) — PASS (2025-08-20 17:02)  
-[SHELL03] Breadcrumb/Voltar funcional — PASS (2025-08-20 17:02)
-[SHELL04] Estados de loading/empty/error presentes — PASS (2025-08-20 17:02)
-[SHELL05] A11y mínima (teclado, foco, aria) — PASS (2025-08-20 17:02)
-[SHELL06] Sem scroll indevido; sem CTAs duplicados — PASS (2025-08-20 17:02)
+## SHELL   App Shell (/app) p s-login
+[SHELL01] Menu colaps vel com persist ncia (pg.nav.collapsed)   PASS (2025-08-20 17:02)
+[SHELL02] Cabe alho padr o (logo, user menu, badge ambiente)   PASS (2025-08-20 17:02)  
+[SHELL03] Breadcrumb/Voltar funcional   PASS (2025-08-20 17:02)
+[SHELL04] Estados de loading/empty/error presentes   PASS (2025-08-20 17:02)
+[SHELL05] A11y m nima (teclado, foco, aria)   PASS (2025-08-20 17:02)
+[SHELL06] Sem scroll indevido; sem CTAs duplicados   PASS (2025-08-20 17:02)
 
-## REFINAMENTO V2 — Cabeçalho, Sidebar, Dashboard (mock)
-[HEADER01] Branding "Organização10x" (logo/título), user menu, badge ambiente, toggle de tema — EM VALIDAÇÃO
-[HEADER02] A11y/UX do cabeçalho (aria-*, foco, navegação por teclado; sem scroll indevido) — EM VALIDAÇÃO
-[SIDEBAR01] Sidebar moderna (ícones, tooltips, grupos, active/hover claros) — EM VALIDAÇÃO
-[SIDEBAR02] Colapso com persistência (pg.nav.collapsed) e acessibilidade — EM VALIDAÇÃO
-[SIDEBAR03] Microinterações suaves (sem jitter; 60fps) — EM VALIDAÇÃO
-[DASH-MOCK01] KPIs/Gráficos com mock data (skeleton → valores; empty/error) — EM VALIDAÇÃO
-[DASH-MOCK02] Filtros visuais (range 7/30d; trainer) atuando sobre mock — EM VALIDAÇÃO
+## REFINAMENTO V2   Cabe alho, Sidebar, Dashboard (mock)
+[HEADER01] Branding "Organiza  o10x" (logo/t tulo), user menu, badge ambiente, toggle de tema   EM VALIDA  O
+[HEADER02] A11y/UX do cabe alho (aria-*, foco, navega  o por teclado; sem scroll indevido)   EM VALIDA  O
+[SIDEBAR01] Sidebar moderna ( cones, tooltips, grupos, active/hover claros)   EM VALIDA  O
+[SIDEBAR02] Colapso com persist ncia (pg.nav.collapsed) e acessibilidade   EM VALIDA  O
+[SIDEBAR03] Microintera  es suaves (sem jitter; 60fps)   EM VALIDA  O
+[DASH-MOCK01] KPIs/Gr ficos com mock data (skeleton → valores; empty/error)   EM VALIDA  O
+[DASH-MOCK02] Filtros visuais (range 7/30d; trainer) atuando sobre mock   EM VALIDA  O
 
-## SHELL — Navegação e Breadcrumb (Novo bloco)
-[SHELL-NAV01] Dashboard como landing e 1º item do menu — PASS
-[SHELL-NAV02] Ordem e grupos do menu conforme especificação — PASS
-[SHELL-NAV03] Sidebar premium (estados/tooltip/microinterações/A11y) — PASS
-[SHELL-NAV04] Breadcrumb padrão “Dashboard › {Seção}” — PASS
+## SHELL   Navega  o e Breadcrumb (Novo bloco)
+[SHELL-NAV01] Dashboard como landing e 1  item do menu   PASS
+[SHELL-NAV02] Ordem e grupos do menu conforme especifica  o   PASS
+[SHELL-NAV03] Sidebar premium (estados/tooltip/microintera  es/A11y)   PASS
+[SHELL-NAV04] Breadcrumb padr o  Dashboard   {Se  o}”   PASS
 
-## ACC — Cadastro de Conta & Guardas de Menu
-[ACC01] Wizard (Personal | Player): PASS — evid.: Estrutura/account/wizard_choice.json
-[ACC02] Personal: PASS — evid.: Estrutura/account/personal_upsert.json
-[ACC03] Player: PASS — evid.: Estrutura/account/player_org_created.json (hotfix em 21/08: service-role + payload mínimo; evid.: Estrutura/account/player_org_created_fix.json)
-[ACC04] Guardas: PASS — evid.: Estrutura/account/menu_guard_state.json
-[ACC02] Personal: upsert de profiles (full_name min 2) + toast + volta ao /app — EM ANDAMENTO
-[ACC03] Player: cria organization + membership(admin) + ativa organization_id + toast — EM ANDAMENTO
-[ACC04] Guardas: sem org -> itens do menu desabilitados + CTA “Criar organização”; com org -> habilita por role — EM ANDAMENTO
-[ACC05] UX/A11y: validação inline, DrawerDescription + aria-describedby, foco/teclado; zero scroll indevido — EM ANDAMENTO
-[ACC06] Telemetria: account.created(type) e membership.created(org_id,role,source,ts) — AGUARDANDO base estável
+## ACC   Cadastro de Conta & Guardas de Menu
+[ACC01] Wizard (Personal | Player): PASS   evid.: Estrutura/account/wizard_choice.json
+[ACC02] Personal: PASS   evid.: Estrutura/account/personal_upsert.json
+[ACC03] Player: PASS   evid.: Estrutura/account/player_org_created.json (hotfix em 21/08: service-role + payload m nimo; evid.: Estrutura/account/player_org_created_fix.json)
+[ACC04] Guardas: PASS   evid.: Estrutura/account/menu_guard_state.json
+[ACC02] Personal: upsert de profiles (full_name min 2) + toast + volta ao /app   EM ANDAMENTO
+[ACC03] Player: cria organization + membership(admin) + ativa organization_id + toast   EM ANDAMENTO
+[ACC04] Guardas: sem org -> itens do menu desabilitados + CTA  Criar organiza  o”; com org -> habilita por role   EM ANDAMENTO
+[ACC05] UX/A11y: valida  o inline, DrawerDescription + aria-describedby, foco/teclado; zero scroll indevido   EM ANDAMENTO
+[ACC06] Telemetria: account.created(type) e membership.created(org_id,role,source,ts)   AGUARDANDO base est vel
 
-Notas de governança
+Notas de governan a
 - Todo novo Dialog deve incluir DrawerDescription + aria-describedby
-- Qualquer mudança em next.config.ts que afete redirects deve ser validada por este checklist antes do release
+- Qualquer mudan a em next.config.ts que afete redirects deve ser validada por este checklist antes do release
 
-[QA01] Fluxo QA (PRs qa-suggested sem merge direto) — ATIVO
-[QA02] Triagem por severidade (SEV-1 bloqueia; SEV-2/3 sob triagem) — ATIVO
+[QA01] Fluxo QA (PRs qa-suggested sem merge direto)   ATIVO
+[QA02] Triagem por severidade (SEV-1 bloqueia; SEV-2/3 sob triagem)   ATIVO
 
-## STUDENTS — Alunos V2
-[STU01] PASS — evid.: web/Estrutura/students/*
-[STU02] Criar aluno (validação inline, toasts) — AGUARDANDO
-[STU03] Editar aluno — AGUARDANDO
-[STU04] RBAC/guards (alunos) — EM ANDAMENTO (leitura)
-[STU05] UX/A11y premium — EM ANDAMENTO
-[STU06] Telemetria (created/updated/assigned_trainer, 2xx only) — AGUARDANDO
+## STUDENTS   Alunos V2
+[STU01] PASS   evid.: web/Estrutura/students/*
+[STU02] Criar aluno (valida  o inline, toasts)   AGUARDANDO
+[STU03] Editar aluno   AGUARDANDO
+[STU04] RBAC/guards (alunos)   EM ANDAMENTO (leitura)
+[STU05] UX/A11y premium   EM ANDAMENTO
+[STU06] Telemetria (created/updated/assigned_trainer, 2xx only)   AGUARDANDO
 
-## USER — Perfil
-[USER01] Ver perfil — EM VALIDAÇÃO — evid.: Estrutura/profile/view.json
-[USER02] Editar nome — EM VALIDAÇÃO — evid.: Estrutura/profile/edit_success.json
-[USER03] Segurança (link trocar senha) — EM VALIDAÇÃO
-[USER04] UX/A11y — EM VALIDAÇÃO
-[USER05] Telemetria — AGUARDANDO
+## USER   Perfil
+[USER01] Ver perfil   EM VALIDA  O   evid.: Estrutura/profile/view.json
+[USER02] Editar nome   EM VALIDA  O   evid.: Estrutura/profile/edit_success.json
+[USER03] Seguran a (link trocar senha)   EM VALIDA  O
+[USER04] UX/A11y   EM VALIDA  O
+[USER05] Telemetria   AGUARDANDO
 
-[v0.1.0][2025-08-27] Público/Signup: PASS. Funcionando perfeitamente.
+[v0.1.0][2025-08-27] P blico/Signup: PASS. Funcionando perfeitamente.
 [v0.1.0][2025-08-27] Onboarding/Kanban: PASS. Board funcionando, cards sendo criados.
 [v0.1.0][2025-08-27] Hard Delete: PASS. ON DELETE CASCADE funcionando perfeitamente.
 [v0.1.0][2025-08-27] Editar Colunas: PASS. Modal funcionando, colunas fixas protegidas.
 
-[v0.2.0][2025-08-27] LOG-CARD-ACTIONS — PASS ✅
-[v0.2.0][2025-08-27] TASKS-INSTANTIATE — PASS ✅
-[v0.2.0][2025-08-27] ADVANCE-CONFIRM-MODAL — PASS ✅
-[v0.2.0][2025-08-27] FINISH-TO-HISTORY — PASS ✅
-[v0.2.0][2025-08-27] CARD-MODAL-EDITOR — PASS ✅
+[v0.2.0][2025-08-27] LOG-CARD-ACTIONS   PASS ✅
+[v0.2.0][2025-08-27] TASKS-INSTANTIATE   PASS ✅
+[v0.2.0][2025-08-27] ADVANCE-CONFIRM-MODAL   PASS ✅
+[v0.2.0][2025-08-27] FINISH-TO-HISTORY   PASS ✅
+[v0.2.0][2025-08-27] CARD-MODAL-EDITOR   PASS ✅
 
-## Checklist de Validação da Release v0.2.0
+## Checklist de Valida  o da Release v0.2.0
 
 ### ✅ Funcionalidades v0.1.0 (PASS)
 - [x] Signup e Login funcionando
 - [x] Kanban board ativo e funcional
 - [x] Hard delete de alunos com cascade
-- [x] Edição de colunas (nome e posição)
+- [x] Edi  o de colunas (nome e posi  o)
 
 ### ✅ Funcionalidades v0.2.0 (COMPLETED - QA FINAL PASS)
 - [x] **LOG-CARD-ACTIONS** - Logs de atividades dos cards ✅ PASS
-- [x] **TASKS-INSTANTIATE** - Tarefas obrigatórias instanciadas automaticamente ✅ PASS
-- [x] **CARD-MODAL-EDITOR** - Modal premium para edição de cards ✅ PASS
-- [x] **ADVANCE-CONFIRM-MODAL** - Modal de confirmação para avançar etapa ✅ PASS
-- [x] **FINISH-TO-HISTORY** - Modal de confirmação para encerrar onboarding ✅ PASS
+- [x] **TASKS-INSTANTIATE** - Tarefas obrigat rias instanciadas automaticamente ✅ PASS
+- [x] **CARD-MODAL-EDITOR** - Modal premium para edi  o de cards ✅ PASS
+- [x] **ADVANCE-CONFIRM-MODAL** - Modal de confirma  o para avan ar etapa ✅ PASS
+- [x] **FINISH-TO-HISTORY** - Modal de confirma  o para encerrar onboarding ✅ PASS
 
 ### 🎯 QA FINAL EXECUTADO: 11/11 PASS ✅
-**Status: PRONTO PARA PRODUÇÃO**
+**Status: PRONTO PARA PRODU  O**
 
 ### 📋 Detalhes das Funcionalidades v0.2.0
 
 #### ✅ LOG-CARD-ACTIONS (PASS - QA FINAL)
 - Endpoint: `GET /api/kanban/logs/:card_id` ✅
 - Componente: `KanbanLogDrawer` ✅
-- Logs de criação, movimentação, edição e tarefas ✅
-- Timeline organizada com horário e usuário ✅
+- Logs de cria  o, movimenta  o, edi  o e tarefas ✅
+- Timeline organizada com hor rio e usu rio ✅
 
 #### ✅ TASKS-INSTANTIATE (PASS - QA FINAL)
 - Endpoint: `POST /api/kanban/items/:cardId/tasks/:taskId/toggle` ✅
 - Componente: `KanbanChecklist` ✅
-- Tarefas obrigatórias criadas automaticamente para novos cards ✅
+- Tarefas obrigat rias criadas automaticamente para novos cards ✅
 - Progresso atualiza em tempo real sem flicker ✅
 
 #### ✅ CARD-MODAL-EDITOR (PASS - QA FINAL)
 - Modal central (720-864px) com abas ✅
-- Abas: Visão Geral, Checklist, Comentários, Anexos ✅
+- Abas: Vis o Geral, Checklist, Coment rios, Anexos ✅
 - Hotkeys: E (Checklist), L (Log), Esc (Fechar) ✅
-- Botão lápis (✏️) no card compacto ✅
+- Bot o l pis (✏️) no card compacto ✅
 - Cards sem scroll horizontal ou editor embutido ✅
 
 #### ✅ ADVANCE-CONFIRM-MODAL (PASS - QA FINAL)
-- Modal de confirmação para avançar etapa ✅
-- Visível apenas com 100% obrigatórias concluídas ✅
-- Integração com endpoint POST /api/kanban/move ✅
-- Busca automática da próxima coluna disponível ✅
-- Pula colunas fixas (posição 1 e 99) automaticamente ✅
+- Modal de confirma  o para avan ar etapa ✅
+- Vis vel apenas com 100% obrigat rias conclu das ✅
+- Integra  o com endpoint POST /api/kanban/move ✅
+- Busca autom tica da pr xima coluna dispon vel ✅
+- Pula colunas fixas (posi  o 1 e 99) automaticamente ✅
 
 #### ✅ FINISH-TO-HISTORY (PASS - QA FINAL)
-- Modal de confirmação para encerrar onboarding ✅
-- Visível apenas na coluna 99 (Entrega do Treino) ✅
+- Modal de confirma  o para encerrar onboarding ✅
+- Vis vel apenas na coluna 99 (Entrega do Treino) ✅
 - Endpoint POST /api/kanban/complete ✅
-- Verifica 100% tarefas obrigatórias concluídas ✅
-- Marca card como completed e envia para histórico ✅
+- Verifica 100% tarefas obrigat rias conclu das ✅
+- Marca card como completed e envia para hist rico ✅
 
 ---
 
-## 🚀 Checklist de Validação da Release v0.3.0-dev
+## 🚀 Checklist de Valida  o da Release v0.3.0-dev
 
-### 📋 P0 — Funcionalidades Essenciais (SERVIÇOS ONBOARDING)
-- [x] **P0-01: CRUD de colunas intermediárias (2..98)** no módulo Serviços ✅
-- [x] **P0-02: CRUD de tarefas por coluna** (catálogo) ✅
-- [x] **P0-03: Instanciação automática** em cards, idempotente ✅
-- [x] **P0-04: Opção "Aplicar aos cards existentes"** ao alterar catálogo ✅
+### 📋 P0   Funcionalidades Essenciais (SERVI OS ONBOARDING)
+- [x] **P0-01: CRUD de colunas intermedi rias (2..98)** no m dulo Servi os ✅
+- [x] **P0-02: CRUD de tarefas por coluna** (cat logo) ✅
+- [x] **P0-03: Instancia  o autom tica** em cards, idempotente ✅
+- [x] **P0-04: Op  o "Aplicar aos cards existentes"** ao alterar cat logo ✅
 
-### 🔧 P1 — Configurações
+### 🔧 P1   Configura  es
 - [x] **P1-01: Equipe** - Menu habilitado para todos os planos (Basic = apenas admin) ✅
-- [x] **P1-02: Configurações** - Menu em todos os planos, respeitando limitações ✅
+- [x] **P1-02: Configura  es** - Menu em todos os planos, respeitando limita  es ✅
 
-### 🎨 P2 — Polimento Premium
-- [x] **P2-01: UI refinada** nos cards (ícones, tooltips, estados) ✅
-- [x] **P2-02: Placeholders** de comentários/anexos no modal ✅
-- [x] **P2-03: Logs visuais** e métricas básicas no histórico ✅
+### 🎨 P2   Polimento Premium
+- [x] **P2-01: UI refinada** nos cards ( cones, tooltips, estados) ✅
+- [x] **P2-02: Placeholders** de coment rios/anexos no modal ✅
+- [x] **P2-03: Logs visuais** e m tricas b sicas no hist rico ✅
 
 ### 📊 Status Geral v0.3.0-dev
 **Progresso:** 9/9 funcionalidades implementadas  
 **Status:** COMPLETO ✅  
-**Próxima etapa:** QA Final e Deploy v0.3.0
+**Pr xima etapa:** QA Final e Deploy v0.3.0
 
 ---
 
-## 🔧 Fix Imediato - Botão "Avançar etapa" Reativo
+## 🔧 Fix Imediato - Bot o "Avan ar etapa" Reativo
 
 ### 📋 Smoke Test (5/5 PASS)
-- [x] **1. Card com 2 obrigatórias + 1 opcional** - Marcar as 2 obrigatórias → botão habilita imediatamente ✅
-- [x] **2. Card com 0 tarefas** - Abrir modal → botão já habilitado ✅
-- [x] **3. Desmarcar uma obrigatória** - Botão desabilita no ato (regressão tratada) ✅
-- [x] **4. Mover card para próxima coluna** - Continua funcionando; sem regressão ✅
+- [x] **1. Card com 2 obrigat rias + 1 opcional** - Marcar as 2 obrigat rias → bot o habilita imediatamente ✅
+- [x] **2. Card com 0 tarefas** - Abrir modal → bot o j habilitado ✅
+- [x] **3. Desmarcar uma obrigat ria** - Bot o desabilita no ato (regress o tratada) ✅
+- [x] **4. Mover card para pr xima coluna** - Continua funcionando; sem regress o ✅
 - [x] **5. Console limpo** - Sem warnings ou erros ✅
 
-### 🎯 Implementação
+### 🎯 Implementa  o
 - [x] **Estado derivado** do checklist vivo ✅
-- [x] **Optimistic update** com invalidação ✅
-- [x] **Reatividade instantânea** sem reload ✅
+- [x] **Optimistic update** com invalida  o ✅
+- [x] **Reatividade instant nea** sem reload ✅
 - [x] **Edge cases tratados** (0 tarefas, opcionais, erros) ✅
 
 **Status:** FIX CONCLUÍDO ✅  
@@ -293,64 +293,64 @@ Notas de governança
 
 ---
 
-## 🚀 Checklist de Validação da Release v0.3.1-dev
+## 🚀 Checklist de Valida  o da Release v0.3.1-dev
 
-### 🎯 P1 — Módulo Serviços → Onboarding (Reformulação)
-- [x] **P1-01: Layout Accordion Expansível** - Colunas como cards expansíveis ✅
+### 🎯 P1   M dulo Servi os → Onboarding (Reformula  o)
+- [x] **P1-01: Layout Accordion Expans vel** - Colunas como cards expans veis ✅
 - [ ] **P1-02: CRUD Inline de Tarefas** - Criar, editar, excluir sem modais
 - [ ] **P1-03: Feedback Premium** - Badges, barras de progresso, toasts
-- [ ] **P1-04: Sincronização Tempo Real** - Catálogo e cards atualizados
+- [ ] **P1-04: Sincroniza  o Tempo Real** - Cat logo e cards atualizados
 
-### 🎯 P2 — Cards do Kanban Premium
+### 🎯 P2   Cards do Kanban Premium
 - [ ] **P2-01: Cards Simplificados** - Remover labels redundantes
 - [ ] **P2-02: Badge de Tarefas Discreto** - Ícone ✅ + contador 0/0
-- [ ] **P2-03: UX Clean** - Sem scroll, informações essenciais
-- [ ] **P2-04: Consistência Visual** - Mesmo design em todas as colunas
+- [ ] **P2-03: UX Clean** - Sem scroll, informa  es essenciais
+- [ ] **P2-04: Consist ncia Visual** - Mesmo design em todas as colunas
 
-### 🎯 P3 — Módulo Equipe (P1)
+### 🎯 P3   M dulo Equipe (P1)
 - [x] **P3-01: CRUD Perfis Profissionais** - Criar, editar, excluir perfis ✅
 - [x] **P3-02: CRUD Profissionais** - Criar, editar, excluir profissionais ✅
-- [x] **P3-03: Integração com Usuários** - Vínculo automático e criação ✅
+- [x] **P3-03: Integra  o com Usu rios** - V nculo autom tico e cria  o ✅
 - [x] **P3-04: Regras de Plano** - Modal de upgrade para Basic ✅
-- [x] **P3-05: Validações Robustas** - CPF, WhatsApp, Email ✅
+- [x] **P3-05: Valida  es Robustas** - CPF, WhatsApp, Email ✅
 - [x] **P3-06: Interface Premium** - Modais, toasts, loading states ✅
-- [x] **P3-07: Banco de Dados** - Migração aplicada, IDs sequenciais ✅
+- [x] **P3-07: Banco de Dados** - Migra  o aplicada, IDs sequenciais ✅
 - [x] **P3-08: Seed e Backfill** - Admin por tenant + donos vinculados ✅
 - [x] **P3-09: RBAC e Middleware** - Acesso configurado corretamente ✅
-- [x] **P3-10: Integração Alunos** - student_responsibles implementado ✅
+- [x] **P3-10: Integra  o Alunos** - student_responsibles implementado ✅
 
 ### 📊 Status Geral v0.3.1-dev
 **Progresso:** 8/14 funcionalidades implementadas  
 **Status:** EM DESENVOLVIMENTO  
-**Próxima entrega:** P1-02 (CRUD Inline de Tarefas) + Validação Equipe pelo Patrocinador
+**Pr xima entrega:** P1-02 (CRUD Inline de Tarefas) + Valida  o Equipe pelo Patrocinador
 
 ---
 
-## 🚀 Checklist GATE 10.15 – Header Compacto Global (DEV)
+## 🚀 Checklist GATE 10.15   Header Compacto Global (DEV)
 
 ### ✅ Header Compacto Implementado
 - [x] **Removido "Voltar" textual** com setinha ✅
-- [x] **Botão "Cancelar" destrutivo** (outline vermelho) ✅
-- [x] **Ações concentradas à direita** (Salvar + Cancelar) ✅
+- [x] **Bot o "Cancelar" destrutivo** (outline vermelho) ✅
+- [x] **A  es concentradas à direita** (Salvar + Cancelar) ✅
 - [x] **Altura reduzida 50%** (py-2 desktop, py-1 md) ✅
 
-### ✅ Compactação de Título
+### ✅ Compacta  o de T tulo
 - [x] **Breadcrumb mantido** (Dashboard / Alunos / Editar) ✅
-- [x] **Nome + Status em linha única** ✅
-- [x] **Removida duplicidade** "Editar Aluno — Nome — Email" ✅
-- [x] **Sem repetição** do nome em outras faixas ✅
+- [x] **Nome + Status em linha  nica** ✅
+- [x] **Removida duplicidade** "Editar Aluno   Nome   Email" ✅
+- [x] **Sem repeti  o** do nome em outras faixas ✅
 
-### ✅ Componente Reutilizável
+### ✅ Componente Reutiliz vel
 - [x] **CompactHeader criado** (/components/ui/CompactHeader.tsx) ✅
 - [x] **Props tipadas** com TypeScript ✅
-- [x] **Suporte a breadcrumb, título, status, ações** ✅
+- [x] **Suporte a breadcrumb, t tulo, status, a  es** ✅
 - [x] **Estados de loading e debug info** ✅
 
-### ✅ Ganho de Área Útil
+### ✅ Ganho de Área  til
 - [x] **Sem scroll horizontal** ✅
-- [x] **Campos visíveis sem cortar** ✅
-- [x] **Tabs imediatamente após header** ✅
-- [x] **Layout responsivo** (ações empilham em mobile) ✅
+- [x] **Campos vis veis sem cortar** ✅
+- [x] **Tabs imediatamente ap s header** ✅
+- [x] **Layout responsivo** (a  es empilham em mobile) ✅
 
 ### ✅ Funcionalidades
 - [x] **Cancelar preserva returnTo** ✅
@@ -360,38 +360,38 @@ Notas de governança
 
 ---
 
-## 🚀 Checklist GATE 9.1 – Consistência Students (DEV)
+## 🚀 Checklist GATE 9.1   Consist ncia Students (DEV)
 
 ### ✅ Environment Setup
-- [x] **Produção congelada** (login bloqueado 503) ✅
+- [x] **Produ  o congelada** (login bloqueado 503) ✅
 - [x] **Badge DEV ativo** ✅
 - [x] **DEV Environment** configurado com `.env.development.local` ✅
 - [x] **DEBUG Mode** `NEXT_PUBLIC_DEBUG=true` ativo ✅
 
 ### ✅ Backend Consistency
-- [x] **List e item único aplicam mesmos filtros** (tenant_id + deleted_at IS NULL se flag=true) ✅
+- [x] **List e item  nico aplicam mesmos filtros** (tenant_id + deleted_at IS NULL se flag=true) ✅
 - [x] **Headers Cache-Control no-store e X-Debug-* ativos** ✅
 - [x] **Endpoints DEV-only habilitados** com NEXT_PUBLIC_DEBUG=true ✅
 - [x] **Feature flag STUDENTS_USE_SOFT_DELETE** implementada ✅
 
 ### ✅ Frontend Cache Disabled
-- [x] **Front-end sem cache para Students** (lista e item único) ✅
-- [x] **Edição sempre faz fetch fresh** ✅
-- [x] **Status (lista vs edição) usa função única derivada** ✅
+- [x] **Front-end sem cache para Students** (lista e item  nico) ✅
+- [x] **Edi  o sempre faz fetch fresh** ✅
+- [x] **Status (lista vs edi  o) usa fun  o  nica derivada** ✅
 
 ### ✅ Debug Features (DEV Only)
-- [x] **Identificadores (id • tenant) visíveis nos cards e edição** ✅
+- [x] **Identificadores (id   tenant) vis veis nos cards e edi  o** ✅
 - [x] **Endpoints debug** `/api/_debug/session`, `/api/_debug/students/:id/raw` ✅
-- [x] **Sentinela** `/api/_health/students-consistency` executada sem divergência ✅
+- [x] **Sentinela** `/api/_health/students-consistency` executada sem diverg ncia ✅
 
 ### ✅ QA Execution
 - [x] **TestSprite: login redireciona corretamente** ✅
-- [x] **TestSprite: cenários 200/404/403 ok** ✅
-- [x] **TestSprite: consistência A/B e multi-navegador validados** ✅
+- [x] **TestSprite: cen rios 200/404/403 ok** ✅
+- [x] **TestSprite: consist ncia A/B e multi-navegador validados** ✅
 - [x] **Atividades.txt atualizado com timestamp + hash** ✅
-- [x] **Report.md atualizado com evidências** ✅
+- [x] **Report.md atualizado com evid ncias** ✅
 
 ### 📊 Status GATE 9.1
 **Progresso:** 15/15 itens implementados  
 **Status:** ✅ CONCLUÍDO  
-**Próximo:** Implementação estrutura edição (tabs Anexos + Processos)
+**Pr ximo:** Implementa  o estrutura edi  o (tabs Anexos + Processos)

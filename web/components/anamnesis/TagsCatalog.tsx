@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -34,7 +34,7 @@ export function TagsCatalog() {
       // Simular delay de API
       await new Promise(resolve => setTimeout(resolve, 100))
       
-      setTags(GUIDELINE_TAGS)
+      setTags([...(GUIDELINE_TAGS as any)]))
       setQueryTime(Date.now() - startTime)
     } catch (error) {
       console.error('Erro ao buscar tags:', error)
@@ -64,8 +64,8 @@ export function TagsCatalog() {
   const getCategoryLabel = (category: string) => {
     switch (category) {
       case 'cardiovascular': return 'Cardiovascular'
-      case 'musculoesqueletica': return 'Musculoesquelética'
-      case 'metabolica': return 'Metabólica'
+      case 'musculoesqueletica': return 'MusculoesquelÃ©tica'
+      case 'metabolica': return 'MetabÃ³lica'
       case 'objetivo': return 'Objetivo'
       case 'capacidade': return 'Capacidade'
       default: return category
@@ -96,16 +96,16 @@ export function TagsCatalog() {
 
   const getCategoryDescription = (category: string) => {
     switch (category) {
-      case 'cardiovascular': return 'Condições relacionadas ao sistema cardiovascular'
-      case 'musculoesqueletica': return 'Lesões e problemas musculoesqueléticos'
-      case 'metabolica': return 'Condições metabólicas e endócrinas'
-      case 'objetivo': return 'Objetivos específicos de treino'
-      case 'capacidade': return 'Habilidades e capacidades físicas'
+      case 'cardiovascular': return 'CondiÃ§Ãµes relacionadas ao sistema cardiovascular'
+      case 'musculoesqueletica': return 'LesÃµes e problemas musculoesquelÃ©ticos'
+      case 'metabolica': return 'CondiÃ§Ãµes metabÃ³licas e endÃ³crinas'
+      case 'objetivo': return 'Objetivos especÃ­ficos de treino'
+      case 'capacidade': return 'Habilidades e capacidades fÃ­sicas'
       default: return 'Categoria geral'
     }
   }
 
-  const categories = Array.from(new Set(tags.map(tag => tag.category)))
+  const categories = Array.from(new Set(tags.map(tag => tag.category))
   const groupedTags = categories.map(category => ({
     category,
     tags: filteredTags.filter(tag => tag.category === category)
@@ -117,7 +117,7 @@ export function TagsCatalog() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Tag className="h-5 w-5" />
-            Catálogo de Tags Canônicas
+            CatÃ¡logo de Tags CanÃ´nicas
           </CardTitle>
           <div className="flex gap-4">
             <Skeleton className="h-10 w-64" />
@@ -140,7 +140,7 @@ export function TagsCatalog() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Tag className="h-5 w-5" />
-          Catálogo de Tags Canônicas
+          CatÃ¡logo de Tags CanÃ´nicas
           <Badge variant="secondary">
             {filteredTags.length} tags
           </Badge>
@@ -151,7 +151,7 @@ export function TagsCatalog() {
           )}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Tags padronizadas para criação de regras de diretrizes de treino
+          Tags padronizadas para criaÃ§Ã£o de regras de diretrizes de treino
         </p>
         <div className="flex gap-4 mt-4">
           <div className="relative flex-1">
@@ -211,7 +211,7 @@ export function TagsCatalog() {
                       </div>
                     </div>
                     <div className="text-xs text-gray-500">
-                      Use nas condições das regras
+                      Use nas condiÃ§Ãµes das regras
                     </div>
                   </div>
                 ))}
@@ -233,15 +233,15 @@ export function TagsCatalog() {
           <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center gap-2 mb-4">
               <Info className="h-5 w-5 text-blue-600" />
-              <h4 className="font-bold text-lg text-blue-900">🏷️ Sistema de Tags Canônicas</h4>
+              <h4 className="font-bold text-lg text-blue-900">ðŸ·ï¸ Sistema de Tags CanÃ´nicas</h4>
             </div>
             <p className="text-sm text-blue-800 mb-4">
-              As tags canônicas são identificadores padronizados usados nas regras de diretrizes de treino. 
-              Cada tag pertence a uma categoria específica e é usada para criar condições nas regras.
+              As tags canÃ´nicas sÃ£o identificadores padronizados usados nas regras de diretrizes de treino. 
+              Cada tag pertence a uma categoria especÃ­fica e Ã© usada para criar condiÃ§Ãµes nas regras.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <h5 className="font-semibold text-sm text-blue-900">Categorias Disponíveis:</h5>
+                <h5 className="font-semibold text-sm text-blue-900">Categorias DisponÃ­veis:</h5>
                 <div className="space-y-2 text-sm text-blue-700">
                   {categories.map(category => (
                     <div key={category} className="flex items-center gap-2">
@@ -254,10 +254,10 @@ export function TagsCatalog() {
               <div className="space-y-3">
                 <h5 className="font-semibold text-sm text-blue-900">Como Usar:</h5>
                 <div className="space-y-2 text-sm text-blue-700">
-                  <p>• <strong>Seleção:</strong> Use o valor da tag nas condições das regras</p>
-                  <p>• <strong>Validação:</strong> Apenas tags canônicas são aceitas</p>
-                  <p>• <strong>Busca:</strong> Use o campo de busca para encontrar tags</p>
-                  <p>• <strong>Filtro:</strong> Filtre por categoria para organizar</p>
+                  <p>â€¢ <strong>SeleÃ§Ã£o:</strong> Use o valor da tag nas condiÃ§Ãµes das regras</p>
+                  <p>â€¢ <strong>ValidaÃ§Ã£o:</strong> Apenas tags canÃ´nicas sÃ£o aceitas</p>
+                  <p>â€¢ <strong>Busca:</strong> Use o campo de busca para encontrar tags</p>
+                  <p>â€¢ <strong>Filtro:</strong> Filtre por categoria para organizar</p>
                 </div>
               </div>
             </div>
@@ -266,21 +266,21 @@ export function TagsCatalog() {
           <div className="p-6 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center gap-2 mb-4">
               <Lightbulb className="h-5 w-5 text-green-600" />
-              <h4 className="font-bold text-lg text-green-900">💡 Dicas de Uso por Categoria</h4>
+              <h4 className="font-bold text-lg text-green-900">ðŸ’¡ Dicas de Uso por Categoria</h4>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-800">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Heart className="h-4 w-4 text-red-500" />
-                  <span><strong>Cardiovascular:</strong> Use para condições relacionadas ao sistema cardiovascular</span>
+                  <span><strong>Cardiovascular:</strong> Use para condiÃ§Ãµes relacionadas ao sistema cardiovascular</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Bone className="h-4 w-4 text-orange-500" />
-                  <span><strong>Musculoesquelética:</strong> Use para lesões e problemas musculoesqueléticos</span>
+                  <span><strong>MusculoesquelÃ©tica:</strong> Use para lesÃµes e problemas musculoesquelÃ©ticos</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-yellow-500" />
-                  <span><strong>Metabólica:</strong> Use para condições metabólicas como diabetes e obesidade</span>
+                  <span><strong>MetabÃ³lica:</strong> Use para condiÃ§Ãµes metabÃ³licas como diabetes e obesidade</span>
                 </div>
               </div>
               <div className="space-y-2">
@@ -290,7 +290,7 @@ export function TagsCatalog() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Dumbbell className="h-4 w-4 text-blue-500" />
-                  <span><strong>Capacidade:</strong> Use para habilidades físicas específicas</span>
+                  <span><strong>Capacidade:</strong> Use para habilidades fÃ­sicas especÃ­ficas</span>
                 </div>
               </div>
             </div>
@@ -299,13 +299,13 @@ export function TagsCatalog() {
           <div className="p-6 bg-amber-50 border border-amber-200 rounded-lg">
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle className="h-5 w-5 text-amber-600" />
-              <h4 className="font-bold text-lg text-amber-900">⚠️ Importante</h4>
+              <h4 className="font-bold text-lg text-amber-900">âš ï¸ Importante</h4>
             </div>
             <div className="space-y-2 text-sm text-amber-800">
-              <p>• <strong>Padronização:</strong> Use sempre as tags canônicas para manter consistência</p>
-              <p>• <strong>Validação:</strong> O sistema valida automaticamente se a tag existe</p>
-              <p>• <strong>Atualização:</strong> Novas tags são adicionadas pelo sistema, não pelo usuário</p>
-              <p>• <strong>Compatibilidade:</strong> Tags canônicas garantem compatibilidade entre versões</p>
+              <p>â€¢ <strong>PadronizaÃ§Ã£o:</strong> Use sempre as tags canÃ´nicas para manter consistÃªncia</p>
+              <p>â€¢ <strong>ValidaÃ§Ã£o:</strong> O sistema valida automaticamente se a tag existe</p>
+              <p>â€¢ <strong>AtualizaÃ§Ã£o:</strong> Novas tags sÃ£o adicionadas pelo sistema, nÃ£o pelo usuÃ¡rio</p>
+              <p>â€¢ <strong>Compatibilidade:</strong> Tags canÃ´nicas garantem compatibilidade entre versÃµes</p>
             </div>
           </div>
         </div>
@@ -313,3 +313,6 @@ export function TagsCatalog() {
     </Card>
   )
 }
+
+
+

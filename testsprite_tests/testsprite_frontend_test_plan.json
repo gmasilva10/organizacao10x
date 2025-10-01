@@ -95,7 +95,7 @@
       },
       {
         "type": "action",
-        "description": "Edit the student’s profile including attachments."
+        "description": "Edit the student s profile including attachments."
       },
       {
         "type": "assertion",

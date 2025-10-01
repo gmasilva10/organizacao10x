@@ -54,10 +54,10 @@ export function AnamneseInviteModal({
   const [entities, setEntities] = useState<RelationshipEntity[]>([])
 
   useEffect(() => {
-    // Tentativa de buscar grupos do aluno; se a API ainda nÃ£o existir, falha silenciosa
+    // Tentativa de buscar grupos do aluno; se a API ainda n £o existir, falha silenciosa
     const fetchGroups = async () => {
       try {
-        // Em Next.js (App Router), a pasta /app nÃ£o entra na URL pÃºblica. Usar sempre /api/*
+        // Em Next.js (App Router), a pasta /app n £o entra na URL p  blica. Usar sempre /api/*
         const res = await fetch(`/api/relationship/whatsapp/groups?studentId=${studentId}`)
         if (res.ok) {
           const data = (await res.json()) as { groups?: RelationshipGroup[] }
@@ -97,7 +97,7 @@ export function AnamneseInviteModal({
 
   const handleGenerate = async () => {
     const isUuid = (v: string) => /^[0-9a-fA-F-]{36}$/.test(v)
-    // ServiÃ§o Ã© opcional neste fluxo (iremos gravar null se ausente)
+    // Servi  o    opcional neste fluxo (iremos gravar null se ausente)
     try {
       setLoadingGenerate(true)
       const response = await fetch('/api/anamnese/generate', {
@@ -117,8 +117,8 @@ export function AnamneseInviteModal({
         setGeneratedLink(String(data.public_link))
       }
     } catch (error) {
-      console.error('Erro ao gerar versÃ£o:', error)
-      toast.error(error instanceof Error ? error.message : 'Erro ao gerar versÃ£o')
+      console.error('Erro ao gerar vers £o:', error)
+      toast.error(error instanceof Error ? error.message : 'Erro ao gerar vers £o')
     } finally {
       setLoadingGenerate(false)
     }
@@ -129,20 +129,20 @@ export function AnamneseInviteModal({
       const link = generatedLink
       if (!link) { toast.error('Gere a anamnese antes de enviar'); return }
       // Construir texto
-      // Mensagem com link em linha prÃ³pria para maximizar conversÃ£o em hyperlink
+      // Mensagem com link em linha pr ³pria para maximizar convers £o em hyperlink
       const text = customMessage?.trim().length
         ? `${customMessage}\n\n${link}`
-        : `OlÃ¡! Para personalizarmos seu treino, responda sua Anamnese:\n${link}\nLeva ~7â€“10 min. Obrigado!`
+        : `Ol ¡! Para personalizarmos seu treino, responda sua Anamnese:\n${link}\nLeva ~7   10 min. Obrigado!`
 
       // Abrir wa.me - normalizar telefone para E.164
       const phoneDigits = (phone || '').replace(/\D/g, '')
       let normalizedPhone = phoneDigits
       
-      // Se tem 11 dÃ­gitos (DDD + nÃºmero), adicionar +55
+      // Se tem 11 d ­gitos (DDD + n  mero), adicionar +55
       if (phoneDigits.length === 11) {
         normalizedPhone = `55${phoneDigits}`
       }
-      // Se jÃ¡ tem 13 dÃ­gitos (55 + DDD + nÃºmero), usar como estÃ¡
+      // Se j ¡ tem 13 d ­gitos (55 + DDD + n  mero), usar como est ¡
       else if (phoneDigits.length === 13 && phoneDigits.startsWith('55')) {
         normalizedPhone = phoneDigits
       }
@@ -152,7 +152,7 @@ export function AnamneseInviteModal({
         : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`
       window.open(href, '_blank')
 
-      // Registrar histÃ³rico
+      // Registrar hist ³rico
       await fetch('/api/relationship/whatsapp/history', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -184,11 +184,11 @@ export function AnamneseInviteModal({
         </DialogHeader>
 
         <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-140px)] pr-2">
-          {/* IdentificaÃ§Ã£o do Aluno */}
+          {/* Identifica   £o do Aluno */}
           <div className="bg-card border rounded-lg p-6">
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold text-foreground">IdentificaÃ§Ã£o do Aluno</h3>
+                <h3 className="text-lg font-semibold text-foreground">Identifica   £o do Aluno</h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   Confirme o aluno para esta anamnese
                 </p>
@@ -203,13 +203,13 @@ export function AnamneseInviteModal({
             </div>
           </div>
 
-          {/* ConfiguraÃ§Ã£o do Envio */}
+          {/* Configura   £o do Envio */}
           <div className="bg-card border rounded-lg p-6">
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold text-foreground">ConfiguraÃ§Ã£o do Envio</h3>
+                <h3 className="text-lg font-semibold text-foreground">Configura   £o do Envio</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Escolha como a anamnese serÃ¡ enviada ao aluno
+                  Escolha como a anamnese ser ¡ enviada ao aluno
                 </p>
               </div>
               
@@ -269,14 +269,14 @@ export function AnamneseInviteModal({
                         ) : (
                           groups.map((g) => (
                             <SelectItem key={g.id} value={g.id}>
-                              {g.name}{g.is_primary ? ' [PadrÃ£o]' : ''}{g.external_id ? ` â€” ${g.external_id}` : ''}
+                              {g.name}{g.is_primary ? ' [Padr £o]' : ''}{g.external_id ? `   ” ${g.external_id}` : ''}
                             </SelectItem>
                           ))
                         )}
                       </SelectContent>
                     </Select>
                     <div className="text-xs text-muted-foreground">
-                      NÃ£o encontrou? <button type="button" className="text-blue-600 underline hover:text-blue-700" onClick={() => toast.info('Abra o Criar Grupo no menu Processos â€º WhatsApp.')}>Criar grupo</button>
+                      N £o encontrou? <button type="button" className="text-blue-600 underline hover:text-blue-700" onClick={() => toast.info('Abra o Criar Grupo no menu Processos     WhatsApp.')}>Criar grupo</button>
                     </div>
                   </div>
                 ) : (
@@ -293,7 +293,7 @@ export function AnamneseInviteModal({
                       onChange={(e) => setPhone(e.target.value)}
                       disabled={loadingSend || loadingGenerate}
                     />
-                    <p className="text-xs text-muted-foreground">SerÃ¡ normalizado automaticamente para formato E.164</p>
+                    <p className="text-xs text-muted-foreground">Ser ¡ normalizado automaticamente para formato E.164</p>
                     {entities.filter(e => e.type === 'CONTACT').length > 0 && (
                       <div className="text-xs text-muted-foreground">
                         Contatos salvos:
@@ -312,20 +312,20 @@ export function AnamneseInviteModal({
             </div>
           </div>
 
-          {/* PersonalizaÃ§Ã£o da Anamnese */}
+          {/* Personaliza   £o da Anamnese */}
           <div className="bg-card border rounded-lg p-6">
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold text-foreground">PersonalizaÃ§Ã£o da Anamnese</h3>
+                <h3 className="text-lg font-semibold text-foreground">Personaliza   £o da Anamnese</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Configure o serviÃ§o e personalize a mensagem de convite
+                  Configure o servi  o e personalize a mensagem de convite
                 </p>
               </div>
               
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="service" className="text-sm font-medium flex items-center gap-1">
-                    ServiÃ§o (opcional)
+                    Servi  o (opcional)
                     <Info className="h-3.5 w-3.5 text-muted-foreground" aria-label="Ajuda" title="Usado para personalizar a mensagem e o protocolo gerado" />
                   </Label>
                   <Select
@@ -334,7 +334,7 @@ export function AnamneseInviteModal({
                     disabled={loadingSend || loadingGenerate}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={services.length ? 'Selecione um serviÃ§o' : 'Carregando serviÃ§os...'} />
+                      <SelectValue placeholder={services.length ? 'Selecione um servi  o' : 'Carregando servi  os...'} />
                     </SelectTrigger>
                     <SelectContent>
                       {services.map(s => (
@@ -342,14 +342,14 @@ export function AnamneseInviteModal({
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Personaliza o texto do convite e o cabeÃ§alho do PDF.</p>
+                  <p className="text-xs text-muted-foreground">Personaliza o texto do convite e o cabe  alho do PDF.</p>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="message" className="text-sm font-medium">Mensagem personalizada (opcional)</Label>
                   <Textarea
                     id="message"
-                    placeholder="Deixe em branco para usar mensagem padrÃ£o"
+                    placeholder="Deixe em branco para usar mensagem padr £o"
                     value={customMessage}
                     onChange={(e) => setCustomMessage(e.target.value)}
                     disabled={loadingSend || loadingGenerate}
@@ -357,14 +357,14 @@ export function AnamneseInviteModal({
                     className="resize-none"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Esta mensagem serÃ¡ incluÃ­da no convite enviado ao aluno
+                    Esta mensagem ser ¡ inclu ­da no convite enviado ao aluno
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes do Processo */}
+          {/* Informa   µes do Processo */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start gap-3">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 flex-shrink-0 mt-0.5">
@@ -373,15 +373,15 @@ export function AnamneseInviteModal({
               <div className="space-y-2">
                 <p className="text-sm font-medium text-blue-900">Como funciona o processo:</p>
                 <ul className="text-xs text-blue-800 space-y-1">
-                  <li>â€¢ <strong>Gerar</strong> cria uma versÃ£o RASCUNHO com snapshot das perguntas</li>
-                  <li>â€¢ <strong>Enviar</strong> manda o link (Grupo ou Aluno) via WhatsApp</li>
-                  <li>â€¢ <strong>Aluno responde</strong> no celular (7â€“10 min) e o PDF Ã© anexado automaticamente</li>
+                  <li>  ¢ <strong>Gerar</strong> cria uma vers £o RASCUNHO com snapshot das perguntas</li>
+                  <li>  ¢ <strong>Enviar</strong> manda o link (Grupo ou Aluno) via WhatsApp</li>
+                  <li>  ¢ <strong>Aluno responde</strong> no celular (7   10 min) e o PDF    anexado automaticamente</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          {/* BotÃµes de AÃ§Ã£o */}
+          {/* Bot µes de A   £o */}
           <div className="flex justify-between items-center pt-4 border-t">
             <div>
               <Button

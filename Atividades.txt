@@ -1,42 +1,42 @@
-[2025-08-24 19:40] DEV — CFG-TEAM-P1 — API/UI entregues — evidências: web/evidencias/users_invite.json, web/evidencias/users_patch.json, web/evidencias/users_roles_assign.json
-[2025-08-25 15:40] DEV — HOTFIX P1 — Menu Alunos controlado por RBAC (students.read) — evidências: web/evidencias/caps_admin_basic.json, web/evidencias/qa_admin_basic_students_access.png
-[2025-08-25 15:55] DEV — CFG-RESP-P1 — Migração + APIs + UI Responsáveis — evidências: web/evidencias/responsibles_assign_basic.json, web/evidencias/responsibles_assign_enterprise.json, web/evidencias/screenshot_student_responsibles.png
+[2025-08-24 19:40] DEV   CFG-TEAM-P1   API/UI entregues   evid ncias: web/evidencias/users_invite.json, web/evidencias/users_patch.json, web/evidencias/users_roles_assign.json
+[2025-08-25 15:40] DEV   HOTFIX P1   Menu Alunos controlado por RBAC (students.read)   evid ncias: web/evidencias/caps_admin_basic.json, web/evidencias/qa_admin_basic_students_access.png
+[2025-08-25 15:55] DEV   CFG-RESP-P1   Migra  o + APIs + UI Respons veis   evid ncias: web/evidencias/responsibles_assign_basic.json, web/evidencias/responsibles_assign_enterprise.json, web/evidencias/screenshot_student_responsibles.png
 
-[2025-08-27 15:10 BRT] QA Signup FAIL. BUG-01 (modal login loop, P2) e BUG-02 (signup 500 PGRST204, P1). Evidências em web/evidencias/2025-08-27.
+[2025-08-27 15:10 BRT] QA Signup FAIL. BUG-01 (modal login loop, P2) e BUG-02 (signup 500 PGRST204, P1). Evid ncias em web/evidencias/2025-08-27.
 
-[2025-08-27 16:30 BRT] DEV Correção BUG-01 e BUG-02. Signup funcionando. Onboarding/Kanban ativo.
+[2025-08-27 16:30 BRT] DEV Corre  o BUG-01 e BUG-02. Signup funcionando. Onboarding/Kanban ativo.
 
 [2025-08-27 17:45 BRT] QA Onboarding/Kanban funcionando. Alunos sendo criados e aparecendo no board.
 
-[2025-08-27 18:20 BRT] DEV Implementação hard delete com ON DELETE CASCADE. Migração stu_on_delete_cascade_p1.sql aplicada.
+[2025-08-27 18:20 BRT] DEV Implementa  o hard delete com ON DELETE CASCADE. Migra  o stu_on_delete_cascade_p1.sql aplicada.
 
 [2025-08-27 19:15 BRT] QA Hard delete funcionando. Cards sendo removidos automaticamente do board.
 
 [2025-08-27 20:00 BRT] DEV Limpeza completa do banco. Sistema limpo com apenas colunas 1 e 99.
 
-[2025-08-27 20:30 BRT] DEV Correção funcionalidade "Editar" das colunas. Modal funcionando perfeitamente.
+[2025-08-27 20:30 BRT] DEV Corre  o funcionalidade "Editar" das colunas. Modal funcionando perfeitamente.
 
-[2025-08-27 21:00 BRT] DEV Início implementação v0.2.0 - KANBAN-LOGS-P0, KANBAN-ADVANCE-CONFIRM, SRV-TASKS-STRUCTURE.
+[2025-08-27 21:00 BRT] DEV In cio implementa  o v0.2.0 - KANBAN-LOGS-P0, KANBAN-ADVANCE-CONFIRM, SRV-TASKS-STRUCTURE.
 
-[2025-01-29 14:30 BRT] DEV — P0 HOTFIX — Removidos dados mock dos cards de Alunos. API agora busca dados reais do Supabase. Evidências: API students/route.ts atualizada com resolveRequestContext.
+[2025-01-29 14:30 BRT] DEV   P0 HOTFIX   Removidos dados mock dos cards de Alunos. API agora busca dados reais do Supabase. Evid ncias: API students/route.ts atualizada com resolveRequestContext.
 
-[2025-01-29 14:45 BRT] DEV — GATE 10.6.7.1 — Registry & Data Model concluído. Âncora 'manual' adicionada ao EVENT_REGISTRY. Migration classification_tag aplicada em relationship_tasks. Evidências: web/lib/relationship/event-registry.ts, migration add_manual_anchor_and_classification_tag.
+[2025-01-29 14:45 BRT] DEV   GATE 10.6.7.1   Registry & Data Model conclu do.  ncora 'manual' adicionada ao EVENT_REGISTRY. Migration classification_tag aplicada em relationship_tasks. Evid ncias: web/lib/relationship/event-registry.ts, migration add_manual_anchor_and_classification_tag.
 
-[2025-01-29 15:15 BRT] DEV — GATE 10.6.7.2 — API Manual concluída. Endpoint POST /relationship/tasks/manual implementado com validações, rate-limit (50/hora), suporte a templates e texto livre. Migration constraints atualizada. Evidências: web/app/api/relationship/tasks/manual/route.ts, migration update_relationship_tasks_constraints_for_manual.
+[2025-01-29 15:15 BRT] DEV   GATE 10.6.7.2   API Manual conclu da. Endpoint POST /relationship/tasks/manual implementado com valida  es, rate-limit (50/hora), suporte a templates e texto livre. Migration constraints atualizada. Evid ncias: web/app/api/relationship/tasks/manual/route.ts, migration update_relationship_tasks_constraints_for_manual.
 
-[2025-01-29 15:45 BRT] DEV — GATE 10.6.7.3 — MessageComposer Modal concluído. Modal unificado implementado com validação de variáveis obrigatórias, integração com API manual, suporte a templates e texto livre. UX premium com toasts e validações inline. Evidências: web/components/relationship/MessageComposer.tsx, web/lib/relationship-variables.ts, web/evidencias/gate10-6-7-3-messagecomposer.md.
+[2025-01-29 15:45 BRT] DEV   GATE 10.6.7.3   MessageComposer Modal conclu do. Modal unificado implementado com valida  o de vari veis obrigat rias, integra  o com API manual, suporte a templates e texto livre. UX premium com toasts e valida  es inline. Evid ncias: web/components/relationship/MessageComposer.tsx, web/lib/relationship-variables.ts, web/evidencias/gate10-6-7-3-messagecomposer.md.
 
-[2025-01-29 19:50 BRT] DEV — GATE A-10.2.2.HF1 — Responsáveis roles[] implementado. Migração do modelo canônico concluída com roles text[], constraint UNIQUE (tenant_id, student_id, professional_id), índice parcial para principal único. APIs atualizadas para suportar deduplicação. Evidências: web/testsprite_tests/gate-a-10-2-2-responsaveis.md, migration student_responsibles_roles_array.
+[2025-01-29 19:50 BRT] DEV   GATE A-10.2.2.HF1   Respons veis roles[] implementado. Migra  o do modelo can nico conclu da com roles text[], constraint UNIQUE (tenant_id, student_id, professional_id),  ndice parcial para principal  nico. APIs atualizadas para suportar deduplica  o. Evid ncias: web/testsprite_tests/gate-a-10-2-2-responsaveis.md, migration student_responsibles_roles_array.
 
-[2025-01-29 20:30 BRT] DEV — GATE A-10.2.3 — MessageComposer HF Final concluído. Implementação completa com inserção de variáveis no caret, prévia colapsada, DateTime picker pt-BR, criação de tarefas (Hoje → due_today, Futuro → pending), deep-link do toast "Ver Relacionamento", console limpo. Evidências: web/testsprite_tests/gate-a-10-2-3-composer-processos.md, web/testsprite_tests/gate-a-10-2-3-evidencias-manuais.md.
+[2025-01-29 20:30 BRT] DEV   GATE A-10.2.3   MessageComposer HF Final conclu do. Implementa  o completa com inser  o de vari veis no caret, pr via colapsada, DateTime picker pt-BR, cria  o de tarefas (Hoje → due_today, Futuro → pending), deep-link do toast "Ver Relacionamento", console limpo. Evid ncias: web/testsprite_tests/gate-a-10-2-3-composer-processos.md, web/testsprite_tests/gate-a-10-2-3-evidencias-manuais.md.
 
-[2025-08-27 21:15 BRT] DEV Migração kan_kanban_logs_p0.sql criada com tabelas: kanban_logs, service_onboarding_tasks, card_tasks.
+[2025-08-27 21:15 BRT] DEV Migra  o kan_kanban_logs_p0.sql criada com tabelas: kanban_logs, service_onboarding_tasks, card_tasks.
 
 [2025-08-27 21:20 BRT] DEV Endpoints criados: GET /api/kanban/logs/:card_id, GET /api/services/onboarding/tasks.
 
-[2025-08-27 21:25 BRT] DEV API de criação de alunos atualizada para instanciar tarefas automaticamente ao criar card.
+[2025-08-27 21:25 BRT] DEV API de cria  o de alunos atualizada para instanciar tarefas automaticamente ao criar card.
 
-[2025-08-27 21:30 BRT] DEV Frontend v0.2.0 implementado: Botão Log (drawer) funcionando perfeitamente.
+[2025-08-27 21:30 BRT] DEV Frontend v0.2.0 implementado: Bot o Log (drawer) funcionando perfeitamente.
 
 [2025-08-27 21:35 BRT] DEV Frontend v0.2.0 implementado: Aba Checklist funcionando com toggle de tarefas.
 
@@ -44,108 +44,108 @@
 
 [2025-08-27 21:45 BRT] DEV Componentes UI criados: Badge e ScrollArea para suportar o frontend v0.2.0.
 
-[2025-08-27 21:50 BRT] DEV Dependências instaladas: @radix-ui/react-scroll-area e class-variance-authority.
+[2025-08-27 21:50 BRT] DEV Depend ncias instaladas: @radix-ui/react-scroll-area e class-variance-authority.
 
 [2025-08-27 21:55 BRT] DEV Erro corrigido: editorTab is not defined - props passadas corretamente do KanbanPage para ColumnView e DraggableCard.
 
-[2025-08-27 22:00 BRT] DEV Modal Premium implementado: KanbanCardEditor com abas Visão Geral, Checklist, Comentários e Anexos. Cards agora são compactos com botão lápis (✏️) e hotkey E.
+[2025-08-27 22:00 BRT] DEV Modal Premium implementado: KanbanCardEditor com abas Vis o Geral, Checklist, Coment rios e Anexos. Cards agora s o compactos com bot o l pis (✏️) e hotkey E.
 
-[2025-08-27 22:05 BRT] DEV Modais de Confirmação implementados: ENDPOINTS POST /api/kanban/move e POST /api/kanban/complete para avançar etapas e encerrar onboarding. Lógica real de verificação de tarefas obrigatórias implementada.
+[2025-08-27 22:05 BRT] DEV Modais de Confirma  o implementados: ENDPOINTS POST /api/kanban/move e POST /api/kanban/complete para avan ar etapas e encerrar onboarding. L gica real de verifica  o de tarefas obrigat rias implementada.
 
-[2025-08-27 22:10 BRT] QA FINAL v0.2.0 - Executando roteiro funcional completo para validação de produção.
+[2025-08-27 22:10 BRT] QA FINAL v0.2.0 - Executando roteiro funcional completo para valida  o de produ  o.
 
-[2025-08-27 22:15 BRT] GOVERNANÇA v0.2.0: KANBAN-LOGS-P0, KANBAN-ADVANCE-CONFIRM, KANBAN-COMPLETE-99, KAN-CARD-MODAL-EDITOR, KANBAN-CHECKLIST-FRONT implementados e funcionais.
+[2025-08-27 22:15 BRT] GOVERNAN A v0.2.0: KANBAN-LOGS-P0, KANBAN-ADVANCE-CONFIRM, KANBAN-COMPLETE-99, KAN-CARD-MODAL-EDITOR, KANBAN-CHECKLIST-FRONT implementados e funcionais.
 
-[2025-08-27 22:20 BRT] DEPLOY v0.2.0 - Executado com sucesso em produção. Smoke test 5/5 PASS. Versão estável e funcional.
+[2025-08-27 22:20 BRT] DEPLOY v0.2.0 - Executado com sucesso em produ  o. Smoke test 5/5 PASS. Vers o est vel e funcional.
 
-[2025-08-27 22:25 BRT] v0.3.0-dev ABERTA - Iniciando desenvolvimento do módulo de Serviços Completos.
+[2025-08-27 22:25 BRT] v0.3.0-dev ABERTA - Iniciando desenvolvimento do m dulo de Servi os Completos.
 
-### 🚀 v0.3.0-dev - SERVIÇOS COMPLETOS
+### 🚀 v0.3.0-dev - SERVI OS COMPLETOS
 
-#### 📋 P0 — Funcionalidades Essenciais (SERVIÇOS ONBOARDING)
-[2025-08-27 22:30 BRT] P0-01: CRUD de colunas intermediárias (2..98) no módulo Serviços - PENDING
-[2025-08-27 22:30 BRT] P0-02: CRUD de tarefas por coluna (catálogo) - PENDING
-[2025-08-27 22:30 BRT] P0-03: Instanciação automática em cards, idempotente - PENDING
-[2025-08-27 22:30 BRT] P0-04: Opção "Aplicar aos cards existentes: sim/não" ao alterar catálogo - PENDING
+#### 📋 P0   Funcionalidades Essenciais (SERVI OS ONBOARDING)
+[2025-08-27 22:30 BRT] P0-01: CRUD de colunas intermedi rias (2..98) no m dulo Servi os - PENDING
+[2025-08-27 22:30 BRT] P0-02: CRUD de tarefas por coluna (cat logo) - PENDING
+[2025-08-27 22:30 BRT] P0-03: Instancia  o autom tica em cards, idempotente - PENDING
+[2025-08-27 22:30 BRT] P0-04: Op  o "Aplicar aos cards existentes: sim/n o" ao alterar cat logo - PENDING
 
-#### 🔧 P1 — Configurações
+#### 🔧 P1   Configura  es
 [2025-08-27 22:30 BRT] P1-01: Equipe - habilitar menu para todos os planos (Basic = apenas admin) - PENDING
-[2025-08-27 22:30 BRT] P1-02: Configurações - habilitar menu em todos os planos, respeitando limitações - PENDING
+[2025-08-27 22:30 BRT] P1-02: Configura  es - habilitar menu em todos os planos, respeitando limita  es - PENDING
 
-#### 🎨 P2 — Polimento Premium
-[2025-08-27 22:30 BRT] P2-01: UI refinada nos cards (ícones, tooltips, estados) - PENDING
-[2025-08-27 22:30 BRT] P2-02: Placeholders de comentários/anexos no modal - PENDING
-[2025-08-27 22:30 BRT] P2-03: Logs visuais e métricas básicas no histórico - PENDING
+#### 🎨 P2   Polimento Premium
+[2025-08-27 22:30 BRT] P2-01: UI refinada nos cards ( cones, tooltips, estados) - PENDING
+[2025-08-27 22:30 BRT] P2-02: Placeholders de coment rios/anexos no modal - PENDING
+[2025-08-27 22:30 BRT] P2-03: Logs visuais e m tricas b sicas no hist rico - PENDING
 
-[2025-08-27 22:35 BRT] P0-01 EM DESENVOLVIMENTO: CRUD de colunas intermediárias implementado no módulo Serviços. Interface completa com criar, editar, excluir e reordenar colunas. Integração em tempo real com Kanban via eventos pg:kanban:refresh.
+[2025-08-27 22:35 BRT] P0-01 EM DESENVOLVIMENTO: CRUD de colunas intermedi rias implementado no m dulo Servi os. Interface completa com criar, editar, excluir e reordenar colunas. Integra  o em tempo real com Kanban via eventos pg:kanban:refresh.
 
-[2025-08-27 22:40 BRT] P0-02 EM DESENVOLVIMENTO: CRUD de tarefas por coluna implementado no módulo Serviços. Interface completa com gerenciador de tarefas, modal de criação, edição e exclusão. Integração preparada para instanciação automática em cards.
+[2025-08-27 22:40 BRT] P0-02 EM DESENVOLVIMENTO: CRUD de tarefas por coluna implementado no m dulo Servi os. Interface completa com gerenciador de tarefas, modal de cria  o, edi  o e exclus o. Integra  o preparada para instancia  o autom tica em cards.
 
-[2025-08-27 22:45 BRT] P0-03 EM DESENVOLVIMENTO: Instanciação automática de tarefas em cards implementada. Funções PostgreSQL criadas para instanciar tarefas automaticamente quando cards entram em colunas. Triggers configurados para criação e movimentação de cards. API endpoints completos para CRUD de tarefas com integração de logs.
+[2025-08-27 22:45 BRT] P0-03 EM DESENVOLVIMENTO: Instancia  o autom tica de tarefas em cards implementada. Fun  es PostgreSQL criadas para instanciar tarefas automaticamente quando cards entram em colunas. Triggers configurados para cria  o e movimenta  o de cards. API endpoints completos para CRUD de tarefas com integra  o de logs.
 
-[2025-08-27 22:50 BRT] P0-04 CONCLUÍDO: Opção "Aplicar aos cards existentes" implementada no módulo Serviços. Interface completa com modal de edição, switch para escolha de aplicação, validações e feedback visual. Integração com API PATCH para aplicar mudanças em massa aos cards existentes. Logs detalhados para auditoria.
+[2025-08-27 22:50 BRT] P0-04 CONCLUÍDO: Op  o "Aplicar aos cards existentes" implementada no m dulo Servi os. Interface completa com modal de edi  o, switch para escolha de aplica  o, valida  es e feedback visual. Integra  o com API PATCH para aplicar mudan as em massa aos cards existentes. Logs detalhados para auditoria.
 
-[2025-08-27 23:00 BRT] P1-01 CONCLUÍDO: Menu Equipe habilitado para todos os planos implementado. Menu sempre visível com funcionalidades limitadas por plano (Basic = 1 colaborador, Enterprise = ilimitado). Interface atualizada com badges de plano, contadores de limite, mensagens de upgrade e validações visuais. Integração completa com sistema de planos e RBAC.
+[2025-08-27 23:00 BRT] P1-01 CONCLUÍDO: Menu Equipe habilitado para todos os planos implementado. Menu sempre vis vel com funcionalidades limitadas por plano (Basic = 1 colaborador, Enterprise = ilimitado). Interface atualizada com badges de plano, contadores de limite, mensagens de upgrade e valida  es visuais. Integra  o completa com sistema de planos e RBAC.
 
-[2025-08-27 23:15 BRT] P1-02 CONCLUÍDO: Menu Configurações habilitado para todos os planos implementado. Página funcional com 4 abas: Perfil, Organização, Segurança (sempre disponíveis) e Avançado (limitado por plano). Plano Basic: acesso a configurações essenciais com itens avançados bloqueados e mensagens de upgrade. Plano Enterprise: acesso completo a todas as seções. Interface premium com badges de plano, tooltips e feedback visual consistente.
+[2025-08-27 23:15 BRT] P1-02 CONCLUÍDO: Menu Configura  es habilitado para todos os planos implementado. P gina funcional com 4 abas: Perfil, Organiza  o, Seguran a (sempre dispon veis) e Avan ado (limitado por plano). Plano Basic: acesso a configura  es essenciais com itens avan ados bloqueados e mensagens de upgrade. Plano Enterprise: acesso completo a todas as se  es. Interface premium com badges de plano, tooltips e feedback visual consistente.
 
-[2025-08-27 23:30 BRT] P2-01 CONCLUÍDO: UI refinada nos cards do Kanban implementada. Cards com ícones contextuais (status, coluna, progresso, edição), tooltips informativos, estados visuais refinados (hover, focus, drag), barra de progresso com gradiente e animações. Checklist com ícones contextuais, badges refinados, indicadores de ordem e timestamps visuais. Interface premium com transições suaves, feedback visual e estados de interação.
+[2025-08-27 23:30 BRT] P2-01 CONCLUÍDO: UI refinada nos cards do Kanban implementada. Cards com  cones contextuais (status, coluna, progresso, edi  o), tooltips informativos, estados visuais refinados (hover, focus, drag), barra de progresso com gradiente e anima  es. Checklist com  cones contextuais, badges refinados, indicadores de ordem e timestamps visuais. Interface premium com transi  es suaves, feedback visual e estados de intera  o.
 
-[2025-08-27 23:45 BRT] P2-02 CONCLUÍDO: Placeholders de comentários e anexos no modal do card implementados. Aba Comentários com campo de input preparado, listagem visual de comentários e informações sobre funcionalidade futura. Aba Anexos com botões de upload preparados, área de drag & drop e interface para gerenciamento de arquivos. Logs de auditoria integrados para abertura das abas (comment_tab_opened, attachments_tab_opened). UI premium com ícones contextuais, tooltips informativos e design consistente com o sistema existente.
+[2025-08-27 23:45 BRT] P2-02 CONCLUÍDO: Placeholders de coment rios e anexos no modal do card implementados. Aba Coment rios com campo de input preparado, listagem visual de coment rios e informa  es sobre funcionalidade futura. Aba Anexos com bot es de upload preparados,  rea de drag & drop e interface para gerenciamento de arquivos. Logs de auditoria integrados para abertura das abas (comment_tab_opened, attachments_tab_opened). UI premium com  cones contextuais, tooltips informativos e design consistente com o sistema existente.
 
-[2025-08-27 23:55 BRT] P2-03 CONCLUÍDO: Logs visuais e métricas básicas no histórico implementados. Sistema de métricas com contadores de ações totais, ações do dia e da semana. Gráficos de barras para visualização de atividade por tipo de ação. Filtros avançados por termo de busca, tipo de ação e período (hoje, semana, mês). Interface premium com cards de métricas, gráficos responsivos, filtros intuitivos e design refinado dos logs. Integração completa com sistema de logs existente e suporte para novas ações (comments_tab_opened, attachments_tab_opened).
+[2025-08-27 23:55 BRT] P2-03 CONCLUÍDO: Logs visuais e m tricas b sicas no hist rico implementados. Sistema de m tricas com contadores de a  es totais, a  es do dia e da semana. Gr ficos de barras para visualiza  o de atividade por tipo de a  o. Filtros avan ados por termo de busca, tipo de a  o e per odo (hoje, semana, m s). Interface premium com cards de m tricas, gr ficos responsivos, filtros intuitivos e design refinado dos logs. Integra  o completa com sistema de logs existente e suporte para novas a  es (comments_tab_opened, attachments_tab_opened).
 
-[2025-08-27 23:58 BRT] v0.3.1-dev ABERTA - Iniciando reformulação completa do módulo Serviços → Onboarding e Cards do Kanban premium. P1: Layout accordion expansível com CRUD inline de tarefas. P2: Cards simplificados e clean com badge de tarefas discreto. Foco em usabilidade e design premium.
+[2025-08-27 23:58 BRT] v0.3.1-dev ABERTA - Iniciando reformula  o completa do m dulo Servi os → Onboarding e Cards do Kanban premium. P1: Layout accordion expans vel com CRUD inline de tarefas. P2: Cards simplificados e clean com badge de tarefas discreto. Foco em usabilidade e design premium.
 
-[2025-08-27 23:59 BRT] P1-01 CONCLUÍDO: Layout accordion expansível implementado. Colunas como cards expansíveis com header clicável, ícones de expansão (ChevronDown/ChevronRight), conteúdo expansível com CRUD inline de tarefas. Botões de ação (editar/excluir) aparecem no hover, integração com sistema de tarefas existente. Interface premium com badges de contagem, barras de progresso e design responsivo.
+[2025-08-27 23:59 BRT] P1-01 CONCLUÍDO: Layout accordion expans vel implementado. Colunas como cards expans veis com header clic vel,  cones de expans o (ChevronDown/ChevronRight), conte do expans vel com CRUD inline de tarefas. Bot es de a  o (editar/excluir) aparecem no hover, integra  o com sistema de tarefas existente. Interface premium com badges de contagem, barras de progresso e design responsivo.
 
-[2025-01-29 14:45 BRT] DEV — GATE 10.6.HF-FILTROS — Correção "filtros nao funciona" — evidências: web/evidencias/gate10-6-hf-filtros-correcao.md
+[2025-01-29 14:45 BRT] DEV   GATE 10.6.HF-FILTROS   Corre  o "filtros nao funciona"   evid ncias: web/evidencias/gate10-6-hf-filtros-correcao.md
 
-[2025-01-29 15:00 BRT] DEV — GATE 10.6.HF-SERVIÇOS — Página /app/services/relationship criada — evidências: web/evidencias/gate10-6-hf-servicos-relacionamento.md
-[2025-01-29 15:30 BRT] DEV — GATE 10.6.HF-API-AUTH — Correção crítica da API /relationship/tasks (401→200) — evidências: web/evidencias/gate10-6-hf-api-auth-correcao.md
-[2025-01-29 15:35 BRT] DEV — GATE 10.6.HF-VARIAVEL — Correção ReferenceError: start_time is not defined na API — evidências: web/evidencias/gate10-6-hf-variavel-correcao.md
-[2025-01-29 15:45 BRT] DEV — GATE 10.6.HF-TEMPLATES-API — Correção API /relationship/templates (500→200) e estrutura de dados — evidências: web/evidencias/gate10-6-hf-templates-api-correcao.md
-[2025-01-29 15:50 BRT] DEV — GATE 10.6.HF-TOAST-FIX — Correção Module not found: @/hooks/use-toast (usar sonner) — evidências: web/evidencias/gate10-6-hf-toast-fix.md
-[2025-01-29 16:05 BRT] DEV — GATE 10.6.HF-DELETE-FIX — Correção erro 500 na API DELETE /relationship/templates/[id] (ctx.tenantId → tenantId) — evidências: web/evidencias/gate10-6-hf-delete-fix.md
-[2025-01-29 16:10 BRT] DEV — GATE 10.6.HF-MODAL-VARIÁVEIS — Modal premium + sistema completo de variáveis personalizadas — evidências: web/evidencias/gate10-6-hf-modal-variaveis-correcao.md
-[2025-01-29 16:15 BRT] DEV — GATE 10.6.HF-SIMPLIFICAR-MSG — Simplificação para apenas 1 mensagem (remover V1/V2 confuso) — evidências: web/evidencias/gate10-6-hf-simplificar-mensagem.md
-[2025-01-29 16:30 BRT] DEV — GATE 10.6.7 — ENVIO/CRIAÇÃO MANUAL DE MENSAGENS — MessageComposer unificado, âncora manual, integração total — evidências: web/evidencias/gate10-6-7-manual-messages.md
-[2025-01-29 16:45 BRT] DEV — GATE 10.6.7-UX — MELHORIAS UX — Aluno automático, destaque [Primeiro Nome], exemplos práticos — evidências: web/evidencias/gate10-6-7-ux-melhorias.md
-[2025-01-29 17:45 BRT] DEV — GATE 10.6.7.4 — ENTRADAS DO SISTEMA — Botão "Enviar follow-up" nas ocorrências (lista + modal) e card "Relacionamento - Ações rápidas" no Dashboard — evidências: web/evidencias/gate10-6-7-4-entradas.md
-[2025-01-29 18:30 BRT] DEV — GATE 10.6.7.5 — INTEGRAÇÃO KANBAN/TIMELINE — Reflexo imediato das ações do MessageComposer no Kanban, Calendário, Timeline e Analytics com âncora manual — evidências: web/evidencias/gate10-6-7-5-integracao.md
-[2025-01-29 18:45 BRT] DEV — GATE 10.6.7.6 — QA & EVIDÊNCIAS E2E — Testes completos E2E, performance (69ms Kanban, 18ms API), RLS ativo, console limpo, aprovado para produção — evidências: web/testsprite_tests/gate10-6-7-6-qa.md, web/Checklist_Release_Validation.txt
-[2025-01-29 19:15 BRT] DEV — GATE 10.6.7.HF — COMPOSER ALUNO/PROCESSOS — Layout padronizado como Regras, remoções (versão template), variáveis compactas (popover), Criar Tarefa imediato — evidências: web/testsprite_tests/gate10-6-7-hf-composer-aluno.md
-[2025-01-29 19:45 BRT] DEV — GATE 10.6.7.HF2 — COMPOSER ALUNO/PROCESSOS — Variáveis painel colapsável, tokens colchetes [PrimeiroNome], catálogo ícones/legendas, textos/labels corrigidos, prévia collapse — evidências: web/testsprite_tests/gate10-6-7-hf2-composer-aluno.md
-[2025-01-29 20:15 BRT] DEV — GATE 10.6.7.HF3 — COMPOSER ALUNO/PROCESSOS — Reflexo imediato Kanban/Calendário, variáveis cursor+colchetes, prévia/variáveis separados, UI limpa, Date/Time Picker moderno, toasts microcopy+deep-links — evidências: web/testsprite_tests/gate10-6-7-hf3-composer-aluno.md
-[2025-01-29 20:45 BRT] DEV — GATE 10.6.7.HF4 — COMPOSER ALUNO/PROCESSOS — Criar Tarefa reflexo imediato+deep-link, prévia resolvida [PrimeiroNome]/[SaudacaoTemporal], Date/Time UI padrão Calendar+24h, timezone America/Sao_Paulo — evidências: web/testsprite_tests/gate10-6-7-hf4-relacionamento.md
-[2025-01-29 21:15 BRT] DEV — GATE 10.6.7.HF5 — COMPOSER ALUNO/PROCESSOS — Correção "Invalid time value" defensiva prévia+parse+TZ, validação submit data/hora obrigatórias, Calendar UX i18n pt-BR+botão OK, telemetria logs estruturados, console limpo — evidências: web/testsprite_tests/gate10-6-7-hf5-composer.md
-[2025-01-29 21:30 BRT] DEV — GATE 10.6.7.HF5.HOTFIX — COMPOSER ALUNO/PROCESSOS — Correção final "Invalid time value" dayjs().tz() vs dayjs.tz(), formato ISO completo toISOString(), logs debug removidos, teste criação tarefa funcionando — evidências: console limpo, criação tarefa OK
-[2025-01-29 22:00 BRT] DEV — GATE 10.6.7.HF5.FINAL — KANBAN REFRESH IMEDIATO — Row Level Security (RLS) bloqueando consultas, createClientAdmin() bypass RLS desenvolvimento, ordenação created_at DESC, reflexo imediato 100% funcional — evidências: 39 tarefas listadas, criação+listagem instantânea
-[2025-01-29 22:30 BRT] DEV — GATE 10.6.7.HF6 — LAYOUT KANBAN PREMIUM — Redesign completo TaskCard simplificado, header limpo, colunas otimizadas, dados realistas (44 tarefas), layout escalável para milhares de mensagens — evidências: interface limpa, cards compactos, UX premium
-[2025-01-29 23:00 BRT] DEV — GATE 10.6.7.HF7 — CORREÇÃO PROFISSIONAL COMPLETA — Limpeza total dados antigos/mock, layout colorido restaurado (print 2), dados reais (5 tarefas), contadores corretos, endpoint cleanup implementado, sistema profissional e eficiente — evidências: dados limpos, layout colorido, contadores precisos
-[2025-01-29 23:15 BRT] DEV — GATE 10.6.7.HF8 — EXCLUSÃO E CORREÇÃO MENSAGENS — Endpoint DELETE /api/relationship/tasks/[id], funcionalidade exclusão TaskCard, correção incompatibilidade nomes/mensagens, dados personalizados corretos (Regina→Regina, Rafa→Rafa), sistema 100% funcional — evidências: exclusão funcionando, mensagens corretas
-[2025-01-29 23:45 BRT] DEV — GATE 10.6.7.HF9 — VALIDAÇÃO DATA AMIGÁVEL — Validação data passada MessageComposer, feedback visual tempo real, mensagem amigável "data anterior ao momento atual", botão desabilitado com erro, limpeza automática ao fechar modal — evidências: validação funcionando, UX profissional
-[2025-01-30 00:15 BRT] DEV — GATE 10.6.7.HF10 — CORREÇÃO ERRO 500 RELATIONSHIP LOGS — Tabela relationship_logs não existia, endpoint modificado para retornar dados vazios quando tabela não configurada, migração criada, página debug para execução manual — evidências: erro 500 resolvido, sistema funcionando
-[2025-01-30 00:45 BRT] DEV — GATE 10.6.7.HF11 — CORREÇÃO ERROS CRÍTICOS SISTEMA — "Responsável inválido" (falta profissionais), "ConfirmDialog is not defined" (import faltando), endpoints debug criados, página debug unificada para correção automática — evidências: ambos erros resolvidos, sistema estável
-[2025-01-30 01:00 BRT] DEV — GATE 10.6.7.HF11.FINAL — CORREÇÃO COMPLETA CONFIRMDIALOG — Import ConfirmDialog adicionado em todos os componentes (ProfessionalsManager, ProfessionalProfilesManager, OccurrenceTypesManager, OccurrenceGroupsManager), erro "ConfirmDialog is not defined" eliminado completamente — evidências: página Equipe funcionando, todos os modais de confirmação operacionaisG A T E   1 0 . 6 . 7 . H F 1 2     R E F O R M U L A � � O   C O M P L E T A   L A Y O U T   A L U N O S 
+[2025-01-29 15:00 BRT] DEV   GATE 10.6.HF-SERVI OS   P gina /app/services/relationship criada   evid ncias: web/evidencias/gate10-6-hf-servicos-relacionamento.md
+[2025-01-29 15:30 BRT] DEV   GATE 10.6.HF-API-AUTH   Corre  o cr tica da API /relationship/tasks (401→200)   evid ncias: web/evidencias/gate10-6-hf-api-auth-correcao.md
+[2025-01-29 15:35 BRT] DEV   GATE 10.6.HF-VARIAVEL   Corre  o ReferenceError: start_time is not defined na API   evid ncias: web/evidencias/gate10-6-hf-variavel-correcao.md
+[2025-01-29 15:45 BRT] DEV   GATE 10.6.HF-TEMPLATES-API   Corre  o API /relationship/templates (500→200) e estrutura de dados   evid ncias: web/evidencias/gate10-6-hf-templates-api-correcao.md
+[2025-01-29 15:50 BRT] DEV   GATE 10.6.HF-TOAST-FIX   Corre  o Module not found: @/hooks/use-toast (usar sonner)   evid ncias: web/evidencias/gate10-6-hf-toast-fix.md
+[2025-01-29 16:05 BRT] DEV   GATE 10.6.HF-DELETE-FIX   Corre  o erro 500 na API DELETE /relationship/templates/[id] (ctx.tenantId → tenantId)   evid ncias: web/evidencias/gate10-6-hf-delete-fix.md
+[2025-01-29 16:10 BRT] DEV   GATE 10.6.HF-MODAL-VARIÁVEIS   Modal premium + sistema completo de vari veis personalizadas   evid ncias: web/evidencias/gate10-6-hf-modal-variaveis-correcao.md
+[2025-01-29 16:15 BRT] DEV   GATE 10.6.HF-SIMPLIFICAR-MSG   Simplifica  o para apenas 1 mensagem (remover V1/V2 confuso)   evid ncias: web/evidencias/gate10-6-hf-simplificar-mensagem.md
+[2025-01-29 16:30 BRT] DEV   GATE 10.6.7   ENVIO/CRIA  O MANUAL DE MENSAGENS   MessageComposer unificado,  ncora manual, integra  o total   evid ncias: web/evidencias/gate10-6-7-manual-messages.md
+[2025-01-29 16:45 BRT] DEV   GATE 10.6.7-UX   MELHORIAS UX   Aluno autom tico, destaque [Primeiro Nome], exemplos pr ticos   evid ncias: web/evidencias/gate10-6-7-ux-melhorias.md
+[2025-01-29 17:45 BRT] DEV   GATE 10.6.7.4   ENTRADAS DO SISTEMA   Bot o "Enviar follow-up" nas ocorr ncias (lista + modal) e card "Relacionamento - A  es r pidas" no Dashboard   evid ncias: web/evidencias/gate10-6-7-4-entradas.md
+[2025-01-29 18:30 BRT] DEV   GATE 10.6.7.5   INTEGRA  O KANBAN/TIMELINE   Reflexo imediato das a  es do MessageComposer no Kanban, Calend rio, Timeline e Analytics com  ncora manual   evid ncias: web/evidencias/gate10-6-7-5-integracao.md
+[2025-01-29 18:45 BRT] DEV   GATE 10.6.7.6   QA & EVID NCIAS E2E   Testes completos E2E, performance (69ms Kanban, 18ms API), RLS ativo, console limpo, aprovado para produ  o   evid ncias: web/testsprite_tests/gate10-6-7-6-qa.md, web/Checklist_Release_Validation.txt
+[2025-01-29 19:15 BRT] DEV   GATE 10.6.7.HF   COMPOSER ALUNO/PROCESSOS   Layout padronizado como Regras, remo  es (vers o template), vari veis compactas (popover), Criar Tarefa imediato   evid ncias: web/testsprite_tests/gate10-6-7-hf-composer-aluno.md
+[2025-01-29 19:45 BRT] DEV   GATE 10.6.7.HF2   COMPOSER ALUNO/PROCESSOS   Vari veis painel colaps vel, tokens colchetes [PrimeiroNome], cat logo  cones/legendas, textos/labels corrigidos, pr via collapse   evid ncias: web/testsprite_tests/gate10-6-7-hf2-composer-aluno.md
+[2025-01-29 20:15 BRT] DEV   GATE 10.6.7.HF3   COMPOSER ALUNO/PROCESSOS   Reflexo imediato Kanban/Calend rio, vari veis cursor+colchetes, pr via/vari veis separados, UI limpa, Date/Time Picker moderno, toasts microcopy+deep-links   evid ncias: web/testsprite_tests/gate10-6-7-hf3-composer-aluno.md
+[2025-01-29 20:45 BRT] DEV   GATE 10.6.7.HF4   COMPOSER ALUNO/PROCESSOS   Criar Tarefa reflexo imediato+deep-link, pr via resolvida [PrimeiroNome]/[SaudacaoTemporal], Date/Time UI padr o Calendar+24h, timezone America/Sao_Paulo   evid ncias: web/testsprite_tests/gate10-6-7-hf4-relacionamento.md
+[2025-01-29 21:15 BRT] DEV   GATE 10.6.7.HF5   COMPOSER ALUNO/PROCESSOS   Corre  o "Invalid time value" defensiva pr via+parse+TZ, valida  o submit data/hora obrigat rias, Calendar UX i18n pt-BR+bot o OK, telemetria logs estruturados, console limpo   evid ncias: web/testsprite_tests/gate10-6-7-hf5-composer.md
+[2025-01-29 21:30 BRT] DEV   GATE 10.6.7.HF5.HOTFIX   COMPOSER ALUNO/PROCESSOS   Corre  o final "Invalid time value" dayjs().tz() vs dayjs.tz(), formato ISO completo toISOString(), logs debug removidos, teste cria  o tarefa funcionando   evid ncias: console limpo, cria  o tarefa OK
+[2025-01-29 22:00 BRT] DEV   GATE 10.6.7.HF5.FINAL   KANBAN REFRESH IMEDIATO   Row Level Security (RLS) bloqueando consultas, createClientAdmin() bypass RLS desenvolvimento, ordena  o created_at DESC, reflexo imediato 100% funcional   evid ncias: 39 tarefas listadas, cria  o+listagem instant nea
+[2025-01-29 22:30 BRT] DEV   GATE 10.6.7.HF6   LAYOUT KANBAN PREMIUM   Redesign completo TaskCard simplificado, header limpo, colunas otimizadas, dados realistas (44 tarefas), layout escal vel para milhares de mensagens   evid ncias: interface limpa, cards compactos, UX premium
+[2025-01-29 23:00 BRT] DEV   GATE 10.6.7.HF7   CORRE  O PROFISSIONAL COMPLETA   Limpeza total dados antigos/mock, layout colorido restaurado (print 2), dados reais (5 tarefas), contadores corretos, endpoint cleanup implementado, sistema profissional e eficiente   evid ncias: dados limpos, layout colorido, contadores precisos
+[2025-01-29 23:15 BRT] DEV   GATE 10.6.7.HF8   EXCLUS O E CORRE  O MENSAGENS   Endpoint DELETE /api/relationship/tasks/[id], funcionalidade exclus o TaskCard, corre  o incompatibilidade nomes/mensagens, dados personalizados corretos (Regina→Regina, Rafa→Rafa), sistema 100% funcional   evid ncias: exclus o funcionando, mensagens corretas
+[2025-01-29 23:45 BRT] DEV   GATE 10.6.7.HF9   VALIDA  O DATA AMIGÁVEL   Valida  o data passada MessageComposer, feedback visual tempo real, mensagem amig vel "data anterior ao momento atual", bot o desabilitado com erro, limpeza autom tica ao fechar modal   evid ncias: valida  o funcionando, UX profissional
+[2025-01-30 00:15 BRT] DEV   GATE 10.6.7.HF10   CORRE  O ERRO 500 RELATIONSHIP LOGS   Tabela relationship_logs n o existia, endpoint modificado para retornar dados vazios quando tabela n o configurada, migra  o criada, p gina debug para execu  o manual   evid ncias: erro 500 resolvido, sistema funcionando
+[2025-01-30 00:45 BRT] DEV   GATE 10.6.7.HF11   CORRE  O ERROS CRÍTICOS SISTEMA   "Respons vel inv lido" (falta profissionais), "ConfirmDialog is not defined" (import faltando), endpoints debug criados, p gina debug unificada para corre  o autom tica   evid ncias: ambos erros resolvidos, sistema est vel
+[2025-01-30 01:00 BRT] DEV   GATE 10.6.7.HF11.FINAL   CORRE  O COMPLETA CONFIRMDIALOG   Import ConfirmDialog adicionado em todos os componentes (ProfessionalsManager, ProfessionalProfilesManager, OccurrenceTypesManager, OccurrenceGroupsManager), erro "ConfirmDialog is not defined" eliminado completamente   evid ncias: p gina Equipe funcionando, todos os modais de confirma  o operacionaisG A T E   1 0 . 6 . 7 . H F 1 2     R E F O R M U L A     O   C O M P L E T A   L A Y O U T   A L U N O S 
  
- G A T E   1 0 . 6 . 7 . H F 1 2 . F I N A L     C O R R E � � O   E R R O   B U I L D   P R O F E S S I O N A L S M A N A G E R 
+ G A T E   1 0 . 6 . 7 . H F 1 2 . F I N A L     C O R R E     O   E R R O   B U I L D   P R O F E S S I O N A L S M A N A G E R 
  
- G A T E   1 0 . 6 . 7 . H F 1 3     C O R R E � � O   E R R O   A L E R T T R I A N G L E   I M P O R T 
+ G A T E   1 0 . 6 . 7 . H F 1 3     C O R R E     O   E R R O   A L E R T T R I A N G L E   I M P O R T 
  
- G A T E   1 0 . 6 . 7 . H F 1 4     C O R R E � � O   E R R O   S E L E C T   V A L U E   V A Z I O 
+ G A T E   1 0 . 6 . 7 . H F 1 4     C O R R E     O   E R R O   S E L E C T   V A L U E   V A Z I O 
  
- [ 2 0 2 5 - 0 1 - 3 0   1 4 : 3 0   B R T ]   D E V     G A T E   E - 1 0 . 1     M � D U L O   1   E Q U I P E / P R O F I S S I O N A I S   C O N C L U � D O     M i g r a � � o   i s _ a c t i v e   a p l i c a d a ,   e n d p o i n t s   P A T C H / G E T   i m p l e m e n t a d o s ,   t o g g l e   f u n c i o n a l   n a   t a b e l a ,   b u s c a   c o m   d e b o u n c e   3 0 0 m s ,   i n t e g r a � � o   R e s p o n s � v e i s   f u n c i o n a n d o     e v i d � n c i a s :   w e b / e v i d e n c i a s / g a t e - e - 1 0 - 1 - e q u i p e - p r o f i s s i o n a i s . m d 
+ [ 2 0 2 5 - 0 1 - 3 0   1 4 : 3 0   B R T ]   D E V     G A T E   E - 1 0 . 1     M   D U L O   1   E Q U I P E / P R O F I S S I O N A I S   C O N C L U   D O     M i g r a     o   i s _ a c t i v e   a p l i c a d a ,   e n d p o i n t s   P A T C H / G E T   i m p l e m e n t a d o s ,   t o g g l e   f u n c i o n a l   n a   t a b e l a ,   b u s c a   c o m   d e b o u n c e   3 0 0 m s ,   i n t e g r a     o   R e s p o n s   v e i s   f u n c i o n a n d o     e v i d   n c i a s :   w e b / e v i d e n c i a s / g a t e - e - 1 0 - 1 - e q u i p e - p r o f i s s i o n a i s . m d 
  
- [ 2 0 2 5 - 0 1 - 3 0   1 4 : 3 0   B R T ]   D E V     G A T E   E - 1 0 . 1     M � D U L O   1   E Q U I P E / P R O F I S S I O N A I S   C O N C L U � D O     M i g r a � � o   i s _ a c t i v e   a p l i c a d a ,   e n d p o i n t s   P A T C H / G E T   i m p l e m e n t a d o s ,   t o g g l e   f u n c i o n a l   n a   t a b e l a ,   b u s c a   c o m   d e b o u n c e   3 0 0 m s ,   i n t e g r a � � o   R e s p o n s � v e i s   f u n c i o n a n d o     e v i d � n c i a s :   w e b / e v i d e n c i a s / g a t e - e - 1 0 - 1 - e q u i p e - p r o f i s s i o n a i s . m d 
+ [ 2 0 2 5 - 0 1 - 3 0   1 4 : 3 0   B R T ]   D E V     G A T E   E - 1 0 . 1     M   D U L O   1   E Q U I P E / P R O F I S S I O N A I S   C O N C L U   D O     M i g r a     o   i s _ a c t i v e   a p l i c a d a ,   e n d p o i n t s   P A T C H / G E T   i m p l e m e n t a d o s ,   t o g g l e   f u n c i o n a l   n a   t a b e l a ,   b u s c a   c o m   d e b o u n c e   3 0 0 m s ,   i n t e g r a     o   R e s p o n s   v e i s   f u n c i o n a n d o     e v i d   n c i a s :   w e b / e v i d e n c i a s / g a t e - e - 1 0 - 1 - e q u i p e - p r o f i s s i o n a i s . m d 
  
  
- [ 2 0 2 5 - 0 9 - 3 0   1 0 : 4 0   B R T ]   D E V   � �  
+ [ 2 0 2 5 - 0 9 - 3 0   1 0 : 4 0   B R T ]   D E V       
  G A T E  
  1 0 . 7  
- � �   R E F O R M U L A � ! � �O   M � D U L O  
+      R E F O R M U L A   !    O   M   D U L O  
  R E L A C I O N A M E N T O  
- � �   C o l u n a s   d i n � � m i c a s   ( A t r a s a d a s / H o j e / P e n d e n t e s ) ,   t i m e z o n e   A m e r i c a / S a o _ P a u l o ,   s o f t   d e l e t e   c o m   U n d o   ( 5 s ) ,   f i l t r o   p a d r � � o   h o j e ,   o r d e n a � � � � o   s c h e d u l e d _ f o r   A S C   +   c r e a t e d _ a t   A S C   � �  
+      C o l u n a s   d i n     m i c a s   ( A t r a s a d a s / H o j e / P e n d e n t e s ) ,   t i m e z o n e   A m e r i c a / S a o _ P a u l o ,   s o f t   d e l e t e   c o m   U n d o   ( 5 s ) ,   f i l t r o   p a d r     o   h o j e ,   o r d e n a         o   s c h e d u l e d _ f o r   A S C   +   c r e a t e d _ a t   A S C       
  a r q u i v o s :  
  s u p a b a s e / m i g r a t i o n s / 2 0 2 5 0 9 3 0 _ r e l a t i o n s h i p _ s t a t u s _ s t a n d a r d i z a t i o n . s q l  
  w e b / l i b / d a t e - u t i l s . t s  
@@ -156,7 +156,7 @@
  w e b / h o o k s / u s e R e l a t i o n s h i p F i l t e r s . t s  
  w e b / c o m p o n e n t s / r e l a t i o n s h i p / R e l a t i o n s h i p K a n b a n . t s x  
  w e b / c o m p o n e n t s / r e l a t i o n s h i p / T a s k C a r d . t s x  
- � �   e v i d � � n c i a s :   C h e c k l i s t _ R e l e a s e _ V a l i d a t i o n . t x t   c o m   9   c r i t � � r i o s   d e   a c e i t e  
+      e v i d     n c i a s :   C h e c k l i s t _ R e l e a s e _ V a l i d a t i o n . t x t   c o m   9   c r i t     r i o s   d e   a c e i t e  
  
 [2025-09-30 10:45 BRT] DEV - GATE 10.7.1 - HOTFIX GLOBAL - Dropdowns transparentes em modais corrigido - z-index Select/Dropdown/Tooltip alterado de z-50 para z-100 - arquivos: web/components/ui/select.tsx, dropdown-menu.tsx, tooltip.tsx, globals.css - evidencias: web/evidencias/GATE_10.7.1_DROPDOWN_MODALS_FIX.md
 
@@ -174,7 +174,7 @@
 
 [2025-09-30 13:20 BRT] DEV - CRIACAO DOCUMENTO PENDENCIAS OUTUBRO - Consolidado 47 pendencias (P0 a P3) para outubro/2025, incluindo seguranca critica, bugs de Relacionamento, implementacao de Categorias Financeiras, estrutura de pastas, tipagem, testes - arquivo: Pendencias_202510.md
 
-[2025-09-30 13:30 BRT] DEV - GATE 10.9 - MODULO CONFIGURACOES - Criado modulo com 2 submódulos (Organização + Integrações), foco em Integrações com teste de conexão WhatsApp Z-API e Supabase, UI completa com status em tempo real - arquivos: web/app/(app)/app/settings/page.tsx, web/components/settings/OrganizationSettings.tsx, web/components/settings/IntegrationsSettings.tsx, web/app/api/wa/test-connection/route.ts, web/app/api/_health/database/route.ts
+[2025-09-30 13:30 BRT] DEV - GATE 10.9 - MODULO CONFIGURACOES - Criado modulo com 2 subm dulos (Organiza  o + Integra  es), foco em Integra  es com teste de conex o WhatsApp Z-API e Supabase, UI completa com status em tempo real - arquivos: web/app/(app)/app/settings/page.tsx, web/components/settings/OrganizationSettings.tsx, web/components/settings/IntegrationsSettings.tsx, web/app/api/wa/test-connection/route.ts, web/app/api/_health/database/route.ts
 
 [2025-09-30 13:45 BRT] DEV - GATE 10.9.1 - REFATORACAO INTEGRACOES - Removido Supabase e WhatsApp (infraestrutura), foco em integracoes de NEGOCIO (Eduzz + Hotmart), cards com logos padrao Servicos, paginas detalhadas com configuracao de credenciais e webhooks - arquivos: web/components/settings/IntegrationsSettings.tsx (refatorado), web/app/(app)/app/settings/integrations/eduzz/page.tsx (novo), web/app/(app)/app/settings/integrations/hotmart/page.tsx (novo)
 
@@ -198,6 +198,6 @@
 
 [2025-09-30 15:10 BRT] DEV - GATE 10.9.11 - CORRECAO CRITICA ESTRUTURA BANCO - Usuario identificou erro grave: service_catalog != plans, tabela plans criada corretamente (planos de venda), migrations Hotmart revertidas e reaplicadas com referencia correta para plans.id - arquivos: supabase/migrations/20250930_plans.sql (novo), hotmart_integrations (corrigido)
 
-[2025-09-30 15:20 BRT] DEV - GATE 10.9.12 - ESTRUTURA CORRIGIDA - Tabela plans criada, integração Hotmart agora mapeia CORRETAMENTE para plans.id (planos de venda), service_catalog preservado apenas para catalogo de serviços, todos os codigos revertidos e corrigidos - BANCO SEGURO - arquivos: supabase/migrations/20250930_plans.sql (novo), hotmart_integrations.sql (corrigido), todos os endpoints e UIs atualizados
+[2025-09-30 15:20 BRT] DEV - GATE 10.9.12 - ESTRUTURA CORRIGIDA - Tabela plans criada, integra  o Hotmart agora mapeia CORRETAMENTE para plans.id (planos de venda), service_catalog preservado apenas para catalogo de servi os, todos os codigos revertidos e corrigidos - BANCO SEGURO - arquivos: supabase/migrations/20250930_plans.sql (novo), hotmart_integrations.sql (corrigido), todos os endpoints e UIs atualizados
 
 [2025-09-30 15:30 BRT] DEV - GATE 10.9.13 - FERRAMENTA TESTE HOTMART - Criada pagina de testes /settings/integrations/hotmart/test com simulador de webhooks (PURCHASE_APPROVED e REFUNDED), editor de payload JSON, validacao visual de resultados, guia completo de testes com 3 metodos (UI, Postman, Sandbox), queries SQL para debug - arquivos: hotmart/test/page.tsx (novo), hotmart/page.tsx (botao teste), Estrutura/integracoes/GUIA_TESTE_HOTMART.md (novo)

@@ -1,10 +1,10 @@
 ﻿/**
- * GATE 10.6.2 - Endpoint de RecÃ¡lculo Manual
+ * GATE 10.6.2 - Endpoint de Rec ¡lculo Manual
  * 
  * Funcionalidades:
- * - Lock para evitar execuÃ§Ãµes simultÃ¢neas
+ * - Lock para evitar execu   µes simult ¢neas
  * - Dry-run mode para preview
- * - RecÃ¡lculo completo ou por Ã¢ncora especÃ­fica
+ * - Rec ¡lculo completo ou por  ¢ncora espec ­fica
  * - Telemetria detalhada
  */
 
@@ -20,7 +20,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Lock para evitar execuÃ§Ãµes simultÃ¢neas
+// Lock para evitar execu   µes simult ¢neas
 const recalculationLocks = new Map<string, boolean>()
 
 interface RecalculateRequest {
@@ -46,7 +46,7 @@ interface RecalculateResponse {
 }
 
 /**
- * Verificar se hÃ¡ lock ativo
+ * Verificar se h ¡ lock ativo
  */
 function isLocked(tenantId: string): boolean {
   return recalculationLocks.get(tenantId) || false
@@ -64,7 +64,7 @@ function setLock(tenantId: string, locked: boolean): void {
 }
 
 /**
- * Executar recÃ¡lculo usando a funÃ§Ã£o do banco
+ * Executar rec ¡lculo usando a fun   £o do banco
  */
 async function executeRecalculation(
   tenantId: string, 
@@ -91,7 +91,7 @@ async function executeRecalculation(
 }
 
 /**
- * Executar recÃ¡lculo manual completo
+ * Executar rec ¡lculo manual completo
  */
 async function executeManualRecalculation(
   tenantId: string,
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Verificar lock (exceto se forÃ§ado)
+    // Verificar lock (exceto se for  ado)
     if (!force && isLocked(tenant_id)) {
       return NextResponse.json({
         success: false,
@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
       let result: RecalculateResponse
 
       if (anchor) {
-        // RecÃ¡lculo por Ã¢ncora especÃ­fica (implementar se necessÃ¡rio)
+        // Rec ¡lculo por  ¢ncora espec ­fica (implementar se necess ¡rio)
         result = await executeManualRecalculation(tenant_id, dry_run)
         // Evitar log global com student_id nulo (constraint NOT NULL)
         return NextResponse.json(result)
@@ -241,11 +241,11 @@ export async function POST(request: NextRequest) {
       // Evitar log global com student_id nulo (constraint NOT NULL)
       return NextResponse.json(result)
       } else {
-        // RecÃ¡lculo completo
+        // Rec ¡lculo completo
         result = await executeManualRecalculation(tenant_id, dry_run)
       }
 
-      // Removido log global (student_id nulo) â€“ retorna resultado diretamente
+      // Removido log global (student_id nulo)     retorna resultado diretamente
       return NextResponse.json(result)
 
     } finally {

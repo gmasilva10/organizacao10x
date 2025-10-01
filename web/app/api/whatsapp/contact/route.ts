@@ -1,19 +1,19 @@
 ﻿import { NextRequest, NextResponse } from 'next/server'
 
-// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
+// For  ar execu   £o din ¢mica para evitar problemas de renderiza   £o est ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
-  console.log('ðŸš€ [WHATSAPP CONTACT] GET endpoint chamado!')
+  console.log('ðŸš  [WHATSAPP CONTACT] GET endpoint chamado!')
   
   // Testar POST via GET para debug
   const { searchParams } = new URL(request.url)
   const testPost = searchParams.get('test_post')
   
   if (testPost === 'true') {
-    console.log('ðŸ§ª [WHATSAPP CONTACT] Testando POST via GET...')
+    console.log('ðŸ   [WHATSAPP CONTACT] Testando POST via GET...')
     
     // Simular teste dos endpoints
     const endpoints = [
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           },
           body: JSON.stringify({
             phone: '5584996499247',
-            name: 'RadamÃ©s'
+            name: 'Radam  s'
           })
         })
         
@@ -80,27 +80,27 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('ðŸš€ [WHATSAPP CONTACT] POST endpoint chamado!')
+  console.log('ðŸš  [WHATSAPP CONTACT] POST endpoint chamado!')
   try {
     const body = await request.json()
     const { phone, name, instance, token } = body
 
-    console.log('ðŸ“± [WHATSAPP CONTACT] Dados recebidos:', { phone, name, instance: instance ? '***' : 'undefined', token: token ? '***' : 'undefined' })
-    console.log('ðŸ“± [WHATSAPP CONTACT] Ambiente:', {
+    console.log('ðŸ ± [WHATSAPP CONTACT] Dados recebidos:', { phone, name, instance: instance ? '***' : 'undefined', token: token ? '***' : 'undefined' })
+    console.log('ðŸ ± [WHATSAPP CONTACT] Ambiente:', {
       NODE_ENV: process.env.NODE_ENV,
       VERCEL: process.env.VERCEL,
       VERCEL_ENV: process.env.VERCEL_ENV
     })
 
     if (!phone || !name || !instance || !token) {
-      console.error('âŒ [WHATSAPP CONTACT] ParÃ¢metros faltando:', { phone: !!phone, name: !!name, instance: !!instance, token: !!token })
+      console.error(' Œ [WHATSAPP CONTACT] Par ¢metros faltando:', { phone: !!phone, name: !!name, instance: !!instance, token: !!token })
       return NextResponse.json(
-        { error: 'ParÃ¢metros obrigatÃ³rios: phone, name, instance, token' },
+        { error: 'Par ¢metros obrigat ³rios: phone, name, instance, token' },
         { status: 400 }
       )
     }
 
-        // TESTE: Endpoints corretos baseados na documentaÃ§Ã£o oficial da Z-API
+        // TESTE: Endpoints corretos baseados na documenta   £o oficial da Z-API
         const endpoints = [
           `/send-contact`  // Endpoint oficial para enviar contatos
         ]
@@ -144,32 +144,32 @@ export async function POST(request: NextRequest) {
         
         if (response.ok) {
           const result = await response.json()
-          console.log(`âœ… [WHATSAPP CONTACT] Resposta ${endpoint}:`, result)
+          console.log(` œ  [WHATSAPP CONTACT] Resposta ${endpoint}:`, result)
           
           // Verificar se realmente foi criado (sem erro interno da Z-API)
           if (!result.error && !result.message?.includes('error')) {
             successfulResponse = { endpoint, result, response }
             testLogs.push({ ...logEntry, success: true, result })
-            break // SÃ³ parar se realmente funcionou
+            break // S ³ parar se realmente funcionou
           } else {
             // HTTP 200 mas com erro interno da Z-API
             testLogs.push({ ...logEntry, success: false, result, status: response.status, statusText: response.statusText, ok: response.ok })
           }
         } else {
           const errorText = await response.text()
-          console.log(`âŒ [WHATSAPP CONTACT] Erro com ${endpoint}:`, errorText)
+          console.log(` Œ [WHATSAPP CONTACT] Erro com ${endpoint}:`, errorText)
           lastError = { endpoint, error: errorText, status: response.status }
           testLogs.push({ ...logEntry, success: false, error: errorText, status: response.status })
         }
       } catch (error) {
-        console.log(`âŒ [WHATSAPP CONTACT] ExceÃ§Ã£o com ${endpoint}:`, error)
+        console.log(` Œ [WHATSAPP CONTACT] Exce   £o com ${endpoint}:`, error)
         lastError = { endpoint, error: (error as any)?.message || String(error) }
         testLogs.push({ ...logEntry, success: false, error: (error as any)?.message || String(error) })
       }
     }
     
     if (!successfulResponse) {
-      console.error('âŒ [WHATSAPP CONTACT] Todos os endpoints falharam. Ãšltimo erro:', lastError)
+      console.error(' Œ [WHATSAPP CONTACT] Todos os endpoints falharam.  šltimo erro:', lastError)
       return NextResponse.json(
         { 
           error: 'Todos os endpoints da Z-API falharam', 
@@ -183,21 +183,21 @@ export async function POST(request: NextRequest) {
     
     const { endpoint: successfulEndpoint, result, response } = successfulResponse
     
-    console.log(`âœ… [WHATSAPP CONTACT] Endpoint funcionando: ${successfulEndpoint}`)
+    console.log(` œ  [WHATSAPP CONTACT] Endpoint funcionando: ${successfulEndpoint}`)
     console.log('Resposta Z-API contato:', result)
     
     // Verificar se realmente foi criado
     if (result.error || result.message?.includes('error')) {
-      console.error('âŒ [WHATSAPP CONTACT] Z-API retornou erro:', result)
+      console.error(' Œ [WHATSAPP CONTACT] Z-API retornou erro:', result)
       
-      // Mapear erros especÃ­ficos do Z-API
-      let errorMessage = 'Falha na criaÃ§Ã£o do contato'
-      if (result.message?.includes('already exists') || result.message?.includes('jÃ¡ existe')) {
-        errorMessage = 'Este contato jÃ¡ existe no WhatsApp'
-      } else if (result.message?.includes('invalid phone') || result.message?.includes('telefone invÃ¡lido')) {
-        errorMessage = 'NÃºmero de telefone invÃ¡lido'
-      } else if (result.message?.includes('unauthorized') || result.message?.includes('nÃ£o autorizado')) {
-        errorMessage = 'Erro de autorizaÃ§Ã£o com a API do WhatsApp'
+      // Mapear erros espec ­ficos do Z-API
+      let errorMessage = 'Falha na cria   £o do contato'
+      if (result.message?.includes('already exists') || result.message?.includes('j ¡ existe')) {
+        errorMessage = 'Este contato j ¡ existe no WhatsApp'
+      } else if (result.message?.includes('invalid phone') || result.message?.includes('telefone inv ¡lido')) {
+        errorMessage = 'N  mero de telefone inv ¡lido'
+      } else if (result.message?.includes('unauthorized') || result.message?.includes('n £o autorizado')) {
+        errorMessage = 'Erro de autoriza   £o com a API do WhatsApp'
       } else if (result.message) {
         errorMessage = `Erro: ${result.message}`
       }

@@ -1,12 +1,12 @@
 ﻿/**
- * GATE 10.7 - Kanban Dinâmico para Relacionamento
+ * GATE 10.7 - Kanban Din mico para Relacionamento
  * 
  * Funcionalidades:
- * - Colunas dinâmicas baseadas no intervalo de datas filtrado
+ * - Colunas din micas baseadas no intervalo de datas filtrado
  * - Atrasadas (vermelho) | Para Hoje (azul) | Pendentes de Envio (amarelo)
  * - Enviadas (verde) | Adiadas/Puladas (cinza)
  * - Timezone America/Sao_Paulo
- * - Ordenação: scheduled_for ASC, created_at ASC
+ * - Ordena  o: scheduled_for ASC, created_at ASC
  */
 
 'use client'
@@ -45,15 +45,15 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '
 import { Label } from '@/components/ui/label'
 import { StandardizedCalendar } from '@/components/ui/standardized-calendar'
 
-// Mapeamento de âncoras para exibição
+// Mapeamento de  ncoras para exibi  o
 const ANCHOR_LABELS = {
-  'sale_close': 'Pós-venda',
-  'first_workout': '1º Treino',
+  'sale_close': 'P s-venda',
+  'first_workout': '1  Treino',
   'weekly_followup': 'Follow-up Semanal',
-  'monthly_review': 'Revisão Mensal',
-  'birthday': 'Aniversário',
-  'renewal_window': 'Renovação',
-  'occurrence_followup': 'Follow-up de Ocorrência',
+  'monthly_review': 'Revis o Mensal',
+  'birthday': 'Anivers rio',
+  'renewal_window': 'Renova  o',
+  'occurrence_followup': 'Follow-up de Ocorr ncia',
   'manual': 'Manual'
 }
 
@@ -97,7 +97,7 @@ interface KanbanColumn {
   icon: React.ComponentType<{ className?: string }>
 }
 
-// Definição de todas as colunas possíveis
+// Defini  o de todas as colunas poss veis
 const ALL_COLUMNS: KanbanColumn[] = [
   {
     id: 'overdue',
@@ -137,14 +137,14 @@ const ALL_COLUMNS: KanbanColumn[] = [
 ]
 
 const ANCHOR_OPTIONS = [
-  { value: 'all', label: 'Todas as Âncoras' },
+  { value: 'all', label: 'Todas as  ncoras' },
   { value: 'sale_close', label: 'Fechamento da Venda' },
   { value: 'first_workout', label: 'Primeiro Treino' },
   { value: 'weekly_followup', label: 'Acompanhamento Semanal' },
-  { value: 'monthly_review', label: 'Revisão Mensal' },
-  { value: 'birthday', label: 'Aniversário' },
-  { value: 'renewal_window', label: 'Janela de Renovação' },
-  { value: 'occurrence_followup', label: 'Follow-up de Ocorrência' }
+  { value: 'monthly_review', label: 'Revis o Mensal' },
+  { value: 'birthday', label: 'Anivers rio' },
+  { value: 'renewal_window', label: 'Janela de Renova  o' },
+  { value: 'occurrence_followup', label: 'Follow-up de Ocorr ncia' }
 ]
 
 const CHANNEL_OPTIONS = [
@@ -216,7 +216,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
         throw new Error(data.error || 'Erro ao buscar tarefas')
       }
 
-      console.log(`ðŸ“‹ [FETCH] Tarefas recebidas: ${data.data?.length || 0}`)
+      console.log(`ðŸ   [FETCH] Tarefas recebidas: ${data.data?.length || 0}`)
       setTasks(data.data || [])
       setPagination(data.pagination || pagination)
     } catch (error) {
@@ -230,7 +230,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
   // Atualizar status da tarefa
   const updateTaskStatus = async (taskId: string, status: string, notes?: string) => {
     try {
-      // Guardar estado anterior para possível undo
+      // Guardar estado anterior para poss vel undo
       const taskBefore = tasks.find(t => t.id === taskId)
       const previousStatus = taskBefore?.status
       const previousScheduledFor = taskBefore?.scheduled_for
@@ -260,7 +260,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       // Se for skip, oferecer undo
       if (status === 'skipped') {
         toast.success('Tarefa pulada', {
-          description: 'Você tem 5 segundos para desfazer',
+          description: 'Voc  tem 5 segundos para desfazer',
           duration: 5000,
           action: {
             label: 'Desfazer',
@@ -279,7 +279,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
   // Copiar mensagem
   const copyMessage = (message: string) => {
     navigator.clipboard.writeText(message)
-    toast.success('Mensagem copiada para a área de transferência')
+    toast.success('Mensagem copiada para a  rea de transfer ncia')
   }
 
   // Abrir WhatsApp Web
@@ -316,7 +316,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     }
   }
 
-  // Expor função de refresh para componentes pai
+  // Expor fun  o de refresh para componentes pai
   useImperativeHandle(ref, () => ({
     refresh: fetchTasks
   }))
@@ -326,11 +326,11 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     fetchTasks()
   }, [debouncedFilters, pagination.page])
 
-  // Determinar colunas visíveis baseadas no intervalo de datas
+  // Determinar colunas vis veis baseadas no intervalo de datas
   const visibleColumns = useMemo(() => {
     const { date_from, date_to } = debouncedFilters
     
-    // Se não há filtro de data, mostrar todas as colunas
+    // Se n o h filtro de data, mostrar todas as colunas
     if (!date_from || !date_to) {
       return ALL_COLUMNS
     }
@@ -338,13 +338,13 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     const dateFrom = new Date(date_from)
     const dateTo = new Date(date_to)
     
-    // Verificar se o intervalo contém passado, hoje e futuro
+    // Verificar se o intervalo cont m passado, hoje e futuro
     const hasPast = isPast(dateFrom) || isPast(dateTo)
     const hasToday = isToday(dateFrom) || isToday(dateTo) || 
                      (isPast(dateFrom) && isFuture(dateTo))
     const hasFuture = isFuture(dateFrom) || isFuture(dateTo)
     
-    // Verificar se é 100% futuro (para mostrar "Pendentes de Envio")
+    // Verificar se   100% futuro (para mostrar "Pendentes de Envio")
     const isFullyFuture = isFuture(dateFrom) && isFuture(dateTo)
     
     const columns: KanbanColumn[] = []
@@ -359,12 +359,12 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       columns.push(ALL_COLUMNS.find(c => c.id === 'due_today')!)
     }
     
-    // Pendentes de Envio - aparece SOMENTE quando o intervalo é 100% futuro
+    // Pendentes de Envio - aparece SOMENTE quando o intervalo   100% futuro
     if (isFullyFuture) {
       columns.push(ALL_COLUMNS.find(c => c.id === 'pending_future')!)
     }
     
-    // Enviadas e Adiadas/Puladas - sempre visíveis
+    // Enviadas e Adiadas/Puladas - sempre vis veis
     columns.push(ALL_COLUMNS.find(c => c.id === 'sent')!)
     columns.push(ALL_COLUMNS.find(c => c.id === 'postponed_skipped')!)
     
@@ -401,7 +401,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       
       return false
     }).sort((a, b) => {
-      // Ordenação: scheduled_for ASC, depois created_at ASC
+      // Ordena  o: scheduled_for ASC, depois created_at ASC
       const dateA = new Date(a.scheduled_for).getTime()
       const dateB = new Date(b.scheduled_for).getTime()
       
@@ -416,7 +416,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     })
   }
 
-  // Função de Undo (desfazer ação)
+  // Fun  o de Undo (desfazer a  o)
   const handleUndo = async (taskId: string, previousStatus: string, previousScheduledFor: string) => {
     try {
       const response = await fetch(`/api/relationship/tasks/${taskId}/undo`, {
@@ -431,23 +431,23 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       const data = await response.json()
       
       if (!response.ok) {
-        throw new Error(data.error || 'Erro ao desfazer ação')
+        throw new Error(data.error || 'Erro ao desfazer a  o')
       }
       
       fetchTasks()
       if (onTaskUpdate) onTaskUpdate()
       
-      toast.success('Ação desfeita com sucesso')
+      toast.success('A  o desfeita com sucesso')
     } catch (error) {
-      console.error('Erro ao desfazer ação:', error)
-      toast.error('Erro ao desfazer ação')
+      console.error('Erro ao desfazer a  o:', error)
+      toast.error('Erro ao desfazer a  o')
     }
   }
 
   // Excluir tarefa (soft delete com Undo)
   const deleteTask = async (taskId: string) => {
     try {
-      console.log(`[DELETE] Iniciando exclusão da tarefa: ${taskId}`)
+      console.log(`[DELETE] Iniciando exclus o da tarefa: ${taskId}`)
       
       // Guardar estado anterior para undo
       const taskBefore = tasks.find(t => t.id === taskId)
@@ -467,11 +467,11 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       }
       
       const result = await response.json()
-      console.log(`ðŸ—‘ï¸ [DELETE] Resposta da API:`, result)
+      console.log(`ðŸ   ¸ [DELETE] Resposta da API:`, result)
       
       // Oferecer Undo
-      toast.success('Tarefa excluída', {
-        description: 'Você tem 5 segundos para desfazer',
+      toast.success('Tarefa exclu da', {
+        description: 'Voc  tem 5 segundos para desfazer',
         duration: 5000,
         action: {
           label: 'Desfazer',
@@ -504,7 +504,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
 
   return (
     <div className="space-y-4">
-      {/* Header simplificado - botões ficam na página principal */}
+      {/* Header simplificado - bot es ficam na p gina principal */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Relacionamento</h2>
@@ -580,7 +580,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       </div>
 
 
-      {/* Kanban Board Dinâmico */}
+      {/* Kanban Board Din mico */}
       <div className={`grid grid-cols-1 gap-4 ${
         visibleColumns.length === 2 ? 'md:grid-cols-2' :
         visibleColumns.length === 3 ? 'md:grid-cols-3' :
@@ -630,7 +630,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
         })}
       </div>
 
-      {/* Paginação */}
+      {/* Pagina  o */}
       {pagination.total_pages > 1 && (
         <div className="flex items-center justify-center gap-2">
           <Button
@@ -643,7 +643,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           </Button>
           
           <span className="text-sm text-gray-600">
-            Página {pagination.page} de {pagination.total_pages}
+            P gina {pagination.page} de {pagination.total_pages}
           </span>
           
           <Button
@@ -652,7 +652,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
             onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
             disabled={pagination.page === pagination.total_pages}
           >
-            Próxima
+            Pr xima
           </Button>
         </div>
       )}
@@ -673,7 +673,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           <DrawerHeader>
             <DrawerTitle id="relationship-filters-title">Filtros</DrawerTitle>
             <p className="sr-only" id="relationship-filters-desc">
-              Ajuste filtros de status, canal e período para o módulo de relacionamento.
+              Ajuste filtros de status, canal e per odo para o m dulo de relacionamento.
             </p>
           </DrawerHeader>
           
@@ -716,9 +716,9 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
               </div>
             </div>
             
-            {/* Filtro de Período */}
+            {/* Filtro de Per odo */}
             <div>
-              <Label className="text-sm font-medium">Período</Label>
+              <Label className="text-sm font-medium">Per odo</Label>
               <div className="mt-2 space-y-3">
                 <StandardizedCalendar
                   value={filters.date_from ? new Date(filters.date_from) : undefined}

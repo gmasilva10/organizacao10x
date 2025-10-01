@@ -1,41 +1,41 @@
-Relatório de Progresso — 2025-08-26
-Produto: Personal Global (Organização10x)
-Responsável: DEV (com validação do QA e GP)
+Relat rio de Progresso   2025-08-26
+Produto: Personal Global (Organiza  o10x)
+Respons vel: DEV (com valida  o do QA e GP)
 
 Resumo Executivo
-- Documentação de Estrutura revisada (Rotas, Padronizacao, README, Erros, Credenciais) e sincronizada com evidências/QA.
-- Foco do QA: Navegação sem alias /kanban em produção; status dos P1 de Agosto; App Shell (sidebar, breadcrumb, tooltips).
+- Documenta  o de Estrutura revisada (Rotas, Padronizacao, README, Erros, Credenciais) e sincronizada com evid ncias/QA.
+- Foco do QA: Navega  o sem alias /kanban em produ  o; status dos P1 de Agosto; App Shell (sidebar, breadcrumb, tooltips).
 
-Progresso por Blocos/Módulos
+Progresso por Blocos/M dulos
 - SHELL/APP
   - Rotas atualizadas: '/' permanece Landing; '/app' = Dashboard (sem redirect da raiz).
-  - App Shell: reforço na padronização de sidebar (traço 3px ativo), tooltips apenas em colapsado e breadcrumb padrão.
+  - App Shell: refor o na padroniza  o de sidebar (tra o 3px ativo), tooltips apenas em colapsado e breadcrumb padr o.
 - ACC (Cadastro de Conta)
-  - Itens ACC01..ACC04 e ACC06 aprovados por evidência.
-  - Hotfix em ACC03 documentado (service-role + payload mínimo + idempotência).
+  - Itens ACC01..ACC04 e ACC06 aprovados por evid ncia.
+  - Hotfix em ACC03 documentado (service-role + payload m nimo + idempot ncia).
 - STUDENTS
-  - STU01 (listagem/filtros/paginação) marcado como RESOLVIDO.
-  - Correção de visibilidade do menu “Alunos” pelo RBAC (admin.basic) — QA pendente.
+  - STU01 (listagem/filtros/pagina  o) marcado como RESOLVIDO.
+  - Corre  o de visibilidade do menu  Alunos” pelo RBAC (admin.basic)   QA pendente.
 - KANBAN/ONBOARDING
-  - Diretriz mantida: rota oficial /(app)/onboarding; alias /(app)/kanban não exposto.
-  - P1 ainda em andamento: DnD desaparecendo card; Histórico items.map; Sidebar/Árvore; Layout/UX CTA duplicado/Toggle Recolher.
+  - Diretriz mantida: rota oficial /(app)/onboarding; alias /(app)/kanban n o exposto.
+  - P1 ainda em andamento: DnD desaparecendo card; Hist rico items.map; Sidebar/Árvore; Layout/UX CTA duplicado/Toggle Recolher.
 
-Pendências P1 (Agosto)
-- DnD card desaparece após drop — Em andamento — Resp.: DEV — Prazo: 22/08
-- Histórico: TypeError items.map — Em andamento — Resp.: DEV — Prazo: 22/08
-- Sidebar/Árvore (contadores/filtro/colapso) — Em andamento — Resp.: DEV — Prazo: 22/08
-- Layout/UX (CTA duplicado + Recolher) — Em andamento — Resp.: DEV — Prazo: 22/08
-- Telemetria (validar após base estável) — Aguardando — Resp.: DEV — Prazo: 22/08
+Pend ncias P1 (Agosto)
+- DnD card desaparece ap s drop   Em andamento   Resp.: DEV   Prazo: 22/08
+- Hist rico: TypeError items.map   Em andamento   Resp.: DEV   Prazo: 22/08
+- Sidebar/Árvore (contadores/filtro/colapso)   Em andamento   Resp.: DEV   Prazo: 22/08
+- Layout/UX (CTA duplicado + Recolher)   Em andamento   Resp.: DEV   Prazo: 22/08
+- Telemetria (validar ap s base est vel)   Aguardando   Resp.: DEV   Prazo: 22/08
 
-Riscos & Observações
-- Automação de QA para Students: intermitência 401→200 em runners; fallback manual adotado.
-- Dependência de envs Supabase: `.env.local` deve conter 5 variáveis; reiniciar server após alterações.
+Riscos & Observa  es
+- Automa  o de QA para Students: intermit ncia 401→200 em runners; fallback manual adotado.
+- Depend ncia de envs Supabase: `.env.local` deve conter 5 vari veis; reiniciar server ap s altera  es.
 
-Próximas Ações
-- DEV: Endereçar P1 Kanban e reexecutar QA.
-- QA: Validar rotas (sem alias /kanban em produção), revisar P1 em Pendencias_Agosto2025, e conferir App Shell conforme padronização.
+Pr ximas A  es
+- DEV: Endere ar P1 Kanban e reexecutar QA.
+- QA: Validar rotas (sem alias /kanban em produ  o), revisar P1 em Pendencias_Agosto2025, e conferir App Shell conforme padroniza  o.
 
-Referências (evidências)
+Refer ncias (evid ncias)
 - web/evidencias/smoke_students_422_body.json
 - web/evidencias/smoke_students_full.json
 - web/evidencias/screenshot_services_grid.png

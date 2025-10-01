@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
 import { 
   Upload, 
   CheckCircle, 
@@ -50,15 +49,15 @@ export function GuidelinesVersioningModal({
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || 'Erro ao publicar versão')
+        throw new Error(error.error || 'Erro ao publicar versÃ£o')
       }
 
-      toast.success('Versão publicada com sucesso!')
+      toast.success('VersÃ£o publicada com sucesso!')
       onVersionUpdate()
       onClose()
     } catch (error) {
-      console.error('Erro ao publicar versão:', error)
-      toast.error(error instanceof Error ? error.message : 'Erro ao publicar versão')
+      console.error('Erro ao publicar versÃ£o:', error)
+      toast.error(error instanceof Error ? error.message : 'Erro ao publicar versÃ£o')
     } finally {
       setIsPublishing(false)
     }
@@ -75,15 +74,15 @@ export function GuidelinesVersioningModal({
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || 'Erro ao definir como padrão')
+        throw new Error(error.error || 'Erro ao definir como padrÃ£o')
       }
 
-      toast.success('Versão definida como padrão!')
+      toast.success('VersÃ£o definida como padrÃ£o!')
       onVersionUpdate()
       onClose()
     } catch (error) {
-      console.error('Erro ao definir como padrão:', error)
-      toast.error(error instanceof Error ? error.message : 'Erro ao definir como padrão')
+      console.error('Erro ao definir como padrÃ£o:', error)
+      toast.error(error instanceof Error ? error.message : 'Erro ao definir como padrÃ£o')
     } finally {
       setIsSettingDefault(false)
     }
@@ -98,7 +97,7 @@ export function GuidelinesVersioningModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Gerenciar Versão {version.version}
+            Gerenciar VersÃ£o {version.version}
           </DialogTitle>
         </DialogHeader>
 
@@ -127,20 +126,20 @@ export function GuidelinesVersioningModal({
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Versão Padrão:</span>
+                <span className="text-sm font-medium">VersÃ£o PadrÃ£o:</span>
                 {version.is_default ? (
                   <Badge className="bg-green-100 text-green-800">
                     <Star className="h-3 w-3 mr-1" />
                     Sim
                   </Badge>
                 ) : (
-                  <Badge variant="outline">Não</Badge>
+                  <Badge variant="outline">NÃ£o</Badge>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Ações Disponíveis */}
+          {/* AÃ§Ãµes DisponÃ­veis */}
           <div className="space-y-4">
             {/* Publicar */}
             {canPublish && (
@@ -148,10 +147,10 @@ export function GuidelinesVersioningModal({
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Upload className="h-5 w-5 text-blue-600" />
-                    Publicar Versão
+                    Publicar VersÃ£o
                   </CardTitle>
                   <CardDescription>
-                    Publicar esta versão tornará as regras disponíveis para uso em diretrizes de treino.
+                    Publicar esta versÃ£o tornarÃ¡ as regras disponÃ­veis para uso em diretrizes de treino.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -160,8 +159,8 @@ export function GuidelinesVersioningModal({
                     <div className="text-sm">
                       <p className="font-medium text-blue-900">Importante:</p>
                       <p className="text-blue-800">
-                        Após a publicação, esta versão não poderá mais ser editada. 
-                        Certifique-se de que todas as regras estão corretas.
+                        ApÃ³s a publicaÃ§Ã£o, esta versÃ£o nÃ£o poderÃ¡ mais ser editada. 
+                        Certifique-se de que todas as regras estÃ£o corretas.
                       </p>
                     </div>
                   </div>
@@ -179,7 +178,7 @@ export function GuidelinesVersioningModal({
                     ) : (
                       <>
                         <Upload className="h-4 w-4 mr-2" />
-                        Publicar Versão
+                        Publicar VersÃ£o
                       </>
                     )}
                   </Button>
@@ -187,26 +186,26 @@ export function GuidelinesVersioningModal({
               </Card>
             )}
 
-            {/* Definir como Padrão */}
+            {/* Definir como PadrÃ£o */}
             {canSetDefault && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Star className="h-5 w-5 text-yellow-600" />
-                    Definir como Padrão
+                    Definir como PadrÃ£o
                   </CardTitle>
                   <CardDescription>
-                    Definir esta versão como padrão para novas diretrizes de treino.
+                    Definir esta versÃ£o como padrÃ£o para novas diretrizes de treino.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg mb-4">
                     <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium text-yellow-900">Atenção:</p>
+                      <p className="font-medium text-yellow-900">AtenÃ§Ã£o:</p>
                       <p className="text-yellow-800">
-                        Esta ação irá remover o status de padrão da versão atual 
-                        e aplicará à esta versão.
+                        Esta aÃ§Ã£o irÃ¡ remover o status de padrÃ£o da versÃ£o atual 
+                        e aplicarÃ¡ Ã  esta versÃ£o.
                       </p>
                     </div>
                   </div>
@@ -225,7 +224,7 @@ export function GuidelinesVersioningModal({
                     ) : (
                       <>
                         <Star className="h-4 w-4 mr-2" />
-                        Definir como Padrão
+                        Definir como PadrÃ£o
                       </>
                     )}
                   </Button>
@@ -233,17 +232,17 @@ export function GuidelinesVersioningModal({
               </Card>
             )}
 
-            {/* Informações quando não há ações */}
+            {/* InformaÃ§Ãµes quando nÃ£o hÃ¡ aÃ§Ãµes */}
             {!canPublish && !canSetDefault && (
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-center py-8">
                     <CheckCircle className="h-12 w-12 mx-auto text-green-600 mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Versão Configurada</h3>
+                    <h3 className="text-lg font-semibold mb-2">VersÃ£o Configurada</h3>
                     <p className="text-muted-foreground">
                       {version.is_default 
-                        ? 'Esta versão já está publicada e é a versão padrão.'
-                        : 'Esta versão está publicada. Para torná-la padrão, use a ação "Definir como Padrão".'
+                        ? 'Esta versÃ£o jÃ¡ estÃ¡ publicada e Ã© a versÃ£o padrÃ£o.'
+                        : 'Esta versÃ£o estÃ¡ publicada. Para tornÃ¡-la padrÃ£o, use a aÃ§Ã£o "Definir como PadrÃ£o".'
                       }
                     </p>
                   </div>

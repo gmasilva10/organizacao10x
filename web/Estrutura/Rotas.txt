@@ -1,19 +1,19 @@
-# ROTAS — LANDING Personal Global
-# Última atualização: 13/08/2025
-# Atualização: 2025-08-26
+# ROTAS   LANDING Personal Global
+#  ltima atualiza  o: 13/08/2025
+# Atualiza  o: 2025-08-26
 
-PÚBLICAS
+P BLICAS
 /                → Landing (Hero + Globo 3D, Features, Stats, About, Footer)
-/login           → (Plano futuro) Página de login dedicada (hoje drawer no Header)
+/login           → (Plano futuro) P gina de login dedicada (hoje drawer no Header)
 
-Âncoras na Landing
+ ncoras na Landing
 #features, #stats, #about, #contact
 
-PRIVADAS (Bloco 1 — concluído)
-/(app)/team        [auth] — TeamAdmin (adicionar treinador; UX de upgrade)
-/(app)/onboarding  [auth] — Rota oficial do processo de Onboarding; renderiza o Kanban (colunas fixas “Novo Aluno”, “Entrega do Treino” + intermediárias customizáveis). Histórico movido automaticamente. Menu recolhível com árvore (Enterprise).
-/(app)/onboarding/history [auth] — Histórico de alunos concluídos (default últimos 7 dias; filtros from/to/trainerId; paginação; RBAC server-first)
-/(app) — cluster de rotas privadas; '/app' = Dashboard protegido
+PRIVADAS (Bloco 1   conclu do)
+/(app)/team        [auth]   TeamAdmin (adicionar treinador; UX de upgrade)
+/(app)/onboarding  [auth]   Rota oficial do processo de Onboarding; renderiza o Kanban (colunas fixas  Novo Aluno”,  Entrega do Treino” + intermedi rias customiz veis). Hist rico movido automaticamente. Menu recolh vel com  rvore (Enterprise).
+/(app)/onboarding/history [auth]   Hist rico de alunos conclu dos (default  ltimos 7 dias; filtros from/to/trainerId; pagina  o; RBAC server-first)
+/(app)   cluster de rotas privadas; '/app' = Dashboard protegido
 
 APIs protegidas (Bloco 1)
 /api/capabilities [auth] → snapshot { plan, role, limits, features }
@@ -23,53 +23,53 @@ APIs protegidas (Bloco 1)
   - 403 { error:"forbidden" } → events.rbac.denied
   - 422 { error:"limit_reached", details:{ limit:"trainers", value, max } } → events.limit.hit
 
-[Histórico Bloco 1 — Etapa 3/3]
-/(app)/team [auth] — TeamAdmin mínimo (form de e-mail + adicionar treinador; UX de upgrade)
-/(app)/onboarding [auth] — Kanban com FeatureGate (features.onboarding.kanban)
+[Hist rico Bloco 1   Etapa 3/3]
+/(app)/team [auth]   TeamAdmin m nimo (form de e-mail + adicionar treinador; UX de upgrade)
+/(app)/onboarding [auth]   Kanban com FeatureGate (features.onboarding.kanban)
 Menu Header:
-- "Onboarding" sempre visível; quando feature off → abre Modal Upgrade e não navega; quando on → navega para /onboarding.
+- "Onboarding" sempre vis vel; quando feature off → abre Modal Upgrade e n o navega; quando on → navega para /onboarding.
 
 Regras
-- Nav do Header aponta para âncoras (#) e CTA “Começar agora” pode levar para /login (quando existir) ou scroll para o formulário de captura (futuro).
-- Toggle de tema permanece fixo no topo (não muda rota).
-- O alias /(app)/kanban não deve ser exposto em produção; usar apenas em dev como alias temporário ou redirecionar para /(app)/onboarding.
+- Nav do Header aponta para  ncoras (#) e CTA  Come ar agora” pode levar para /login (quando existir) ou scroll para o formul rio de captura (futuro).
+- Toggle de tema permanece fixo no topo (n o muda rota).
+- O alias /(app)/kanban n o deve ser exposto em produ  o; usar apenas em dev como alias tempor rio ou redirecionar para /(app)/onboarding.
 
-[Histórico de mudanças]
-[13/08/2025] Landing Page v1.0 — Rotas públicas implementadas:
-[17/08/2025] Consolidação de rotas privadas em /(app)
- - TeamAdmin e Onboarding estáveis sob /(app)
- - Middleware mantendo refresh de sessão; auth server-first
+[Hist rico de mudan as]
+[13/08/2025] Landing Page v1.0   Rotas p blicas implementadas:
+[17/08/2025] Consolida  o de rotas privadas em /(app)
+ - TeamAdmin e Onboarding est veis sob /(app)
+ - Middleware mantendo refresh de sess o; auth server-first
 
-[Bloco 2 — Students]
-/(app)/students [auth] — Lista + filtros + novo aluno + atribuição de treinador
-/api/students* [auth] — GET/POST/PATCH/DELETE com RBAC + RLS + limits
+[Bloco 2   Students]
+/(app)/students [auth]   Lista + filtros + novo aluno + atribui  o de treinador
+/api/students* [auth]   GET/POST/PATCH/DELETE com RBAC + RLS + limits
 
 Abas do modal (STU-B):
 - Dados Gerais (Nome*, Email*, Telefone, CPF, Data de Nascimento, Status, Tipo de Cliente, Treinador)
-- Endereço (JSONB: zip, street, number, complement, district, city, state, country)
-- Financeiro → Serviços (CRUD local do aluno; sem pagamentos)
+- Endere o (JSONB: zip, street, number, complement, district, city, state, country)
+- Financeiro → Servi os (CRUD local do aluno; sem pagamentos)
 
-Endpoints de serviços por aluno (STU-B):
-- GET /api/students/:id/services — lista serviços do aluno
-- POST /api/students/:id/services — cria serviço (XOR desconto; 1 ativo por aluno via unique parcial)
-- PATCH /api/students/:id/services/:serviceId — atualiza metadados de serviço
-- DELETE /api/students/:id/services/:serviceId — remove serviço
+Endpoints de servi os por aluno (STU-B):
+- GET /api/students/:id/services   lista servi os do aluno
+- POST /api/students/:id/services   cria servi o (XOR desconto; 1 ativo por aluno via unique parcial)
+- PATCH /api/students/:id/services/:serviceId   atualiza metadados de servi o
+- DELETE /api/students/:id/services/:serviceId   remove servi o
 
-Endpoints de responsáveis por aluno (CFG-RESP-P1):
-- GET /api/students/:id/responsibles — lista owner/primary/support
-- POST /api/students/:id/responsibles — vincula responsável (valida plano + unicidade)
-- DELETE /api/students/:id/responsibles/:id — remove vínculo
+Endpoints de respons veis por aluno (CFG-RESP-P1):
+- GET /api/students/:id/responsibles   lista owner/primary/support
+- POST /api/students/:id/responsibles   vincula respons vel (valida plano + unicidade)
+- DELETE /api/students/:id/responsibles/:id   remove v nculo
 Regras:
 - Unicidade condicional: 1 owner e 1 trainer_primary por aluno
 - Basic: trainer_support = 0..1; Enterprise: 0..N (conforme limits.trainers)
 - RBAC: admin|manager podem alterar; demais leitura
 UI:
-- `StudentFullModal` → Dados Gerais → seção “Responsáveis” (Proprietário, Treinador Principal, Treinador de Apoio) com autocomplete de colaboradores ativos
+- `StudentFullModal` → Dados Gerais → se  o  Respons veis” (Propriet rio, Treinador Principal, Treinador de Apoio) com autocomplete de colaboradores ativos
 
-RBAC — Roles & Permissions
-- GET /api/settings/roles — obtém roles, permissions e role_permissions
-- PATCH /api/settings/roles/:id/permissions — atualiza matriz para um role (batch)
-- POST /api/settings/roles/restore-default — repõe a matriz para o seed default (tenant); audita em settings_audit
+RBAC   Roles & Permissions
+- GET /api/settings/roles   obt m roles, permissions e role_permissions
+- PATCH /api/settings/roles/:id/permissions   atualiza matriz para um role (batch)
+- POST /api/settings/roles/restore-default   rep e a matriz para o seed default (tenant); audita em settings_audit
 
 Contratos (server-first)
 - GET /api/students?q=&status=&page=&pageSize=
@@ -78,7 +78,7 @@ Contratos (server-first)
       items: Array<{ id, tenant_id, name, email, phone, status, trainer_id, created_at, updated_at }>,
       page: number, pageSize: number, total: number
     }
-  - RBAC: admin|manager|seller|support (read); trainer vê somente trainer_id = auth.uid()
+  - RBAC: admin|manager|seller|support (read); trainer v  somente trainer_id = auth.uid()
 
 - POST /api/students
   - Body: { name: string; email: string; phone?: string; status?: 'onboarding'|'active'|'paused'; trainer_id?: uuid }
@@ -90,7 +90,7 @@ Contratos (server-first)
 - PATCH /api/students/:id
   - Body: { name?, email?, phone?, status?, trainer_id? }
   - 200: { ok: true }
-  - 403: { error:'forbidden' } (trainer só pode alterar status onboarding→active do próprio)
+  - 403: { error:'forbidden' } (trainer s  pode alterar status onboarding→active do pr prio)
   - RBAC: admin|manager (full); trainer (restrito); seller/support (read-only)
   - Events: feature.used: students.update | students.assign_trainer
 
@@ -103,46 +103,46 @@ APIs Kanban
 - GET /api/kanban/board[?trainerId=uuid] -> { columns:[{id,title,sort}], cards:[{id,student_id,column_id,trainer_id,sort,created_at,completed_at?}] }
 - POST /api/kanban/move -> 204; body { studentId, from, to } (telemetria student.stage.moved)
 - GET /api/kanban/tree -> { root:{id,title,count}, nodes:[{id,type(title),count,items[]}]} (RBAC: admin|manager agregados; trainer somente seus)
-- GET /api/kanban/history?from&to&trainerId&page&pageSize -> lista cards concluídos (completed_at desc); quando trainerId ausente e usuário for trainer, restringe trainer_id=ctx.userId
+- GET /api/kanban/history?from&to&trainerId&page&pageSize -> lista cards conclu dos (completed_at desc); quando trainerId ausente e usu rio for trainer, restringe trainer_id=ctx.userId
 
 APIs Settings & RBAC (Release 26/08/2025)
-- POST /api/settings/rbac/restore_default -> repõe matriz role_permissions para seed default (tenant); audita em settings_audit
-- GET /api/settings/roles -> obtém roles, permissions e role_permissions do tenant
+- POST /api/settings/rbac/restore_default -> rep e matriz role_permissions para seed default (tenant); audita em settings_audit
+- GET /api/settings/roles -> obt m roles, permissions e role_permissions do tenant
 - PATCH /api/settings/roles/:id/permissions -> atualiza matriz para um role (batch); audita em settings_audit  
-- PATCH /api/settings/users/[id]/roles -> atribui/remove papel de usuário; valida membership ativa
-- GET /api/settings/users -> listagem de usuários com papéis e busca; RBAC: admin|manager
+- PATCH /api/settings/users/[id]/roles -> atribui/remove papel de usu rio; valida membership ativa
+- GET /api/settings/users -> listagem de usu rios com pap is e busca; RBAC: admin|manager
 
 APIs Services (Release 26/08/2025)
-- GET /api/services -> listagem com paginação e filtros; RBAC: read para todos papéis
-- POST /api/services -> criação de serviço; RBAC: admin|manager; validação campos obrigatórios
-- PATCH /api/services/:id -> edição completa ou toggle ativo; RBAC: admin|manager
+- GET /api/services -> listagem com pagina  o e filtros; RBAC: read para todos pap is
+- POST /api/services -> cria  o de servi o; RBAC: admin|manager; valida  o campos obrigat rios
+- PATCH /api/services/:id -> edi  o completa ou toggle ativo; RBAC: admin|manager
 - DELETE /api/services/:id -> soft delete (deleted_at); RBAC: admin
 
 Rotas Settings & Profile (Release 26/08/2025)
-/(app)/settings [auth] — Menu Configurações para admin/manager
-/(app)/settings/users [auth] — Listagem usuários + atribuição de papéis + busca
-/(app)/settings/roles [auth] — Gestão de papéis + botão Restaurar Padrão
-/(app)/profile [auth] — Perfil editável (nome, telefone) + breadcrumb + validações
+/(app)/settings [auth]   Menu Configura  es para admin/manager
+/(app)/settings/users [auth]   Listagem usu rios + atribui  o de pap is + busca
+/(app)/settings/roles [auth]   Gest o de pap is + bot o Restaurar Padr o
+/(app)/profile [auth]   Perfil edit vel (nome, telefone) + breadcrumb + valida  es
 
-# ACC — Cadastro de Conta
+# ACC   Cadastro de Conta
 /onboarding/account              -> Wizard (Personal | Player)
 /onboarding/account/personal     -> Form de Conta Pessoal
-/onboarding/account/player       -> Form de Organização (Player)
+/onboarding/account/player       -> Form de Organiza  o (Player)
 
-[2025-08-13] Sprint Landing v1.0 concluída
+[2025-08-13] Sprint Landing v1.0 conclu da
 - Rotas da landing revisadas e otimizadas
 - Nenhuma rota adicional criada nesta entrega
-- Próximas rotas a definir no escopo do sistema
+- Pr ximas rotas a definir no escopo do sistema
 
-# Mapa rápido (atualizado)
+# Mapa r pido (atualizado)
 /               -> Landing
 /app            -> Dashboard (App Shell)
 /app/students   -> Alunos V2
 /app/relationship -> Relacionamento (placeholder)
 /app/relationship/templates -> Templates (placeholder)
-/app/services   -> Serviços
+/app/services   -> Servi os
 /app/onboarding -> Kanban (oficial; sem alias /kanban)
-/app/onboarding/history -> Histórico
-/app/team       -> Administração de Equipe
-/app/settings   -> Configurações
-# /app/payments -> Pagamentos (pausado: oculto ou disabled — manter “Serviços” do menu como Em breve)
+/app/onboarding/history -> Hist rico
+/app/team       -> Administra  o de Equipe
+/app/settings   -> Configura  es
+# /app/payments -> Pagamentos (pausado: oculto ou disabled   manter  Servi os” do menu como Em breve)

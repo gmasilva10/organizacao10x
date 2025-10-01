@@ -1,13 +1,13 @@
-Procedimento de Login (Ambiente Local) — Somente Execução de Testes
+Procedimento de Login (Ambiente Local)   Somente Execu  o de Testes
 Objetivo
 
 Permitir que o desenvolvedor acesse o sistema localmente apenas para realizar os testes solicitados pelo GP, sem iniciar servidor e sem capturas de tela.
 
-Regras Inegociáveis
+Regras Inegoci veis
 
-Não iniciar servidor/local stack. O ambiente já estará ativo.
+N o iniciar servidor/local stack. O ambiente j estar ativo.
 
-Não gerar prints, GIFs ou evidências visuais.
+N o gerar prints, GIFs ou evid ncias visuais.
 
 Apenas executar o passo a passo de login e os testes especificados pelo GP.
 
@@ -21,44 +21,44 @@ Acessar: http://localhost:3000
 
 Clicar em Entrar.
 
-Campo Usuário/E-mail: apagar conteúdo e digitar gma_silva@yahoo.com.br
+Campo Usu rio/E-mail: apagar conte do e digitar gma_silva@yahoo.com.br
 
-Campo Senha: apagar conteúdo e digitar Gma@11914984
+Campo Senha: apagar conte do e digitar Gma@11914984
 
 Clicar em Entrar/Login e aguardar o redirecionamento ao dashboard.
 
-Critérios de Sucesso (Login)
+Crit rios de Sucesso (Login)
 
 Redireciona para o Dashboard sem erro.
 
-Menus e navegação principal carregam normalmente.
+Menus e navega  o principal carregam normalmente.
 
-Não há mensagens de erro visíveis.
+N o h mensagens de erro vis veis.
 
-Caso qualquer erro apareça (ex.: “credenciais inválidas” ou falha de rede), não tente corrigir nem iniciar servidor. Informe imediatamente ao GP.
+Caso qualquer erro apare a (ex.:  credenciais inv lidas” ou falha de rede), n o tente corrigir nem iniciar servidor. Informe imediatamente ao GP.
 
 Como reportar (texto, sem anexos)
 
-Ao finalizar cada solicitação de teste, responder com o texto:
+Ao finalizar cada solicita  o de teste, responder com o texto:
 
 [LOGIN]
 - Acessou: http://localhost:3000
 - Login realizado com e-mail gma_silva@yahoo.com.br → sucesso/erro: <descrever>
-- Tempo aproximado até o dashboard: <x>s
+- Tempo aproximado at  o dashboard: <x>s
 
 [TESTES EXECUTADOS]
-- Tarefa 1: <nome curto> → resultado: <ok/erro> → observações: <curto e factual>
-- Tarefa 2: <nome curto> → resultado: <ok/erro> → observações: <curto e factual>
+- Tarefa 1: <nome curto> → resultado: <ok/erro> → observa  es: <curto e factual>
+- Tarefa 2: <nome curto> → resultado: <ok/erro> → observa  es: <curto e factual>
 (...)
 
 [BLOQUEIOS OU ERROS]
 - <descrever mensagem exata que apareceu na tela, se houver>
-- Não reiniciei servidor. Sem prints.
+- N o reiniciei servidor. Sem prints.
 
-Observações
+Observa  es
 
-As credenciais acima são exclusivas para uso local.
+As credenciais acima s o exclusivas para uso local.
 
 Sempre utilizar exatamente o e-mail e senha informados neste documento.
 
-Em caso de erro, parar e informar (não alterar ambiente, não limpar cache, não mexer em .env, não reiniciar nada).
+Em caso de erro, parar e informar (n o alterar ambiente, n o limpar cache, n o mexer em .env, n o reiniciar nada).
