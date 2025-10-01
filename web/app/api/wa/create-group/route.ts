@@ -1,27 +1,66 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 
-// Forçar Node runtime para compatibilidade com bibliotecas
+// ForÃ§ar Node runtime para compatibilidade com bibliotecas
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-// Configurações de cache
+// ConfiguraÃ§Ãµes de cache
 export const revalidate = 0
 
-// Função para mascarar logs sensíveis
-function maskSensitiveData(data: any) {
-  const masked = { ...data }
-  if (masked.token) masked.token = '***'
-  if (masked.instance) masked.instance = '***'
-  if (masked.participants) {
-    masked.participants = masked.participants.map((p: string) => 
-      p.replace(/(\d{2})(\d{4})(\d{4})/, '$1****$3')
+
+type MaskableData = Record<string, unknown> & {
+  token?: string
+  instance?: string
+  participants?: unknown
+  originalParticipants?: unknown
+  normalizedParticipants?: unknown
+  response?: unknown
+  headers?: Record<string, unknown>
+  body?: unknown
+}
+
+type CreateGroupRequest = {
+  name?: string
+  participants?: string[]
+}
+
+
+// FunÃ§Ã£o para mascarar logs sensÃ­veis
+function maskSensitiveData(data: MaskableData): MaskableData {
+  const masked: MaskableData = { ...data }
+
+  if (typeof masked.token === 'string') masked.token = '***'
+  if (typeof masked.instance === 'string') masked.instance = '***'
+
+  if (Array.isArray(masked.participants)) {
+    masked.participants = masked.participants.map((participant) =>
+      typeof participant === 'string'
+        ? participant.replace(/(\d{2})(\d{4})(\d{4})/, '****')
+        : participant
     )
   }
+
+  if (Array.isArray(masked.originalParticipants)) {
+    masked.originalParticipants = masked.originalParticipants.map((participant) =>
+      typeof participant === 'string'
+        ? participant.replace(/(\d{2})(\d{4})(\d{4})/, '****')
+        : participant
+    )
+  }
+
+  if (Array.isArray(masked.normalizedParticipants)) {
+    masked.normalizedParticipants = masked.normalizedParticipants.map((participant) =>
+      typeof participant === 'string'
+        ? participant.replace(/(\d{2})(\d{4})(\d{4})/, '****')
+        : participant
+    )
+  }
+
   return masked
 }
 
-// Função para log estruturado
-function logAction(action: string, data: any, status?: number) {
+// FunÃ§Ã£o para log estruturado
+function logAction(action: string, data: MaskableData, status?: number) {
   const timestamp = new Date().toISOString()
   const maskedData = maskSensitiveData(data)
   
@@ -39,42 +78,51 @@ export async function POST(request: NextRequest) {
   const correlationId = `${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}-wa-group`
   
   try {
-    const body = await request.json()
+    const body = (await request.json()) as CreateGroupRequest
     const { name, participants } = body
+    const participantList = Array.isArray(participants) ? participants : undefined
 
     // Debug detalhado do payload recebido
     console.log('=== PAYLOAD RECEBIDO ===')
     console.log('Body completo:', JSON.stringify(body, null, 2))
-    console.log('Name extraído:', name)
+    console.log('Name extraÃ­do:', name)
     console.log('Name type:', typeof name)
     console.log('Name length:', name ? name.length : 'undefined')
     console.log('Name trim:', name ? name.trim() : 'undefined')
-    console.log('Participants:', participants)
+    console.log('Participants:', participantList)
 
-    // Dados fixos para garantir funcionamento
-    const instance = '3E7608F78BA2405A08E5EE5C772D9ACD'
-    const token = '8F670F193615706A0616496E'
-    const clientToken = 'F31db8854d41742a7a08625204dc7a618S'
+    // Dados da Z-API via variÃ¡veis de ambiente
+    const instance = process.env.ZAPI_INSTANCE_ID
+    const token = process.env.ZAPI_TOKEN
+    const clientToken = process.env.ZAPI_CLIENT_TOKEN
 
-    // Validação de parâmetros obrigatórios
-    if (!name || !participants) {
-      console.log('❌ VALIDAÇÃO FALHOU:', { name, participants })
-      logAction('CREATE_GROUP_ERROR', { name, participants }, 400)
+    if (!instance || !token || !clientToken) {
+      console.error('âŒ Z-API credentials nÃ£o configuradas')
       return NextResponse.json(
-        { error: 'Parâmetros obrigatórios: name, participants' },
+        { error: 'ConfiguraÃ§Ã£o da API WhatsApp nÃ£o disponÃ­vel' },
+        { status: 503 }
+      )
+    }
+
+    // ValidaÃ§Ã£o de parÃ¢metros obrigatÃ³rios
+    if (!name || !participantList?.length) {
+      console.log('âŒ VALIDAÃ‡ÃƒO FALHOU:', { name, participants: participantList })
+      logAction('CREATE_GROUP_ERROR', { name, participants: participantList }, 400)
+      return NextResponse.json(
+        { error: 'ParÃ¢metros obrigatÃ³rios: name, participants' },
         { status: 400 }
       )
     }
 
-    // Normalização E.164 com DDD 11 fallback
-    const normalizedParticipants = participants.map((phone: string) => 
+    // NormalizaÃ§Ã£o E.164 com DDD 11 fallback
+    const normalizedParticipants = (participantList ?? []).map((phone) => 
       phone.startsWith('+55') ? phone : 
       phone.startsWith('55') ? `+${phone}` :
       phone.startsWith('11') ? `+55${phone}` :
       `+5511${phone.replace(/\D/g, '')}`
     )
 
-    // URL da Z-API com HTTPS garantido - usando documentação oficial
+    // URL da Z-API com HTTPS garantido - usando documentaÃ§Ã£o oficial
     const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/create-group`
     
     const payload = {
@@ -83,27 +131,21 @@ export async function POST(request: NextRequest) {
       autoInvite: true
     }
 
-    // Debug detalhado
-    console.log('=== DEBUG Z-API GROUP ===')
-    console.log('URL:', zapiUrl)
-    console.log('Instance:', instance)
-    console.log('Token:', token)
-    console.log('Client Token:', clientToken)
-    console.log('Group Name:', name)
-    console.log('Original Participants:', participants)
-    console.log('Normalized Participants:', normalizedParticipants)
-    console.log('Payload:', JSON.stringify(payload, null, 2))
-    console.log('Headers:', {
-      'Content-Type': 'application/json',
-      'client-token': clientToken,
-      'User-Agent': 'Organizacao10x/1.0'
-    })
+    // Debug seguro (nÃ£o expor secrets)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('=== DEBUG Z-API GROUP ===')
+      console.log('URL:', zapiUrl)
+      console.log('Group Name:', name)
+      console.log('Original Participants:', participantList)
+      console.log('Normalized Participants:', normalizedParticipants)
+      console.log('Payload:', JSON.stringify(payload, null, 2))
+    }
 
     logAction('CREATE_GROUP_START', {
       url: zapiUrl,
       method: 'POST',
       body: payload,
-      originalParticipants: participants,
+      originalParticipants: participantList ?? [],
       normalizedParticipants
     })
 
@@ -117,7 +159,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(payload)
     })
 
-    const responseData = await response.json()
+    const responseData = (await response.json()) as Record<string, unknown>
     
     // Debug detalhado da resposta
     console.log('=== RESPOSTA Z-API GROUP ===')
@@ -134,16 +176,16 @@ export async function POST(request: NextRequest) {
     }, response.status)
 
     if (!response.ok) {
-      // Mapear erros específicos do Z-API
-      let errorMessage = 'Falha na criação do grupo'
-      if (responseData.message?.includes('already exists') || responseData.message?.includes('já existe')) {
-        errorMessage = 'Este grupo já existe no WhatsApp'
-      } else if (responseData.message?.includes('invalid participants') || responseData.message?.includes('participantes inválidos')) {
-        errorMessage = 'Participantes inválidos para o grupo'
-      } else if (responseData.message?.includes('unauthorized') || responseData.message?.includes('não autorizado')) {
-        errorMessage = 'Erro de autorização com a API do WhatsApp'
-      } else if (responseData.message) {
-        errorMessage = `Erro: ${responseData.message}`
+      // Mapear erros especÃ­ficos do Z-API
+      let errorMessage = 'Falha na criaÃ§Ã£o do grupo'
+      if (message?.includes('already exists') || message?.includes('jÃ¡ existe')) {
+        errorMessage = 'Este grupo jÃ¡ existe no WhatsApp'
+      } else if (message?.includes('invalid participants') || message?.includes('participantes invÃ¡lidos')) {
+        errorMessage = 'Participantes invÃ¡lidos para o grupo'
+      } else if (message?.includes('unauthorized') || message?.includes('nÃ£o autorizado')) {
+        errorMessage = 'Erro de autorizaÃ§Ã£o com a API do WhatsApp'
+      } else if (message) {
+        errorMessage = `Erro: ${message}`
       }
 
       return NextResponse.json(
@@ -174,3 +216,8 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+
+
+
+

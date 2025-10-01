@@ -173,21 +173,21 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-6xl max-h-[95vh] overflow-visible p-0">
+        <DialogHeader className="px-6 pt-6">
           <DialogTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5" />
             {guideline.title}
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'summary' | 'preview')}>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'summary' | 'preview')} className="px-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="summary">Resumo da Versão</TabsTrigger>
             <TabsTrigger value="preview">Preview</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="summary" className="space-y-6 mt-6">
+          <TabsContent value="summary" className="space-y-6 mt-6 overflow-y-auto max-h-[calc(95vh-200px)] pr-2">
             {/* Metadados da versão */}
             <Card>
               <CardHeader>

@@ -138,50 +138,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validações específicas para template
-    if (mode === 'template') {
-      const { templateCode, templateVersion } = body
-      if (!templateCode || !templateVersion) {
-        const queryTime = Date.now() - startTime
-        return NextResponse.json(
-          { error: 'missing_template_fields', message: 'templateCode e templateVersion são obrigatórios no modo template' },
-          { status: 400, headers: { 'X-Query-Time': queryTime.toString() } }
-        )
-      }
-
-      // Validar template existe e está ativo
-      const { data: template, error: templateError } = await supabase
-        .from('relationship_templates_v2')
-        .select('id, code, anchor, active, variables, message_v1, message_v2')
-        .eq('code', templateCode)
-        .eq('active', true)
-        .single()
-
-      if (templateError || !template) {
-        const queryTime = Date.now() - startTime
-        return NextResponse.json(
-          { error: 'template_not_found', message: 'Template não encontrado ou inativo' },
-          { status: 404, headers: { 'X-Query-Time': queryTime.toString() } }
-        )
-      }
-
-      // Validar variáveis obrigatórias
-      const requiredVariables = template.variables || []
-      const providedVariables = body.variablesUsed || {}
-      const missingVariables = requiredVariables.filter((v: string) => !providedVariables[v])
-      
-      if (missingVariables.length > 0) {
-        const queryTime = Date.now() - startTime
-        return NextResponse.json(
-          { 
-            error: 'missing_variables', 
-            message: `Variáveis obrigatórias não fornecidas: ${missingVariables.join(', ')}`,
-            missingVariables
-          },
-          { status: 400, headers: { 'X-Query-Time': queryTime.toString() } }
-        )
-      }
-    }
+    // Validações específicas para template (adiadas até carregar aluno/tenant)
 
     // Validar scheduledFor se sendNow=false
     if (!sendNow) {
@@ -224,6 +181,58 @@ export async function POST(request: NextRequest) {
         },
         { status: 404, headers: { 'X-Query-Time': queryTime.toString() } }
       )
+    }
+
+    // Se modo template: validar template no modelo MVP (content JSON)
+    if (mode === 'template') {
+      const { templateCode, templateVersion } = body
+      if (!templateCode || !templateVersion) {
+        const queryTime = Date.now() - startTime
+        return NextResponse.json(
+          { error: 'missing_template_fields', message: 'templateCode e templateVersion são obrigatórios no modo template' },
+          { status: 400, headers: { 'X-Query-Time': queryTime.toString() } }
+        )
+      }
+
+      const { data: tmplRows } = await supabase
+        .from('relationship_templates')
+        .select('id, content')
+        .eq('tenant_id', student.tenant_id)
+
+      let foundTemplate: any = null
+      for (const row of (tmplRows || [])) {
+        try {
+          const parsed = JSON.parse((row as any).content || '{}')
+          if (parsed?.code === templateCode && parsed?.active === true) {
+            foundTemplate = parsed
+            break
+          }
+        } catch {}
+      }
+
+      if (!foundTemplate) {
+        const queryTime = Date.now() - startTime
+        return NextResponse.json(
+          { error: 'template_not_found', message: 'Template não encontrado ou inativo' },
+          { status: 404, headers: { 'X-Query-Time': queryTime.toString() } }
+        )
+      }
+
+      const requiredVariables: string[] = Array.isArray(foundTemplate.variables) ? foundTemplate.variables : []
+      const providedVariables = body.variablesUsed || {}
+      const missingVariables = requiredVariables.filter((v: string) => !providedVariables[v])
+
+      if (missingVariables.length > 0) {
+        const queryTime = Date.now() - startTime
+        return NextResponse.json(
+          {
+            error: 'missing_variables',
+            message: `Variáveis obrigatórias não fornecidas: ${missingVariables.join(', ')}`,
+            missingVariables
+          },
+          { status: 400, headers: { 'X-Query-Time': queryTime.toString() } }
+        )
+      }
     }
 
     // Determinar status baseado na data

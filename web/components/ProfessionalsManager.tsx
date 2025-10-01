@@ -605,7 +605,7 @@ export function ProfessionalsManager() {
 
       {/* Modal de Edição/Criação */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-visible">
           <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
             <DialogTitle className="text-xl font-semibold flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -623,7 +623,7 @@ export function ProfessionalsManager() {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="px-6 py-6">
+          <div className="px-6 py-6 overflow-y-auto max-h-[calc(90vh-200px)]">
             {/* Tabs */}
             <div className="flex space-x-1 bg-muted/50 p-1 rounded-xl mb-6 border">
               <button

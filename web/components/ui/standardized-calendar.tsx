@@ -99,11 +99,11 @@ export function StandardizedCalendar({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-0" 
+        className="w-auto p-0 bg-white" 
         align="start"
         onKeyDown={handleKeyDown}
       >
-        <div className="p-3">
+        <div className="p-3 bg-white">
           <Calendar
             mode="single"
             selected={selectedDate}

@@ -4,14 +4,5 @@
   "scope": "codebase",
   "localEndpoint": "http://localhost:3000",
   "loginUser": "gma_silva@yahoo.com.br",
-  "loginPassword": "Gma@11914984",
-  "executionArgs": {
-    "projectName": "Organizacao10x",
-    "projectPath": "C:\\Projetos\\Organizacao10x",
-    "testIds": [],
-    "additionalInstruction": "Focus on smoke: login, open student, open Processos > Gerar Anamnese, choose Group, Generate, open Editor, autosave, conclude, generate PDF, open Relacionamento and ensure history entry exists. Save evidence videos to web/evidencias/anamnese/v0.4.1/ with appropriate names.",
-    "envs": {
-      "API_KEY": "sk-user-L_Ma3VW6CGxvUlXstg766pouZj7dIgTPIVL2YtCqhDLEOQ5V1XGfBco9rWFJe_BtAl9M0QK3Nqtq4-V1HN2m7mG-_ddmOR0cyH-l6aDXnFI0ncTEsZVTOCkf9zY9visvp2A"
-    }
-  }
+  "loginPassword": "Gma@11914984"
 }

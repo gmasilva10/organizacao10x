@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useDebounce } from './useDebounce'
+import { getTodayInterval } from '@/lib/date-utils'
 
 export interface RelationshipFilters {
   status: string
@@ -23,26 +24,31 @@ export interface RelationshipFilters {
   q: string
 }
 
-const DEFAULT_FILTERS: RelationshipFilters = {
-  status: 'all',
-  anchor: 'all',
-  template_code: 'all',
-  channel: 'all',
-  date_from: '',
-  date_to: '',
-  q: ''
+// Função para obter filtros padrão (hoje)
+const getDefaultFilters = (): RelationshipFilters => {
+  const today = getTodayInterval()
+  return {
+    status: 'all',
+    anchor: 'all',
+    template_code: 'all',
+    channel: 'all',
+    date_from: today.date_from,
+    date_to: today.date_to,
+    q: ''
+  }
 }
 
 const STORAGE_KEY = 'relationship_filters'
 
 export function useRelationshipFilters() {
-  const [filters, setFilters] = useState<RelationshipFilters>(DEFAULT_FILTERS)
-  const [debouncedFilters, setDebouncedFilters] = useState<RelationshipFilters>(DEFAULT_FILTERS)
+  const [filters, setFilters] = useState<RelationshipFilters>(getDefaultFilters())
+  const [debouncedFilters, setDebouncedFilters] = useState<RelationshipFilters>(getDefaultFilters())
   
   // Debounce para busca (500ms)
   const debouncedQ = useDebounce(filters.q, 500)
 
   // Carregar filtros do localStorage na inicialização
+  // Se não houver filtros salvos, usar filtro padrão "hoje"
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
@@ -50,9 +56,18 @@ export function useRelationshipFilters() {
         const parsedFilters = JSON.parse(saved)
         setFilters(parsedFilters)
         setDebouncedFilters(parsedFilters)
+      } else {
+        // Sem filtros salvos - usar padrão "hoje"
+        const defaultFilters = getDefaultFilters()
+        setFilters(defaultFilters)
+        setDebouncedFilters(defaultFilters)
       }
     } catch (error) {
       console.warn('Erro ao carregar filtros do localStorage:', error)
+      // Em caso de erro, usar padrão "hoje"
+      const defaultFilters = getDefaultFilters()
+      setFilters(defaultFilters)
+      setDebouncedFilters(defaultFilters)
     }
   }, [])
 
@@ -88,11 +103,24 @@ export function useRelationshipFilters() {
     })
   }, [])
 
-  // Resetar filtros
+  // Resetar filtros (volta para "hoje")
   const resetFilters = useCallback(() => {
-    setFilters(DEFAULT_FILTERS)
-    setDebouncedFilters(DEFAULT_FILTERS)
+    const defaultFilters = getDefaultFilters()
+    setFilters(defaultFilters)
+    setDebouncedFilters(defaultFilters)
   }, [])
+
+  // Atalho para filtrar apenas hoje
+  const setToday = useCallback(() => {
+    const today = getTodayInterval()
+    const todayFilters = {
+      ...filters,
+      date_from: today.date_from,
+      date_to: today.date_to
+    }
+    setFilters(todayFilters)
+    setDebouncedFilters(todayFilters)
+  }, [filters])
 
   // Verificar se há filtros ativos
   const hasActiveFilters = useCallback(() => {
@@ -126,8 +154,9 @@ export function useRelationshipFilters() {
     debouncedFilters,
     updateFilters,
     resetFilters,
-    hasActiveFilters: hasActiveFilters(),
+    setToday,
+    hasActiveFilters,
     getApiFilters,
-    getActiveFiltersCount: getActiveFiltersCount()
+    getActiveFiltersCount
   }
 }

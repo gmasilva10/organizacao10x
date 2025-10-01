@@ -75,33 +75,60 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    console.log(`🗑️ Excluindo tarefa: ${params.id}`)
+    console.log(`🗑️ Soft delete tarefa: ${params.id}`)
     
     const supabase = await createClientAdmin()
     
     // 1. Buscar a tarefa para log
-    const { data: taskToDelete } = await supabase
+    const { data: task } = await supabase
       .from('relationship_tasks')
-      .select('student:students(name)')
+      .select('id, student_id, status, scheduled_for, student:students(name)')
       .eq('id', params.id)
       .single()
     
-    // 2. Excluir a tarefa
+    if (!task) {
+      return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 })
+    }
+    
+    // 2. Soft delete - marcar como deleted
     const { error } = await supabase
       .from('relationship_tasks')
-      .delete()
+      .update({ 
+        status: 'deleted',
+        deleted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
       .eq('id', params.id)
     
     if (error) {
-      console.error('❌ Erro ao excluir tarefa:', error)
-      return NextResponse.json({ error: 'Erro ao excluir tarefa' }, { status: 500 })
+      console.error('❌ Erro ao deletar tarefa:', error)
+      return NextResponse.json({ error: 'Erro ao deletar tarefa' }, { status: 500 })
     }
     
-    console.log(`✅ Tarefa excluída: ${taskToDelete?.student?.name || 'Aluno'} - ${params.id}`)
+    // 3. Log de auditoria
+    await supabase
+      .from('relationship_logs')
+      .insert({
+        student_id: task.student_id,
+        task_id: params.id,
+        action: 'deleted',
+        channel: 'manual',
+        meta: {
+          previous_status: task.status,
+          previous_scheduled_for: task.scheduled_for,
+          deleted_by: 'dev-user-id' // TODO: usar userId real
+        }
+      })
+    
+    console.log(`✅ Tarefa deletada (soft): ${task.student?.name || 'Aluno'} - ${params.id}`)
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Tarefa excluída com sucesso' 
+      message: 'Tarefa excluída com sucesso',
+      can_undo: true,
+      undo_window_seconds: 5,
+      previous_status: task.status,
+      previous_scheduled_for: task.scheduled_for
     })
     
   } catch (error) {

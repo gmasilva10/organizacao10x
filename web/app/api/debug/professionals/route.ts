@@ -3,6 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 import { resolveRequestContext } from '@/server/context'
 
 export async function GET(request: NextRequest) {
+  // Guard: somente disponível em dev ou quando explicitamente habilitado
+  if (
+    process.env.NODE_ENV !== 'development' &&
+    process.env.ENABLE_DEBUG_ROUTES !== '1'
+  ) {
+    return NextResponse.json({ error: 'Debug endpoint disabled' }, { status: 403 })
+  }
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
 

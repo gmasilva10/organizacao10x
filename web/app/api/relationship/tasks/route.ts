@@ -1,5 +1,5 @@
-
-// Forçar execução dinâmica para evitar problemas de renderização estática
+﻿
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -8,10 +8,10 @@ export const revalidate = 0;
  * GATE 10.6.3 - API para Tarefas de Relacionamento
  * 
  * Funcionalidades:
- * - Listar tarefas com filtros avançados
- * - Paginação e ordenação
- * - Filtros por status, âncora, template, canal, datas
- * - Performance otimizada com índices
+ * - Listar tarefas com filtros avanÃ§ados
+ * - PaginaÃ§Ã£o e ordenaÃ§Ã£o
+ * - Filtros por status, Ã¢ncora, template, canal, datas
+ * - Performance otimizada com Ã­ndices
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -23,10 +23,10 @@ export async function GET(request: NextRequest) {
     // Para desenvolvimento, usar tenant fixo
     const tenant_id = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
     
-    // TODO: Implementar autenticação real em produção
+    // TODO: Implementar autenticaÃ§Ã£o real em produÃ§Ã£o
     // const ctx = await resolveRequestContext(request)
     // if (!ctx) {
-    //   return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    //   return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
     // }
     // const { tenant_id } = ctx
     try {
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       const student_id = searchParams.get('student_id')
       const q = searchParams.get('q')?.trim() || ''
       
-      // Paginação e ordenação
+      // PaginaÃ§Ã£o e ordenaÃ§Ã£o
       const sort_by = searchParams.get('sort_by') || 'created_at'
       const sort_order = searchParams.get('sort_order') || 'desc'
       const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
@@ -73,9 +73,17 @@ export async function GET(request: NextRequest) {
           updated_at
         `, { count: 'exact' })
 
+      // Excluir tarefas deletadas por padrão (soft delete)
+      query = query.neq('status', 'deleted')
+
       // Aplicar filtros
       if (status && status !== 'all') {
-        query = query.eq('status', status)
+        // Se o filtro for especificamente 'deleted', sobrescrever o filtro padrão
+        if (status === 'deleted') {
+          query = query.eq('status', 'deleted')
+        } else {
+          query = query.eq('status', status)
+        }
       }
       if (anchor && anchor !== 'all') {
         query = query.eq('anchor', anchor)
@@ -90,6 +98,8 @@ export async function GET(request: NextRequest) {
         query = query.gte('scheduled_for', date_from)
       }
       if (date_to) {
+        // date_to já deve vir em formato ISO UTC com endOfDay aplicado no frontend
+        // Mas garantimos que a comparação seja <= (less than or equal)
         query = query.lte('scheduled_for', date_to)
       }
       if (student_id) {
@@ -105,7 +115,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Aplicar paginação e ordenação
+      // Aplicar paginaÃ§Ã£o e ordenaÃ§Ã£o
       const from_idx = (page - 1) * page_size
       const to_idx = from_idx + page_size - 1
 
@@ -134,7 +144,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Enriquecer dados com informações do aluno
+      // Enriquecer dados com informaÃ§Ãµes do aluno
       const enriched_tasks = (tasks || []).map(task => ({
         ...task,
         student: student_map[task.student_id] || null
@@ -178,9 +188,9 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
   } catch (error) {
-    console.error('Erro na autenticação /relationship/tasks:', error)
+    console.error('Erro na autenticaÃ§Ã£o /relationship/tasks:', error)
     return NextResponse.json({ 
-      error: 'Erro de autenticação',
+      error: 'Erro de autenticaÃ§Ã£o',
       details: error.message 
     }, { status: 401 })
   }
@@ -192,39 +202,36 @@ export async function PATCH(request: NextRequest) {
     const tenant_id = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
     const userId = 'dev-user-id'
     
-    // TODO: Implementar autenticação real em produção
+    // TODO: Implementar autenticaÃ§Ã£o real em produÃ§Ã£o
     // const ctx = await resolveRequestContext(request)
     // if (!ctx) {
-    //   return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    //   return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
     // }
     // const { tenant_id, userId } = ctx
     try {
       // Para desenvolvimento, usar cliente admin que bypassa RLS
       const supabase = await createClientAdmin()
-      const { task_id, status, notes } = await request.json()
+      const { task_id, status, notes, scheduled_for, postpone_days } = await request.json()
 
       if (!task_id) {
         return NextResponse.json({ error: 'task_id é obrigatório' }, { status: 400 })
       }
 
-      // Verificar se a tarefa pertence ao tenant
+      // Verificar se a tarefa pertence ao tenant (join com students)
       const { data: task, error: taskError } = await supabase
         .from('relationship_tasks')
         .select(`
           id,
           student_id,
           status,
+          scheduled_for,
           payload,
           template_code,
-          channel
+          channel,
+          students!inner(tenant_id)
         `)
         .eq('id', task_id)
-        .in('student_id', 
-          supabase
-            .from('students')
-            .select('id')
-            .eq('tenant_id', tenant_id)
-        )
+        .eq('students.tenant_id', tenant_id)
         .single()
 
       if (taskError || !task) {
@@ -236,10 +243,21 @@ export async function PATCH(request: NextRequest) {
         updated_at: new Date().toISOString()
       }
 
+      // Determinar ação para log de auditoria
+      let action = 'updated'
+
       if (status) {
         updateData.status = status
         if (status === 'sent') {
           updateData.sent_at = new Date().toISOString()
+          action = 'sent'
+        } else if (status === 'postponed') {
+          action = 'postponed'
+        } else if (status === 'skipped') {
+          action = 'skipped'
+        } else if (status === 'deleted') {
+          updateData.deleted_at = new Date().toISOString()
+          action = 'deleted'
         }
       }
 
@@ -247,6 +265,22 @@ export async function PATCH(request: NextRequest) {
         updateData.notes = notes
       }
 
+      // Se fornecido scheduled_for, atualizar
+      if (scheduled_for) {
+        updateData.scheduled_for = scheduled_for
+      }
+
+      // Se fornecido postpone_days, calcular novo scheduled_for
+      if (postpone_days && typeof postpone_days === 'number') {
+        const currentScheduled = new Date(task.scheduled_for)
+        const newScheduled = new Date(currentScheduled)
+        newScheduled.setDate(newScheduled.getDate() + postpone_days)
+        updateData.scheduled_for = newScheduled.toISOString()
+        updateData.status = 'pending' // Manter como pending ao adiar
+        action = 'postponed'
+      }
+
+      const startUpdate = Date.now()
       // Atualizar tarefa
       const { error: updateError } = await supabase
         .from('relationship_tasks')
@@ -264,23 +298,29 @@ export async function PATCH(request: NextRequest) {
         .insert({
           student_id: task.student_id,
           task_id: task_id,
-          action: status === 'sent' ? 'sent' : 'updated',
+          action,
           channel: task.channel,
           template_code: task.template_code,
           meta: {
             updated_by: userId,
             old_status: task.status,
-            new_status: status,
-            notes: notes
+            new_status: status || task.status,
+            old_scheduled_for: task.scheduled_for,
+            new_scheduled_for: updateData.scheduled_for,
+            postpone_days,
+            notes,
+            action_type: action
           }
         })
 
+      const query_time = Date.now() - startUpdate
       return NextResponse.json({
         message: 'Tarefa atualizada com sucesso',
         task_id: task_id,
         status: status || task.status,
+        scheduled_for: updateData.scheduled_for || task.scheduled_for,
         notes: notes
-      })
+      }, { headers: { 'X-Query-Time': String(query_time) } })
 
     } catch (error) {
       console.error('Erro na API PATCH /relationship/tasks:', error)

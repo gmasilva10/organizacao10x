@@ -163,6 +163,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Não é possível excluir colunas fixas' }, { status: 403 })
     }
 
+    // Bloquear exclusão das posições 1 e 99
+    if (existingColumn.position === 1 || existingColumn.position === 99) {
+      return NextResponse.json({ error: 'Não é possível excluir as colunas padrão (1 e 99)' }, { status: 403 })
+    }
+
     // Encontrar coluna padrão ("Novo Aluno" ou posição 1)
     const { data: defaultStage } = await supabase
       .from('kanban_stages')

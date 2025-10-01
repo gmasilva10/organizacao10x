@@ -1,12 +1,34 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
-  productionBrowserSourceMaps: true,
+  productionBrowserSourceMaps: false,
+  async redirects() {
+    return [
+      {
+        source: '/app/relacionamento',
+        destination: '/app/relationship',
+        permanent: true,
+      },
+      {
+        source: '/app/relacionamento/:path*',
+        destination: '/app/relationship/:path*',
+        permanent: true,
+      },
+    ]
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/relacionamento/:path*',
+        destination: '/api/relationship/:path*',
+      },
+    ]
+  },
   // experimental: {
   //   turbo: {
   //     rules: {

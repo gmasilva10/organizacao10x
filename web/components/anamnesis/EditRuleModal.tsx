@@ -186,13 +186,13 @@ export function EditRuleModal({ isOpen, onClose, onSuccess, rule, versionId }: E
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto">
-        <DialogHeader className="pb-6">
+      <DialogContent className="max-w-5xl max-h-[95vh] overflow-visible p-0">
+        <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle className="text-2xl font-bold text-gray-900">Editar Regra de Diretriz de Treino</DialogTitle>
           <p className="text-sm text-gray-600 mt-2">Modifique as condições e parâmetros de treino para esta regra</p>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8 overflow-y-auto max-h-[calc(95vh-180px)] px-6">
           {/* Prioridade */}
           <div className="bg-gray-50 p-6 rounded-lg border">
             <div className="space-y-3">
@@ -645,7 +645,7 @@ export function EditRuleModal({ isOpen, onClose, onSuccess, rule, versionId }: E
             </div>
           </div>
 
-          <DialogFooter className="bg-gray-50 px-6 py-4 -mx-6 -mb-6 rounded-b-lg border-t">
+          <DialogFooter className="bg-gray-50 px-6 py-4 border-t sticky bottom-0">
             <div className="flex justify-end gap-3 w-full">
               <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="h-11 px-6">
                 Cancelar

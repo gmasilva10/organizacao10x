@@ -100,16 +100,19 @@ async function executeManualRecalculation(
   const startTime = Date.now()
   
   try {
-    // Buscar templates ativos
-    const { data: templates, error: templatesError } = await supabase
-      .from('relationship_templates_v2')
-      .select('*')
-      .eq('active', true)
-      .order('priority')
+    // Buscar templates ativos (MVP via JSON em content)
+    const { data: tmplRows, error: tmplErr } = await supabase
+      .from('relationship_templates')
+      .select('id, tenant_id, content')
+      .eq('tenant_id', tenantId)
 
-    if (templatesError) {
-      throw new Error(`Failed to fetch templates: ${templatesError.message}`)
+    if (tmplErr) {
+      throw new Error(`Failed to fetch templates: ${tmplErr.message}`)
     }
+
+    const templates = (tmplRows || []).map((row: any) => {
+      try { return JSON.parse(row.content || '{}') } catch { return null }
+    }).filter((t: any) => t && t.active)
 
     if (!templates || templates.length === 0) {
       return {
@@ -232,27 +235,17 @@ export async function POST(request: NextRequest) {
       if (anchor) {
         // Recálculo por âncora específica (implementar se necessário)
         result = await executeManualRecalculation(tenant_id, dry_run)
+        // Evitar log global com student_id nulo (constraint NOT NULL)
+        return NextResponse.json(result)
+      
+      // Evitar log global com student_id nulo (constraint NOT NULL)
+      return NextResponse.json(result)
       } else {
         // Recálculo completo
         result = await executeManualRecalculation(tenant_id, dry_run)
       }
 
-      // Log da operação
-      await supabase
-        .from('relationship_logs')
-        .insert({
-          student_id: null,
-          action: 'recalculated',
-          channel: 'manual',
-          meta: {
-            tenant_id,
-            dry_run,
-            anchor: anchor || 'all',
-            force,
-            stats: result.stats
-          }
-        })
-
+      // Removido log global (student_id nulo) – retorna resultado diretamente
       return NextResponse.json(result)
 
     } finally {

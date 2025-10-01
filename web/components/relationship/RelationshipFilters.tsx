@@ -62,8 +62,8 @@ const STATUS_OPTIONS = [
   { value: 'pending', label: 'Pendente' },
   { value: 'due_today', label: 'Para Hoje' },
   { value: 'sent', label: 'Enviadas' },
-  { value: 'snoozed', label: 'Snoozed' },
-  { value: 'skipped', label: 'Skipped' }
+  { value: 'snoozed', label: 'Adiada' },
+  { value: 'skipped', label: 'Pulada' }
 ]
 
 const TEMPLATE_OPTIONS = [
@@ -105,13 +105,13 @@ export default function RelationshipFilters({
   ) || filters.q.trim() !== ''
 
   return (
-    <Card className={compact ? 'mb-4' : ''}>
-      <CardHeader className={compact ? 'pb-3' : ''}>
+    <div className={compact ? 'mb-4' : ''}>
+      <div className={compact ? 'pb-3' : ''}>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm">
             <Filter className="h-4 w-4" />
             Filtros
-          </CardTitle>
+          </div>
           {hasActiveFilters && (
             <Button
               variant="ghost"
@@ -124,9 +124,9 @@ export default function RelationshipFilters({
             </Button>
           )}
         </div>
-      </CardHeader>
+      </div>
       
-      <CardContent className={compact ? 'pt-0' : ''}>
+      <div className={compact ? 'pt-0' : ''}>
         <div className={`grid gap-4 ${compact ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
           {/* Status */}
           <div className="space-y-2">
@@ -254,7 +254,7 @@ export default function RelationshipFilters({
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

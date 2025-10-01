@@ -203,13 +203,13 @@ async function updateOccurrenceFollowupTask(
       }
     }
 
-    // Log da atualização
+    // Log da atualização (agendamento)
     await supabase
       .from('relationship_logs')
       .insert({
         student_id: task.student_id,
         task_id: taskId,
-        action: 'created',
+        action: 'scheduled',
         channel: 'whatsapp',
         template_code: 'MSG_OCCURRENCE_FOLLOWUP',
         meta: {

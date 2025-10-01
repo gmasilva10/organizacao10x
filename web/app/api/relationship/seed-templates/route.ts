@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       
       // Verificar se já existem templates para este tenant
       const { data: existingTemplates, error: checkError } = await supabase
-        .from('relationship_templates_v2')
+        .from('relationship_templates')
         .select('id')
         .eq('tenant_id', tenant_id)
         .limit(1)
@@ -33,18 +33,20 @@ export async function POST(request: NextRequest) {
         })
       }
       
-      // Aplicar seeds
+      // Aplicar seeds no modelo MVP (title/type/content)
       const templatesToInsert = RELATIONSHIP_TEMPLATE_SEEDS.map(template => ({
-        ...template,
         tenant_id,
+        title: `${template.code} - ${template.touchpoint}`,
+        type: 'whatsapp',
+        content: JSON.stringify({ ...template, active: template.active ?? true }),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }))
       
       const { data: insertedTemplates, error: insertError } = await supabase
-        .from('relationship_templates_v2')
+        .from('relationship_templates')
         .insert(templatesToInsert)
-        .select('id, code, title')
+        .select('id, title')
       
       if (insertError) {
         console.error('Erro ao inserir templates:', insertError)

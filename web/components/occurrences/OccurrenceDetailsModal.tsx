@@ -269,7 +269,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-visible">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             Ocorrência #{occurrenceId}
@@ -283,7 +283,7 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
         ) : !data ? (
           <div className="p-8 text-center text-muted-foreground">Ocorrência não encontrada</div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-140px)] pr-2">
             {/* Informações básicas */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

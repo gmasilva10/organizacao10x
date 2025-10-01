@@ -1,0 +1,237 @@
+═══════════════════════════════════════════════════════════════════════════════
+  CHECKLIST DE VALIDAÇÃO - MÓDULO DE RELACIONAMENTO v1.0
+  GATE 10.7 - Reformulação com Colunas Dinâmicas e Timezone
+═══════════════════════════════════════════════════════════════════════════════
+
+Data de Criação: 30/09/2025
+Responsável: Dev Team
+Status: ✅ PRONTO PARA TESTE
+
+───────────────────────────────────────────────────────────────────────────────
+  CRITÉRIOS DE ACEITE (9 VALIDAÇÕES OBRIGATÓRIAS)
+───────────────────────────────────────────────────────────────────────────────
+
+[ ] CA-01: Filtro Padrão "Hoje"
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Abrir o módulo de relacionamento SEM filtros salvos no localStorage
+    
+    RESULTADO ESPERADO:
+    - Filtros automaticamente setados: date_from = hoje (00:00) e date_to = hoje (23:59:59)
+    - Colunas visíveis: Atrasadas | Para Hoje | Enviadas | Adiadas/Puladas
+    - Timezone: America/Sao_Paulo (GMT-3 ou GMT-2 conforme horário de verão)
+    
+    COMO VALIDAR:
+    1. Limpar localStorage: `localStorage.removeItem('relationship_filters')`
+    2. Recarregar a página do módulo /app/relationship
+    3. Verificar que o filtro mostra apenas tarefas de hoje
+    4. Verificar que as 4 colunas aparecem (Atrasadas, Para Hoje, Enviadas, Adiadas/Puladas)
+
+
+[ ] CA-02: Filtro Futuro (100% Futuro)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Aplicar filtro de data SOMENTE para data futura (ex: daqui a 3 dias)
+    
+    RESULTADO ESPERADO:
+    - Coluna "Pendentes de Envio" (amarelo) aparece
+    - Colunas "Atrasadas" e "Para Hoje" NÃO aparecem
+    - Colunas "Enviadas" e "Adiadas/Puladas" sempre visíveis
+    
+    COMO VALIDAR:
+    1. Definir date_from = amanhã (ex: 01/10/2025)
+    2. Definir date_to = daqui a 7 dias (ex: 07/10/2025)
+    3. Verificar que aparece: Pendentes de Envio | Enviadas | Adiadas/Puladas
+    4. Verificar que NÃO aparece: Atrasadas | Para Hoje
+
+
+[ ] CA-03: Filtro Passado
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Aplicar filtro de data SOMENTE para datas passadas
+    
+    RESULTADO ESPERADO:
+    - Coluna "Atrasadas" (vermelho) aparece
+    - Colunas "Para Hoje" e "Pendentes de Envio" NÃO aparecem
+    - Colunas "Enviadas" e "Adiadas/Puladas" sempre visíveis
+    
+    COMO VALIDAR:
+    1. Definir date_from = 7 dias atrás (ex: 23/09/2025)
+    2. Definir date_to = ontem (ex: 29/09/2025)
+    3. Verificar que aparece: Atrasadas | Enviadas | Adiadas/Puladas
+    4. Verificar que NÃO aparece: Para Hoje | Pendentes de Envio
+
+
+[ ] CA-04: Intervalo Cruzando Passado/Hoje/Futuro
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Aplicar filtro que cruza passado + hoje + futuro
+    
+    RESULTADO ESPERADO:
+    - Todas as 5 colunas aparecem:
+      • Atrasadas (vermelho)
+      • Para Hoje (azul)
+      • Pendentes de Envio (amarelo)
+      • Enviadas (verde)
+      • Adiadas/Puladas (cinza)
+    
+    COMO VALIDAR:
+    1. Definir date_from = 7 dias atrás
+    2. Definir date_to = daqui a 7 dias
+    3. Verificar que TODAS as 5 colunas são exibidas
+    4. Verificar que cada coluna mostra apenas tarefas do período correspondente
+
+
+[ ] CA-05: Adiar Tarefa (1/3/7 dias)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Testar ação "Adiar" com 1, 3 e 7 dias
+    
+    RESULTADO ESPERADO:
+    - Tarefa move para a nova coluna conforme o novo scheduled_for
+    - Status permanece como 'pending'
+    - Contador da coluna atualiza automaticamente
+    - Toast de sucesso: "Tarefa adiada por X dia(s)"
+    
+    COMO VALIDAR:
+    1. Selecionar tarefa em "Para Hoje"
+    2. Clicar em "..." > "Adiar 1 dia"
+    3. Verificar que tarefa desaparece de "Para Hoje"
+    4. Ajustar filtro para amanhã
+    5. Verificar que tarefa aparece em "Pendentes de Envio" ou "Para Hoje" (se amanhã)
+    6. Verificar que scheduled_for foi atualizado corretamente
+
+
+[ ] CA-06: Marcar como Enviada
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Marcar tarefa como enviada
+    
+    RESULTADO ESPERADO:
+    - Status muda para 'sent'
+    - Campo sent_at é preenchido com timestamp atual
+    - Tarefa move para coluna "Enviadas" (verde)
+    - Toast: "Tarefa atualizada com sucesso"
+    
+    COMO VALIDAR:
+    1. Selecionar tarefa pendente
+    2. Clicar em "..." > "Marcar como enviada"
+    3. Verificar que tarefa aparece em "Enviadas"
+    4. Verificar badge verde "Enviada"
+    5. Validar no banco que sent_at foi preenchido
+
+
+[ ] CA-07: Pular Tarefa com Undo
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Pular tarefa e desfazer dentro de 5 segundos
+    
+    RESULTADO ESPERADO:
+    - Status muda para 'skipped'
+    - Tarefa move para coluna "Adiadas/Puladas" (cinza)
+    - Toast com botão "Desfazer" aparece por 5 segundos
+    - Ao clicar em "Desfazer", tarefa volta ao status anterior
+    - Após 5 segundos, botão desaparece e ação não pode mais ser desfeita
+    
+    COMO VALIDAR:
+    1. Selecionar tarefa pendente
+    2. Clicar em "..." > "Pular tarefa"
+    3. Verificar toast: "Tarefa pulada" com descrição "Você tem 5 segundos para desfazer"
+    4. Clicar em "Desfazer" dentro de 5s
+    5. Verificar que tarefa volta à coluna original com status 'pending'
+    6. Repetir teste SEM clicar em "Desfazer" e aguardar 5s
+    7. Verificar que tarefa permanece pulada
+
+
+[ ] CA-08: Excluir Tarefa com Undo
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Excluir tarefa (soft delete) e desfazer dentro de 5 segundos
+    
+    RESULTADO ESPERADO:
+    - Status muda para 'deleted'
+    - Campo deleted_at preenchido com timestamp
+    - Tarefa SOME do board (filtro padrão exclui 'deleted')
+    - Toast com botão "Desfazer" aparece por 5 segundos
+    - Ao clicar em "Desfazer", tarefa é restaurada
+    
+    COMO VALIDAR:
+    1. Selecionar tarefa pendente
+    2. Clicar em "..." > "Excluir tarefa"
+    3. Verificar toast: "Tarefa excluída" com botão "Desfazer"
+    4. Verificar que tarefa sumiu do board
+    5. Clicar em "Desfazer" dentro de 5s
+    6. Verificar que tarefa volta à coluna original
+    7. Validar no banco: deleted_at = NULL após undo
+    8. Repetir sem undo e validar que deleted_at permanece preenchido
+
+
+[ ] CA-09: Ordenação e Contadores
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DESCRIÇÃO:
+    - Validar ordenação dentro das colunas e contadores
+    
+    RESULTADO ESPERADO:
+    - Tarefas ordenadas por: scheduled_for ASC, depois created_at ASC
+    - Badge de cada coluna mostra quantidade correta de cards
+    - Contadores atualizam em tempo real após qualquer ação
+    - Scroll vertical por coluna (max-height 600px)
+    - Sem scroll horizontal
+    
+    COMO VALIDAR:
+    1. Criar 3+ tarefas para hoje com horários diferentes
+    2. Verificar que aparecem ordenadas por horário (mais cedo primeiro)
+    3. Criar 2 tarefas para o mesmo horário
+    4. Verificar que ordenam por created_at (mais antiga primeiro)
+    5. Contar tarefas manualmente e comparar com badge
+    6. Executar ação (marcar como enviada)
+    7. Verificar que contadores atualizam imediatamente
+
+
+───────────────────────────────────────────────────────────────────────────────
+  VALIDAÇÕES ADICIONAIS
+───────────────────────────────────────────────────────────────────────────────
+
+[ ] UI/UX:
+    - Empty states aparecem quando coluna está vazia
+    - Loading states durante fetch e ações
+    - Toasts de sucesso/erro funcionam
+    - Botão "Hoje" reseta filtros para data atual
+    - Responsive (mobile/tablet/desktop)
+
+[ ] Regressão:
+    - Módulo de Calendário não quebrou
+    - Filtros persistem no localStorage
+    - Ações em lote funcionam (se houver)
+
+[ ] Performance:
+    - Kanban carrega em menos de 2s (dev)
+    - Ações respondem em menos de 500ms
+    - Sem memory leaks ao trocar filtros múltiplas vezes
+
+───────────────────────────────────────────────────────────────────────────────
+  ASSINATURAS
+───────────────────────────────────────────────────────────────────────────────
+
+Desenvolvedor: __________________ Data: ___/___/_____
+
+QA/Tester: _____________________ Data: ___/___/_____
+
+Product Owner: _________________ Data: ___/___/_____
+
+───────────────────────────────────────────────────────────────────────────────
+  OBSERVAÇÕES E BUGS ENCONTRADOS
+───────────────────────────────────────────────────────────────────────────────
+
+[Espaço para anotar bugs, melhorias ou observações durante os testes]
+
+
+
+
+
+
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                              FIM DO CHECKLIST
+═══════════════════════════════════════════════════════════════════════════════

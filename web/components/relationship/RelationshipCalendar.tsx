@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GATE 10.6.4 - Calendário de Relacionamento
  * 
  * Funcionalidades:
@@ -12,6 +12,7 @@
 
 import React, { useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader as ModalHeader, DialogTitle as ModalTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -81,7 +82,10 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [viewMode, setViewMode] = useState<ViewMode>('week')
+  const [viewMode, setViewMode] = useState<ViewMode>('month')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalDate, setModalDate] = useState<Date | null>(null)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   
   const { 
     debouncedFilters, 
@@ -174,7 +178,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     const newDate = new Date()
     newDate.setDate(newDate.getDate() + days)
     
-    updateTaskStatus(taskId, 'snoozed', `Snoozed por ${days} dia(s) até ${format(newDate, 'dd/MM/yyyy', { locale: ptBR })}`)
+    updateTaskStatus(taskId, 'snoozed', `Adiada por ${days} dia(s) até ${format(newDate, 'dd/MM/yyyy', { locale: ptBR })}`)
   }
 
   // Expor função de refresh para componentes pai
@@ -222,8 +226,12 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
       isSameDay(new Date(task.scheduled_for), date)
     )
   }
+  const openDayModal = (date: Date) => {
+    setModalDate(date)
+    setModalOpen(true)
+  }
 
-  // Navegação
+  // NavegaÃ§Ã£o
   const navigatePrevious = () => {
     switch (viewMode) {
       case 'day':
@@ -436,7 +444,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
             
             return (
               <div key={day.toISOString()} className="space-y-1 min-h-[120px]">
-                <div className={`text-center p-2 rounded-lg ${
+                <button onClick={() => openDayModal(day)} className={`w-full text-center p-2 rounded-lg ${
                   isToday 
                     ? 'bg-blue-100 text-blue-900 font-bold' 
                     : isCurrentMonth 
@@ -444,16 +452,12 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
                     : 'bg-gray-50 text-gray-400'
                 }`}>
                   {format(day, 'd')}
-                </div>
-                
-                <div className="space-y-1">
-                  {dayTasks.slice(0, 3).map(renderTask)}
-                  {dayTasks.length > 3 && (
-                    <div className="text-xs text-gray-500 text-center">
-                      +{dayTasks.length - 3} mais
-                    </div>
-                  )}
-                </div>
+                </button>
+                {dayTasks.length > 0 ? (
+                  <div className="text-xs text-gray-600 text-center">{dayTasks.length} tarefa(s)</div>
+                ) : (
+                  <div className="text-xs text-gray-300 text-center">—</div>
+                )}
               </div>
             )
           })}
@@ -472,15 +476,25 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
               <CalendarIcon className="h-5 w-5" />
               Calendário de Relacionamento
             </CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={fetchTasks}
-              disabled={loading}
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Atualizar
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setFiltersOpen(true)}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                Filtros
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchTasks}
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Atualizar
+              </Button>
+            </div>
           </div>
         </CardHeader>
         
@@ -541,14 +555,45 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
         </CardContent>
       </Card>
 
-      {/* Filtros */}
-      <RelationshipFilters
-        filters={debouncedFilters}
-        onFiltersChange={updateFilters}
-        onClearFilters={resetFilters}
-        showDateFilters={true}
-        compact={false}
-      />
+      {/* Modal com tarefas do dia */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-3xl" aria-describedby="calendar-day-tasks-desc">
+          <ModalHeader>
+            <ModalTitle>{modalDate ? `Tarefas de ${format(modalDate, 'dd/MM/yyyy', { locale: ptBR })}` : 'Tarefas do dia'}</ModalTitle>
+          </ModalHeader>\n          <p id="calendar-day-tasks-desc" className="sr-only">Lista de tarefas da data selecionada</p>
+          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+            {modalDate && getTasksForDate(modalDate).length > 0 ? (
+              getTasksForDate(modalDate).map(renderTask)
+            ) : (
+              <div className="col-span-full text-sm text-gray-500">Nenhuma tarefa neste dia.</div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Filtros */}
+      <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <DialogContent className="max-w-2xl overflow-visible" aria-describedby="calendar-filters-desc">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filtros do Calendário
+            </DialogTitle>
+            <p className="sr-only" id="calendar-filters-desc">
+              Ajuste e aplique filtros para o calendário de relacionamento.
+            </p>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+            <RelationshipFilters
+              filters={debouncedFilters}
+              onFiltersChange={updateFilters}
+              onClearFilters={resetFilters}
+              showDateFilters={true}
+              compact={false}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Conteúdo do calendário */}
       <Card>
@@ -571,3 +616,5 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
 })
 
 export default RelationshipCalendar
+
+

@@ -1,0 +1,52 @@
+{
+  "id": "d5b2c8f4-3a1e-4b7c-9f0d-1e8a6c3b5d7f",
+  "event": "PURCHASE_APPROVED",
+  "version": "2.0.0",
+  "creation_date": 1696089600000,
+  "data": {
+    "product": {
+      "id": 123456,
+      "name": "Plano Mensal - Personal Trainer",
+      "ucode": "abc-def-ghi-123"
+    },
+    "buyer": {
+      "name": "João Silva",
+      "email": "joao.silva@email.com",
+      "checkout_phone": "+5511987654321",
+      "document": "12345678900"
+    },
+    "purchase": {
+      "order_ref": "HPM123456789",
+      "status": "approved",
+      "approved_date": 1696089600000,
+      "transaction": "HP12345678901234567890",
+      "price": {
+        "currency_code": "BRL",
+        "value": 199.90
+      },
+      "payment": {
+        "type": "CREDIT_CARD",
+        "installments_number": 1
+      },
+      "subscription": {
+        "status": "ACTIVE",
+        "plan": {
+          "name": "Mensal"
+        },
+        "subscriber": {
+          "code": "SUB-ABC123"
+        }
+      }
+    },
+    "producer": {
+      "name": "Academia Alpha"
+    },
+    "commissions": [
+      {
+        "name": "Afiliado X",
+        "value": 39.98
+      }
+    ]
+  },
+  "hottok": "Basic YWNhZGVtaWFAZXhhbXBsZS5jb206YmFzaWN0b2tlbjEyMw=="
+}

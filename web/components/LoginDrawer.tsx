@@ -45,13 +45,19 @@ function LoginDrawerContent() {
             // Debug: verificar variáveis de ambiente
             console.log("🔍 [LOGIN DEBUG] Variáveis de ambiente:", {
                 SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-                SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Presente" : "❌ Ausente"
+                SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Presente" : "❌ Ausente",
+                NODE_ENV: process.env.NODE_ENV
             })
             
             const supabase = createClient()
-            console.log("🔍 [LOGIN DEBUG] Cliente Supabase criado:", supabase)
+            console.log("🔍 [LOGIN DEBUG] Cliente Supabase criado:", {
+                supabaseUrl: supabase.supabaseUrl,
+                supabaseKey: supabase.supabaseKey ? "Present" : "Missing"
+            })
             
-            const { error } = await supabase.auth.signInWithPassword({ email, password })
+            console.log("🔍 [LOGIN DEBUG] Tentando autenticar com:", { email, hasPassword: !!password })
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+            console.log("🔍 [LOGIN DEBUG] Resultado da autenticação:", { data, error })
             if (error) {
                 toast.error("Credenciais inválidas. Tente novamente.")
                 return

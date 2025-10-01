@@ -147,7 +147,7 @@ export function OccurrencesFiltersDrawer({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      <DrawerContent className="ml-auto h-full w-full max-w-md overflow-y-auto" aria-describedby="occurrences-filters-desc">
+      <DrawerContent className="ml-auto h-full w-full max-w-md flex flex-col" aria-describedby="occurrences-filters-desc">
         <DrawerHeader>
           <DrawerTitle>Filtros de Ocorrências</DrawerTitle>
           <p className="sr-only" id="occurrences-filters-desc">
@@ -155,7 +155,7 @@ export function OccurrencesFiltersDrawer({
           </p>
         </DrawerHeader>
         
-        <div className="space-y-4 p-4">
+        <div className="space-y-4 p-4 overflow-y-auto flex-1">
           {/* Período */}
           <div>
             <Label>Período</Label>

@@ -32,3 +32,6 @@ export default function EmptyState({ icon: Icon, title, description, action }: E
     </Card>
   )
 }
+
+// Re-export variantes clássicas para padronizar import em um único lugar
+export { EmptyState as EmptyStateClassic, ErrorState } from "./empty-state"

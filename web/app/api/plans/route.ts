@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const { data: plans, error } = await supabase
       .from('plans')
       .select('*')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     const { data: existingPlan, error: checkError } = await supabase
       .from('plans')
       .select('id')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('plan_code', plan_code)
       .single()
 
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
         ciclo: ciclo || null,
         duracao_em_ciclos: duracao_em_ciclos || null,
         ativo: b.ativo ?? true,
-        tenant_id: ctx.tenantId
+        org_id: ctx.tenantId
       })
       .select()
       .single()

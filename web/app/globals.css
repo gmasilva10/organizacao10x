@@ -113,4 +113,108 @@
   .kanban-card {
     overflow: hidden;
   }
+
+  /* 
+   * GATE 10.7.1 - Fix Z-Index para Dropdowns em Modais
+   * Garante que todos os componentes Radix UI com Portal
+   * apareçam ACIMA de modais/dialogs
+   */
+  
+  /* Radix Select - Sempre acima de modais */
+  [data-radix-select-content] {
+    z-index: 9999 !important;
+    background-color: white !important;
+    opacity: 1 !important;
+  }
+  
+  /* Radix Dropdown - Sempre acima de modais */
+  [data-radix-dropdown-menu-content] {
+    z-index: 9999 !important;
+    background-color: white !important;
+    opacity: 1 !important;
+  }
+  
+  /* Radix Tooltip - Sempre acima de modais */
+  [data-radix-tooltip-content] {
+    z-index: 9999 !important;
+  }
+  
+  /* Radix Popover - Máxima prioridade */
+  [data-radix-popover-content] {
+    z-index: 9999 !important;
+    background-color: white !important;
+    opacity: 1 !important;
+  }
+  
+  /* Calendar dentro de Popover */
+  [data-radix-popover-content] .rdp {
+    background-color: white !important;
+  }
+  
+  /* Garantir que o viewport do Select não seja cortado */
+  [data-radix-select-viewport] {
+    overflow: visible !important;
+    background-color: white !important;
+  }
+  
+  /* Garantir que Portals não sejam afetados por overflow de parents */
+  [data-radix-portal] {
+    position: fixed !important;
+  }
+  
+  /* Garantir que itens do Select sejam visíveis */
+  [data-radix-select-item] {
+    background-color: white !important;
+  }
+  
+  [data-radix-select-item][data-highlighted] {
+    background-color: hsl(var(--accent)) !important;
+  }
+
+  /* Garantir que o backdrop do Dialog não afete dropdowns */
+  [data-radix-dialog-overlay] {
+    z-index: 40 !important;
+  }
+  
+  [data-radix-alert-dialog-overlay] {
+    z-index: 40 !important;
+  }
+  
+  /* Forçar pointer-events para permitir cliques em dropdowns */
+  [data-radix-select-content],
+  [data-radix-dropdown-menu-content],
+  [data-radix-popover-content] {
+    pointer-events: auto !important;
+  }
+}
+
+/* Dark mode - garantir que dropdowns sejam visíveis */
+.dark [data-radix-select-content],
+.dark [data-radix-dropdown-menu-content] {
+  background-color: hsl(var(--popover)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark [data-radix-select-item] {
+  background-color: transparent !important;
+}
+
+.dark [data-radix-select-item][data-highlighted] {
+  background-color: hsl(var(--accent)) !important;
+}
+
+/* Drawer - Garantir que backdrop não afete dropdowns */
+[data-vaul-drawer-wrapper] [data-slot="drawer-overlay"] {
+  z-index: 40 !important;
+}
+
+[data-vaul-drawer-wrapper] [data-slot="drawer-content"] {
+  z-index: 100 !important;
+  background-color: white !important;
+  opacity: 1 !important;
+}
+
+/* Garantir que o conteúdo do Drawer seja clicável */
+[data-slot="drawer-content"] * {
+  pointer-events: auto !important;
 }

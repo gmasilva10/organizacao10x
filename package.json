@@ -1,26 +1,26 @@
 {
-  "name": "organizacao10x",
-  "version": "0.3.1-dev",
-  "description": "Sistema de organização para academias e personal trainers",
-  "private": true,
-  "type": "module",
-  "workspaces": [
-    "web"
-  ],
-  "scripts": {
-    "dev:web": "npm run dev -w web",
-    "build:web": "npm run build -w web",
-    "lint:web": "npm run lint -w web",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
-  },
-  "dependencies": {
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.55.0",
-    "three-globe": "^2.44.0"
-  },
-  "devDependencies": {
-    "vitest": "^2.0.5"
-  }
+    "name":  "organizacao10x",
+    "version":  "0.3.1-dev",
+    "description":  "Sistema de organizacao para academias e personal trainers",
+    "private":  true,
+    "type":  "module",
+    "workspaces":  [
+                       "web"
+                   ],
+    "scripts":  {
+                    "dev:web":  "npm run dev -w web",
+                    "build:web":  "npm run build -w web",
+                    "lint:web":  "npm --prefix web run lint",
+                    "test":  "vitest run",
+                    "test:watch":  "vitest",
+                    "coverage":  "vitest run --coverage"
+                },
+    "dependencies":  {
+                         "@supabase/ssr":  "^0.6.1",
+                         "@supabase/supabase-js":  "^2.55.0",
+                         "three-globe":  "^2.44.0"
+                     },
+    "devDependencies":  {
+                            "vitest":  "^2.0.5"
+                        }
 }

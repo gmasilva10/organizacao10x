@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { KanbanChecklist } from './KanbanChecklist'
 import { KanbanLogDrawer } from './KanbanLogDrawer'
+import { useToast } from '@/components/ui/toast'
 
 interface Card {
   id: string
@@ -45,6 +46,7 @@ export function KanbanCardEditor({
   updateCardProgress 
 }: KanbanCardEditorProps) {
   const [activeTab, setActiveTab] = useState<EditorTab>('checklist')
+  const { success: toastSuccess, error: toastError } = useToast()
 
   // P2-02: Função para registrar logs de auditoria das abas
   const logTabOpen = async (tabName: string) => {
@@ -191,10 +193,10 @@ export function KanbanCardEditor({
       setAdvanceConfirmOpen(false)
       onClose()
       
-      // Toast de sucesso (será implementado pelo parent)
+      toastSuccess(`Card avançado com sucesso: Este card foi movido para ${nextColumn.title}.`)
     } catch (error) {
       console.error('Erro ao avançar:', error)
-      // TODO: mostrar toast de erro
+      toastError(error instanceof Error ? error.message : "Não foi possível avançar o card.")
     } finally {
       setIsAdvancing(false)
     }
@@ -249,10 +251,10 @@ export function KanbanCardEditor({
       setCompleteConfirmOpen(false)
       onClose()
       
-      // Toast de sucesso (será implementado pelo parent)
+      toastSuccess("Onboarding encerrado com sucesso: O card foi movido para histórico e o onboarding foi finalizado.")
     } catch (error) {
       console.error('Erro ao encerrar:', error)
-      // TODO: mostrar toast de erro
+      toastError(error instanceof Error ? error.message : "Não foi possível encerrar o onboarding.")
     } finally {
       setIsCompleting(false)
     }
@@ -263,7 +265,7 @@ export function KanbanCardEditor({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden [&>button]:hidden">
+        <DialogContent className="max-w-4xl max-h-[80vh] p-0 flex flex-col overflow-hidden [&>button]:hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="flex-1">
@@ -554,7 +556,7 @@ export function KanbanCardEditor({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between border-t pt-4">
+          <div className="flex items-center justify-between border-t pt-4 px-6 pb-6">
             <div className="text-sm text-muted-foreground">
               <kbd className="px-2 py-1 bg-muted rounded text-xs">E</kbd> Checklist • 
               <kbd className="px-2 py-1 bg-muted rounded text-xs ml-2">L</kbd> Log • 
@@ -570,6 +572,31 @@ export function KanbanCardEditor({
               >
                 <Edit className="h-4 w-4" />
                 Editar Aluno
+              </Button>
+
+              {/* Botão Excluir Card */}
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={async () => {
+                  const ok = window.confirm('Excluir este card? Esta ação não pode ser desfeita.')
+                  if (!ok) return
+                  try {
+                    const res = await fetch(`/api/kanban/items/${card.id}`, { method: 'DELETE' })
+                    if (!res.ok) {
+                      const msg = (await res.json().catch(()=>({error:'Erro'}))).error || 'Erro ao excluir card'
+                      throw new Error(msg)
+                    }
+                    onClose()
+                    // Dispara evento de atualização do board
+                    window.dispatchEvent(new CustomEvent('kanban:invalidateCache'))
+                  } catch (e) {
+                    console.error(e)
+                  }
+                }}
+              >
+                <X className="h-4 w-4" />
+                Excluir
               </Button>
               
               {!isLastColumn && (

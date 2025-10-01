@@ -1,4 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+﻿# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
 /node_modules
@@ -12,6 +12,12 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+*.webm
+*.zip
+debug-*.html
+teste-*.html
 
 # next.js
 /.next/
@@ -33,9 +39,17 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# Playwright / test artifacts
+test-results/
+playwright-report/
+.playwright/
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+!.env.example
+

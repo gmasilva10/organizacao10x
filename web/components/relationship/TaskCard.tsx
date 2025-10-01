@@ -39,7 +39,7 @@ interface Task {
   anchor: string
   scheduled_for: string
   channel: string
-  status: 'pending' | 'due_today' | 'sent' | 'snoozed' | 'skipped' | 'failed'
+  status: 'pending' | 'sent' | 'postponed' | 'skipped' | 'deleted'
   payload: {
     message: string
     student_name: string
@@ -77,9 +77,9 @@ const CHANNEL_ICONS = {
 const STATUS_COLORS = {
   pending: 'bg-yellow-500',
   sent: 'bg-green-500',
-  snoozed: 'bg-blue-500',
+  postponed: 'bg-blue-500',
   skipped: 'bg-gray-500',
-  failed: 'bg-red-500'
+  deleted: 'bg-red-500'
 }
 
 export default function TaskCard({ 
@@ -187,17 +187,17 @@ export default function TaskCard({
             className={`text-xs px-2 py-0.5 capitalize ${
               task.status === 'pending' ? 'border-yellow-500 text-yellow-700' :
               task.status === 'sent' ? 'border-green-500 text-green-700' :
-              task.status === 'snoozed' ? 'border-blue-500 text-blue-700' :
+              task.status === 'postponed' ? 'border-blue-500 text-blue-700' :
               task.status === 'skipped' ? 'border-gray-500 text-gray-700' :
-              task.status === 'failed' ? 'border-red-500 text-red-700' :
+              task.status === 'deleted' ? 'border-red-500 text-red-700' :
               'border-gray-500 text-gray-700'
             }`}
           >
             {task.status === 'pending' ? 'Pendente' :
              task.status === 'sent' ? 'Enviada' :
-             task.status === 'snoozed' ? 'Adiada' :
+             task.status === 'postponed' ? 'Adiada' :
              task.status === 'skipped' ? 'Pulada' :
-             task.status === 'failed' ? 'Falhou' :
+             task.status === 'deleted' ? 'Excluída' :
              'Desconhecido'}
           </Badge>
         </div>

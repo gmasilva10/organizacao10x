@@ -16,6 +16,12 @@ export async function GET(request: Request) {
   // if (!canRead(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+  const readV2 = process.env.REL_TEMPLATES_V2_READ === '1'
+  if (readV2) {
+    const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?tenant_id=eq.${tenantId}&order=priority.asc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+    const itemsV2 = await respV2.json().catch(()=>[])
+    return NextResponse.json({ items: itemsV2 })
+  }
   const resp = await fetch(`${url}/rest/v1/relationship_templates?tenant_id=eq.${tenantId}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
   const items = await resp.json().catch(()=>[])
   
@@ -88,19 +94,39 @@ export async function POST(request: Request) {
     variables: body.variables || []
   }
   
-  const row = { 
+  const rowMVP = { 
     tenant_id: tenantId, 
     title: String(body.title||''), 
-    type: 'whatsapp', // Tipo fixo por enquanto
-    content: JSON.stringify(templateData) // Armazenar dados completos no content
+    type: 'whatsapp',
+    content: JSON.stringify(templateData)
   }
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const resp = await fetch(`${url}/rest/v1/relationship_templates`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=representation' }, body: JSON.stringify(row) })
-  if (!resp.ok) return NextResponse.json({ error: 'insert_failed' }, { status: 500 })
-  const data = await resp.json().catch(()=>[])
-  await logEvent({ tenantId: tenantId, userId: userId, eventType: 'feature.used', payload: { feature: 'relationship.template.created', id: data?.[0]?.id } })
-  return NextResponse.json({ ok: true, id: data?.[0]?.id || null })
+  const respMVP = await fetch(`${url}/rest/v1/relationship_templates`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=representation' }, body: JSON.stringify(rowMVP) })
+  if (!respMVP.ok) return NextResponse.json({ error: 'insert_failed_mvp' }, { status: 500 })
+  const dataMVP = await respMVP.json().catch(()=>[])
+  
+  // Dual-write v2 (best-effort)
+  const rowV2 = {
+    tenant_id: tenantId,
+    code: templateData.code,
+    anchor: templateData.anchor,
+    touchpoint: templateData.touchpoint,
+    suggested_offset: templateData.suggested_offset,
+    channel_default: templateData.channel_default,
+    message_v1: templateData.message_v1,
+    message_v2: templateData.message_v2 || null,
+    active: templateData.active,
+    priority: templateData.priority,
+    audience_filter: templateData.audience_filter,
+    variables: templateData.variables
+  }
+  try {
+    await fetch(`${url}/rest/v1/relationship_templates_v2`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates,return=representation' }, body: JSON.stringify(rowV2) })
+  } catch {}
+
+  await logEvent({ tenantId: tenantId, userId: userId, eventType: 'feature.used', payload: { feature: 'relationship.template.created', id: dataMVP?.[0]?.id } })
+  return NextResponse.json({ ok: true, id: dataMVP?.[0]?.id || null })
 }
 
 

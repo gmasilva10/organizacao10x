@@ -82,7 +82,7 @@ export async function PATCH(
       const { data: existingPlan, error: checkError } = await supabase
         .from('plans')
         .select('id')
-        .eq('tenant_id', ctx.tenantId)
+        .eq('org_id', ctx.tenantId)
         .eq('plan_code', b.plan_code)
         .neq('id', params.id)
         .single()
@@ -113,7 +113,7 @@ export async function PATCH(
       .from('plans')
       .update(updateData)
       .eq('id', params.id)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .select()
       .single()
 
@@ -157,7 +157,7 @@ export async function DELETE(
       .from('plans')
       .select('id, plan_code')
       .eq('id', params.id)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (checkError) {
@@ -193,7 +193,7 @@ export async function DELETE(
       .from('plans')
       .delete()
       .eq('id', params.id)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
 
     if (error) {
       console.error('Erro ao deletar plano:', error)

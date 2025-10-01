@@ -47,13 +47,8 @@ export async function middleware(request: NextRequest) {
         return next
       }
       
-      // TEMPORÁRIO: Definir organização padrão para resolver o problema
-      const next = NextResponse.next()
-      try { 
-        next.cookies.set("pg.active_org", "fb381d42-9cf8-41d9-b0ab-fdb706a85ae7", { path: "/", sameSite: "lax", httpOnly: true }) 
-        console.log('Cookie de organização definido temporariamente')
-      } catch {}
-      return next
+      // Redirecionar para seleção de organização se não houver org ativa
+      return NextResponse.redirect(new URL('/app/team?selectOrg=true', request.url))
     }
   } catch {}
 
@@ -62,7 +57,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$|api/whatsapp).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$|api/whatsapp|api/wa/webhook).*)",
   ],
 }
 

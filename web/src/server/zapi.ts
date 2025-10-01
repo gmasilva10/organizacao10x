@@ -53,9 +53,10 @@ export async function zapiCreateGroup(groupName: string, phones: string[], autoI
   const payload = { groupName, phones, autoInvite }
   const body = JSON.stringify(payload)
   
-  // Debug: log what we're sending
-  console.log('🔍 Z-API create-group payload:', JSON.stringify(payload, null, 2))
-  console.log('🔍 Z-API create-group URL:', url)
+  if (process.env.DEBUG_LOGS === '1') {
+    console.log('🔍 Z-API create-group payload:', JSON.stringify(payload, null, 2))
+    console.log('🔍 Z-API create-group URL:', url)
+  }
   
   try {
     const res = await fetchWithTimeout(url, { method: "POST", headers: getHeaders(), body })

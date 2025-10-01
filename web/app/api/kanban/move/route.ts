@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Transação atômica: mover card e atualizar posições
+    // Transação atômica via RPC; se indisponível, aplicar fallback simples
     const { error: transactionError } = await supabase.rpc('move_kanban_card', {
       p_card_id: cardId,
       p_from_stage_id: fromColumnId,
@@ -143,13 +143,31 @@ export async function POST(request: NextRequest) {
     })
 
     if (transactionError) {
-      console.error(`❌ [${requestId}] Erro na transação:`, transactionError)
-      return NextResponse.json({ 
-        error: 'Erro interno', 
-        code: 'TRANSACTION_FAILED',
-        detail: transactionError.message,
-        requestId 
-      }, { status: 500 })
+      console.warn(`⚠️ [${requestId}] RPC move_kanban_card falhou, aplicando fallback:`, transactionError?.message)
+      // Fallback: atualizar stage_id diretamente e posicionar no final da coluna destino
+      const { data: maxPosData } = await supabase
+        .from('kanban_items')
+        .select('position')
+        .eq('org_id', card.org_id)
+        .eq('stage_id', toColumnId)
+        .order('position', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      const nextPos = (maxPosData?.position || 0) + 1
+      const { error: updErr } = await supabase
+        .from('kanban_items')
+        .update({ stage_id: toColumnId, position: nextPos })
+        .eq('id', cardId)
+        .eq('org_id', card.org_id)
+      if (updErr) {
+        console.error(`❌ [${requestId}] Fallback também falhou:`, updErr)
+        return NextResponse.json({ 
+          error: 'Erro interno', 
+          code: 'TRANSACTION_FAILED',
+          detail: updErr.message,
+          requestId 
+        }, { status: 500 })
+      }
     }
 
     console.log(`✅ [${requestId}] Card movido com sucesso:`, { 

@@ -8,6 +8,13 @@ export const revalidate = 0;
 
 
 export async function POST(request: NextRequest) {
+  // Guard: somente disponível em dev ou quando explicitamente habilitado
+  if (
+    process.env.NODE_ENV !== 'development' &&
+    process.env.ENABLE_DEBUG_ROUTES !== '1'
+  ) {
+    return NextResponse.json({ error: 'Debug endpoint disabled' }, { status: 403 })
+  }
   try {
     const supabase = await createClientAdmin()
     

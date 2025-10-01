@@ -1,11 +1,11 @@
-/**
+﻿/**
  * GATE 10.6.2 - Motor de Relacionamento
- * Job diário 03:00 para gerar/atualizar tarefas em lote
+ * Job diÃ¡rio 03:00 para gerar/atualizar tarefas em lote
  * 
  * Funcionalidades:
- * - Queries únicas por âncora + índices
- * - Rate limiting (máx. N tarefas/dia por aluno)
- * - Dedup por chave lógica
+ * - Queries Ãºnicas por Ã¢ncora + Ã­ndices
+ * - Rate limiting (mÃ¡x. N tarefas/dia por aluno)
+ * - Dedup por chave lÃ³gica
  * - Telemetria e logs
  */
 
@@ -21,64 +21,17 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Rate limiting: máximo de tarefas por aluno por dia
+// Rate limiting: mÃ¡ximo de tarefas por aluno por dia
 const MAX_TASKS_PER_STUDENT_PER_DAY = 3
 
-// EVENT_REGISTRY com queries otimizadas
-const EVENT_QUERIES = {
-  sale_close: `
-    SELECT s.id, s.name, s.email, s.phone, s.created_at as anchor_date, s.tenant_id
-    FROM students s
-    WHERE s.status = 'active' 
-    AND s.created_at::date = CURRENT_DATE
-    AND s.tenant_id = $1
-  `,
-  
-  first_workout: `
-    SELECT s.id, s.name, s.email, s.phone, s.created_at as anchor_date, s.tenant_id
-    FROM students s
-    WHERE s.status = 'active'
-    AND s.created_at::date = CURRENT_DATE - INTERVAL '1 day'
-    AND s.tenant_id = $1
-  `,
-  
-  weekly_followup: `
-    SELECT s.id, s.name, s.email, s.phone, s.created_at as anchor_date, s.tenant_id
-    FROM students s
-    WHERE s.status = 'active'
-    AND s.created_at::date = CURRENT_DATE - INTERVAL '7 days'
-    AND s.tenant_id = $1
-  `,
-  
-  monthly_review: `
-    SELECT s.id, s.name, s.email, s.phone, s.created_at as anchor_date, s.tenant_id
-    FROM students s
-    WHERE s.status = 'active'
-    AND EXTRACT(DAY FROM s.created_at) = EXTRACT(DAY FROM CURRENT_DATE)
-    AND EXTRACT(MONTH FROM s.created_at) = EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL '1 month')
-    AND s.tenant_id = $1
-  `,
-  
-  birthday: `
-    SELECT s.id, s.name, s.email, s.phone, s.birth_date as anchor_date, s.tenant_id
-    FROM students s
-    WHERE s.status IN ('active', 'onboarding')
-    AND s.birth_date IS NOT NULL
-    AND EXTRACT(MONTH FROM s.birth_date) = EXTRACT(MONTH FROM CURRENT_DATE)
-    AND EXTRACT(DAY FROM s.birth_date) = EXTRACT(DAY FROM CURRENT_DATE)
-    AND s.tenant_id = $1
-  `,
-  
-  renewal_window: `
-    SELECT s.id, s.name, s.email, s.phone, s.created_at as anchor_date, s.tenant_id
-    FROM students s
-    WHERE s.status = 'active'
-    AND s.created_at::date BETWEEN CURRENT_DATE - INTERVAL '7 days' AND CURRENT_DATE
-    AND s.tenant_id = $1
-  `
-} as const
-
-type EventCode = keyof typeof EVENT_QUERIES
+type EventCode =
+  | 'sale_close'
+  | 'first_workout'
+  | 'weekly_followup'
+  | 'monthly_review'
+  | 'birthday'
+  | 'renewal_window'
+  | 'occurrence_followup'
 
 interface StudentData {
   id: string
@@ -92,13 +45,14 @@ interface StudentData {
 interface TemplateData {
   id: string
   code: string
-  anchor: string
+  anchor: EventCode
   suggested_offset: string
   channel_default: string
   message_v1: string
-  message_v2: string
+  message_v2?: string
   audience_filter: any
   variables: string[]
+  active: boolean
 }
 
 interface TaskStats {
@@ -112,7 +66,7 @@ interface TaskStats {
 }
 
 /**
- * Aplicar filtros de audiência em memória
+ * Aplicar filtros de audiÃªncia em memÃ³ria
  */
 function applyAudienceFilter(students: StudentData[], filter: any): StudentData[] {
   if (!filter || Object.keys(filter).length === 0) {
@@ -122,18 +76,18 @@ function applyAudienceFilter(students: StudentData[], filter: any): StudentData[
   return students.filter(student => {
     // Filtro por status (se especificado)
     if (filter.status && Array.isArray(filter.status)) {
-      // Para simplificar, assumimos que todos os alunos retornados são 'active'
-      // Em implementação real, você verificaria o status real do aluno
+      // Para simplificar, assumimos que todos os alunos retornados sÃ£o 'active'
+      // Em implementaÃ§Ã£o real, vocÃª verificaria o status real do aluno
     }
 
     // Filtro por tags (se especificado)
     if (filter.tags && Array.isArray(filter.tags)) {
-      // Implementar filtro por tags quando disponível
+      // Implementar filtro por tags quando disponÃ­vel
     }
 
     // Filtro por trainer_id (se especificado)
     if (filter.trainer_id) {
-      // Implementar filtro por trainer quando disponível
+      // Implementar filtro por trainer quando disponÃ­vel
     }
 
     return true
@@ -163,12 +117,12 @@ function calculateScheduledDate(anchorDate: string, offset: string): Date {
 }
 
 /**
- * Renderizar mensagem com variáveis
+ * Renderizar mensagem com variÃ¡veis
  */
 function renderMessage(template: string, student: StudentData): string {
   let message = template
   
-  // Substituir variáveis básicas
+  // Substituir variÃ¡veis bÃ¡sicas
   message = message.replace(/\[Nome do Cliente\]/g, student.name)
   message = message.replace(/\[Nome\]/g, student.name)
   message = message.replace(/\[PrimeiroNome\]/g, student.name.split(' ')[0])
@@ -198,8 +152,245 @@ async function checkRateLimit(studentId: string, tenantId: string): Promise<bool
   return (count || 0) < MAX_TASKS_PER_STUDENT_PER_DAY
 }
 
+function startOfDayISO(date = new Date()) {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  return d.toISOString()
+}
+
+function endOfDayISO(date = new Date()) {
+  const d = new Date(date)
+  d.setHours(23, 59, 59, 999)
+  return d.toISOString()
+}
+
+// Buscar alunos elegÃ­veis por Ã¢ncora sem usar RPCs
+async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Promise<StudentData[]> {
+  // New implementation without RPC execute_sql
+  const students = await fetchStudentsForAnchor(anchor, tenantId)
+  if (!students || students.length === 0) {
+    return { created, updated, skipped, errors }
+  }
+
+  for (const template of anchorTemplates) {
+    const filteredStudents = applyAudienceFilter(students as any, template.audience_filter)
+    for (const student of filteredStudents) {
+      try {
+        const canCreate = await checkRateLimit(student.id, tenantId)
+        if (!canCreate) {
+          skipped++
+          continue
+        }
+
+        const scheduledDate = calculateScheduledDate(student.anchor_date, template.suggested_offset)
+
+        const dayStart = new Date(scheduledDate)
+        dayStart.setHours(0, 0, 0, 0)
+        const dayEnd = new Date(scheduledDate)
+        dayEnd.setHours(23, 59, 59, 999)
+
+        const { data: existingTask } = await supabase
+          .from('relationship_tasks')
+          .select('id')
+          .eq('student_id', student.id)
+          .eq('template_code', template.code)
+          .eq('anchor', anchor)
+          .gte('scheduled_for', dayStart.toISOString())
+          .lt('scheduled_for', dayEnd.toISOString())
+          .maybeSingle()
+
+        if (existingTask) {
+          const renderedMessage = renderMessage(template.message_v1, student)
+          const { error: updateError } = await supabase
+            .from('relationship_tasks')
+            .update({
+              payload: {
+                message: renderedMessage,
+                student_name: student.name,
+                student_email: student.email,
+                student_phone: student.phone
+              },
+              variables_used: template.variables,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingTask.id)
+          if (updateError) {
+            errors.push(`Erro ao atualizar tarefa para ${student.name}: ${updateError.message}`)
+          } else {
+            updated++
+          }
+        } else {
+          const renderedMessage = renderMessage(template.message_v1, student)
+          const { data: inserted, error: insertError } = await supabase
+            .from('relationship_tasks')
+            .insert({
+              student_id: student.id,
+              template_code: template.code,
+              anchor: anchor,
+              scheduled_for: scheduledDate.toISOString(),
+              channel: template.channel_default,
+              status: 'pending',
+              payload: {
+                message: renderedMessage,
+                student_name: student.name,
+                student_email: student.email,
+                student_phone: student.phone
+              },
+              variables_used: template.variables,
+              created_by: 'system'
+            })
+            .select('id')
+            .single()
+          if (insertError) {
+            errors.push(`Erro ao criar tarefa para ${student.name}: ${insertError.message}`)
+          } else {
+            created++
+            const taskId = inserted?.id
+            if (taskId) {
+              await supabase
+                .from('relationship_logs')
+                .insert({
+                  student_id: student.id,
+                  task_id: taskId,
+                  action: 'created',
+                  channel: template.channel_default,
+                  template_code: template.code,
+                  meta: { anchor, scheduled_for: scheduledDate.toISOString() }
+                })
+            }
+          }
+        }
+      } catch (e: any) {
+        errors.push(`Erro ao processar aluno ${student.name}: ${e?.message || String(e)}`)
+      }
+    }
+  }
+
+  return { created, updated, skipped, errors }
+    if (anchor === 'sale_close') {
+      const { data, error } = await supabase
+        .from('students')
+        .select('id, name, email, phone, created_at, tenant_id')
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active')
+        .gte('created_at', startOfDayISO())
+        .lte('created_at', endOfDayISO())
+      if (error) return []
+      return (data || []).map((s: any) => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        phone: s.phone,
+        anchor_date: s.created_at,
+        tenant_id: s.tenant_id,
+      }))
+    }
+
+    if (anchor === 'birthday') {
+      const { data, error } = await supabase
+        .from('students')
+        .select('id, name, email, phone, birth_date, tenant_id')
+        .eq('tenant_id', tenantId)
+        .not('birth_date', 'is', null)
+      if (error) return []
+      const today = new Date()
+      const m = today.getMonth() + 1
+      const d = today.getDate()
+      return (data || [])
+        .filter((s: any) => {
+          if (!s.birth_date) return false
+          const bd = new Date(s.birth_date)
+          return bd.getMonth() + 1 === m && bd.getDate() === d
+        })
+        .map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          email: s.email,
+          phone: s.phone,
+          anchor_date: s.birth_date,
+          tenant_id: s.tenant_id,
+        }))
+    }
+
+    if (anchor === 'occurrence_followup') {
+      const { data: occs, error: occErr } = await supabase
+        .from('student_occurrences')
+        .select('student_id, reminder_at, tenant_id')
+        .eq('tenant_id', tenantId)
+        .gte('reminder_at', startOfDayISO())
+        .lte('reminder_at', endOfDayISO())
+      if (occErr || !occs || occs.length === 0) return []
+
+      const studentIds = Array.from(new Set(occs.map((o: any) => o.student_id)))
+      const { data: students, error: stuErr } = await supabase
+        .from('students')
+        .select('id, name, email, phone, tenant_id')
+        .in('id', studentIds)
+      if (stuErr) return []
+      const map = new Map<string, any>()
+      for (const s of students || []) map.set(s.id, s)
+
+      return occs
+        .map((o: any) => {
+          const s = map.get(o.student_id)
+          if (!s) return null
+          return {
+            id: s.id,
+            name: s.name,
+            email: s.email,
+            phone: s.phone,
+            anchor_date: o.reminder_at,
+            tenant_id: s.tenant_id,
+          } as StudentData
+        })
+        .filter(Boolean) as StudentData[]
+    }
+
+    // first_workout, weekly_followup, monthly_review, renewal_window
+    // Campos podem nÃ£o existir ainda; retornar vazio
+    return []
+  } catch {
+    return []
+  }
+}
+
+// Carregar templates ativos da tabela MVP (JSON em content)
+async function fetchActiveTemplates(tenantId: string): Promise<TemplateData[]> {
+  const { data, error } = await supabase
+    .from('relationship_templates')
+    .select('id, tenant_id, content')
+    .eq('tenant_id', tenantId)
+  if (error || !data) return []
+
+  const templates: TemplateData[] = []
+  for (const row of data) {
+    try {
+      const parsed = JSON.parse((row as any).content || '{}')
+      if (!parsed || parsed.active !== true) continue
+      const anchor = parsed.anchor as EventCode
+      const code = String(parsed.code || '')
+      if (!code || !anchor) continue
+      templates.push({
+        id: (row as any).id,
+        code,
+        anchor,
+        suggested_offset: String(parsed.suggested_offset || '+0d'),
+        channel_default: String(parsed.channel_default || 'whatsapp'),
+        message_v1: String(parsed.message_v1 || ''),
+        message_v2: parsed.message_v2 ? String(parsed.message_v2) : undefined,
+        audience_filter: parsed.audience_filter || {},
+        variables: Array.isArray(parsed.variables) ? parsed.variables : [],
+        active: true,
+      })
+    } catch {
+      // ignora linhas invÃ¡lidas
+    }
+  }
+  return templates
+}
+
 /**
- * Processar uma âncora específica
+ * Processar uma Ã¢ncora especÃ­fica
  */
 async function processAnchor(
   anchor: EventCode,
@@ -217,15 +408,11 @@ async function processAnchor(
   const errors: string[] = []
 
   try {
-    // Buscar alunos para esta âncora
+    // Buscar alunos para esta Ã¢ncora
     const { data: students, error: studentsError } = await supabase
-      .rpc('execute_sql', {
-        query: EVENT_QUERIES[anchor],
-        params: [tenantId]
-      })
 
     if (studentsError) {
-      errors.push(`Erro ao buscar alunos para âncora ${anchor}: ${studentsError.message}`)
+      errors.push(`Erro ao buscar alunos para Ã¢ncora ${anchor}: ${studentsError.message}`)
       return { created, updated, skipped, errors }
     }
 
@@ -233,9 +420,9 @@ async function processAnchor(
       return { created, updated, skipped, errors }
     }
 
-    // Processar cada template desta âncora
+    // Processar cada template desta Ã¢ncora
     for (const template of anchorTemplates) {
-      // Aplicar filtros de audiência
+      // Aplicar filtros de audiÃªncia
       const filteredStudents = applyAudienceFilter(students, template.audience_filter)
 
       for (const student of filteredStudents) {
@@ -250,7 +437,7 @@ async function processAnchor(
           // Calcular data agendada
           const scheduledDate = calculateScheduledDate(student.anchor_date, template.suggested_offset)
           
-          // Verificar se já existe tarefa para este aluno/template/data
+          // Verificar se jÃ¡ existe tarefa para este aluno/template/data
           const { data: existingTask } = await supabase
             .from('relationship_tasks')
             .select('id')
@@ -319,7 +506,7 @@ async function processAnchor(
       }
     }
   } catch (error) {
-    errors.push(`Erro geral ao processar âncora ${anchor}: ${error.message}`)
+    errors.push(`Erro geral ao processar Ã¢ncora ${anchor}: ${error.message}`)
   }
 
   return { created, updated, skipped, errors }
@@ -329,7 +516,7 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    // Verificar se é chamada autorizada (cron job ou admin)
+    // Verificar se Ã© chamada autorizada (cron job ou admin)
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET || 'default-secret'
     
@@ -342,19 +529,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'tenant_id required' }, { status: 400 })
     }
 
-    // Buscar templates ativos
-    const { data: templates, error: templatesError } = await supabase
-      .from('relationship_templates_v2')
-      .select('*')
-      .eq('active', true)
-      .order('priority')
-
-    if (templatesError) {
-      return NextResponse.json({ 
-        error: 'Failed to fetch templates', 
-        details: templatesError.message 
-      }, { status: 500 })
-    }
+    // Buscar templates ativos (MVP via JSON em content)
+    const templates = await fetchActiveTemplates(tenant_id)
 
     if (!templates || templates.length === 0) {
       return NextResponse.json({ 
@@ -372,7 +548,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Processar cada âncora
+    // Processar cada Ã¢ncora
     const stats: TaskStats = {
       templates_processed: templates.length,
       students_found: 0,
@@ -395,20 +571,6 @@ export async function POST(request: NextRequest) {
 
     stats.duration_ms = Date.now() - startTime
 
-    // Log do resumo
-    await supabase
-      .from('relationship_logs')
-      .insert({
-        student_id: null,
-        action: 'recalculated',
-        channel: 'system',
-        meta: {
-          tenant_id,
-          stats,
-          job_type: 'daily_03_00'
-        }
-      })
-
     return NextResponse.json({
       success: true,
       message: 'Job executed successfully',
@@ -421,8 +583,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: 'Internal server error',
-      details: error.message,
+      details: (error as any)?.message || String(error),
       duration_ms: Date.now() - startTime
     }, { status: 500 })
   }
 }
+

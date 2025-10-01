@@ -140,3 +140,64 @@
  [ 2 0 2 5 - 0 1 - 3 0   1 4 : 3 0   B R T ]   D E V     G A T E   E - 1 0 . 1     M ï¿½ D U L O   1   E Q U I P E / P R O F I S S I O N A I S   C O N C L U ï¿½ D O     M i g r a ï¿½ ï¿½ o   i s _ a c t i v e   a p l i c a d a ,   e n d p o i n t s   P A T C H / G E T   i m p l e m e n t a d o s ,   t o g g l e   f u n c i o n a l   n a   t a b e l a ,   b u s c a   c o m   d e b o u n c e   3 0 0 m s ,   i n t e g r a ï¿½ ï¿½ o   R e s p o n s ï¿½ v e i s   f u n c i o n a n d o     e v i d ï¿½ n c i a s :   w e b / e v i d e n c i a s / g a t e - e - 1 0 - 1 - e q u i p e - p r o f i s s i o n a i s . m d 
  
  
+ [ 2 0 2 5 - 0 9 - 3 0   1 0 : 4 0   B R T ]   D E V   â ¬  
+ G A T E  
+ 1 0 . 7  
+ â ¬   R E F O R M U L A Ã ! Ã ’O   M Ã D U L O  
+ R E L A C I O N A M E N T O  
+ â ¬   C o l u n a s   d i n Ã ¢ m i c a s   ( A t r a s a d a s / H o j e / P e n d e n t e s ) ,   t i m e z o n e   A m e r i c a / S a o _ P a u l o ,   s o f t   d e l e t e   c o m   U n d o   ( 5 s ) ,   f i l t r o   p a d r Ã £ o   h o j e ,   o r d e n a Ã § Ã £ o   s c h e d u l e d _ f o r   A S C   +   c r e a t e d _ a t   A S C   â ¬  
+ a r q u i v o s :  
+ s u p a b a s e / m i g r a t i o n s / 2 0 2 5 0 9 3 0 _ r e l a t i o n s h i p _ s t a t u s _ s t a n d a r d i z a t i o n . s q l  
+ w e b / l i b / d a t e - u t i l s . t s  
+ w e b / _ _ t e s t s _ _ / u n i t / l i b / d a t e - u t i l s . t e s t . t s  
+ w e b / a p p / a p i / r e l a t i o n s h i p / t a s k s / r o u t e . t s  
+ w e b / a p p / a p i / r e l a t i o n s h i p / t a s k s / [ i d ] / r o u t e . t s  
+ w e b / a p p / a p i / r e l a t i o n s h i p / t a s k s / [ i d ] / u n d o / r o u t e . t s  
+ w e b / h o o k s / u s e R e l a t i o n s h i p F i l t e r s . t s  
+ w e b / c o m p o n e n t s / r e l a t i o n s h i p / R e l a t i o n s h i p K a n b a n . t s x  
+ w e b / c o m p o n e n t s / r e l a t i o n s h i p / T a s k C a r d . t s x  
+ â ¬   e v i d Ã ª n c i a s :   C h e c k l i s t _ R e l e a s e _ V a l i d a t i o n . t x t   c o m   9   c r i t Ã © r i o s   d e   a c e i t e  
+ 
+[2025-09-30 10:45 BRT] DEV - GATE 10.7.1 - HOTFIX GLOBAL - Dropdowns transparentes em modais corrigido - z-index Select/Dropdown/Tooltip alterado de z-50 para z-100 - arquivos: web/components/ui/select.tsx, dropdown-menu.tsx, tooltip.tsx, globals.css - evidencias: web/evidencias/GATE_10.7.1_DROPDOWN_MODALS_FIX.md
+
+[2025-09-30 12:20 BRT] DEV - GATE 10.7.1 (V2) - CORRECAO AGRESSIVA - Dropdowns em modais - backdrop-blur removido, z-index aumentado para 9999, bg-white forcado, overflow corrigido em 11 modais - arquivos: web/components/ui/dialog.tsx, select.tsx, dropdown-menu.tsx, alert-dialog.tsx, globals.css + 11 modais - teste: Ctrl+Shift+R obrigatorio
+
+[2025-09-30 12:25 BRT] DEV - GATE 10.7.1 (V3-FINAL) - CORRECAO DRAWER - Drawer de filtros corrigido, z-index Drawer: overlay=40 content=45, Select=9999, overflow-visible em Drawer + scroll interno, backdrop-blur removido de Dialog E Drawer - arquivos: web/components/ui/drawer.tsx, web/app/(app)/app/relationship/page.tsx, web/components/occurrences/OccurrencesFiltersDrawer.tsx, globals.css - teste: CTRL+SHIFT+R obrigatorio
+
+[2025-09-30 12:30 BRT] DEV - GATE 10.7.1 (V4-CRITICAL) - CORRECAO Z-INDEX DRAWER - Bug critico identificado: z-45 invalido no Tailwind, corrigido para z-[100], drawer agora acima do overlay, bg-white forcado, pointer-events auto - arquivos: web/components/ui/drawer.tsx, globals.css
+
+[2025-09-30 13:00 BRT] DEV - GATE 10.7.2 - SIMPLIFICACAO FILTROS RELACIONAMENTO - Removido Drawer antigo desconectado, filtros agora dentro do Kanban usando useRelationshipFilters corretamente, botoes Nova Mensagem e Filtros adicionados, calendario compacto, sem encoding UTF-8, formato brasileiro - arquivos: web/app/(app)/app/relationship/page.tsx (simplificado), web/components/relationship/RelationshipKanban.tsx (Drawer funcional)
+
+[2025-09-30 13:05 BRT] DEV - GATE 10.7.2.HF1 - CORRECAO ERRO getActiveFiltersCount - Hook retornava funcao mas componente chamava novamente, corrigido para retornar callbacks diretamente - arquivos: web/hooks/useRelationshipFilters.ts, web/components/relationship/RelationshipKanban.tsx
+
+[2025-09-30 13:15 BRT] DEV - GATE 10.8 - REFATORACAO MODULO SERVICOS - Cards compactos (5 por linha), Planos renomeado para Financeiro com submodulos (Planos + Categoria), padrao similar ao Anamnese - arquivos: web/app/(app)/app/services/page.tsx, web/app/(app)/app/services/financial/page.tsx (novo), web/components/services/PlansManager.tsx (novo), web/components/services/CategoryManager.tsx (novo)
+
+[2025-09-30 13:20 BRT] DEV - CRIACAO DOCUMENTO PENDENCIAS OUTUBRO - Consolidado 47 pendencias (P0 a P3) para outubro/2025, incluindo seguranca critica, bugs de Relacionamento, implementacao de Categorias Financeiras, estrutura de pastas, tipagem, testes - arquivo: Pendencias_202510.md
+
+[2025-09-30 13:30 BRT] DEV - GATE 10.9 - MODULO CONFIGURACOES - Criado modulo com 2 submÃ³dulos (OrganizaÃ§Ã£o + IntegraÃ§Ãµes), foco em IntegraÃ§Ãµes com teste de conexÃ£o WhatsApp Z-API e Supabase, UI completa com status em tempo real - arquivos: web/app/(app)/app/settings/page.tsx, web/components/settings/OrganizationSettings.tsx, web/components/settings/IntegrationsSettings.tsx, web/app/api/wa/test-connection/route.ts, web/app/api/_health/database/route.ts
+
+[2025-09-30 13:45 BRT] DEV - GATE 10.9.1 - REFATORACAO INTEGRACOES - Removido Supabase e WhatsApp (infraestrutura), foco em integracoes de NEGOCIO (Eduzz + Hotmart), cards com logos padrao Servicos, paginas detalhadas com configuracao de credenciais e webhooks - arquivos: web/components/settings/IntegrationsSettings.tsx (refatorado), web/app/(app)/app/settings/integrations/eduzz/page.tsx (novo), web/app/(app)/app/settings/integrations/hotmart/page.tsx (novo)
+
+[2025-09-30 14:00 BRT] DEV - GATE 10.9.2 - ADICAO WHATSAPP INTEGRACOES - Adicionado WhatsApp como integracao DO CLIENTE (multi-tenant), cada organizacao configura sua propria instancia Z-API, pagina completa com instrucoes passo-a-passo, teste de conexao, custos e limites - arquivos: web/components/settings/IntegrationsSettings.tsx, web/app/(app)/app/settings/integrations/whatsapp/page.tsx (novo)
+
+[2025-09-30 14:10 BRT] DEV - GATE 10.9.3 - LOGOS REAIS INTEGRACOES - Criado estrutura para logos (web/public/integrations/), SVGs placeholder para Eduzz/Hotmart/WhatsApp, codigo atualizado para usar Image do Next.js - arquivos: web/public/integrations/*.svg (3 arquivos), web/components/settings/IntegrationsSettings.tsx (Image component)
+
+[2025-09-30 14:15 BRT] DEV - GATE 10.9.4 - CONFIGURACAO LOGOS INTEGRACOES - Codigo atualizado para usar .png ao inves de .svg, Image component do Next.js, background branco para logos, instrucoes criadas para salvar logos reais - arquivos: IntegrationsSettings.tsx, eduzz/page.tsx, whatsapp/page.tsx, INSTRUCOES_LOGOS.md (novo)
+
+[2025-09-30 14:20 BRT] DEV - GATE 10.9.5 - LOGOS JPG INTEGRACOES - Codigo atualizado para usar .jpg (usuario salvou logos nesse formato), todas as 3 integracoes agora usam logos reais - arquivos: IntegrationsSettings.tsx, whatsapp/page.tsx, eduzz/page.tsx, hotmart/page.tsx
+
+[2025-09-30 14:25 BRT] DEV - GATE 10.9.6 - AJUSTE LOGO WHATSAPP - Logo do WhatsApp aumentada de 48px para 56px no grid e de 56px para 64px na pagina individual para melhor visibilidade - arquivos: IntegrationsSettings.tsx, whatsapp/page.tsx
+
+[2025-09-30 14:30 BRT] DEV - GATE 10.9.7 - AJUSTE LOGO WHATSAPP V2 - Logo WhatsApp aumentada de 56px para 64px + scale-125 (total 25% maior) para equilibrar visualmente com Eduzz/Hotmart - arquivo: IntegrationsSettings.tsx
+
+[2025-09-30 14:35 BRT] DEV - GATE 10.9.8 - ANALISE INTEGRACAO HOTMART - Documento tecnico completo criado com arquitetura multi-tenant, fluxo de webhooks, estrutura de banco (3 tabelas), logica de criacao de aluno, mapeamento de produtos, 6 fases de implementacao, 6 criterios de aceite, estimativa 15-21h - arquivo: web/Estrutura/integracoes/INTEGRACAO_HOTMART.md
+
+[2025-09-30 14:45 BRT] DEV - GATE 10.9 - INTEGRACAO HOTMART COMPLETA (6 FASES) - Migrations (3 tabelas), APIs (connect/status/disconnect/mappings CRUD), Webhook receiver completo (PURCHASE_APPROVED/REFUNDED/CANCELLATION), UI de mapeamentos, payload mock, checklist validacao - arquivos: supabase/migrations/20250930_hotmart_integrations.sql, api/integrations/hotmart/* (4 endpoints), api/webhooks/hotmart/route.ts, settings/integrations/hotmart/mappings/page.tsx, Estrutura/integracoes/* (3 docs) - tempo: 2h30min - pronto para testes
+
+[2025-09-30 15:00 BRT] DEV - GATE 10.9.10 - MIGRATIONS HOTMART APLICADAS + CORRECAO - Migrations aplicadas via MCP Supabase, corrigido para usar service_catalog ao inves de plans (tabela nao existia), codigos atualizados (internal_service_id), student_services vinculado automaticamente ao processar PURCHASE_APPROVED - arquivos: supabase/migrations/20250930_hotmart_integrations.sql, api/integrations/hotmart/mappings (2 arquivos), api/webhooks/hotmart/route.ts, mappings/page.tsx
+
+[2025-09-30 15:10 BRT] DEV - GATE 10.9.11 - CORRECAO CRITICA ESTRUTURA BANCO - Usuario identificou erro grave: service_catalog != plans, tabela plans criada corretamente (planos de venda), migrations Hotmart revertidas e reaplicadas com referencia correta para plans.id - arquivos: supabase/migrations/20250930_plans.sql (novo), hotmart_integrations (corrigido)
+
+[2025-09-30 15:20 BRT] DEV - GATE 10.9.12 - ESTRUTURA CORRIGIDA - Tabela plans criada, integraÃ§Ã£o Hotmart agora mapeia CORRETAMENTE para plans.id (planos de venda), service_catalog preservado apenas para catalogo de serviÃ§os, todos os codigos revertidos e corrigidos - BANCO SEGURO - arquivos: supabase/migrations/20250930_plans.sql (novo), hotmart_integrations.sql (corrigido), todos os endpoints e UIs atualizados
+
+[2025-09-30 15:30 BRT] DEV - GATE 10.9.13 - FERRAMENTA TESTE HOTMART - Criada pagina de testes /settings/integrations/hotmart/test com simulador de webhooks (PURCHASE_APPROVED e REFUNDED), editor de payload JSON, validacao visual de resultados, guia completo de testes com 3 metodos (UI, Postman, Sandbox), queries SQL para debug - arquivos: hotmart/test/page.tsx (novo), hotmart/page.tsx (botao teste), Estrutura/integracoes/GUIA_TESTE_HOTMART.md (novo)
