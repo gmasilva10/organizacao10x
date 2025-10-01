@@ -34,7 +34,7 @@ export function TagsCatalog() {
       // Simular delay de API
       await new Promise(resolve => setTimeout(resolve, 100))
       
-      setTags([...(GUIDELINE_TAGS as any)]))
+      setTags([...(GUIDELINE_TAGS as any)])
       setQueryTime(Date.now() - startTime)
     } catch (error) {
       console.error('Erro ao buscar tags:', error)
