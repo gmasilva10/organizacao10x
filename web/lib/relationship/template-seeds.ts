@@ -151,7 +151,7 @@ export function validateTemplateSeeds() {
     }
     
     // Validar variáveis
-    const { invalid } = validateTemplateVariables(template.variables)
+    const { invalid } = validateTemplateVariables([...template.variables])
     if (invalid.length > 0) {
       errors.push(`Template ${template.code} (index ${index}): variáveis inválidas: ${invalid.join(', ')}`)
     }

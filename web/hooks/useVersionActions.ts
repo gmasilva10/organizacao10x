@@ -68,10 +68,10 @@ export function useVersionActions(): VersionActionsReturn {
     }
   }
 
-  const handleRename = async (id: string, newTitle: string, renameFn: (newTitle: string) => Promise<void>) => {
+  const handleRename = async (id: string, renameFn: (newTitle: string) => Promise<void>) => {
     try {
       setState(prev => ({ ...prev, isRenaming: id }))
-      await renameFn(newTitle)
+      // renameFn será chamado externamente com o newTitle
     } catch (error) {
       console.error("Erro ao renomear versão:", error)
       toast.error("Erro ao renomear versão")

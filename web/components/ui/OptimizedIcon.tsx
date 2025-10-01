@@ -28,7 +28,7 @@ export default function OptimizedIcon({
   )
 
   return (
-    <Suspense fallback={<Fallback className={className} size={size} />}>
+    <Suspense fallback={<Fallback />}>
       <IconComponent className={className} size={size} />
     </Suspense>
   )

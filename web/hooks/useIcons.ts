@@ -23,7 +23,7 @@ export function useIcons() {
   const Save = lazy(() => import('lucide-react').then(module => ({ default: module.Save })))
   const AlertTriangle = lazy(() => import('lucide-react').then(module => ({ default: module.AlertTriangle })))
   const Loader2 = lazy(() => import('lucide-react').then(module => ({ default: module.Loader2 })))
-  const ChevronDown = lazy(() => import('lucide-react').then(module => ({ default: module.Chevrondown })))
+  const ChevronDown = lazy(() => import('lucide-react').then(module => ({ default: module.ChevronDown })))
   const FileText = lazy(() => import('lucide-react').then(module => ({ default: module.FileText })))
   const Target = lazy(() => import('lucide-react').then(module => ({ default: module.Target })))
   const Dumbbell = lazy(() => import('lucide-react').then(module => ({ default: module.Dumbbell })))

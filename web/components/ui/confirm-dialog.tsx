@@ -103,7 +103,12 @@ export function ConfirmDialog({
 // Hook para facilitar o uso
 export function useConfirmDialog() {
   const [open, setOpen] = React.useState(false)
-  const [config, setConfig] = React.useState<Omit<ConfirmDialogProps, 'open' | 'onOpenChange'>>({})
+  const [config, setConfig] = React.useState<Omit<ConfirmDialogProps, 'open' | 'onOpenChange'>>({
+    title: '',
+    description: '',
+    onConfirm: () => {},
+    onCancel: () => {}
+  })
 
   const confirm = (props: Omit<ConfirmDialogProps, 'open' | 'onOpenChange'>) => {
     setConfig(props)

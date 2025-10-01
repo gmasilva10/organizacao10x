@@ -72,7 +72,7 @@ export function useStudents(filters: StudentsFilters = {}) {
     },
     ...createQueryConfig('list'),
     // keepPreviousData para paginação suave
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   })
 }
 

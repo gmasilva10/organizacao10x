@@ -26,7 +26,7 @@ interface AnamneseData {
   goals: string[]
 }
 
-export async function generateAnamnesePDF(data: AnamneseData, studentName: string): Promise<Buffer> {
+export async function generateAnamnesePDF(data: AnamneseData, studentName: string): Promise<Uint8Array> {
   const browser = await puppeteer.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox']

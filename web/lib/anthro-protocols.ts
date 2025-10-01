@@ -144,7 +144,7 @@ export function calculateAnthropometry(anthro: any) {
   
   return {
     protocolo: protocolo_code,
-    version_tag: protocol.version,
+    version_tag: protocol.version_tag,
     inputs: {
       massa_kg: massa_kg,
       estatura_m: estatura,

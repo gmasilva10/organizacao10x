@@ -33,6 +33,7 @@ type Student = {
   nationality?: string
   birth_place?: string
   photo_url?: string
+  trainer?: { id: string; name: string } | null
 }
 
 type IdentificacaoTabProps = {
