@@ -712,7 +712,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="plan_code">Plano</Label>
-              <Select value={formData.plan_code} onValueChange={(value) => {
+              <Select value={formData.plan_code} onValueChange={(value: string) => {
                 const selectedPlan = plans.find(p => p.plan_code === value)
                 setFormData({ 
                   ...formData, 
@@ -750,7 +750,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
               </div>
               <div className="space-y-2">
                 <Label htmlFor="currency">Moeda</Label>
-                <Select value={formData.currency} onValueChange={(value) => setFormData({ ...formData, currency: value })}>
+                <Select value={formData.currency} onValueChange={(value: string) => setFormData({ ...formData, currency: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -842,7 +842,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit_currency">Moeda</Label>
-                <Select value={formData.currency} onValueChange={(value) => setFormData({ ...formData, currency: value })}>
+                <Select value={formData.currency} onValueChange={(value: string) => setFormData({ ...formData, currency: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -858,7 +858,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="edit_cycle">Ciclo</Label>
-                <Select value={formData.cycle} onValueChange={(value) => setFormData({ ...formData, cycle: value })}>
+                <Select value={formData.cycle} onValueChange={(value: string) => setFormData({ ...formData, cycle: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>

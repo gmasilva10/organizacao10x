@@ -356,7 +356,7 @@ export function OccurrenceTypesManager() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="group_id">Grupo *</Label>
-                <Select value={formData.group_id} onValueChange={(value) => setFormData({ ...formData, group_id: value })}>
+                <Select value={formData.group_id} onValueChange={(value: string) => setFormData({ ...formData, group_id: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um grupo" />
                   </SelectTrigger>
@@ -372,7 +372,7 @@ export function OccurrenceTypesManager() {
 
               <div>
                 <Label>Aplicabilidade *</Label>
-                <Select value={formData.applies_to} onValueChange={(value)=>setFormData({ ...formData, applies_to: value as any })}>
+                <Select value={formData.applies_to} onValueChange={(value: string)=>setFormData({ ...formData, applies_to: value as any })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>

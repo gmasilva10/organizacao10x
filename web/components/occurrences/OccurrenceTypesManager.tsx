@@ -295,7 +295,7 @@ export function OccurrenceTypesManager() {
               </div>
               <div>
                 <Label htmlFor="group_id">Grupo *</Label>
-                <Select value={formData.group_id} onValueChange={(value) => setFormData(prev => ({ ...prev, group_id: value }))}>
+                <Select value={formData.group_id} onValueChange={(value: string) => setFormData(prev => ({ ...prev, group_id: value }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um grupo" />
                   </SelectTrigger>

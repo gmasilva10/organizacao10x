@@ -678,7 +678,7 @@ export function ProfessionalsManager() {
                         </div>
                         <div>
                           <Label htmlFor="profile_id">Perfil Profissional *</Label>
-                          <Select value={formData.profile_id} onValueChange={(value) => setFormData({ ...formData, profile_id: value })}>
+                          <Select value={formData.profile_id} onValueChange={(value: string) => setFormData({ ...formData, profile_id: value })}>
                             <SelectTrigger className="h-10">
                               <SelectValue placeholder="Selecione um perfil" />
                             </SelectTrigger>
@@ -723,7 +723,7 @@ export function ProfessionalsManager() {
                         </div>
                         <div>
                           <Label htmlFor="sex" className="text-sm font-medium">Sexo *</Label>
-                          <Select value={formData.sex} onValueChange={(value) => setFormData({ ...formData, sex: value })}>
+                          <Select value={formData.sex} onValueChange={(value: string) => setFormData({ ...formData, sex: value })}>
                             <SelectTrigger className="h-10">
                               <SelectValue placeholder="Selecione" />
                             </SelectTrigger>
@@ -807,7 +807,7 @@ export function ProfessionalsManager() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="profile_id" className="text-sm font-medium">Perfil Profissional *</Label>
-                          <Select value={formData.profile_id} onValueChange={(value) => setFormData({ ...formData, profile_id: value })}>
+                          <Select value={formData.profile_id} onValueChange={(value: string) => setFormData({ ...formData, profile_id: value })}>
                             <SelectTrigger className="h-10">
                               <SelectValue placeholder="Selecione o perfil" />
                             </SelectTrigger>
@@ -899,7 +899,7 @@ export function ProfessionalsManager() {
                         <Label htmlFor="user_profile">Perfil de Usuário</Label>
                         <Select
                           value={userFormData.userProfile}
-                          onValueChange={(value) => setUserFormData(prev => ({ ...prev, userProfile: value }))}
+                          onValueChange={(value: string) => setUserFormData(prev => ({ ...prev, userProfile: value }))}
                         >
                           <SelectTrigger>
                             <SelectValue />

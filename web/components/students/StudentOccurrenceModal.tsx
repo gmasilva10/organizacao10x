@@ -414,7 +414,7 @@ export function StudentOccurrenceModal({
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="group_id" className="text-sm font-medium">Grupo *</Label>
-                    <Select value={formData.group_id} onValueChange={(value) => handleInputChange('group_id', value)}>
+                    <Select value={formData.group_id} onValueChange={(value: string) => handleInputChange('group_id', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione um grupo" />
                       </SelectTrigger>
@@ -431,7 +431,7 @@ export function StudentOccurrenceModal({
                     <Label htmlFor="type_id" className="text-sm font-medium">Tipo *</Label>
                     <Select 
                       value={formData.type_id} 
-                      onValueChange={(value) => handleInputChange('type_id', value)}
+                      onValueChange={(value: string) => handleInputChange('type_id', value)}
                       disabled={!formData.group_id}
                     >
                       <SelectTrigger>
@@ -473,7 +473,7 @@ export function StudentOccurrenceModal({
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="owner_user_id" className="text-sm font-medium">Responsável</Label>
-                      <Select value={formData.owner_user_id} onValueChange={(value) => handleInputChange('owner_user_id', value)}>
+                      <Select value={formData.owner_user_id} onValueChange={(value: string) => handleInputChange('owner_user_id', value)}>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione um responsável" />
                         </SelectTrigger>

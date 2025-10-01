@@ -737,7 +737,7 @@ export default function MessageComposer({
                 <Label htmlFor="student" className="text-sm font-medium">Aluno *</Label>
                 <Select 
                   value={formData.studentId} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, studentId: value }))}
+                  onValueChange={(value: string) => setFormData(prev => ({ ...prev, studentId: value }))}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Selecione um aluno" />
@@ -772,7 +772,7 @@ export default function MessageComposer({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="mode" className="text-sm font-medium">Modo</Label>
-                  <Select value={formData.mode} onValueChange={(value) => setFormData(prev => ({ ...prev, mode: value as 'template' | 'free' }))}>
+                  <Select value={formData.mode} onValueChange={(value: string) => setFormData(prev => ({ ...prev, mode: value as 'template' | 'free' }))}>
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
@@ -805,7 +805,7 @@ export default function MessageComposer({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="channel" className="text-sm font-medium">Canal *</Label>
-                  <Select value={formData.channel} onValueChange={(value) => setFormData(prev => ({ ...prev, channel: value }))}>
+                  <Select value={formData.channel} onValueChange={(value: string) => setFormData(prev => ({ ...prev, channel: value }))}>
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
@@ -819,7 +819,7 @@ export default function MessageComposer({
 
                 <div>
                   <Label htmlFor="classification" className="text-sm font-medium">Classificação</Label>
-                  <Select value={formData.classificationTag} onValueChange={(value) => setFormData(prev => ({ ...prev, classificationTag: value }))}>
+                  <Select value={formData.classificationTag} onValueChange={(value: string) => setFormData(prev => ({ ...prev, classificationTag: value }))}>
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Selecione uma classificação" />
                     </SelectTrigger>

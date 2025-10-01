@@ -133,7 +133,7 @@ export default function RelationshipFilters({
             <label className="text-sm font-medium">Status</label>
             <Select
               value={filters.status}
-              onValueChange={(value) => onFiltersChange({ status: value })}
+              onValueChange={(value: string) => onFiltersChange({ status: value })}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -153,7 +153,7 @@ export default function RelationshipFilters({
             <label className="text-sm font-medium">Âncora</label>
             <Select
               value={filters.anchor}
-              onValueChange={(value) => onFiltersChange({ anchor: value })}
+              onValueChange={(value: string) => onFiltersChange({ anchor: value })}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -173,7 +173,7 @@ export default function RelationshipFilters({
             <label className="text-sm font-medium">Canal</label>
             <Select
               value={filters.channel}
-              onValueChange={(value) => onFiltersChange({ channel: value })}
+              onValueChange={(value: string) => onFiltersChange({ channel: value })}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -193,7 +193,7 @@ export default function RelationshipFilters({
             <label className="text-sm font-medium">Template</label>
             <Select
               value={filters.template_code}
-              onValueChange={(value) => onFiltersChange({ template_code: value })}
+              onValueChange={(value: string) => onFiltersChange({ template_code: value })}
             >
               <SelectTrigger>
                 <SelectValue />
