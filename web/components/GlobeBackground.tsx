@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
 
-const Globe = dynamic(() => import("react-globe.gl"), { ssr: false })
+const Globe = dynamic<any>(() => import("react-globe.gl"), { ssr: false })
 
 type Props = {
 	className?: string
