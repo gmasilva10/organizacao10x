@@ -109,7 +109,7 @@ export default function HotmartTestPage() {
       const parsedPayload = JSON.parse(payload)
       
       // Simular webhook (chamando nossa própria API)
-      const basicToken = 'test-basic-token-123' // Token fictício para teste
+      const basicToken = 'test-webhook-token-123' // Token fictício para teste
       const hottok = `Basic ${Buffer.from(`test@email.com:${basicToken}`).toString('base64')}`
       
       const response = await fetch('/api/webhooks/hotmart', {
