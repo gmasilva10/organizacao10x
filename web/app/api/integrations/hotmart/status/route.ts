@@ -5,13 +5,16 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClientAdmin } from '@/utils/supabase/server'
+import { resolveRequestContext } from '@/server/context'
 
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClientAdmin()
+    const ctx = await resolveRequestContext(request)
+    if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
     
-    // TODO: Obter org_id do contexto de autenticação
-    const org_id = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
+    // Obter org_id do contexto de autenticação
+    const org_id = ctx.tenantId
     
     // Buscar integração
     const { data: integration, error } = await supabase

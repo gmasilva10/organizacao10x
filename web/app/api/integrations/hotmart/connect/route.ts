@@ -5,10 +5,14 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClientAdmin } from '@/utils/supabase/server'
+import { resolveRequestContext } from '@/server/context'
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClientAdmin()
+    const ctx = await resolveRequestContext(request)
+    if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
+    
     const body = await request.json()
     
     const { client_id, client_secret, basic_token } = body
@@ -20,8 +24,8 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
     
-    // TODO: Obter org_id do contexto de autenticação
-    const org_id = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
+    // Obter org_id do contexto de autenticação
+    const org_id = ctx.tenantId
     
     // Testar conexão OAuth2 com Hotmart
     const authString = Buffer.from(`${client_id}:${client_secret}`).toString('base64')
