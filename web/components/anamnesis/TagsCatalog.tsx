@@ -105,7 +105,7 @@ export function TagsCatalog() {
     }
   }
 
-  const categories = Array.from(new Set(tags.map(tag => tag.category))
+  const categories = Array.from(new Set(tags.map(tag => tag.category)))
   const groupedTags = categories.map(category => ({
     category,
     tags: filteredTags.filter(tag => tag.category === category)
