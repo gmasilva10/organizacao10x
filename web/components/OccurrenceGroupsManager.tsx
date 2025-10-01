@@ -237,7 +237,7 @@ export function OccurrenceGroupsManager() {
       const arr = Array.isArray(data?.groups) ? data.groups : (Array.isArray(data) ? data : [])
       setGroups(arr)
     } catch (err) {
-      error('Erro ao carregar grupos de ocorrências')
+      showError('Erro ao carregar grupos de ocorrências')
       console.error(err)
     } finally {
       setLoading(false)
@@ -267,14 +267,14 @@ export function OccurrenceGroupsManager() {
         throw new Error(errorData.error || 'Erro ao salvar grupo')
       }
 
-      success(editingGroup ? 'Grupo atualizado com sucesso!' : 'Grupo criado com sucesso!')
+      showSuccess(editingGroup ? 'Grupo atualizado com sucesso!' : 'Grupo criado com sucesso!')
       setIsModalOpen(false)
       setFormData({ name: '', description: '', is_active: true })
       setEditingGroup(null)
       loadGroups()
       try { window.dispatchEvent(new Event('pg:occurrence:groups:refresh')) } catch {}
     } catch (err) {
-      error(err instanceof Error ? err.message : 'Erro ao salvar grupo')
+      showError(err instanceof Error ? err.message : 'Erro ao salvar grupo')
       console.error(err)
     } finally {
       setSaving(false)
@@ -302,11 +302,11 @@ export function OccurrenceGroupsManager() {
         throw new Error(errorData.error || 'Erro ao excluir grupo')
       }
 
-      success('Grupo excluído com sucesso!')
+      showSuccess('Grupo excluído com sucesso!')
       loadGroups()
       try { window.dispatchEvent(new Event('pg:occurrence:groups:refresh')) } catch {}
     } catch (err) {
-      error(err instanceof Error ? err.message : 'Erro ao excluir grupo')
+      showError(err instanceof Error ? err.message : 'Erro ao excluir grupo')
       console.error(err)
     }
   }
