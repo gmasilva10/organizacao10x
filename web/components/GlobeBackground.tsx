@@ -31,15 +31,6 @@ export function GlobeBackground({ className, sizeDesktop = 640, sizeMobile = 320
 		return () => window.removeEventListener("resize", update)
 	}, [sizeDesktop, sizeMobile])
 
-  useEffect(() => {
-    if (!globeRef.current) return
-    const controls = globeRef.current.controls?.()
-    if (controls) {
-      controls.autoRotate = true
-      controls.autoRotateSpeed = 0.3
-    }
-    globeRef.current.pointOfView({ altitude: 2.8 }, 0)
-  }, [size])
 
   // Usa texturas remotas confiáveis por padrão (podem ser trocadas por arquivos locais depois)
   const textureUrl = "https://unpkg.com/three-globe/example/img/earth-day.jpg"
