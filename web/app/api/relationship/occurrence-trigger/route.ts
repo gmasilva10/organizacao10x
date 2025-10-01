@@ -1,10 +1,10 @@
-/**
- * GATE 10.6.2 - Gatilho de Ocorrência
+﻿/**
+ * GATE 10.6.2 - Gatilho de OcorrÃªncia
  * 
  * Funcionalidades:
- * - Disparo imediato ao salvar Ocorrência com lembrete
- * - Criação automática de tarefa occurrence_followup
- * - Integração com sistema de ocorrências existente
+ * - Disparo imediato ao salvar OcorrÃªncia com lembrete
+ * - CriaÃ§Ã£o automÃ¡tica de tarefa occurrence_followup
+ * - IntegraÃ§Ã£o com sistema de ocorrÃªncias existente
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -36,7 +36,7 @@ interface OccurrenceTriggerResponse {
 }
 
 /**
- * Criar tarefa de follow-up de ocorrência
+ * Criar tarefa de follow-up de ocorrÃªncia
  */
 async function createOccurrenceFollowupTask(
   studentId: string,
@@ -60,7 +60,7 @@ async function createOccurrenceFollowupTask(
       }
     }
 
-    // Verificar se já existe tarefa para esta ocorrência
+    // Verificar se jÃ¡ existe tarefa para esta ocorrÃªncia
     const { data: existingTask } = await supabase
       .from('relationship_tasks')
       .select('id')
@@ -78,13 +78,13 @@ async function createOccurrenceFollowupTask(
     }
 
     // Renderizar mensagem personalizada
-    const message = `Follow-up da ocorrência: ${occurrenceNotes || 'Sem descrição'}`
+    const message = `Follow-up da ocorrÃªncia: ${occurrenceNotes || 'Sem descriÃ§Ã£o'}`
     const renderedMessage = message
       .replace(/\[Nome do Cliente\]/g, student.name)
       .replace(/\[Nome\]/g, student.name)
       .replace(/\[PrimeiroNome\]/g, student.name.split(' ')[0])
-      .replace(/\[TipoOcorrencia\]/g, occurrenceType || 'Ocorrência')
-      .replace(/\[DescricaoOcorrencia\]/g, occurrenceNotes || 'Sem descrição')
+      .replace(/\[TipoOcorrencia\]/g, occurrenceType || 'OcorrÃªncia')
+      .replace(/\[DescricaoOcorrencia\]/g, occurrenceNotes || 'Sem descriÃ§Ã£o')
 
     // Criar tarefa
     const { data: task, error: taskError } = await supabase
@@ -119,7 +119,7 @@ async function createOccurrenceFollowupTask(
       }
     }
 
-    // Log da criação
+    // Log da criaÃ§Ã£o
     await supabase
       .from('relationship_logs')
       .insert({
@@ -144,7 +144,7 @@ async function createOccurrenceFollowupTask(
   } catch (error) {
     return { 
       success: false, 
-      error: `Unexpected error: ${error.message}` 
+      error: `Unexpected error: ${(error as any)?.message || String(error)}` 
     }
   }
 }
@@ -178,12 +178,12 @@ async function updateOccurrenceFollowupTask(
       ...task.payload,
       occurrence_type: occurrenceType || task.payload.occurrence_type,
       occurrence_notes: occurrenceNotes || task.payload.occurrence_notes,
-      message: `Follow-up da ocorrência: ${occurrenceNotes || 'Sem descrição'}`
+      message: `Follow-up da ocorrÃªncia: ${occurrenceNotes || 'Sem descriÃ§Ã£o'}`
         .replace(/\[Nome do Cliente\]/g, task.payload.student_name)
         .replace(/\[Nome\]/g, task.payload.student_name)
         .replace(/\[PrimeiroNome\]/g, task.payload.student_name.split(' ')[0])
-        .replace(/\[TipoOcorrencia\]/g, occurrenceType || 'Ocorrência')
-        .replace(/\[DescricaoOcorrencia\]/g, occurrenceNotes || 'Sem descrição')
+        .replace(/\[TipoOcorrencia\]/g, occurrenceType || 'OcorrÃªncia')
+        .replace(/\[DescricaoOcorrencia\]/g, occurrenceNotes || 'Sem descriÃ§Ã£o')
     }
 
     // Atualizar tarefa
@@ -203,7 +203,7 @@ async function updateOccurrenceFollowupTask(
       }
     }
 
-    // Log da atualização (agendamento)
+    // Log da atualizaÃ§Ã£o (agendamento)
     await supabase
       .from('relationship_logs')
       .insert({
@@ -225,7 +225,7 @@ async function updateOccurrenceFollowupTask(
   } catch (error) {
     return { 
       success: false, 
-      error: `Unexpected error: ${error.message}` 
+      error: `Unexpected error: ${(error as any)?.message || String(error)}` 
     }
   }
 }
@@ -242,7 +242,7 @@ export async function POST(request: NextRequest) {
       tenant_id 
     } = body
 
-    // Validações
+    // ValidaÃ§Ãµes
     if (!student_id || !occurrence_id || !reminder_at || !tenant_id) {
       return NextResponse.json({
         success: false,
@@ -250,7 +250,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Verificar se já existe tarefa para esta ocorrência
+    // Verificar se jÃ¡ existe tarefa para esta ocorrÃªncia
     const { data: existingTask } = await supabase
       .from('relationship_tasks')
       .select('id')
@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: 'Internal server error',
-      message: error.message
+      message: (error as any)?.message || String(error)
     }, { status: 500 })
   }
 }
@@ -347,7 +347,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: 'Failed to fetch task',
-      message: error.message
+      message: (error as any)?.message || String(error)
     }, { status: 500 })
   }
 }

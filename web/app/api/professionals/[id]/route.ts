@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { resolveRequestContext } from '@/server/context'
 import { z } from 'zod'
@@ -6,25 +6,25 @@ import { normalizeToE164DigitsBR } from '@/lib/phone-normalize'
 
 const WRITERS = new Set(['admin', 'manager'])
 
-// Schema de validação para atualização completa
+// Schema de validaÃ§Ã£o para atualizaÃ§Ã£o completa
 const updateProfessionalSchema = z.object({
-  full_name: z.string().min(1, 'Nome completo é obrigatório'),
-  cpf: z.string().min(1, 'CPF é obrigatório'),
-  sex: z.enum(['M', 'F', 'Outro'], { required_error: 'Sexo é obrigatório' }),
-  birth_date: z.string().min(1, 'Data de nascimento é obrigatória'),
+  full_name: z.string().min(1, 'Nome completo Ã© obrigatÃ³rio'),
+  cpf: z.string().min(1, 'CPF Ã© obrigatÃ³rio'),
+  sex: z.enum(['M', 'F', 'Outro']),
+  birth_date: z.string().min(1, 'Data de nascimento Ã© obrigatÃ³ria'),
   whatsapp_personal: z.string().optional(),
-  whatsapp_work: z.string().min(1, 'WhatsApp profissional é obrigatório'),
-  email: z.string().email('E-mail inválido'),
-  profile_id: z.number().int().positive('Perfil é obrigatório'),
+  whatsapp_work: z.string().min(1, 'WhatsApp profissional Ã© obrigatÃ³rio'),
+  email: z.string().email('E-mail invÃ¡lido'),
+  profile_id: z.number().int().positive('Perfil Ã© obrigatÃ³rio'),
   notes: z.string().optional()
 })
 
-// Schema de validação para toggle de status (apenas is_active)
+// Schema de validaÃ§Ã£o para toggle de status (apenas is_active)
 const toggleStatusSchema = z.object({
   is_active: z.boolean()
 })
 
-// Função para validar CPF
+// FunÃ§Ã£o para validar CPF
 function validateCPF(cpf: string): boolean {
   const cleanCPF = cpf.replace(/\D/g, '')
   if (cleanCPF.length !== 11) return false
@@ -49,11 +49,11 @@ function validateCPF(cpf: string): boolean {
   return true
 }
 
-// Função para validar WhatsApp
+// FunÃ§Ã£o para validar WhatsApp
 function validateWhatsApp(whatsapp: string): boolean {
   const cleanWhatsApp = whatsapp.replace(/\D/g, '')
-  // Aceita números brasileiros com ou sem código do país (55)
-  // Formato: (XX) XXXXX-XXXX (11 dígitos) ou 55XXXXXXXXXXX (13 dígitos)
+  // Aceita nÃºmeros brasileiros com ou sem cÃ³digo do paÃ­s (55)
+  // Formato: (XX) XXXXX-XXXX (11 dÃ­gitos) ou 55XXXXXXXXXXX (13 dÃ­gitos)
   return (cleanWhatsApp.length === 11 && cleanWhatsApp.startsWith('1')) || 
          (cleanWhatsApp.length === 13 && cleanWhatsApp.startsWith('55'))
 }
@@ -84,11 +84,11 @@ export async function PATCH(
   try {
     const body = await request.json()
     
-    // Detectar se é uma atualização de status (apenas is_active)
+    // Detectar se Ã© uma atualizaÃ§Ã£o de status (apenas is_active)
     const isStatusUpdate = body.hasOwnProperty('is_active') && Object.keys(body).length === 1
     
     if (isStatusUpdate) {
-      // Atualização apenas de status
+      // AtualizaÃ§Ã£o apenas de status
       const statusData = toggleStatusSchema.parse(body)
       
       // Verificar se o profissional existe e pertence ao tenant
@@ -131,7 +131,7 @@ export async function PATCH(
       })
     }
     
-    // Atualização completa (validação existente)
+    // AtualizaÃ§Ã£o completa (validaÃ§Ã£o existente)
     const validatedData = updateProfessionalSchema.parse(body)
     
     // Validar CPF
@@ -139,7 +139,7 @@ export async function PATCH(
       return NextResponse.json({ error: "invalid_cpf" }, { status: 400 })
     }
     
-    // Normalizar WhatsApp profissional (aceita 10/11 dígitos BR)
+    // Normalizar WhatsApp profissional (aceita 10/11 dÃ­gitos BR)
     const workNorm = normalizeToE164DigitsBR(validatedData.whatsapp_work)
     if (!workNorm.ok || !workNorm.value) {
       return NextResponse.json({ error: "invalid_whatsapp_work" }, { status: 400 })
@@ -163,7 +163,7 @@ export async function PATCH(
       return NextResponse.json({ error: "professional_not_found" }, { status: 404 })
     }
 
-    // Verificar se o email já existe em outro profissional
+    // Verificar se o email jÃ¡ existe em outro profissional
     if (validatedData.email !== existingProfessional.email) {
       const { data: emailExists } = await supabase
         .from('professionals')
@@ -178,7 +178,7 @@ export async function PATCH(
       }
     }
 
-    // Verificar se o CPF já existe em outro profissional
+    // Verificar se o CPF jÃ¡ existe em outro profissional
     if (validatedData.cpf !== existingProfessional.cpf) {
       const { data: cpfExists } = await supabase
         .from('professionals')
@@ -230,7 +230,7 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
         error: "validation_error", 
-        details: error.errors 
+        details: error.issues 
       }, { status: 400 })
     }
     

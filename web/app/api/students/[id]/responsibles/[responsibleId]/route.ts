@@ -48,7 +48,7 @@ export async function DELETE(
       removed: {
         id: responsibleId,
         role: responsible.role,
-        professional_name: responsible.professionals.full_name
+        professional_name: (Array.isArray((responsible as any).professionals) ? (responsible as any).professionals[0]?.full_name : (responsible as any).professionals?.full_name)
       }
     })
 

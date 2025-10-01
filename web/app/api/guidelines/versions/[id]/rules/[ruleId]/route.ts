@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { resolveRequestContext } from "@/server/context"
 import { z } from "zod"
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -52,8 +52,8 @@ export async function PUT(
 ) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx.userId || !ctx.tenantId) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+    if (!ctx || !ctx.userId || !ctx.tenantId) {
+      return NextResponse.json({ error: "NÃ£o autorizado" }, { status: 401 })
     }
 
     const { id: versionId, ruleId } = await params
@@ -62,7 +62,7 @@ export async function PUT(
 
     const supabase = await createClient()
 
-    // Verificar se a versão pertence ao tenant e é DRAFT
+    // Verificar se a versÃ£o pertence ao tenant e Ã© DRAFT
     const { data: version, error: versionError } = await supabase
       .from('guidelines_versions')
       .select('id, status')
@@ -71,11 +71,11 @@ export async function PUT(
       .single()
 
     if (versionError || !version) {
-      return NextResponse.json({ error: "Versão não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "VersÃ£o nÃ£o encontrada" }, { status: 404 })
     }
 
     if (version.status !== 'DRAFT') {
-      return NextResponse.json({ error: "Apenas versões em rascunho podem ser editadas" }, { status: 400 })
+      return NextResponse.json({ error: "Apenas versÃµes em rascunho podem ser editadas" }, { status: 400 })
     }
 
     // Verificar se a regra existe e pertence ao tenant
@@ -88,7 +88,7 @@ export async function PUT(
       .single()
 
     if (ruleError || !existingRule) {
-      return NextResponse.json({ error: "Regra não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "Regra nÃ£o encontrada" }, { status: 404 })
     }
 
     // Atualizar regra
@@ -117,7 +117,7 @@ export async function PUT(
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Dados inválidos", details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: "Dados invÃ¡lidos", details: error.issues }, { status: 400 })
     }
     console.error('Erro na API de regras:', error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
@@ -130,14 +130,14 @@ export async function DELETE(
 ) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx.userId || !ctx.tenantId) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+    if (!ctx || !ctx.userId || !ctx.tenantId) {
+      return NextResponse.json({ error: "NÃ£o autorizado" }, { status: 401 })
     }
 
     const { id: versionId, ruleId } = await params
     const supabase = await createClient()
 
-    // Verificar se a versão pertence ao tenant e é DRAFT
+    // Verificar se a versÃ£o pertence ao tenant e Ã© DRAFT
     const { data: version, error: versionError } = await supabase
       .from('guidelines_versions')
       .select('id, status')
@@ -146,11 +146,11 @@ export async function DELETE(
       .single()
 
     if (versionError || !version) {
-      return NextResponse.json({ error: "Versão não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "VersÃ£o nÃ£o encontrada" }, { status: 404 })
     }
 
     if (version.status !== 'DRAFT') {
-      return NextResponse.json({ error: "Apenas versões em rascunho podem ser editadas" }, { status: 400 })
+      return NextResponse.json({ error: "Apenas versÃµes em rascunho podem ser editadas" }, { status: 400 })
     }
 
     // Verificar se a regra existe e pertence ao tenant
@@ -163,7 +163,7 @@ export async function DELETE(
       .single()
 
     if (ruleError || !existingRule) {
-      return NextResponse.json({ error: "Regra não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "Regra nÃ£o encontrada" }, { status: 404 })
     }
 
     // Deletar regra
@@ -180,7 +180,7 @@ export async function DELETE(
 
     return NextResponse.json({ 
       success: true,
-      message: "Regra excluída com sucesso"
+      message: "Regra excluÃ­da com sucesso"
     })
 
   } catch (error) {

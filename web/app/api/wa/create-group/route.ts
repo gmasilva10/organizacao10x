@@ -176,6 +176,7 @@ export async function POST(request: NextRequest) {
     }, response.status)
 
     if (!response.ok) {
+      const message = String(((responseData as any)?.message) || response.statusText || '')
       // Mapear erros especÃ­ficos do Z-API
       let errorMessage = 'Falha na criaÃ§Ã£o do grupo'
       if (message?.includes('already exists') || message?.includes('jÃ¡ existe')) {

@@ -17,7 +17,7 @@ export async function POST(
     console.log('🔍 Toggle task iniciado:', { cardId, taskId })
     
     const cookieStore = cookies()
-    const supabase = await createClient(cookieStore)
+    const supabase = await createClient()
     
     // Verificar autenticação
     const { data: { user }, error: authError } = await supabase.auth.getUser()

@@ -10,7 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { X, Filter, Eye, CheckCircle, Bell, Calendar, Copy, Download } from "lucide-react"
 import { useOccurrencesPermissions } from "@/lib/use-occurrences-permissions"
 import { useConfirmDialog, ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { TableSkeleton, EmptyState, ErrorState, Skeleton } from "@/components/ui/skeleton"
+import { TableSkeleton, Skeleton } from "@/components/ui/skeleton"
+import { EmptyState } from "@/components/ui/empty-state"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 
 type OccurrenceRow = {
@@ -62,6 +63,7 @@ export default function OccurrencesManagementPage() {
   const [selectedOccurrenceId, setSelectedOccurrenceId] = useState<number | undefined>()
   const [rescheduleOpen, setRescheduleOpen] = useState(false)
   const [rescheduleCurrentAt, setRescheduleCurrentAt] = useState<string | null>(null)
+  const { confirm, ConfirmDialog } = useConfirmDialog()
 
   // Handlers para aplicar filtros do drawer
   function handleApplyFilters(newFilters: typeof initialFilters) {
@@ -168,8 +170,6 @@ export default function OccurrencesManagementPage() {
   }
 
   async function cancelReminder(row: OccurrenceRow) {
-    const { confirm, ConfirmDialog } = useConfirmDialog()
-    
     confirm({
       title: "Cancelar Lembrete",
       description: "Tem certeza que deseja cancelar este lembrete?",

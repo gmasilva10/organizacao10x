@@ -12,6 +12,7 @@ export default function RelationshipTemplatesPage() {
   const [title, setTitle] = useState("")
   const [type, setType] = useState<Template['type']>('nota')
   const [content, setContent] = useState("")
+  const { confirm, ConfirmDialog } = useConfirmDialog()
 
   useEffect(() => { load() }, [])
 
@@ -41,7 +42,6 @@ export default function RelationshipTemplatesPage() {
   }
 
   async function remove(id: string) {
-    const { confirm, ConfirmDialog } = useConfirmDialog()
     
     confirm({
       title: "Excluir Template",

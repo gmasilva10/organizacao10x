@@ -161,17 +161,18 @@ export async function POST(
 
     // Log de auditoria
     try {
-      await auditLogger.logAttachmentUploaded(
-        id,
-        `${id}_${Date.now()}`,
-        user.id,
-        membership.tenant_id,
-        {
+      await auditLogger.log({
+        organization_id: membership.tenant_id,
+        user_id: user.id,
+        action: 'create',
+        resource_type: 'occurrence_attachment' as any,
+        resource_id: id,
+        payload_after: {
           filename: file.name,
           fileSize: file.size,
           mimeType: file.type
         }
-      )
+      } as any, supabase)
     } catch (auditError) {
       console.error('Erro ao registrar log de auditoria:', auditError)
       // Não falha a operação por erro de auditoria

@@ -59,12 +59,14 @@ export async function POST(
       return acc
     }, {} as Record<string, any>) || {}
 
-    const studentName = version.students?.name || 'Aluno'
+    const studentName = Array.isArray((version as any).students)
+      ? (((version as any).students[0]?.name) || 'Aluno')
+      : (((version as any).students?.name) || 'Aluno')
 
     // Gerar PDF
     try {
       console.log(`🔄 [ANAMNESE PDF] Gerando PDF para ${studentName}...`)
-      const pdfBuffer = await generateAnamnesePDF(formData, studentName)
+      const pdfBuffer = await generateAnamnesePDF(formData as any, studentName)
       
       // Upload do PDF para storage
       const fileName = `anamnese_${studentName?.replace(/\s+/g, '_')}_${version.code}_${new Date().toISOString().split('T')[0]}.pdf`

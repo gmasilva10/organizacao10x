@@ -230,15 +230,15 @@ export function GuidelinesPreviewPanel({ version }: { version: VersionLike }) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <Label className="text-sm font-medium">Total de Regras</Label>
-                    <p className="text-sm text-muted-foreground">{previewResult.debug_info.total_rules}</p>
+                    <p className="text-sm text-muted-foreground">{(previewResult as any).debug_info?.total_rules}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Regras Aplicáveis</Label>
-                    <p className="text-sm text-muted-foreground">{previewResult.debug_info.applicable_rules}</p>
+                    <p className="text-sm text-muted-foreground">{(previewResult as any).debug_info?.applicable_rules}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Lógica de Combinação</Label>
-                    <p className="text-sm text-muted-foreground">{previewResult.debug_info.combination_logic}</p>
+                    <p className="text-sm text-muted-foreground">{(previewResult as any).debug_info?.combination_logic}</p>
                   </div>
                 </div>
                 

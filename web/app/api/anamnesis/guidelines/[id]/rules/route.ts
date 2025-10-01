@@ -1,21 +1,19 @@
-import { NextResponse } from "next/server"
+﻿import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { z } from "zod"
 import { createClient } from "@/utils/supabase/server"
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 
 const createRuleSchema = z.object({
-  rule_name: z.string().min(1, "Nome da regra é obrigatório"),
-  decision_tag: z.string().min(1, "Tag de decisão é obrigatória"),
-  condition_type: z.enum(['single', 'multiple', 'custom'], {
-    errorMap: () => ({ message: "Tipo de condição deve ser 'single', 'multiple' ou 'custom'" })
-  }),
-  conditions: z.record(z.any(), "Condições são obrigatórias"),
+  rule_name: z.string().min(1, "Nome da regra Ã© obrigatÃ³rio"),
+  decision_tag: z.string().min(1, "Tag de decisÃ£o Ã© obrigatÃ³ria"),
+  condition_type: z.enum(['single', 'multiple', 'custom']),
+  conditions: z.record(z.string(), z.any()),
   outputs: z.object({
     resistencia_aerobia: z.object({
       duracao: z.string().optional(),
@@ -37,7 +35,7 @@ const createRuleSchema = z.object({
 
 const updateRuleSchema = createRuleSchema.partial().omit({ rule_name: true, decision_tag: true })
 
-// GET /api/anamnesis/guidelines/[id]/rules - Listar regras de uma versão
+// GET /api/anamnesis/guidelines/[id]/rules - Listar regras de uma versÃ£o
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
@@ -65,10 +63,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
       .order('priority', { ascending: true })
 
     if (versionId) {
-      // Buscar por versão específica
+      // Buscar por versÃ£o especÃ­fica
       query = query.eq('guideline_version_id', versionId)
     } else {
-      // Buscar pela versão mais recente das diretrizes
+      // Buscar pela versÃ£o mais recente das diretrizes
       const { data: latestVersion } = await supabase
         .from('training_guideline_versions')
         .select('id')
@@ -97,7 +95,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }, {
       headers: {
         'Cache-Control': 'public, max-age=30, stale-while-revalidate=60',
-        'X-Query-Time': '0' // TODO: implementar medição real
+        'X-Query-Time': '0' // TODO: implementar mediÃ§Ã£o real
       }
     })
 
@@ -118,7 +116,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const body = await request.json()
     const validatedData = createRuleSchema.parse(body)
 
-    // Verificar se as diretrizes pertencem à organização
+    // Verificar se as diretrizes pertencem Ã  organizaÃ§Ã£o
     const { data: guideline, error: guidelineError } = await supabase
       .from('training_guidelines')
       .select('id, organization_id')
@@ -127,10 +125,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
       .single()
 
     if (guidelineError || !guideline) {
-      return NextResponse.json({ error: "Diretrizes não encontradas" }, { status: 404 })
+      return NextResponse.json({ error: "Diretrizes nÃ£o encontradas" }, { status: 404 })
     }
 
-    // Buscar a versão mais recente (não publicada)
+    // Buscar a versÃ£o mais recente (nÃ£o publicada)
     const { data: latestVersion, error: versionError } = await supabase
       .from('training_guideline_versions')
       .select('id, is_published')
@@ -140,12 +138,12 @@ export async function POST(request: Request, { params }: { params: { id: string 
       .single()
 
     if (versionError || !latestVersion) {
-      return NextResponse.json({ error: "Versão das diretrizes não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "VersÃ£o das diretrizes nÃ£o encontrada" }, { status: 404 })
     }
 
     if (latestVersion.is_published) {
       return NextResponse.json({ 
-        error: "Não é possível editar uma versão publicada. Crie uma nova versão." 
+        error: "NÃ£o Ã© possÃ­vel editar uma versÃ£o publicada. Crie uma nova versÃ£o." 
       }, { status: 400 })
     }
 
@@ -167,7 +165,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Dados inválidos", details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: "Dados invÃ¡lidos", details: error.issues }, { status: 400 })
     }
     console.error('Erro interno:', error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
@@ -183,7 +181,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   const ruleId = url.pathname.split('/').pop()
   
   if (!ruleId) {
-    return NextResponse.json({ error: "ID da regra é obrigatório" }, { status: 400 })
+    return NextResponse.json({ error: "ID da regra Ã© obrigatÃ³rio" }, { status: 400 })
   }
 
   const supabase = await createClient()
@@ -192,7 +190,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const body = await request.json()
     const validatedData = updateRuleSchema.parse(body)
 
-    // Verificar se a regra pertence às diretrizes e organização
+    // Verificar se a regra pertence Ã s diretrizes e organizaÃ§Ã£o
     const { data: rule, error: ruleError } = await supabase
       .from('training_guideline_rules')
       .select(`
@@ -210,17 +208,22 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .single()
 
     if (ruleError || !rule) {
-      return NextResponse.json({ error: "Regra não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "Regra nÃ£o encontrada" }, { status: 404 })
     }
 
-    const guideline = rule.guideline_version?.guideline
+    const guideline = Array.isArray((rule as any).guideline_version?.guideline)
+      ? (rule as any).guideline_version?.guideline?.[0]
+      : (rule as any).guideline_version?.guideline
     if (!guideline || guideline.organization_id !== ctx.tenantId) {
-      return NextResponse.json({ error: "Regra não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "Regra nÃ£o encontrada" }, { status: 404 })
     }
 
-    if (rule.guideline_version?.is_published) {
+    const isPublished = Array.isArray((rule as any).guideline_version)
+      ? (rule as any).guideline_version[0]?.is_published
+      : (rule as any).guideline_version?.is_published
+    if (isPublished) {
       return NextResponse.json({ 
-        error: "Não é possível editar uma regra de versão publicada" 
+        error: "NÃ£o Ã© possÃ­vel editar uma regra de versÃ£o publicada" 
       }, { status: 400 })
     }
 
@@ -243,7 +246,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Dados inválidos", details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: "Dados invÃ¡lidos", details: error.issues }, { status: 400 })
     }
     console.error('Erro interno:', error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
@@ -259,13 +262,13 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   const ruleId = url.pathname.split('/').pop()
   
   if (!ruleId) {
-    return NextResponse.json({ error: "ID da regra é obrigatório" }, { status: 400 })
+    return NextResponse.json({ error: "ID da regra Ã© obrigatÃ³rio" }, { status: 400 })
   }
 
   const supabase = await createClient()
   
   try {
-    // Verificar se a regra pertence às diretrizes e organização
+    // Verificar se a regra pertence Ã s diretrizes e organizaÃ§Ã£o
     const { data: rule, error: ruleError } = await supabase
       .from('training_guideline_rules')
       .select(`
@@ -283,17 +286,22 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       .single()
 
     if (ruleError || !rule) {
-      return NextResponse.json({ error: "Regra não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "Regra nÃ£o encontrada" }, { status: 404 })
     }
 
-    const guideline = rule.guideline_version?.guideline
+    const guideline = Array.isArray((rule as any).guideline_version?.guideline)
+      ? (rule as any).guideline_version?.guideline?.[0]
+      : (rule as any).guideline_version?.guideline
     if (!guideline || guideline.organization_id !== ctx.tenantId) {
-      return NextResponse.json({ error: "Regra não encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "Regra nÃ£o encontrada" }, { status: 404 })
     }
 
-    if (rule.guideline_version?.is_published) {
+    const isPublished2 = Array.isArray((rule as any).guideline_version)
+      ? (rule as any).guideline_version[0]?.is_published
+      : (rule as any).guideline_version?.is_published
+    if (isPublished2) {
       return NextResponse.json({ 
-        error: "Não é possível deletar uma regra de versão publicada" 
+        error: "NÃ£o Ã© possÃ­vel deletar uma regra de versÃ£o publicada" 
       }, { status: 400 })
     }
 

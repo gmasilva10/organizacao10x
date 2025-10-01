@@ -6,6 +6,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragStartEvent,
+  DragOverEvent,
   DragEndEvent,
   useDroppable,
   useDraggable,
@@ -100,8 +102,7 @@ export default function OnboardingPage() {
         id: k.id, 
         title, 
         studentId: k.student_id, 
-        status: k.student_status,
-        studentPhone: (k as any).student_phone
+        status: k.student_status
       }
       if (k.completed_at && doneColId) {
         historyBuffer.push(card)
@@ -338,12 +339,12 @@ export default function OnboardingPage() {
         <>
       <div className="mb-3" />
 
-          <DndContext sensors={sensors} onDragStart={(e) => {
+          <DndContext sensors={sensors} onDragStart={(e: DragStartEvent) => {
             const isDraggingCol = e.active.id.toString().startsWith('col:')
             if (isDraggingCol) {
               draggingColRef.current = String(e.active.id).replace('col:', '')
             }
-          }} onDragOver={(e) => {
+          }} onDragOver={(e: DragOverEvent) => {
             if (busy) return
             const over = e.over
             if (!over || !draggingColRef.current) return
@@ -367,7 +368,7 @@ export default function OnboardingPage() {
               newColumns.splice(newIndex, 0, draggedColumn)
               setColumns(newColumns)
             }
-          }} onDragEnd={async (e) => {
+          }} onDragEnd={async (e: DragEndEvent) => {
             draggingColRef.current = null
             setBusy(false)
             const { active, over } = e
@@ -445,6 +446,7 @@ export default function OnboardingPage() {
       {confirm.open && (
         <ConfirmDialog
           open={confirm.open}
+          onOpenChange={(v: boolean) => setConfirm(prev => ({ ...prev, open: v }))}
           onConfirm={confirm.onConfirm || (() => setConfirm({...confirm, open: false}))}
           onCancel={() => setConfirm({...confirm, open: false})}
           title={confirm.title}
@@ -453,10 +455,10 @@ export default function OnboardingPage() {
       )}
 
       {/* KanbanCardEditor */}
-      {openEditorId && columns.map(col => col.cards.find(c => c.id === openEditorId)).filter(Boolean).length > 0 && (
+      {openEditorId && columns.some(col => col.cards.some(c => c.id === openEditorId)) && (
         <KanbanCardEditor
-          card={columns.map(col => col.cards.find(c => c.id === openEditorId)).filter(Boolean)[0]!}
-          column={columns.map(col => col.cards.find(c => c.id === openEditorId)).find(Boolean)?.[0] ? columns.find(col => col.cards.some(c => c.id === openEditorId))! : columns[0]!}
+          card={columns.flatMap(c => c.cards).find(c => c.id === openEditorId)!}
+          column={columns.find(c => c.cards.some(card => card.id === openEditorId))!}
           isOpen={!!openEditorId}
           onClose={() => setOpenEditorId(null)}
           onMove={async (cardId: string, fromColumnId: string, toColumnId: string) => {
@@ -488,9 +490,9 @@ export default function OnboardingPage() {
               toastError(err instanceof Error ? err.message : "Não foi possível avançar para a próxima etapa.")
             }
           }}
-          onComplete={(cardId: string) => {
+          onComplete={async (cardId: string) => {
             toastSuccess("Card completado: As tarefas do card foram concluídas.")
-            loadBoard(trainerScope)
+            await loadBoard(trainerScope)
           }}
           updateCardProgress={updateCardProgress}
         />

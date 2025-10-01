@@ -394,7 +394,7 @@ export default function AnamneseFormPage() {
 
                         <div className="ml-11">
                           {hasOptions && !isMultiple ? (
-                            <Select value={(dynamicAnswers[q.key] ?? '').toString()} onValueChange={(value) => setDynamicAnswers(prev => ({ ...prev, [q.key]: value }))}>
+                            <Select value={(dynamicAnswers[q.key] ?? '').toString()} onValueChange={(value: string) => setDynamicAnswers(prev => ({ ...prev, [q.key]: value }))}>
                               <SelectTrigger className="h-12 bg-white border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg">
                                 <SelectValue placeholder="Selecione uma opção" />
                               </SelectTrigger>
@@ -417,7 +417,7 @@ export default function AnamneseFormPage() {
                                     <Checkbox
                                       id={`${q.key}-${idx}`}
                                       checked={checked}
-                                      onCheckedChange={(checked) => {
+                                      onCheckedChange={(checked: boolean) => {
                                         setDynamicAnswers(prev => {
                                           const prevArr = Array.isArray(prev[q.key]) ? [...prev[q.key]] : []
                                           if (checked) {

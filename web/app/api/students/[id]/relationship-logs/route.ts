@@ -1,5 +1,5 @@
-
-// Forçar execução dinâmica para evitar problemas de renderização estática
+﻿
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -8,9 +8,9 @@ export const revalidate = 0;
  * GATE 10.6.5 - API para Logs de Relacionamento do Aluno
  * 
  * Funcionalidades:
- * - Listar logs de relacionamento de um aluno específico
- * - Filtros por ação, canal, template, período
- * - Paginação e ordenação cronológica
+ * - Listar logs de relacionamento de um aluno especÃ­fico
+ * - Filtros por aÃ§Ã£o, canal, template, perÃ­odo
+ * - PaginaÃ§Ã£o e ordenaÃ§Ã£o cronolÃ³gica
  * - Performance otimizada
  */
 
@@ -37,7 +37,7 @@ export async function GET(
       const date_from = searchParams.get('date_from')
       const date_to = searchParams.get('date_to')
       
-      // Paginação e ordenação
+      // PaginaÃ§Ã£o e ordenaÃ§Ã£o
       const sort_by = searchParams.get('sort_by') || 'at'
       const sort_order = searchParams.get('sort_order') || 'desc'
       const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
@@ -52,7 +52,7 @@ export async function GET(
         .single()
 
       if (studentError || !student) {
-        return NextResponse.json({ error: 'Aluno não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Aluno nÃ£o encontrado' }, { status: 404 })
       }
 
 
@@ -89,11 +89,11 @@ export async function GET(
         query = query.lte('at', date_to)
       }
 
-      // Aplicar paginação e ordenação
+      // Aplicar paginaÃ§Ã£o e ordenaÃ§Ã£o
       const from_idx = (page - 1) * page_size
       const to_idx = from_idx + page_size - 1
 
-      console.log('🔍 [DEBUG] Executando query com filtros:', {
+      console.log('ðŸ” [DEBUG] Executando query com filtros:', {
         studentId,
         action,
         channel,
@@ -104,8 +104,8 @@ export async function GET(
         page_size
       })
 
-      // Log da query SQL que será executada
-      console.log('🔍 [DEBUG] Query SQL final:', {
+      // Log da query SQL que serÃ¡ executada
+      console.log('ðŸ” [DEBUG] Query SQL final:', {
         table: 'relationship_logs',
         select: 'id, student_id, task_id, action, channel, template_code, meta, at',
         where: `student_id = '${studentId}'`,
@@ -117,7 +117,7 @@ export async function GET(
         .order(sort_by, { ascending: sort_order === 'asc' })
         .range(from_idx, to_idx)
 
-      console.log('🔍 [DEBUG] API - Resultado da query:', {
+      console.log('ðŸ” [DEBUG] API - Resultado da query:', {
         logsCount: logs?.length || 0,
         totalCount: count,
         error: error?.message,
@@ -127,9 +127,9 @@ export async function GET(
 
       // Log detalhado dos dados retornados
       if (logs && logs.length > 0) {
-        console.log('🔍 [DEBUG] API - Dados encontrados:', logs.slice(0, 2))
+        console.log('ðŸ” [DEBUG] API - Dados encontrados:', logs.slice(0, 2))
       } else {
-        console.log('🔍 [DEBUG] API - Nenhum dado encontrado, verificando RLS...')
+        console.log('ðŸ” [DEBUG] API - Nenhum dado encontrado, verificando RLS...')
         
         // Testar query sem RLS para debug
         const { data: debugLogs, error: debugError } = await supabase
@@ -138,7 +138,7 @@ export async function GET(
           .eq('student_id', studentId)
           .limit(5)
         
-        console.log('🔍 [DEBUG] API - Query de debug (sem RLS):', {
+        console.log('ðŸ” [DEBUG] API - Query de debug (sem RLS):', {
           debugLogsCount: debugLogs?.length || 0,
           debugError: debugError?.message,
           debugLogs: debugLogs?.slice(0, 2)
@@ -150,7 +150,7 @@ export async function GET(
           .select('*', { count: 'exact', head: true })
           .eq('student_id', studentId)
         
-        console.log('🔍 [DEBUG] API - Contagem total de logs:', {
+        console.log('ðŸ” [DEBUG] API - Contagem total de logs:', {
           totalCount,
           countError: countError?.message
         })
@@ -161,7 +161,7 @@ export async function GET(
           .select('id, student_id, action, at')
           .limit(3)
         
-        console.log('🔍 [DEBUG] API - Todos os logs (sem filtro):', {
+        console.log('ðŸ” [DEBUG] API - Todos os logs (sem filtro):', {
           allLogsCount: allLogs?.length || 0,
           allError: allError?.message,
           allLogs: allLogs?.slice(0, 2)
@@ -169,11 +169,11 @@ export async function GET(
       }
 
       if (error) {
-        console.error('❌ [DEBUG] API - Erro na query:', error)
+        console.error('âŒ [DEBUG] API - Erro na query:', error)
         return NextResponse.json({ error: 'Erro ao buscar logs' }, { status: 500 })
       }
 
-      // Enriquecer logs com informações da tarefa (se disponível)
+      // Enriquecer logs com informaÃ§Ãµes da tarefa (se disponÃ­vel)
       const taskIds = Array.from(new Set((logs || []).map(log => log.task_id).filter(Boolean)))
       const taskMap: Record<string, any> = {}
       
@@ -188,7 +188,7 @@ export async function GET(
         }
       }
 
-      // Enriquecer dados com informações da tarefa
+      // Enriquecer dados com informaÃ§Ãµes da tarefa
       const enriched_logs = (logs || []).map(log => ({
         ...log,
         task: log.task_id ? taskMap[log.task_id] : null,
@@ -229,7 +229,7 @@ export async function GET(
       console.error('Erro na API /students/[id]/relationship-logs:', error)
       return NextResponse.json({ 
         error: 'Erro interno do servidor',
-        details: error.message 
+        details: (error as any)?.message || String(error) 
       }, { status: 500 })
     }
   })

@@ -1,24 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { z } from 'zod'
 
-// Schema de validação para criação/atualização
+// Schema de validaÃ§Ã£o para criaÃ§Ã£o/atualizaÃ§Ã£o
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const OccurrenceTypeSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
-  description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
-  group_id: z.number().int().positive('ID do grupo deve ser um número positivo'),
+  name: z.string().min(1, 'Nome Ã© obrigatÃ³rio').max(100, 'Nome deve ter no mÃ¡ximo 100 caracteres'),
+  description: z.string().max(500, 'DescriÃ§Ã£o deve ter no mÃ¡ximo 500 caracteres').optional(),
+  group_id: z.number().int().positive('ID do grupo deve ser um nÃºmero positivo'),
   applies_to: z.enum(['student','professional','both']).default('student'),
   is_active: z.boolean().default(true)
 })
 
-// GET - Listar tipos de ocorrências (com filtros)
+// GET - Listar tipos de ocorrÃªncias (com filtros)
 export async function GET(request: NextRequest) {
   return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
     try {
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       const q = searchParams.get('query')?.trim() || ''
       const groupIdParam = searchParams.get('group_id')
 
-      // Buscar tipos do tenant com informações do grupo
+      // Buscar tipos do tenant com informaÃ§Ãµes do grupo
       let query = supabase
         .from('occurrence_types')
         .select(`
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
       // Processar dados para incluir nome do grupo
       const processedTypes = types?.map(type => ({
         ...type,
-        group_name: type.occurrence_groups?.name || 'Grupo não encontrado'
+        group_name: type.occurrence_groups?.name || 'Grupo nÃ£o encontrado'
       })) || []
 
       return NextResponse.json({ types: processedTypes })
@@ -103,10 +103,10 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (!group) {
-        return NextResponse.json({ error: 'Grupo não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Grupo nÃ£o encontrado' }, { status: 404 })
       }
 
-      // Verificar se nome já existe no grupo
+      // Verificar se nome jÃ¡ existe no grupo
       const { data: existingType } = await supabase
         .from('occurrence_types')
         .select('id')
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (existingType) {
-        return NextResponse.json({ error: 'Já existe um tipo com este nome neste grupo' }, { status: 409 })
+        return NextResponse.json({ error: 'JÃ¡ existe um tipo com este nome neste grupo' }, { status: 409 })
       }
 
       // Criar tipo
@@ -140,8 +140,8 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json({ 
-          error: 'Dados inválidos', 
-          details: error.errors 
+          error: 'Dados invÃ¡lidos', 
+          details: error.issues 
         }, { status: 400 })
       }
       

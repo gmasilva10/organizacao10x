@@ -63,7 +63,7 @@ export async function POST(
     }
 
     // 2. Verificar se o email já existe como usuário no auth.users
-    const { data: existingUser, error: userError } = await supabase.auth.admin.getUserByEmail(email)
+    const { data: existingUser, error: userError } = await (supabase.auth.admin as any).getUserByEmail(email)
 
     if (userError && userError.message !== 'User not found') {
       console.error('Erro ao verificar usuário existente:', userError)

@@ -1,25 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { z } from 'zod'
 import { auditLogger } from '@/lib/audit-logger'
 
-// Schema para atualização (todos os campos opcionais)
+// Schema para atualizaÃ§Ã£o (todos os campos opcionais)
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const UpdateOccurrenceTypeSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres').optional(),
-  description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
-  group_id: z.number().int().positive('ID do grupo deve ser um número positivo').optional(),
+  name: z.string().min(1, 'Nome Ã© obrigatÃ³rio').max(100, 'Nome deve ter no mÃ¡ximo 100 caracteres').optional(),
+  description: z.string().max(500, 'DescriÃ§Ã£o deve ter no mÃ¡ximo 500 caracteres').optional(),
+  group_id: z.number().int().positive('ID do grupo deve ser um nÃºmero positivo').optional(),
   applies_to: z.enum(['student', 'professional', 'both']).optional(),
   is_active: z.boolean().optional()
 })
 
-// GET - Buscar tipo específico
+// GET - Buscar tipo especÃ­fico
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -40,7 +40,7 @@ export async function GET(
         .single()
 
       if (error || !type) {
-        return NextResponse.json({ error: 'Tipo não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Tipo nÃ£o encontrado' }, { status: 404 })
       }
 
       return NextResponse.json({ type })
@@ -70,14 +70,14 @@ export async function PATCH(
         .single()
 
       if (!currentType) {
-        return NextResponse.json({ error: 'Tipo não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Tipo nÃ£o encontrado' }, { status: 404 })
       }
 
       // Validar dados
       const body = await request.json()
       const validatedData = UpdateOccurrenceTypeSchema.parse(body)
 
-      // Verificar se nome é único (se estiver sendo alterado)
+      // Verificar se nome Ã© Ãºnico (se estiver sendo alterado)
       if (validatedData.name && validatedData.name !== currentType.name) {
         const groupId = validatedData.group_id || currentType.group_id
         const { data: existingType } = await supabase
@@ -91,8 +91,8 @@ export async function PATCH(
 
         if (existingType) {
           return NextResponse.json({ 
-            error: 'Nome já existe', 
-            details: 'Já existe um tipo com este nome no grupo selecionado' 
+            error: 'Nome jÃ¡ existe', 
+            details: 'JÃ¡ existe um tipo com este nome no grupo selecionado' 
           }, { status: 400 })
         }
       }
@@ -108,8 +108,8 @@ export async function PATCH(
 
         if (!group) {
           return NextResponse.json({ 
-            error: 'Grupo inválido', 
-            details: 'O grupo selecionado não existe ou não pertence à sua organização' 
+            error: 'Grupo invÃ¡lido', 
+            details: 'O grupo selecionado nÃ£o existe ou nÃ£o pertence Ã  sua organizaÃ§Ã£o' 
           }, { status: 400 })
         }
       }
@@ -154,7 +154,7 @@ export async function PATCH(
 
         if (Object.keys(changes).length > 0) {
           await auditLogger.log({
-            action: 'occurrence_type_updated',
+            action: 'update',
             entityType: 'occurrence_type',
             entityId: id,
             payload: {
@@ -163,7 +163,7 @@ export async function PATCH(
             },
             actorId: user.id,
             tenantId: tenant_id
-          })
+          } as any, supabase)
         }
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)
@@ -172,13 +172,13 @@ export async function PATCH(
       return NextResponse.json({ type: updatedType })
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const fieldMessages = error.errors.map(e => {
+        const fieldMessages = error.issues.map(e => {
           const field = e.path.join('.')
           return `${field}: ${e.message}`
         }).join('; ')
         
         return NextResponse.json({ 
-          error: 'Dados inválidos',
+          error: 'Dados invÃ¡lidos',
           details: fieldMessages
         }, { status: 400 })
       }
@@ -208,10 +208,10 @@ export async function DELETE(
         .single()
 
       if (!type) {
-        return NextResponse.json({ error: 'Tipo não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Tipo nÃ£o encontrado' }, { status: 404 })
       }
 
-      // Verificar se há ocorrências vinculadas
+      // Verificar se hÃ¡ ocorrÃªncias vinculadas
       const { data: occurrences } = await supabase
         .from('student_occurrences')
         .select('id')
@@ -221,8 +221,8 @@ export async function DELETE(
 
       if (occurrences && occurrences.length > 0) {
         return NextResponse.json({ 
-          error: 'Não é possível excluir', 
-          details: 'Este tipo possui ocorrências vinculadas. Não é possível excluí-lo.' 
+          error: 'NÃ£o Ã© possÃ­vel excluir', 
+          details: 'Este tipo possui ocorrÃªncias vinculadas. NÃ£o Ã© possÃ­vel excluÃ­-lo.' 
         }, { status: 400 })
       }
 
@@ -241,7 +241,7 @@ export async function DELETE(
       // Log de auditoria
       try {
         await auditLogger.log({
-          action: 'occurrence_type_deleted',
+          action: 'delete',
           entityType: 'occurrence_type',
           entityId: id,
           payload: {
@@ -251,7 +251,7 @@ export async function DELETE(
           },
           actorId: user.id,
           tenantId: tenant_id
-        })
+        } as any, supabase)
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)
       }

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(()=>({})) as { type?: string; payload?: Record<string, unknown> }
   const type = String(body?.type || '').trim() || 'app.event'
   try {
-    await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: type, payload: body?.payload || {} })
+  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: type as any, payload: body?.payload || {} })
   } catch {}
   return new NextResponse(null, { status: 204 })
 }

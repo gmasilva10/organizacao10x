@@ -350,7 +350,7 @@ export default function ServicesOnboardPage() {
             <span className="text-sm text-muted-foreground">Modo compacto</span>
             <Switch
               checked={viewMode === 'compact'}
-              onCheckedChange={(checked) => setViewMode(checked ? 'compact' : 'default')}
+              onCheckedChange={(checked: boolean) => setViewMode(checked ? 'compact' : 'default')}
             />
           </div>
         </div>
@@ -556,7 +556,7 @@ export default function ServicesOnboardPage() {
       </div>
 
       {/* New Template Modal */}
-      <Dialog open={newTemplateModal.open} onOpenChange={(open) => !open && setNewTemplateModal({ open: false, column: null })}>
+      <Dialog open={newTemplateModal.open} onOpenChange={(open: boolean) => !open && setNewTemplateModal({ open: false, column: null })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nova Tarefa</DialogTitle>
@@ -572,7 +572,7 @@ export default function ServicesOnboardPage() {
       </Dialog>
 
       {/* Manage Templates Modal */}
-      <Dialog open={manageTemplatesModal.open} onOpenChange={(open) => !open && setManageTemplatesModal({ open: false, column: null })}>
+      <Dialog open={manageTemplatesModal.open} onOpenChange={(open: boolean) => !open && setManageTemplatesModal({ open: false, column: null })}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Gerenciar Tarefas da Coluna</DialogTitle>
@@ -595,7 +595,7 @@ export default function ServicesOnboardPage() {
       </Dialog>
 
       {/* New Column Modal */}
-      <Dialog open={newColumnModal.open} onOpenChange={(open) => !open && setNewColumnModal({ open: false })}>
+      <Dialog open={newColumnModal.open} onOpenChange={(open: boolean) => !open && setNewColumnModal({ open: false })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nova Coluna</DialogTitle>
@@ -608,7 +608,7 @@ export default function ServicesOnboardPage() {
       </Dialog>
 
       {/* Edit Column Modal */}
-      <Dialog open={editColumnModal.open} onOpenChange={(open) => !open && setEditColumnModal({ open: false, column: null })}>
+      <Dialog open={editColumnModal.open} onOpenChange={(open: boolean) => !open && setEditColumnModal({ open: false, column: null })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Coluna</DialogTitle>
@@ -918,7 +918,7 @@ function NewTemplateForm({ column, onSave, onCancel }: { column: Column; onSave:
         <Switch
           id="isRequired"
           checked={isRequired}
-          onCheckedChange={(checked) => setIsRequired(checked)}
+          onCheckedChange={(checked: boolean) => setIsRequired(checked)}
         />
         <Label htmlFor="isRequired">Tarefa obrigatória</Label>
       </div>

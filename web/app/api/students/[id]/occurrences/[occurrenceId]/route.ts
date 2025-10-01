@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { z } from 'zod'
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -17,10 +17,10 @@ const updateOccurrenceSchema = z.object({
     today.setHours(23, 59, 59, 999)
     return occurrenceDate <= today
   }, {
-    message: "Data da ocorrência não pode ser futura"
+    message: "Data da ocorrÃªncia nÃ£o pode ser futura"
   }).optional(),
   notes: z.string().min(5).max(500).optional(),
-  // Aceitar string numérica do front
+  // Aceitar string numÃ©rica do front
   owner_user_id: z.coerce.number().int().positive().optional(),
   priority: z.enum(['low','medium','high']).optional(),
   is_sensitive: z.boolean().optional(),
@@ -36,10 +36,10 @@ export async function GET(
     const { id: studentId, occurrenceId } = await params
     const supabase = await createClient()
     
-    // Verificar autenticação
+    // Verificar autenticaÃ§Ã£o
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+      return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
     }
 
     // Verificar membership
@@ -50,10 +50,10 @@ export async function GET(
       .single()
 
     if (!membership) {
-      return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'Membro nÃ£o encontrado' }, { status: 404 })
     }
 
-    // Buscar ocorrência
+    // Buscar ocorrÃªncia
     const { data: occurrence, error } = await supabase
       .from('student_occurrences')
       .select(`
@@ -68,8 +68,8 @@ export async function GET(
       .single()
 
     if (error) {
-      console.error('Erro ao buscar ocorrência:', error)
-      return NextResponse.json({ error: 'Ocorrência não encontrada' }, { status: 404 })
+      console.error('Erro ao buscar ocorrÃªncia:', error)
+      return NextResponse.json({ error: 'OcorrÃªncia nÃ£o encontrada' }, { status: 404 })
     }
 
     return NextResponse.json({ occurrence })
@@ -87,10 +87,10 @@ export async function PATCH(
     const { id: studentId, occurrenceId } = await params
     const supabase = await createClient()
     
-    // Verificar autenticação
+    // Verificar autenticaÃ§Ã£o
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+      return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
     }
 
     // Verificar membership
@@ -101,10 +101,10 @@ export async function PATCH(
       .single()
 
     if (!membership) {
-      return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'Membro nÃ£o encontrado' }, { status: 404 })
     }
 
-    // Verificar se a ocorrência existe
+    // Verificar se a ocorrÃªncia existe
     const { data: existingOccurrence } = await supabase
       .from('student_occurrences')
       .select('id, status')
@@ -114,14 +114,14 @@ export async function PATCH(
       .single()
 
     if (!existingOccurrence) {
-      return NextResponse.json({ error: 'Ocorrência não encontrada' }, { status: 404 })
+      return NextResponse.json({ error: 'OcorrÃªncia nÃ£o encontrada' }, { status: 404 })
     }
 
     // Validar dados
     const body = await request.json()
     const validatedData = updateOccurrenceSchema.parse(body)
 
-    // Verificar se o responsável é válido (se fornecido)
+    // Verificar se o responsÃ¡vel Ã© vÃ¡lido (se fornecido)
     let ownerUserId = undefined
     if (validatedData.owner_user_id) {
       const { data: professional } = await supabase
@@ -132,12 +132,12 @@ export async function PATCH(
         .single()
 
       if (!professional) {
-        return NextResponse.json({ error: 'Responsável não encontrado' }, { status: 400 })
+        return NextResponse.json({ error: 'ResponsÃ¡vel nÃ£o encontrado' }, { status: 400 })
       }
       ownerUserId = professional.user_id
     }
 
-    // Atualizar ocorrência
+    // Atualizar ocorrÃªncia
     const { data: updatedOccurrence, error } = await supabase
       .from('student_occurrences')
       .update({
@@ -157,20 +157,20 @@ export async function PATCH(
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar ocorrência:', error)
-      return NextResponse.json({ error: 'Erro ao atualizar ocorrência' }, { status: 500 })
+      console.error('Erro ao atualizar ocorrÃªncia:', error)
+      return NextResponse.json({ error: 'Erro ao atualizar ocorrÃªncia' }, { status: 500 })
     }
 
     return NextResponse.json({ 
-      message: 'Ocorrência atualizada com sucesso',
+      message: 'OcorrÃªncia atualizada com sucesso',
       occurrence: updatedOccurrence
     })
   } catch (error) {
     console.error('Erro na API:', error)
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
-        error: 'Dados inválidos',
-        details: error.errors
+        error: 'Dados invÃ¡lidos',
+        details: error.issues
       }, { status: 400 })
     }
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
@@ -185,10 +185,10 @@ export async function DELETE(
     const { id: studentId, occurrenceId } = await params
     const supabase = await createClient()
     
-    // Verificar autenticação
+    // Verificar autenticaÃ§Ã£o
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+      return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
     }
 
     // Verificar membership
@@ -199,10 +199,10 @@ export async function DELETE(
       .single()
 
     if (!membership) {
-      return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'Membro nÃ£o encontrado' }, { status: 404 })
     }
 
-    // Verificar se a ocorrência existe
+    // Verificar se a ocorrÃªncia existe
     const { data: existingOccurrence } = await supabase
       .from('student_occurrences')
       .select('id')
@@ -212,10 +212,10 @@ export async function DELETE(
       .single()
 
     if (!existingOccurrence) {
-      return NextResponse.json({ error: 'Ocorrência não encontrada' }, { status: 404 })
+      return NextResponse.json({ error: 'OcorrÃªncia nÃ£o encontrada' }, { status: 404 })
     }
 
-    // Deletar ocorrência
+    // Deletar ocorrÃªncia
     const { error } = await supabase
       .from('student_occurrences')
       .delete()
@@ -224,11 +224,11 @@ export async function DELETE(
       .eq('student_id', studentId)
 
     if (error) {
-      console.error('Erro ao deletar ocorrência:', error)
-      return NextResponse.json({ error: 'Erro ao deletar ocorrência' }, { status: 500 })
+      console.error('Erro ao deletar ocorrÃªncia:', error)
+      return NextResponse.json({ error: 'Erro ao deletar ocorrÃªncia' }, { status: 500 })
     }
 
-    return NextResponse.json({ message: 'Ocorrência deletada com sucesso' })
+    return NextResponse.json({ message: 'OcorrÃªncia deletada com sucesso' })
   } catch (error) {
     console.error('Erro na API:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })

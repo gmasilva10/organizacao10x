@@ -1,17 +1,17 @@
-import { NextResponse } from "next/server"
+﻿import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { z } from "zod"
 import { createClient } from "@/utils/supabase/server"
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 
 const previewSchema = z.object({
-  guideline_version_id: z.string().uuid("ID da versão deve ser um UUID válido"),
-  mock_responses: z.record(z.any(), "Respostas mock são obrigatórias")
+  guideline_version_id: z.string().uuid("ID da versÃ£o deve ser um UUID vÃ¡lido"),
+  mock_responses: z.record(z.string(), z.any()),
 })
 
 // POST /api/anamnesis/guidelines/[id]/preview - Preview das diretrizes
@@ -25,7 +25,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const body = await request.json()
     const validatedData = previewSchema.parse(body)
 
-    // Verificar se as diretrizes pertencem à organização
+    // Verificar se as diretrizes pertencem Ã  organizaÃ§Ã£o
     const { data: guideline, error: guidelineError } = await supabase
       .from('training_guidelines')
       .select('id, organization_id')
@@ -34,10 +34,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
       .single()
 
     if (guidelineError || !guideline) {
-      return NextResponse.json({ error: "Diretrizes não encontradas" }, { status: 404 })
+      return NextResponse.json({ error: "Diretrizes nÃ£o encontradas" }, { status: 404 })
     }
 
-    // Buscar regras da versão especificada
+    // Buscar regras da versÃ£o especificada
     const { data: rules, error: rulesError } = await supabase
       .from('training_guideline_rules')
       .select('*')
@@ -72,10 +72,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
     for (const rule of rules || []) {
       let isApplicable = false
 
-      // Verificar condições da regra
+      // Verificar condiÃ§Ãµes da regra
       switch (rule.condition_type) {
         case 'single':
-          // Condição simples: verificar se a resposta corresponde
+          // CondiÃ§Ã£o simples: verificar se a resposta corresponde
           for (const [key, expectedValue] of Object.entries(rule.conditions)) {
             if (validatedData.mock_responses[key] === expectedValue) {
               isApplicable = true
@@ -85,15 +85,15 @@ export async function POST(request: Request, { params }: { params: { id: string 
           break
 
         case 'multiple':
-          // Condição múltipla: todas as condições devem ser atendidas
+          // CondiÃ§Ã£o mÃºltipla: todas as condiÃ§Ãµes devem ser atendidas
           isApplicable = Object.entries(rule.conditions).every(([key, expectedValue]) => 
             validatedData.mock_responses[key] === expectedValue
           )
           break
 
         case 'custom':
-          // Condição customizada: implementar lógica específica
-          // Por enquanto, verificar se pelo menos uma condição é atendida
+          // CondiÃ§Ã£o customizada: implementar lÃ³gica especÃ­fica
+          // Por enquanto, verificar se pelo menos uma condiÃ§Ã£o Ã© atendida
           isApplicable = Object.entries(rule.conditions).some(([key, expectedValue]) => 
             validatedData.mock_responses[key] === expectedValue
           )
@@ -148,7 +148,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       }
     }
 
-    // Remover duplicatas das contraindicações
+    // Remover duplicatas das contraindicaÃ§Ãµes
     combinedOutputs.contraindicacoes = [...new Set(combinedOutputs.contraindicacoes)]
 
     return NextResponse.json({
@@ -160,13 +160,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }, {
       headers: {
         'Cache-Control': 'no-cache',
-        'X-Query-Time': '0' // TODO: implementar medição real
+        'X-Query-Time': '0' // TODO: implementar mediÃ§Ã£o real
       }
     })
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Dados inválidos", details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: "Dados invÃ¡lidos", details: error.issues }, { status: 400 })
     }
     console.error('Erro interno:', error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })

@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { z } from 'zod'
 import { auditLogger } from '@/lib/audit-logger'
 
-// Schema para atualização de lembrete
+// Schema para atualizaÃ§Ã£o de lembrete
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -26,7 +26,7 @@ export async function PATCH(
       const { id } = await params
       const supabase = await createClient()
 
-      // Buscar ocorrência atual para auditoria
+      // Buscar ocorrÃªncia atual para auditoria
       const { data: currentOccurrence } = await supabase
         .from('student_occurrences')
         .select('id, reminder_at, reminder_status, reminder_created_by')
@@ -35,7 +35,7 @@ export async function PATCH(
         .single()
 
       if (!currentOccurrence) {
-        return NextResponse.json({ error: 'Ocorrência não encontrada' }, { status: 404 })
+        return NextResponse.json({ error: 'OcorrÃªncia nÃ£o encontrada' }, { status: 404 })
       }
 
       // Validar dados
@@ -78,15 +78,17 @@ export async function PATCH(
         })
 
         if (Object.keys(changes).length > 0) {
-          await auditLogger.logReminderUpdated(
-            id,
-            user.id,
-            tenant_id,
-            {
+          await auditLogger.log({
+            organization_id: tenant_id,
+            user_id: user.id,
+            action: 'update',
+            resource_type: 'occurrence' as any,
+            resource_id: id,
+            payload_after: {
               changes,
               previousValues
             }
-          )
+          } as any, supabase)
         }
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)
@@ -95,13 +97,13 @@ export async function PATCH(
       return NextResponse.json({ success: true, occurrence: updatedOccurrence })
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const fieldMessages = error.errors.map(e => {
+        const fieldMessages = error.issues.map(e => {
           const field = e.path.join('.')
           return `${field}: ${e.message}`
         }).join('; ')
         
         return NextResponse.json({ 
-          error: 'Dados inválidos',
+          error: 'Dados invÃ¡lidos',
           details: fieldMessages
         }, { status: 400 })
       }

@@ -1,23 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { z } from 'zod'
 import { auditLogger } from '@/lib/audit-logger'
 
-// Schema para atualização (todos os campos opcionais)
+// Schema para atualizaÃ§Ã£o (todos os campos opcionais)
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const UpdateOccurrenceGroupSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres').optional(),
-  description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
+  name: z.string().min(1, 'Nome Ã© obrigatÃ³rio').max(100, 'Nome deve ter no mÃ¡ximo 100 caracteres').optional(),
+  description: z.string().max(500, 'DescriÃ§Ã£o deve ter no mÃ¡ximo 500 caracteres').optional(),
   is_active: z.boolean().optional()
 })
 
-// GET - Buscar grupo específico
+// GET - Buscar grupo especÃ­fico
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -35,7 +35,7 @@ export async function GET(
         .single()
 
       if (error || !group) {
-        return NextResponse.json({ error: 'Grupo não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Grupo nÃ£o encontrado' }, { status: 404 })
       }
 
       return NextResponse.json({ group })
@@ -65,14 +65,14 @@ export async function PATCH(
         .single()
 
       if (!currentGroup) {
-        return NextResponse.json({ error: 'Grupo não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Grupo nÃ£o encontrado' }, { status: 404 })
       }
 
       // Validar dados
       const body = await request.json()
       const validatedData = UpdateOccurrenceGroupSchema.parse(body)
 
-      // Verificar se nome é único (se estiver sendo alterado)
+      // Verificar se nome Ã© Ãºnico (se estiver sendo alterado)
       if (validatedData.name && validatedData.name !== currentGroup.name) {
         const { data: existingGroup } = await supabase
           .from('occurrence_groups')
@@ -84,8 +84,8 @@ export async function PATCH(
 
         if (existingGroup) {
           return NextResponse.json({ 
-            error: 'Nome já existe', 
-            details: 'Já existe um grupo com este nome na sua organização' 
+            error: 'Nome jÃ¡ existe', 
+            details: 'JÃ¡ existe um grupo com este nome na sua organizaÃ§Ã£o' 
           }, { status: 400 })
         }
       }
@@ -127,7 +127,7 @@ export async function PATCH(
 
         if (Object.keys(changes).length > 0) {
           await auditLogger.log({
-            action: 'occurrence_group_updated',
+            action: 'update',
             entityType: 'occurrence_group',
             entityId: id,
             payload: {
@@ -136,7 +136,7 @@ export async function PATCH(
             },
             actorId: user.id,
             tenantId: tenant_id
-          })
+          } as any, supabase)
         }
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)
@@ -145,13 +145,13 @@ export async function PATCH(
       return NextResponse.json({ group: updatedGroup })
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const fieldMessages = error.errors.map(e => {
+        const fieldMessages = error.issues.map(e => {
           const field = e.path.join('.')
           return `${field}: ${e.message}`
         }).join('; ')
         
         return NextResponse.json({ 
-          error: 'Dados inválidos',
+          error: 'Dados invÃ¡lidos',
           details: fieldMessages
         }, { status: 400 })
       }
@@ -181,10 +181,10 @@ export async function DELETE(
         .single()
 
       if (!group) {
-        return NextResponse.json({ error: 'Grupo não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Grupo nÃ£o encontrado' }, { status: 404 })
       }
 
-      // Verificar se há tipos vinculados
+      // Verificar se hÃ¡ tipos vinculados
       const { data: types } = await supabase
         .from('occurrence_types')
         .select('id')
@@ -194,8 +194,8 @@ export async function DELETE(
 
       if (types && types.length > 0) {
         return NextResponse.json({ 
-          error: 'Não é possível excluir', 
-          details: 'Este grupo possui tipos de ocorrências vinculados. Exclua os tipos primeiro.' 
+          error: 'NÃ£o Ã© possÃ­vel excluir', 
+          details: 'Este grupo possui tipos de ocorrÃªncias vinculados. Exclua os tipos primeiro.' 
         }, { status: 400 })
       }
 
@@ -214,7 +214,7 @@ export async function DELETE(
       // Log de auditoria
       try {
         await auditLogger.log({
-          action: 'occurrence_group_deleted',
+          action: 'delete',
           entityType: 'occurrence_group',
           entityId: id,
           payload: {
@@ -223,7 +223,7 @@ export async function DELETE(
           },
           actorId: user.id,
           tenantId: tenant_id
-        })
+        } as any, supabase)
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)
       }

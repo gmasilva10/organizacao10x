@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { withOccurrencesRBAC } from "@/server/withOccurrencesRBAC"
 import { z } from "zod"
 import { auditLogger } from "@/lib/audit-logger"
 import { createAdminClient } from "@/utils/supabase/admin"
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -32,8 +32,8 @@ export async function GET(
 			const supabase = await createClient()
 			const t0 = Date.now()
 			
-			// Buscar ocorrência sem joins (evitar 404 por RLS/joins)
-			console.log('🔎 GET /api/occurrences/[id]', { id, tenant_id })
+			// Buscar ocorrÃªncia sem joins (evitar 404 por RLS/joins)
+			console.log('ðŸ”Ž GET /api/occurrences/[id]', { id, tenant_id })
 			const { data: occurrence, error } = await supabase
 				.from('student_occurrences')
 				.select(`
@@ -57,7 +57,7 @@ export async function GET(
 				.single()
 
 			if (error || !occurrence) {
-				console.warn('⚠️ Occurrence not found or error', { id, tenant_id, error })
+				console.warn('âš ï¸ Occurrence not found or error', { id, tenant_id, error })
 				return NextResponse.json({ error: 'Occurrence not found' }, { status: 404 })
 			}
 
@@ -79,7 +79,7 @@ export async function GET(
 
 			const owner_name = ownerRes?.data?.full_name || null
 
-			// Verificar permissões de edição
+			// Verificar permissÃµes de ediÃ§Ã£o
 			const canEdit = membership.role === 'admin' ||
 							membership.role === 'manager' ||
 							occurrence.owner_user_id === user.id
@@ -123,7 +123,7 @@ export async function PATCH(
 			const validatedData = updateOccurrenceSchema.parse(body)
 			const updateData = validatedData as any
 
-			// Verificar se ocorrência existe e pertence ao tenant
+			// Verificar se ocorrÃªncia existe e pertence ao tenant
 			const { data: existingOccurrence } = await supabase
 				.from('student_occurrences')
 				.select('id, owner_user_id, group_id, type_id, notes, priority, is_sensitive, reminder_at, reminder_status, occurred_at')
@@ -135,7 +135,7 @@ export async function PATCH(
 				return NextResponse.json({ error: 'Occurrence not found' }, { status: 404 })
 			}
 
-			// Verificar permissões específicas de edição
+			// Verificar permissÃµes especÃ­ficas de ediÃ§Ã£o
 			const canEdit = membership.role === 'admin' || 
 						membership.role === 'manager' || 
 						existingOccurrence.owner_user_id === user.id
@@ -144,7 +144,7 @@ export async function PATCH(
 				return NextResponse.json({ error: 'Insufficient permissions to edit this occurrence' }, { status: 403 })
 			}
 
-			// Validações de referência
+			// ValidaÃ§Ãµes de referÃªncia
 			if (validatedData.group_id) {
 				const { data: group } = await supabase
 					.from('occurrence_groups')
@@ -155,8 +155,8 @@ export async function PATCH(
 
 				if (!group) {
 					return NextResponse.json({ 
-						error: 'Grupo de ocorrência inválido', 
-						details: 'O grupo selecionado não existe ou não pertence à sua organização' 
+						error: 'Grupo de ocorrÃªncia invÃ¡lido', 
+						details: 'O grupo selecionado nÃ£o existe ou nÃ£o pertence Ã  sua organizaÃ§Ã£o' 
 					}, { status: 400 })
 				}
 			}
@@ -171,22 +171,22 @@ export async function PATCH(
 
 				if (!type) {
 					return NextResponse.json({ 
-						error: 'Tipo de ocorrência inválido', 
-						details: 'O tipo selecionado não existe ou não pertence à sua organização' 
+						error: 'Tipo de ocorrÃªncia invÃ¡lido', 
+						details: 'O tipo selecionado nÃ£o existe ou nÃ£o pertence Ã  sua organizaÃ§Ã£o' 
 					}, { status: 400 })
 				}
 			}
 
-			// Validar regra de negócio reminder_at >= occurred_at
+			// Validar regra de negÃ³cio reminder_at >= occurred_at
 			if (updateData.reminder_at && existingOccurrence.occurred_at) {
 				const rem = new Date(updateData.reminder_at)
 				const occ = new Date(existingOccurrence.occurred_at)
 				if (isFinite(rem.getTime()) && isFinite(occ.getTime()) && rem < occ) {
-					return NextResponse.json({ error: 'Data do lembrete deve ser posterior à data da ocorrência' }, { status: 422 })
+					return NextResponse.json({ error: 'Data do lembrete deve ser posterior Ã  data da ocorrÃªncia' }, { status: 422 })
 				}
 			}
 
-			// Atualizar ocorrência
+			// Atualizar ocorrÃªncia
 			const normalizedUpdate: Record<string, any> = { ...updateData }
 			if (normalizedUpdate.reminder_at === '' || normalizedUpdate.reminder_at === undefined) {
 				normalizedUpdate.reminder_at = null
@@ -208,7 +208,7 @@ export async function PATCH(
 				return NextResponse.json({ error: 'Failed to update occurrence' }, { status: 500 })
 			}
 
-			// Auditoria: identificar mudanças e registrar
+			// Auditoria: identificar mudanÃ§as e registrar
 			let auditId: string | undefined
 			try {
 				const changes: Record<string, any> = {}
@@ -226,12 +226,14 @@ export async function PATCH(
 
 				if (Object.keys(changes).length > 0) {
 					try {
-						auditId = await auditLogger.logOccurrenceUpdated(
-							id,
-							user.id,
-							tenant_id,
-							{ changes, previousValues }
-						)
+						await auditLogger.log({
+							organization_id: tenant_id,
+							user_id: user.id,
+							action: 'update',
+							resource_type: 'occurrence' as any,
+							resource_id: id,
+							payload_after: { changes, previousValues }
+						} as any, supabase)
 					} catch (e: any) {
 						const admin = createAdminClient()
 						const safeError = {
@@ -276,13 +278,13 @@ export async function PATCH(
 
 		} catch (error) {
 			if (error instanceof z.ZodError) {
-				const fieldMessages = error.errors.map(e => {
+				const fieldMessages = error.issues.map(e => {
 					const field = e.path.join('.')
 					return `${field}: ${e.message}`
 				}).join('; ')
 				
 				return NextResponse.json({ 
-					error: 'Dados inválidos',
+					error: 'Dados invÃ¡lidos',
 					details: fieldMessages
 				}, { status: 400 })
 			}

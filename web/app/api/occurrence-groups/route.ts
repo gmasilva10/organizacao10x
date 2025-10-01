@@ -1,29 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { z } from 'zod'
 
-// Schema de validação para criação/atualização
+// Schema de validaÃ§Ã£o para criaÃ§Ã£o/atualizaÃ§Ã£o
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const OccurrenceGroupSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
-  description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
+  name: z.string().min(1, 'Nome Ã© obrigatÃ³rio').max(100, 'Nome deve ter no mÃ¡ximo 100 caracteres'),
+  description: z.string().max(500, 'DescriÃ§Ã£o deve ter no mÃ¡ximo 500 caracteres').optional(),
   is_active: z.boolean().default(true)
 })
 
-// Schema para atualização (todos os campos opcionais)
+// Schema para atualizaÃ§Ã£o (todos os campos opcionais)
 const UpdateOccurrenceGroupSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres').optional(),
-  description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
+  name: z.string().min(1, 'Nome Ã© obrigatÃ³rio').max(100, 'Nome deve ter no mÃ¡ximo 100 caracteres').optional(),
+  description: z.string().max(500, 'DescriÃ§Ã£o deve ter no mÃ¡ximo 500 caracteres').optional(),
   is_active: z.boolean().optional()
 })
 
-// GET - Listar grupos de ocorrências (com filtros)
+// GET - Listar grupos de ocorrÃªncias (com filtros)
 export async function GET(request: NextRequest) {
   return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
     try {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       const body = await request.json()
       const validatedData = OccurrenceGroupSchema.parse(body)
 
-      // Verificar se nome já existe no tenant
+      // Verificar se nome jÃ¡ existe no tenant
       const { data: existingGroup } = await supabase
         .from('occurrence_groups')
         .select('id')
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (existingGroup) {
-        return NextResponse.json({ error: 'Já existe um grupo com este nome' }, { status: 409 })
+        return NextResponse.json({ error: 'JÃ¡ existe um grupo com este nome' }, { status: 409 })
       }
 
       // Criar grupo
@@ -113,8 +113,8 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json({ 
-          error: 'Dados inválidos', 
-          details: error.errors 
+          error: 'Dados invÃ¡lidos', 
+          details: error.issues 
         }, { status: 400 })
       }
       

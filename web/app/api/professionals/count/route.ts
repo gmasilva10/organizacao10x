@@ -23,10 +23,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "database_error" }, { status: 500 })
     }
 
+    const plan = (ctx as any).plan || 'basic'
     return NextResponse.json({ 
       count: count || 0,
-      plan: ctx.plan,
-      canAddMore: ctx.plan === 'enterprise' || (ctx.plan === 'basic' && (count || 0) < 1)
+      plan,
+      canAddMore: plan === 'enterprise' || (plan === 'basic' && (count || 0) < 1)
     })
   } catch (error) {
     console.error('Erro inesperado:', error)

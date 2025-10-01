@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { RELATIONSHIP_TEMPLATE_SEEDS } from '@/lib/relationship/template-seeds'
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     try {
       const supabase = await createClient()
       
-      // Verificar se já existem templates para este tenant
+      // Verificar se jÃ¡ existem templates para este tenant
       const { data: existingTemplates, error: checkError } = await supabase
         .from('relationship_templates')
         .select('id')
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       
       if (existingTemplates && existingTemplates.length > 0) {
         return NextResponse.json({ 
-          message: 'Templates já existem para este tenant',
+          message: 'Templates jÃ¡ existem para este tenant',
           count: existingTemplates.length
         })
       }
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       console.error('Erro na API /relationship/seed-templates:', error)
       return NextResponse.json({ 
         error: 'Erro interno do servidor',
-        details: error.message 
+        details: (error as any)?.message || String(error) 
       }, { status: 500 })
     }
   })

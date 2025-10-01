@@ -213,7 +213,7 @@ export async function POST(request: Request) {
     }
 
     // Verificar limites por plano antes de criar
-    const { data: currentCount } = await supabase
+    const { count: currentCount } = await supabase
       .from("collaborators")
       .select("id", { count: "exact", head: true })
       .eq("org_id", ctx.tenantId)

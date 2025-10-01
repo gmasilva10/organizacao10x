@@ -51,8 +51,12 @@ export async function GET(request: NextRequest) {
       created_at: version.created_at,
       updated_at: version.updated_at,
       student_id: version.student_id,
-      service_name: version.services?.name || null,
-      student_name: version.students?.name || null
+      service_name: Array.isArray((version as any).services)
+        ? ((version as any).services[0]?.name ?? null)
+        : ((version as any).services?.name ?? null),
+      student_name: Array.isArray((version as any).students)
+        ? ((version as any).students[0]?.name ?? null)
+        : ((version as any).students?.name ?? null)
     })) || []
 
     console.log(`✅ [ANAMNESE ALL] ${formattedVersions.length} versões encontradas`)

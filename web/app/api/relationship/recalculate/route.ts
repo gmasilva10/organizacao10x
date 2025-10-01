@@ -1,10 +1,10 @@
-/**
- * GATE 10.6.2 - Endpoint de Recálculo Manual
+﻿/**
+ * GATE 10.6.2 - Endpoint de RecÃ¡lculo Manual
  * 
  * Funcionalidades:
- * - Lock para evitar execuções simultâneas
+ * - Lock para evitar execuÃ§Ãµes simultÃ¢neas
  * - Dry-run mode para preview
- * - Recálculo completo ou por âncora específica
+ * - RecÃ¡lculo completo ou por Ã¢ncora especÃ­fica
  * - Telemetria detalhada
  */
 
@@ -20,7 +20,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Lock para evitar execuções simultâneas
+// Lock para evitar execuÃ§Ãµes simultÃ¢neas
 const recalculationLocks = new Map<string, boolean>()
 
 interface RecalculateRequest {
@@ -46,7 +46,7 @@ interface RecalculateResponse {
 }
 
 /**
- * Verificar se há lock ativo
+ * Verificar se hÃ¡ lock ativo
  */
 function isLocked(tenantId: string): boolean {
   return recalculationLocks.get(tenantId) || false
@@ -64,7 +64,7 @@ function setLock(tenantId: string, locked: boolean): void {
 }
 
 /**
- * Executar recálculo usando a função do banco
+ * Executar recÃ¡lculo usando a funÃ§Ã£o do banco
  */
 async function executeRecalculation(
   tenantId: string, 
@@ -77,7 +77,7 @@ async function executeRecalculation(
       })
 
     if (error) {
-      return { success: false, result: null, error: error.message }
+      return { success: false, result: null, error: (error as any)?.message || String(error) }
     }
 
     return { success: true, result: data, error: undefined }
@@ -85,13 +85,13 @@ async function executeRecalculation(
     return { 
       success: false, 
       result: null, 
-      error: error.message 
+      error: (error as any)?.message || String(error) 
     }
   }
 }
 
 /**
- * Executar recálculo manual completo
+ * Executar recÃ¡lculo manual completo
  */
 async function executeManualRecalculation(
   tenantId: string,
@@ -198,10 +198,10 @@ async function executeManualRecalculation(
         tasks_created: 0,
         tasks_updated: 0,
         tasks_skipped: 0,
-        errors: [error.message],
+        errors: [(error as any)?.message || String(error)],
         duration_ms: Date.now() - startTime
       },
-      message: `Recalculation failed: ${error.message}`
+      message: `Recalculation failed: ${(error as any)?.message || String(error)}`
     }
   }
 }
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Verificar lock (exceto se forçado)
+    // Verificar lock (exceto se forÃ§ado)
     if (!force && isLocked(tenant_id)) {
       return NextResponse.json({
         success: false,
@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
       let result: RecalculateResponse
 
       if (anchor) {
-        // Recálculo por âncora específica (implementar se necessário)
+        // RecÃ¡lculo por Ã¢ncora especÃ­fica (implementar se necessÃ¡rio)
         result = await executeManualRecalculation(tenant_id, dry_run)
         // Evitar log global com student_id nulo (constraint NOT NULL)
         return NextResponse.json(result)
@@ -241,11 +241,11 @@ export async function POST(request: NextRequest) {
       // Evitar log global com student_id nulo (constraint NOT NULL)
       return NextResponse.json(result)
       } else {
-        // Recálculo completo
+        // RecÃ¡lculo completo
         result = await executeManualRecalculation(tenant_id, dry_run)
       }
 
-      // Removido log global (student_id nulo) – retorna resultado diretamente
+      // Removido log global (student_id nulo) â€“ retorna resultado diretamente
       return NextResponse.json(result)
 
     } finally {
@@ -259,7 +259,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: 'Internal server error',
-      message: error.message,
+      message: (error as any)?.message || String(error),
       dry_run: true,
       stats: {
         templates_processed: 0,
@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
         tasks_created: 0,
         tasks_updated: 0,
         tasks_skipped: 0,
-        errors: [error.message],
+        errors: [(error as any)?.message || String(error)],
         duration_ms: 0
       }
     }, { status: 500 })

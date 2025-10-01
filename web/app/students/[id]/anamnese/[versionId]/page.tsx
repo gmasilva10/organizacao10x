@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
@@ -167,7 +167,7 @@ export default function AnamneseEditorPage() {
       
       case 'select':
         return (
-          <Select value={value} onValueChange={(val) => handleAnswerChange(question.key, val)}>
+          <Select value={value} onValueChange={(val: string) => handleAnswerChange(question.key, val)}>
             <SelectTrigger>
               <SelectValue placeholder={`Selecione ${question.label.toLowerCase()}...`} />
             </SelectTrigger>
@@ -238,8 +238,8 @@ export default function AnamneseEditorPage() {
     return (
       <div className="text-center py-12">
         <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Anamnese não encontrada</h3>
-        <p className="text-gray-600 mb-4">A anamnese solicitada não foi encontrada.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Anamnese nÃ£o encontrada</h3>
+        <p className="text-gray-600 mb-4">A anamnese solicitada nÃ£o foi encontrada.</p>
         <Button asChild>
           <Link href={`/students/${studentId}/anamnese`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -264,7 +264,7 @@ export default function AnamneseEditorPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{version.code}</h1>
             <p className="text-gray-600">
-              {version.service_name || 'Serviço não especificado'} • 
+              {version.service_name || 'ServiÃ§o nÃ£o especificado'} â€¢ 
               Status: {version.status}
             </p>
           </div>
@@ -300,12 +300,12 @@ export default function AnamneseEditorPage() {
         </div>
       </div>
 
-      {/* Formulário */}
+      {/* FormulÃ¡rio */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Formulário de Anamnese
+            FormulÃ¡rio de Anamnese
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">

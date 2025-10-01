@@ -54,8 +54,8 @@ export function EditTemplateModal({ isOpen, onClose, template, onSuccess }: Edit
       
       // Carregar perguntas da versão mais recente
       const latestVersion = template.versions?.[0]
-      if (latestVersion?.questions) {
-        setQuestions(latestVersion.questions.map((q, index) => ({
+      if ((latestVersion as any)?.questions) {
+        setQuestions(((latestVersion as any).questions).map((q: any, index: number) => ({
           id: q.id,
           label: q.label,
           type: q.type,

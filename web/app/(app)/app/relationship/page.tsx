@@ -20,7 +20,7 @@ export default function RelationshipPage() {
     <div className="container py-8 px-4 md:px-6">
       {/* Tabs Kanban/Calendário */}
       <div className="mb-6">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+        <Tabs value={activeTab} onValueChange={(v: 'kanban' | 'calendar') => setActiveTab(v)}>
           <TabsList className="h-10 bg-muted/60">
             <TabsTrigger value="kanban" className="px-6">
               Kanban

@@ -184,14 +184,14 @@ export async function GET(request: NextRequest) {
       console.error('Erro na API /relationship/tasks:', error)
       return NextResponse.json({ 
         error: 'Erro interno do servidor',
-        details: error.message 
+        details: (error as any)?.message || String(error) 
       }, { status: 500 })
     }
   } catch (error) {
     console.error('Erro na autenticaÃ§Ã£o /relationship/tasks:', error)
     return NextResponse.json({ 
       error: 'Erro de autenticaÃ§Ã£o',
-      details: error.message 
+      details: (error as any)?.message || String(error) 
     }, { status: 401 })
   }
 }
@@ -326,14 +326,14 @@ export async function PATCH(request: NextRequest) {
       console.error('Erro na API PATCH /relationship/tasks:', error)
       return NextResponse.json({ 
         error: 'Erro interno do servidor',
-        details: error.message 
+        details: (error as any)?.message || String(error) 
       }, { status: 500 })
     }
   } catch (error) {
     console.error('Erro na autenticação PATCH /relationship/tasks:', error)
     return NextResponse.json({ 
       error: 'Erro de autenticação',
-      details: error.message 
+      details: (error as any)?.message || String(error) 
     }, { status: 401 })
   }
 }

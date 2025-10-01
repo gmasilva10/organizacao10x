@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { resolveRequestContext } from "@/server/context"
 import { z } from "zod"
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -12,7 +12,7 @@ export const revalidate = 0;
 const updateQuestionsSchema = z.object({
   questions: z.array(z.object({
     id: z.string().uuid().optional(),
-    label: z.string().min(1, "Label é obrigatório"),
+    label: z.string().min(1, "Label Ã© obrigatÃ³rio"),
     type: z.enum(['text', 'single', 'multi']),
     required: z.boolean(),
     priority: z.enum(['low', 'medium', 'high']),
@@ -32,11 +32,11 @@ export async function PUT(
   try {
     const { id } = params
     
-    // Resolver contexto da requisição
+    // Resolver contexto da requisiÃ§Ã£o
     const ctx = await resolveRequestContext(request)
-    if (!ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.tenantId) {
       return NextResponse.json(
-        { error: "Usuário não autenticado" },
+        { error: "UsuÃ¡rio nÃ£o autenticado" },
         { status: 401 }
       )
     }
@@ -55,16 +55,16 @@ export async function PUT(
 
     if (templateError || !template) {
       return NextResponse.json(
-        { error: "Template não encontrado" },
+        { error: "Template nÃ£o encontrado" },
         { status: 404 }
       )
     }
 
-    // Validar dados da requisição
+    // Validar dados da requisiÃ§Ã£o
     const body = await request.json()
     const validatedData = updateQuestionsSchema.parse(body)
 
-    // Buscar versão mais recente do template
+    // Buscar versÃ£o mais recente do template
     const { data: latestVersion, error: versionError } = await supabase
       .from('anamnesis_template_versions')
       .select('id')
@@ -75,12 +75,12 @@ export async function PUT(
 
     if (versionError || !latestVersion) {
       return NextResponse.json(
-        { error: "Versão do template não encontrada" },
+        { error: "VersÃ£o do template nÃ£o encontrada" },
         { status: 404 }
       )
     }
 
-    // Deletar perguntas existentes da versão
+    // Deletar perguntas existentes da versÃ£o
     await supabase
       .from('anamnesis_questions')
       .delete()
@@ -121,11 +121,11 @@ export async function PUT(
     )
 
   } catch (error) {
-    console.error('Erro na API de atualização de perguntas:', error)
+    console.error('Erro na API de atualizaÃ§Ã£o de perguntas:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Dados inválidos", details: error.errors },
+        { error: "Dados invÃ¡lidos", details: error.issues },
         { status: 400 }
       )
     }

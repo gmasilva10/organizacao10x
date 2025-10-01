@@ -133,12 +133,12 @@ export async function POST(
     let end_date = b.end_date
     if (!end_date && duration_cycles && cycle) {
       const start = new Date(start_date)
-      const monthsPerCycle = {
+      const monthsPerCycle = (({
         'mensal': 1,
         'trimestral': 3,
         'semestral': 6,
         'anual': 12
-      }[cycle] || 1
+      } as Record<string, number>)[String(cycle)]) || 1
       
       const totalMonths = duration_cycles * monthsPerCycle
       const end = new Date(start)

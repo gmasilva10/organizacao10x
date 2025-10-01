@@ -45,7 +45,7 @@ export function OccurrenceRescheduleModal({ open, onClose, occurrenceId, current
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v)=> { if(!v) onClose() }}>
+    <Dialog open={open} onOpenChange={(v: boolean)=> { if(!v) onClose() }}>
       <DialogContent 
         aria-labelledby="reschedule-title" 
         aria-describedby="reschedule-desc"

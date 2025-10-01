@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { z } from 'zod'
 import { auditLogger } from '@/lib/audit-logger'
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -32,9 +32,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         .eq('tenant_id', tenant_id)
         .single()
       
-      if (!existing) return NextResponse.json({ error: 'Ocorrência não encontrada' }, { status: 404 })
+      if (!existing) return NextResponse.json({ error: 'OcorrÃªncia nÃ£o encontrada' }, { status: 404 })
 
-      // Verificar permissões específicas de encerramento
+      // Verificar permissÃµes especÃ­ficas de encerramento
       const canClose = membership.role === 'admin' || 
                       membership.role === 'manager' || 
                       existing.owner_user_id === user.id
@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (!canClose) {
         return NextResponse.json({ 
           error: 'Acesso negado', 
-          details: 'Apenas administradores, gerentes ou o responsável pela ocorrência podem encerrá-la' 
+          details: 'Apenas administradores, gerentes ou o responsÃ¡vel pela ocorrÃªncia podem encerrÃ¡-la' 
         }, { status: 403 })
       }
 
@@ -60,25 +60,28 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         .eq('tenant_id', tenant_id)
 
       if (error) {
-        console.error('Erro ao encerrar ocorrência:', error)
-        return NextResponse.json({ error: 'Erro ao encerrar ocorrência' }, { status: 500 })
+        console.error('Erro ao encerrar ocorrÃªncia:', error)
+        return NextResponse.json({ error: 'Erro ao encerrar ocorrÃªncia' }, { status: 500 })
       }
 
       // Log de auditoria
       try {
-        await auditLogger.logOccurrenceClosed(
-          id,
-          user.id,
-          tenant_id,
-          {
-            resolutionOutcome: data.resolution_outcome,
-            resolutionNotes: data.resolution_notes || '',
-            closedAt: data.resolved_at
+        await auditLogger.log({
+          organization_id: tenant_id,
+          user_id: user.id,
+          action: 'update',
+          resource_type: 'occurrence' as any,
+          resource_id: id,
+          payload_after: {
+            status: 'DONE',
+            resolutionOutcome: (data as any).resolution_outcome,
+            resolutionNotes: (data as any).resolution_notes || '',
+            closedAt: (data as any).resolved_at
           }
-        )
+        } as any, supabase)
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)
-        // Não falha a operação por erro de auditoria
+        // NÃ£o falha a operaÃ§Ã£o por erro de auditoria
       }
 
       return NextResponse.json({ ok: true })
@@ -86,12 +89,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     } catch (e) {
       if (e instanceof z.ZodError) {
         return NextResponse.json({ 
-          error: 'Dados inválidos', 
-          details: e.errors 
+          error: 'Dados invÃ¡lidos', 
+          details: e.issues 
         }, { status: 400 })
       }
       
-      console.error('Erro interno ao encerrar ocorrência:', e)
+      console.error('Erro interno ao encerrar ocorrÃªncia:', e)
       return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
     }
   })

@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { resolveRequestContext } from "@/server/context"
 import { z } from "zod"
 import { calculateAnthropometry, calculateRIR } from "@/lib/anthro-protocols"
 
-// Função para processar métodos aeróbios
+// FunÃ§Ã£o para processar mÃ©todos aerÃ³bios
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
+// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -19,15 +19,15 @@ function processAerobicMethod(aerobio_metodo: string, fc: any, answers: any) {
 
   switch (aerobio_metodo) {
     case 'FCR':
-      result.texto = 'Frequência Cardíaca de Reserva'
+      result.texto = 'FrequÃªncia CardÃ­aca de Reserva'
       result.faixa = [40, 60]
       break
     case 'PSE':
-      result.texto = 'Escala de Percepção Subjetiva de Esforço (Borg 11-13)'
+      result.texto = 'Escala de PercepÃ§Ã£o Subjetiva de EsforÃ§o (Borg 11-13)'
       result.faixa = [11, 13]
       break
     case 'vVO2':
-      result.texto = 'Velocidade no VO2 máximo'
+      result.texto = 'Velocidade no VO2 mÃ¡ximo'
       result.faixa = [70, 80]
       break
     case 'MFEL':
@@ -36,7 +36,7 @@ function processAerobicMethod(aerobio_metodo: string, fc: any, answers: any) {
       break
   }
 
-  // Adicionar orientação PSE se betabloqueador
+  // Adicionar orientaÃ§Ã£o PSE se betabloqueador
   if (answers.betabloqueador === 'sim' || answers.betabloqueador === true) {
     result.orientacoes.push('Priorizar PSE devido ao uso de betabloqueador')
   }
@@ -44,7 +44,7 @@ function processAerobicMethod(aerobio_metodo: string, fc: any, answers: any) {
   return result
 }
 
-// Função para combinar regras (mais restritivo vence)
+// FunÃ§Ã£o para combinar regras (mais restritivo vence)
 function combineRules(rules: any[]) {
   let combined = {
     aerobio: null as any,
@@ -57,12 +57,12 @@ function combineRules(rules: any[]) {
   for (const rule of rules) {
     const outputs = rule.outputs
 
-    // Aeróbio - mais restritivo vence
+    // AerÃ³bio - mais restritivo vence
     if (outputs.aerobio) {
       if (!combined.aerobio) {
         combined.aerobio = outputs.aerobio
       } else {
-        // Duração - interseção
+        // DuraÃ§Ã£o - interseÃ§Ã£o
         if (outputs.aerobio.duracao_min && combined.aerobio.duracao_min) {
           const newMin = Math.max(outputs.aerobio.duracao_min[0], combined.aerobio.duracao_min[0])
           const newMax = Math.min(outputs.aerobio.duracao_min[1], combined.aerobio.duracao_min[1])
@@ -78,14 +78,14 @@ function combineRules(rules: any[]) {
           }
         }
         
-        // Frequência - interseção
+        // FrequÃªncia - interseÃ§Ã£o
         if (outputs.aerobio.frequencia_sem && combined.aerobio.frequencia_sem) {
           const newMin = Math.max(outputs.aerobio.frequencia_sem[0], combined.aerobio.frequencia_sem[0])
           const newMax = Math.min(outputs.aerobio.frequencia_sem[1], combined.aerobio.frequencia_sem[1])
           combined.aerobio.frequencia_sem = [newMin, newMax]
         }
         
-        // Observações - união
+        // ObservaÃ§Ãµes - uniÃ£o
         if (outputs.aerobio.obs) {
           combined.aerobio.obs = [...new Set([...(combined.aerobio.obs || []), ...outputs.aerobio.obs])]
         }
@@ -97,35 +97,35 @@ function combineRules(rules: any[]) {
       if (!combined.pesos) {
         combined.pesos = outputs.pesos
       } else {
-        // Exercícios - interseção
+        // ExercÃ­cios - interseÃ§Ã£o
         if (outputs.pesos.exercicios && combined.pesos.exercicios) {
           const newMin = Math.max(outputs.pesos.exercicios[0], combined.pesos.exercicios[0])
           const newMax = Math.min(outputs.pesos.exercicios[1], combined.pesos.exercicios[1])
           combined.pesos.exercicios = [newMin, newMax]
         }
         
-        // Séries - interseção
+        // SÃ©ries - interseÃ§Ã£o
         if (outputs.pesos.series && combined.pesos.series) {
           const newMin = Math.max(outputs.pesos.series[0], combined.pesos.series[0])
           const newMax = Math.min(outputs.pesos.series[1], combined.pesos.series[1])
           combined.pesos.series = [newMin, newMax]
         }
         
-        // Reps - interseção
+        // Reps - interseÃ§Ã£o
         if (outputs.pesos.reps && combined.pesos.reps) {
           const newMin = Math.max(outputs.pesos.reps[0], combined.pesos.reps[0])
           const newMax = Math.min(outputs.pesos.reps[1], combined.pesos.reps[1])
           combined.pesos.reps = [newMin, newMax]
         }
         
-        // Intensidade %1RM - interseção
+        // Intensidade %1RM - interseÃ§Ã£o
         if (outputs.pesos.intensidade_pct_1rm && combined.pesos.intensidade_pct_1rm) {
           const newMin = Math.max(outputs.pesos.intensidade_pct_1rm[0], combined.pesos.intensidade_pct_1rm[0])
           const newMax = Math.min(outputs.pesos.intensidade_pct_1rm[1], combined.pesos.intensidade_pct_1rm[1])
           combined.pesos.intensidade_pct_1rm = [newMin, newMax]
         }
         
-        // Observações - união
+        // ObservaÃ§Ãµes - uniÃ£o
         if (outputs.pesos.obs) {
           combined.pesos.obs = [...new Set([...(combined.pesos.obs || []), ...outputs.pesos.obs])]
         }
@@ -137,24 +137,24 @@ function combineRules(rules: any[]) {
       if (!combined.flex_mob) {
         combined.flex_mob = outputs.flex_mob
       } else {
-        // Foco - mais restritivo (obrigatório > opcional)
+        // Foco - mais restritivo (obrigatÃ³rio > opcional)
         if (outputs.flex_mob.foco === 'obrigatorio' || combined.flex_mob.foco === 'obrigatorio') {
           combined.flex_mob.foco = 'obrigatorio'
         }
         
-        // Observações - união
+        // ObservaÃ§Ãµes - uniÃ£o
         if (outputs.flex_mob.obs) {
           combined.flex_mob.obs = [...new Set([...(combined.flex_mob.obs || []), ...outputs.flex_mob.obs])]
         }
       }
     }
 
-    // Contraindicações - união
+    // ContraindicaÃ§Ãµes - uniÃ£o
     if (outputs.contraindicacoes) {
       combined.contraindicacoes = [...new Set([...(combined.contraindicacoes || []), ...outputs.contraindicacoes])]
     }
 
-    // Observações - união
+    // ObservaÃ§Ãµes - uniÃ£o
     if (outputs.observacoes) {
       combined.observacoes = [...new Set([...(combined.observacoes || []), ...outputs.observacoes])]
     }
@@ -163,16 +163,16 @@ function combineRules(rules: any[]) {
   return combined
 }
 
-// Schema de validação para entrada do preview D3
+// Schema de validaÃ§Ã£o para entrada do preview D3
 const previewSchema = z.object({
-  answers: z.record(z.any()).optional().default({}),
+  answers: z.record(z.string(), z.any()).optional().default({}),
   aluno: z.object({
     idade: z.number().min(0).max(120),
     sexo: z.enum(['M', 'F'])
   }).optional(),
   anthro: z.object({
     protocolo_code: z.string(),
-    skinfolds_mm: z.record(z.number()),
+    skinfolds_mm: z.record(z.string(), z.number()),
     massa_kg: z.number().positive(),
     estatura_m: z.number().positive().optional(),
     estatura_cm: z.number().positive().optional()
@@ -180,7 +180,7 @@ const previewSchema = z.object({
   aerobio_metodo: z.enum(['FCR', 'PSE', 'vVO2', 'MFEL']).optional(),
   fc: z.object({
     modo: z.enum(['predicao', 'medicao']),
-    parametros: z.record(z.any())
+    parametros: z.record(z.string(), z.any())
   }).optional(),
   rir: z.object({
     reps: z.number().min(1).max(20),
@@ -201,11 +201,11 @@ export async function POST(
     console.log('=== D3 PREVIEW ENGINE START ===')
     
     const ctx = await resolveRequestContext(request)
-    console.log('Context:', { userId: ctx.userId, tenantId: ctx.tenantId })
+    console.log('Context:', { userId: ctx?.userId, tenantId: ctx?.tenantId })
     
-    if (!ctx.userId || !ctx.tenantId) {
-      console.log('Erro: Contexto inválido')
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+    if (!ctx || !ctx.userId || !ctx.tenantId) {
+      console.log('Erro: Contexto invÃ¡lido')
+      return NextResponse.json({ error: "NÃ£o autorizado" }, { status: 401 })
     }
 
     const { id: versionId } = await params
@@ -219,7 +219,7 @@ export async function POST(
 
     const supabase = await createClient()
 
-    // Buscar versão (ou usar default se id for 'default')
+    // Buscar versÃ£o (ou usar default se id for 'default')
     let version
     if (versionId === 'default') {
       const { data: defaultVersion } = await supabase
@@ -238,16 +238,16 @@ export async function POST(
         .single()
       
       if (versionError || !versionData) {
-        return NextResponse.json({ error: "Versão não encontrada" }, { status: 404 })
+        return NextResponse.json({ error: "VersÃ£o nÃ£o encontrada" }, { status: 404 })
       }
       version = versionData
     }
 
     if (!version) {
-      return NextResponse.json({ error: "Nenhuma versão padrão encontrada" }, { status: 404 })
+      return NextResponse.json({ error: "Nenhuma versÃ£o padrÃ£o encontrada" }, { status: 404 })
     }
 
-    // Buscar regras da versão
+    // Buscar regras da versÃ£o
     const { data: rules, error: rulesError } = await supabase
       .from('guideline_rules')
       .select('*')
@@ -301,7 +301,7 @@ export async function POST(
         console.log('Antropometria calculada:', anthroSnapshot)
       }
     } catch (error) {
-      console.warn('Erro no cálculo antropométrico:', error)
+      console.warn('Erro no cÃ¡lculo antropomÃ©trico:', error)
     }
 
     // Calcular RIR
@@ -313,13 +313,13 @@ export async function POST(
         console.log('RIR calculado:', rirRefs)
       }
     } catch (error) {
-      console.warn('Erro no cálculo RIR:', error)
+      console.warn('Erro no cÃ¡lculo RIR:', error)
     }
 
-    // Processar método aeróbio
-    console.log('Processando método aeróbio...')
+    // Processar mÃ©todo aerÃ³bio
+    console.log('Processando mÃ©todo aerÃ³bio...')
     const aerobicMethod = processAerobicMethod(aerobio_metodo, validatedData.fc, answers)
-    console.log('Método aeróbio:', aerobicMethod)
+    console.log('MÃ©todo aerÃ³bio:', aerobicMethod)
 
     // Aplicar regras
     const applicableRules = []
@@ -394,10 +394,10 @@ export async function POST(
       }
     }
 
-    // Combinar regras aplicáveis
+    // Combinar regras aplicÃ¡veis
     const combinedGuidelines = combineRules(applicableRules)
 
-    // Aplicar método aeróbio se não houver regra específica
+    // Aplicar mÃ©todo aerÃ³bio se nÃ£o houver regra especÃ­fica
     if (combinedGuidelines.aerobio && !combinedGuidelines.aerobio.intensidade) {
       combinedGuidelines.aerobio.intensidade = {
         metodo: aerobicMethod.metodo,
@@ -406,7 +406,7 @@ export async function POST(
       }
     }
 
-    // Adicionar orientações PSE se betabloqueador
+    // Adicionar orientaÃ§Ãµes PSE se betabloqueador
     if (aerobicMethod.orientacoes.length > 0) {
       if (!combinedGuidelines.observacoes) {
         combinedGuidelines.observacoes = []
@@ -425,20 +425,20 @@ export async function POST(
         intensidade: combinedGuidelines.aerobio?.intensidade ? {
           antes: applicableRules.map(r => r.outputs.aerobio?.intensidade?.faixa).filter(Boolean),
           depois: combinedGuidelines.aerobio.intensidade.faixa,
-          criterio: "interseção"
+          criterio: "interseÃ§Ã£o"
         } : null
       },
       anthro_snapshot: anthroSnapshot,
       rir_refs: rirRefs ? [rirRefs] : null,
-      warnings: []
+      warnings: [] as string[]
     }
 
-    // Adicionar warnings se necessário
+    // Adicionar warnings se necessÃ¡rio
     if (!anthroSnapshot && anthro) {
-      debug.warnings.push("Erro no cálculo antropométrico - verifique os dados")
+      debug.warnings.push("Erro no cÃ¡lculo antropomÃ©trico - verifique os dados")
     }
     if (!rirRefs && rir) {
-      debug.warnings.push("Erro no cálculo RIR - verifique os dados")
+      debug.warnings.push("Erro no cÃ¡lculo RIR - verifique os dados")
     }
 
     const processingTime = Date.now() - startTime
@@ -458,7 +458,7 @@ export async function POST(
   } catch (error) {
     console.error('Erro na API de preview:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 })
+      return NextResponse.json({ error: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }

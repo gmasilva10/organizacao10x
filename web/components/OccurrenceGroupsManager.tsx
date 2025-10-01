@@ -89,7 +89,7 @@ function GroupTypesModal({ open, group, onClose }: GroupTypesModalProps) {
   })
 
   return (
-    <Dialog open={open} onOpenChange={(v)=>{ if(!v) onClose() }}>
+    <Dialog open={open} onOpenChange={(v: boolean)=>{ if(!v) onClose() }}>
       <DialogContent className="flex max-h-[90vh] w-[900px] max-w-[90vw] flex-col">
         <DialogHeader>
           <DialogTitle>Tipos do Grupo: {group.name}</DialogTitle>

@@ -184,7 +184,7 @@ export async function PUT(
     }
 
     // Preparar dados para atualização (apenas campos essenciais por enquanto)
-    const updateData = {
+    const updateData: any = {
       name: body.name,
       email: body.email,
       phone: body.phone,

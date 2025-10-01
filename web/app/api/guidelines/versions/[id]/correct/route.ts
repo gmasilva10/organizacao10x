@@ -93,7 +93,7 @@ export async function POST(
 
     // Clonar as regras da versão original
     if (currentVersion.guideline_rules && currentVersion.guideline_rules.length > 0) {
-      const rulesToClone = currentVersion.guideline_rules.map(rule => ({
+    const rulesToClone = currentVersion.guideline_rules.map((rule: any) => ({
         version_id: newVersion.id,
         priority_clinical: rule.priority_clinical,
         condition: rule.condition,

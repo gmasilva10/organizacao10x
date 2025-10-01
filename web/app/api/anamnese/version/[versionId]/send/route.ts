@@ -67,9 +67,9 @@ export async function POST(
 
     // TODO: Implementar envio via WhatsApp
     // Por enquanto, apenas simular o envio
-    console.log(`📱 [ANAMNESE SEND] Simulando envio para ${version.students?.name}`)
+    console.log(`📱 [ANAMNESE SEND] Simulando envio para ${Array.isArray((version as any).students) ? (version as any).students[0]?.name : (version as any).students?.name}`)
     console.log(`📱 [ANAMNESE SEND] Token: ${version.token}`)
-    console.log(`📱 [ANAMNESE SEND] Telefone: ${version.students?.phone}`)
+    console.log(`📱 [ANAMNESE SEND] Telefone: ${Array.isArray((version as any).students) ? (version as any).students[0]?.phone : (version as any).students?.phone}`)
 
     // Criar registro no histórico de relacionamento
     const { error: historyError } = await supabase
@@ -79,13 +79,13 @@ export async function POST(
         tenant_id: version.tenant_id,
         channel: 'whatsapp',
         direction: 'outbound',
-        to_text: version.students?.phone || '',
+        to_text: (Array.isArray((version as any).students) ? (version as any).students[0]?.phone : (version as any).students?.phone) || '',
         template_id: 'anamnese_invite',
         status: 'sent',
         payload: {
           anamnese_version_id: versionId,
           token: version.token,
-          student_name: version.students?.name
+          student_name: Array.isArray((version as any).students) ? (version as any).students[0]?.name : (version as any).students?.name
         },
         created_by: 'system'
       })

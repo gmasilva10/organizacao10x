@@ -32,7 +32,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     // Buscar a versão mais recente (não publicada)
     const { data: latestVersion, error: versionError } = await supabase
       .from('anamnesis_template_versions')
-      .select('id, version_number, is_published')
+      .select('id, version_number, is_published, published_at, published_by')
       .eq('template_id', params.id)
       .order('version_number', { ascending: false })
       .limit(1)

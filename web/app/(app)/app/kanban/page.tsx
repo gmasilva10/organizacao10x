@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useRef, useState } from "react"
 import {
@@ -45,7 +45,7 @@ export default function KanbanPage() {
   const lastMovedIdRef = useRef<string | null>(null)
   const [trainerScope, setTrainerScope] = useState<string | undefined>(undefined)
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({})
-  // estados de arraste não usados removidos para atender regras de lint
+  // estados de arraste nÃ£o usados removidos para atender regras de lint
   const toast = useToast()
   const [confirm, setConfirm] = useState<{ open: boolean; title: string; description?: string; onConfirm?: () => void }>({ open: false, title: '' })
   const [edit, setEdit] = useState<{ open: boolean; id: string | null; name: string; order: number; loading: boolean }>({ open: false, id: null, name: "", order: 2, loading: false })
@@ -56,7 +56,7 @@ export default function KanbanPage() {
   
   // Debug do estado edit
   useEffect(() => {
-    console.log('🔍 Estado edit mudou:', edit)
+    console.log('ðŸ” Estado edit mudou:', edit)
   }, [edit])
   const [busy, setBusy] = useState<boolean>(false)
   const draggingColRef = useRef<string | null>(null)
@@ -77,12 +77,12 @@ export default function KanbanPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [confirm.open])
 
-  // Listener para invalidar cache quando templates são alterados
+  // Listener para invalidar cache quando templates sÃ£o alterados
   useEffect(() => {
     function handleCacheInvalidation(event: CustomEvent) {
-      console.log('🔄 Cache invalidation event received:', event.detail)
+      console.log('ðŸ”„ Cache invalidation event received:', event.detail)
       
-      // Recarregar board para sincronizar com mudanças nos templates
+      // Recarregar board para sincronizar com mudanÃ§as nos templates
       loadBoard(trainerScope)
       
       // Recarregar progresso de todos os cards
@@ -105,16 +105,16 @@ export default function KanbanPage() {
     if (trainerId) url.searchParams.set('trainerId', trainerId)
     const res = await fetch(url.toString(), { cache: 'no-store' })
     const data: { columns?: Array<{ id: string; title: string }>; cards?: Array<{ id: string; student_id: string; column_id: string; completed_at?: string | null; student_status?: 'onboarding'|'active'|'paused'; student_phone?: string }> } = await res.json().catch(()=>({}))
-    // Não deduplicar por título; cada coluna é distinta por id
+    // NÃ£o deduplicar por tÃ­tulo; cada coluna Ã© distinta por id
     const cols: Column[] = (data.columns || []).map((c) => ({
       id: c.id,
       title: c.title,
       cards: [],
-      // Colunas fixas travadas por título, independente da posição
+      // Colunas fixas travadas por tÃ­tulo, independente da posiÃ§Ã£o
       locked: (c as any).is_fixed === true || ["Novo Aluno", "Entrega do Treino"].includes(String(c.title)),
       stageCode: (c as any).stage_code
     }))
-    // Identifica a coluna de conclusão por título, não pela última posição
+    // Identifica a coluna de conclusÃ£o por tÃ­tulo, nÃ£o pela Ãºltima posiÃ§Ã£o
     const doneColId = cols.find(c => String(c.title).toLowerCase().includes('entrega do treino'))?.id
     const mapByCol = new Map<string, Card[]>()
     for (const col of cols) mapByCol.set(col.id, [])
@@ -142,52 +142,52 @@ export default function KanbanPage() {
     setLoadingBoard(false)
     
     // Carregar progresso das tarefas para todos os cards
-    console.log(`🔄 Carregando progresso para ${data.cards?.length || 0} cards`)
+    console.log(`ðŸ”„ Carregando progresso para ${data.cards?.length || 0} cards`)
     for (const card of data.cards || []) {
-      console.log(`📝 Processando card: ${card.id} (${(card as any).student_name || card.student_id})`)
+      console.log(`ðŸ“ Processando card: ${card.id} (${(card as any).student_name || card.student_id})`)
       await loadCardProgress(card.id)
     }
-    console.log('✅ Progresso de todos os cards carregado')
+    console.log('âœ… Progresso de todos os cards carregado')
   }
 
-  // Função para carregar o progresso das tarefas de um card
+  // FunÃ§Ã£o para carregar o progresso das tarefas de um card
   async function loadCardProgress(cardId: string) {
     try {
-      console.log(`🔍 Carregando progresso para card: ${cardId}`)
+      console.log(`ðŸ” Carregando progresso para card: ${cardId}`)
       const response = await fetch(`/api/kanban/items/${cardId}/tasks`)
       if (response.ok) {
         const data = await response.json()
-        console.log(`📊 Dados recebidos para card ${cardId}:`, data)
+        console.log(`ðŸ“Š Dados recebidos para card ${cardId}:`, data)
         
-        // Verificar se data.tasks existe e é um array
+        // Verificar se data.tasks existe e Ã© um array
         const tasks = data.tasks || data || []
-        console.log(`📋 Tasks para card ${cardId}:`, tasks)
+        console.log(`ðŸ“‹ Tasks para card ${cardId}:`, tasks)
         
         if (Array.isArray(tasks)) {
-          // Contar todas as tarefas (obrigatórias + opcionais)
+          // Contar todas as tarefas (obrigatÃ³rias + opcionais)
           const completed = tasks.filter((task: any) => task.status === 'completed').length
           const total = tasks.length
-          console.log(`✅ Progresso calculado para card ${cardId}: ${completed}/${total} (todas as tarefas)`)
+          console.log(`âœ… Progresso calculado para card ${cardId}: ${completed}/${total} (todas as tarefas)`)
           setCardProgress((prev: Record<string, { completed: number; total: number }>) => ({
             ...prev,
             [cardId]: { completed, total }
           }))
         } else {
-          console.warn(`⚠️ Tasks não é um array para card ${cardId}:`, tasks)
+          console.warn(`âš ï¸ Tasks nÃ£o Ã© um array para card ${cardId}:`, tasks)
           setCardProgress((prev: Record<string, { completed: number; total: number }>) => ({
             ...prev,
             [cardId]: { completed: 0, total: 0 }
           }))
         }
       } else {
-        console.warn(`⚠️ Response não OK para card ${cardId}:`, response.status)
+        console.warn(`âš ï¸ Response nÃ£o OK para card ${cardId}:`, response.status)
         setCardProgress((prev: Record<string, { completed: number; total: number }>) => ({
           ...prev,
           [cardId]: { completed: 0, total: 0 }
         }))
       }
     } catch (error) {
-      console.error(`❌ Erro ao carregar progresso do card ${cardId}:`, error)
+      console.error(`âŒ Erro ao carregar progresso do card ${cardId}:`, error)
       // Em caso de erro, definir progresso como 0/0
       setCardProgress((prev: Record<string, { completed: number; total: number }>) => ({
         ...prev,
@@ -196,7 +196,7 @@ export default function KanbanPage() {
     }
   }
 
-  // Função para atualizar o progresso de um card após toggle de tarefa
+  // FunÃ§Ã£o para atualizar o progresso de um card apÃ³s toggle de tarefa
   function updateCardProgress(cardId: string, taskId: string, newStatus: string) {
     setCardProgress((prev: Record<string, { completed: number; total: number }>) => {
       const current = prev[cardId] || { completed: 0, total: 0 }
@@ -216,7 +216,7 @@ export default function KanbanPage() {
 
   useEffect(() => { loadBoard(trainerScope) }, [trainerScope])
 
-  // Restaurar estado de colapso da navegação (persistência localStorage)
+  // Restaurar estado de colapso da navegaÃ§Ã£o (persistÃªncia localStorage)
   useEffect(() => {
     try {
       const v = localStorage.getItem('pg.nav.collapsed')
@@ -224,13 +224,13 @@ export default function KanbanPage() {
     } catch {}
   }, [])
 
-  // Debounce 200ms para busca rápida
+  // Debounce 200ms para busca rÃ¡pida
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.toLowerCase()), 200)
     return () => clearTimeout(t)
   }, [query])
 
-  // Ouve a seleção da árvore
+  // Ouve a seleÃ§Ã£o da Ã¡rvore
   useEffect(() => {
     function onScope(e: CustomEvent<{ trainerId?: string }>) {
       const id = e.detail?.trainerId
@@ -271,12 +271,12 @@ export default function KanbanPage() {
   }, [])
 
   function addCard() {
-    // Criação do card correto: direciona para cadastro completo com onboarding=enviar
+    // CriaÃ§Ã£o do card correto: direciona para cadastro completo com onboarding=enviar
     window.location.href = '/app/students?new=true&onboarding=enviar'
   }
 
   function addColumn() {
-    // Redireciona para o módulo de Serviços (aba Onboarding) para criar a coluna lá
+    // Redireciona para o mÃ³dulo de ServiÃ§os (aba Onboarding) para criar a coluna lÃ¡
     try {
       const url = new URL('/app/services', window.location.origin)
       url.searchParams.set('tab', 'onboarding')
@@ -308,28 +308,28 @@ export default function KanbanPage() {
   }
 
   function openEditModal(col: Column) {
-    console.log('🔍 openEditModal chamado com:', col)
+    console.log('ðŸ” openEditModal chamado com:', col)
     const fixedFirst = columns.find(c=>c.title==='Novo Aluno')?.id
     const fixedLast = columns.find(c=>c.title==='Entrega do Treino')?.id
     const isFixed = col.id === fixedFirst || col.id === fixedLast
     
-    console.log('🔍 Colunas fixas encontradas:', { fixedFirst, fixedLast, isFixed })
+    console.log('ðŸ” Colunas fixas encontradas:', { fixedFirst, fixedLast, isFixed })
     
     if (isFixed) {
-      // Colunas fixas: só podem editar nome, posição fica fixa
+      // Colunas fixas: sÃ³ podem editar nome, posiÃ§Ã£o fica fixa
       const order = col.id === fixedFirst ? 1 : 99
-      console.log('🔍 Definindo coluna fixa:', { order })
+      console.log('ðŸ” Definindo coluna fixa:', { order })
       setEdit({ open: true, id: col.id, name: col.title, order, loading: false })
     } else {
-      // Colunas intermediárias: podem editar nome e posição
+      // Colunas intermediÃ¡rias: podem editar nome e posiÃ§Ã£o
       const middle = columns.filter(c=> c.id!==fixedFirst && c.id!==fixedLast)
       const idx = middle.findIndex(c=>c.id===col.id)
       const order = Math.max(2, Math.min(98, 2 + (idx >= 0 ? idx : 0)))
-      console.log('🔍 Definindo coluna intermediária:', { order, idx })
+      console.log('ðŸ” Definindo coluna intermediÃ¡ria:', { order, idx })
       setEdit({ open: true, id: col.id, name: col.title, order, loading: false })
     }
     
-    console.log('🔍 Estado edit definido:', { open: true, id: col.id, name: col.title })
+    console.log('ðŸ” Estado edit definido:', { open: true, id: col.id, name: col.title })
   }
 
   async function submitEdit() {
@@ -340,23 +340,23 @@ export default function KanbanPage() {
     setEdit(v=>({ ...v, loading: true }))
     try {
       if (isFixed) {
-        // Colunas fixas: só atualiza nome, mantém posição
+        // Colunas fixas: sÃ³ atualiza nome, mantÃ©m posiÃ§Ã£o
         const res = await fetch(`/api/kanban/stages/${edit.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) })
         if (!res.ok) throw new Error('fail')
         toast.success('Nome da coluna atualizado')
       } else {
-        // Colunas intermediárias: atualiza nome e posição
+        // Colunas intermediÃ¡rias: atualiza nome e posiÃ§Ã£o
         const order = Math.max(2, Math.min(98, Number(edit.order || 2)))
         const res = await fetch(`/api/kanban/stages/${edit.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, order }) })
         if (!res.ok) {
           if (res.status === 403) throw new Error('fixed')
           throw new Error('fail')
         }
-        // Após editar ordem de uma, garantimos sequência chamando reorder com o snapshot atual
+        // ApÃ³s editar ordem de uma, garantimos sequÃªncia chamando reorder com o snapshot atual
         const fixedFirst = columns.find(c=>c.title==='Novo Aluno')?.id
         const fixedLast = columns.find(c=>c.title==='Entrega do Treino')?.id
         const middle = columns.filter(c=> c.id!==fixedFirst && c.id!==fixedLast)
-        // Coloca a coluna editada na posição desejada
+        // Coloca a coluna editada na posiÃ§Ã£o desejada
         const others = middle.filter(c=> c.id !== edit.id)
         const clampedIndex = Math.max(0, Math.min(others.length, order - 2))
         const reordered = [...others]
@@ -368,13 +368,13 @@ export default function KanbanPage() {
       setEdit({ open: false, id: null, name: "", order: 2, loading: false })
       await loadBoard(trainerScope)
     } catch (e:any) {
-      if (e?.message === 'fixed') toast.error('Coluna fixa não pode ser editada.')
+      if (e?.message === 'fixed') toast.error('Coluna fixa nÃ£o pode ser editada.')
       else toast.error('Falha ao atualizar coluna')
       setEdit(v=>({ ...v, loading: false }))
     }
   }
 
-  // Exclusão de coluna é feita apenas na tela de Serviços/Onboard
+  // ExclusÃ£o de coluna Ã© feita apenas na tela de ServiÃ§os/Onboard
 
   function moveColumnLeft(id: string) {
     const fixedFirst = columns.find(c=>c.title==='Novo Aluno')?.id
@@ -402,7 +402,7 @@ export default function KanbanPage() {
     setConfirm({
       open: true,
       title: 'Renomear coluna',
-      description: 'Confirma renomear esta coluna? (form de edição completo virá na próxima etapa)',
+      description: 'Confirma renomear esta coluna? (form de ediÃ§Ã£o completo virÃ¡ na prÃ³xima etapa)',
       onConfirm: () => {
         const title = `Coluna ${Date.now().toString().slice(-3)}`
         fetch(`/api/kanban/columns/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ title }) })
@@ -418,19 +418,19 @@ export default function KanbanPage() {
     if (!col) return
     
     if (col.cards.length > 0) {
-      toast.error('Não é possível excluir: coluna não está vazia.')
+      toast.error('NÃ£o Ã© possÃ­vel excluir: coluna nÃ£o estÃ¡ vazia.')
       return
     }
     
     if (col.locked) {
-      toast.error('Não é possível excluir: coluna fixa.')
+      toast.error('NÃ£o Ã© possÃ­vel excluir: coluna fixa.')
       return
     }
     
     setConfirm({
       open: true,
       title: 'Excluir coluna',
-      description: `Tem certeza que deseja excluir a coluna "${col.title}"? Esta ação não pode ser desfeita.`,
+      description: `Tem certeza que deseja excluir a coluna "${col.title}"? Esta aÃ§Ã£o nÃ£o pode ser desfeita.`,
       onConfirm: () => {
         fetch(`/api/kanban/stages/${id}`, { method:'DELETE' })
           .then(async (r)=>{
@@ -443,7 +443,7 @@ export default function KanbanPage() {
           .then(()=> { loadBoard(); window.dispatchEvent(new Event('pg:kanban:refetchTree')); toast.success('Coluna removida') })
           .catch((e)=>{
             const msg = String(e?.message||'')
-            if (msg === 'not_empty') toast.error('Não é possível remover: coluna não está vazia.')
+            if (msg === 'not_empty') toast.error('NÃ£o Ã© possÃ­vel remover: coluna nÃ£o estÃ¡ vazia.')
             else toast.error('Falha ao remover coluna')
           })
       }
@@ -451,7 +451,7 @@ export default function KanbanPage() {
   }
 
   async function handleMoveTelemetry(card: Card, fromId: string, toId: string) {
-    // Compat: backend atual expõe POST em /api/kanban/move com payload cardId/fromColumnId/toColumnId
+    // Compat: backend atual expÃµe POST em /api/kanban/move com payload cardId/fromColumnId/toColumnId
     const res = await fetch("/api/kanban/move", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -469,7 +469,7 @@ export default function KanbanPage() {
   function onDragEnd(e: DragEndEvent) {
     const { active, over } = e
     if (!over || active.id === over.id) return
-    // Reordenação de colunas pelo cabeçalho
+    // ReordenaÃ§Ã£o de colunas pelo cabeÃ§alho
     if (String(active.id).startsWith('col:')) {
       const fromId = String(active.id).slice(4)
       const toId = String(over.id)
@@ -496,7 +496,7 @@ export default function KanbanPage() {
     if (!fromCol || !toCol) return
     const card = fromCol.cards.find((k) => k.id === String(active.id))!
 
-    // Se destino é o mesmo, não faz nada (evita POSTs indevidos)
+    // Se destino Ã© o mesmo, nÃ£o faz nada (evita POSTs indevidos)
     if (fromCol.id === toCol.id) return
 
     // Remover do from
@@ -507,7 +507,7 @@ export default function KanbanPage() {
     // Adicionar no destino
     const after = next.map((c) => (c.id === toCol.id ? { ...c, cards: [...c.cards, card] } : c))
 
-    // Se destino é "Entrega do Treino" (por título) → mandar para histórico
+    // Se destino Ã© "Entrega do Treino" (por tÃ­tulo) â†’ mandar para histÃ³rico
     const doneCol = columns.find(c => String(c.title).toLowerCase().includes('entrega do treino'))
     if (doneCol && toCol.id === doneCol.id) {
       setHistory((h) => [{ ...card }, ...h])
@@ -523,29 +523,29 @@ export default function KanbanPage() {
     // Optimistic UI + persist; em erro, rollback simples: recarregar board
     handleMoveTelemetry(card, fromCol.id, toCol.id).then(async () => {
       try { window.dispatchEvent(new CustomEvent('pg:telemetry',{ detail:{ type:'kanban.card.moved', payload:{ studentId: card.studentId, from: fromCol.id, to: toCol.id } } })) } catch {}
-      // atualizar ordenação sequencial no destino
+      // atualizar ordenaÃ§Ã£o sequencial no destino
       const target = after.find(c => c.id === toCol.id)
       if (target) {
         const cardIds = target.cards.map(c=>c.id)
         await fetch('/api/kanban/reorder', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ columnId: toCol.id, cardIds }) }).catch(()=>{})
       }
       loadBoard(trainerScope)
-      // sinalizar árvore para atualizar contadores
+      // sinalizar Ã¡rvore para atualizar contadores
       window.dispatchEvent(new Event('pg:kanban:refetchTree'))
     }).catch((err) => {
-      // rollback visual: desfaz alteração local e informa usuário
+      // rollback visual: desfaz alteraÃ§Ã£o local e informa usuÃ¡rio
       setColumns(columns)
       const status = err?.status || 'error'
       console.error('[Kanban] move failed', { studentId: card.studentId, from: fromCol.id, to: toCol.id, status })
       if (status === 401) {
-        toast.error('Sessão expirada — faça login novamente.')
+        toast.error('SessÃ£o expirada â€” faÃ§a login novamente.')
       } else if (status === 403) {
-        toast.error('Sem permissão para mover este card.')
+        toast.error('Sem permissÃ£o para mover este card.')
       } else {
-        toast.error('Não foi possível salvar a movimentação. Sua tela foi revertida.')
+        toast.error('NÃ£o foi possÃ­vel salvar a movimentaÃ§Ã£o. Sua tela foi revertida.')
       }
     })
-    // Acessibilidade: devolver foco ao card após o movimento
+    // Acessibilidade: devolver foco ao card apÃ³s o movimento
     setTimeout(() => {
       const el = document.getElementById(card.id)
       if (el) (el as HTMLElement).focus()
@@ -571,12 +571,12 @@ export default function KanbanPage() {
 
       {showHistory ? (
         <div className="rounded-md border p-4">
-          <h2 className="text-lg font-medium">Histórico de Alunos</h2>
+          <h2 className="text-lg font-medium">HistÃ³rico de Alunos</h2>
           {history.length === 0 ? (
             <div className="mt-3 flex flex-col items-center justify-center rounded-md border border-dashed p-8 text-center">
-              <div className="mb-2 text-3xl">📦</div>
-              <p className="text-sm text-muted-foreground">Nenhum histórico por aqui ainda</p>
-              <p className="text-xs text-muted-foreground">Movimente cards para a etapa de entrega para vê-los aqui.</p>
+              <div className="mb-2 text-3xl">ðŸ“¦</div>
+              <p className="text-sm text-muted-foreground">Nenhum histÃ³rico por aqui ainda</p>
+              <p className="text-xs text-muted-foreground">Movimente cards para a etapa de entrega para vÃª-los aqui.</p>
             </div>
           ) : (
             <ul className="mt-3 list-disc pl-6 text-sm">
@@ -629,9 +629,9 @@ export default function KanbanPage() {
                       filters={activeFilters}
                       debouncedQuery={debouncedQuery}
                       onRename={() => {
-                        console.log('🔍 onRename chamado para coluna:', col.title)
-                        console.log('🔍 Estado busy:', busy)
-                        console.log('🔍 Chamando openEditModal...')
+                        console.log('ðŸ” onRename chamado para coluna:', col.title)
+                        console.log('ðŸ” Estado busy:', busy)
+                        console.log('ðŸ” Chamando openEditModal...')
                         openEditModal(col)
                       }}
                       onRemove={() => !col.locked && !busy && removeColumn(col.id)}
@@ -653,13 +653,14 @@ export default function KanbanPage() {
       )}
       <ConfirmDialog
         open={confirm.open}
+        onOpenChange={(v: boolean) => setConfirm(prev => ({ ...prev, open: v }))}
         title={confirm.title || ''}
         description={confirm.description}
         onCancel={()=> setConfirm({ open:false, title:'' })}
         onConfirm={()=>{ try { confirm.onConfirm?.() } finally { setConfirm({ open:false, title:'' }) } }}
       />
 
-      <Dialog open={edit.open} onOpenChange={(v)=> setEdit(prev=>({ ...prev, open: v }))}>
+      <Dialog open={edit.open} onOpenChange={(v: boolean)=> setEdit(prev=>({ ...prev, open: v }))}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar coluna</DialogTitle>
@@ -671,23 +672,23 @@ export default function KanbanPage() {
             </div>
             {edit.order !== 1 && edit.order !== 99 && (
               <div>
-                <label className="mb-1 block text-sm">Posição</label>
+                <label className="mb-1 block text-sm">PosiÃ§Ã£o</label>
                 <Input aria-invalid={edit.order<2 || edit.order>98} type="number" min={2} max={98} value={edit.order} onChange={(e)=> setEdit(v=>({ ...v, order: Number(e.target.value||2) }))} />
                 {(edit.order<2 || edit.order>98) && (
-                  <p className="mt-1 text-xs text-red-600">Posição permitida: 2 a 98</p>
+                  <p className="mt-1 text-xs text-red-600">PosiÃ§Ã£o permitida: 2 a 98</p>
                 )}
               </div>
             )}
             {(edit.order === 1 || edit.order === 99) && (
               <p className="text-xs text-muted-foreground">
-                {edit.order === 1 ? 'Coluna fixa de entrada' : 'Coluna fixa de saída'}
+                {edit.order === 1 ? 'Coluna fixa de entrada' : 'Coluna fixa de saÃ­da'}
               </p>
             )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={()=> setEdit({ open:false, id:null, name:"", order:2, loading:false })} disabled={edit.loading}>Cancelar</Button>
             <Button onClick={submitEdit} disabled={edit.loading || !edit.name.trim() || (edit.order !== 1 && edit.order !== 99 && (edit.order<2 || edit.order>98))}>
-              {edit.loading ? 'Salvando…' : 'Salvar'}
+              {edit.loading ? 'Salvandoâ€¦' : 'Salvar'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -721,13 +722,13 @@ export default function KanbanPage() {
                 throw new Error(errorData.error || 'Erro ao mover card')
               }
 
-              // Recarregar board para refletir mudanças
+              // Recarregar board para refletir mudanÃ§as
               await loadBoard(trainerScope)
               
               // Toast de sucesso
               toast.success('Card movido com sucesso!')
               
-              // Sinalizar árvore para atualizar contadores
+              // Sinalizar Ã¡rvore para atualizar contadores
               window.dispatchEvent(new Event('pg:kanban:refetchTree'))
             } catch (error) {
               console.error('Erro ao mover card:', error)
@@ -736,13 +737,13 @@ export default function KanbanPage() {
           }}
           onComplete={async (cardId) => {
             try {
-              // Recarregar board para refletir mudanças
+              // Recarregar board para refletir mudanÃ§as
               await loadBoard(trainerScope)
               
               // Toast de sucesso
               toast.success('Onboarding encerrado com sucesso!')
               
-              // Sinalizar árvore para atualizar contadores
+              // Sinalizar Ã¡rvore para atualizar contadores
               window.dispatchEvent(new Event('pg:kanban:refetchTree'))
             } catch (error) {
               console.error('Erro ao encerrar onboarding:', error)
@@ -797,11 +798,11 @@ function ColumnView({
       const ok = filters.column.some((v) => String(column.title).toLowerCase() === String(v).toLowerCase())
       if (!ok) return false
     }
-    // status é validado por card individual (feito abaixo)
+    // status Ã© validado por card individual (feito abaixo)
     return true
   }
   const dragDisabled = !!column.locked || !!column.blocked || isBusy
-  // Drag apenas pelo cabeçalho (handle)
+  // Drag apenas pelo cabeÃ§alho (handle)
   const headerDrag = useDraggable({ id: `col:${column.id}`, disabled: dragDisabled })
   return (
     <div ref={setNodeRef} className={`kanban-column h-fit w-[300px] shrink-0 rounded-md border bg-background p-3 ${isOver ? 'ring-2 ring-primary/40 bg-primary/5' : ''}`} aria-dropeffect={isOver ? 'move' : undefined}>
@@ -811,10 +812,10 @@ function ColumnView({
           {...headerDrag.attributes}
           ref={headerDrag.setNodeRef}
           className={`font-medium select-none ${dragDisabled ? '' : 'cursor-grab active:cursor-grabbing'}`}
-          title={column.blocked ? 'Não é possível reordenar: há cards com serviços pendentes nesta coluna.' : undefined}
+          title={column.blocked ? 'NÃ£o Ã© possÃ­vel reordenar: hÃ¡ cards com serviÃ§os pendentes nesta coluna.' : undefined}
         >
           {column.title}
-          {column.blocked && <span className="ml-1" aria-label="bloqueado">🔒</span>}
+          {column.blocked && <span className="ml-1" aria-label="bloqueado">ðŸ”’</span>}
           <span className="ml-1 rounded bg-muted px-1.5 text-[10px] text-muted-foreground">{column.cards.length}</span>
         </h3>
         <div className="relative">
@@ -831,7 +832,7 @@ function ColumnView({
               }
             }}
           >
-            ⋮
+            â‹®
           </button>
           <div className="absolute right-0 z-50 mt-1 w-48 rounded border bg-background p-1 shadow-lg hidden">
             <button 
@@ -839,8 +840,8 @@ function ColumnView({
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                console.log('🔍 Botão Editar clicado!')
-                console.log('🔍 Estado isBusy:', isBusy)
+                console.log('ðŸ” BotÃ£o Editar clicado!')
+                console.log('ðŸ” Estado isBusy:', isBusy)
                 onRename()
                 // Fecha o menu
                 const menu = e.currentTarget.closest('div')
@@ -866,7 +867,7 @@ function ColumnView({
               aria-disabled={!!column.locked || isBusy || column.cards.length > 0} 
               className="mt-1 block w-full rounded px-2 py-1 text-left text-xs text-red-600 disabled:opacity-50 hover:bg-muted"
             >
-              {column.cards.length > 0 ? 'Excluir (coluna não vazia)' : 'Excluir coluna'}
+              {column.cards.length > 0 ? 'Excluir (coluna nÃ£o vazia)' : 'Excluir coluna'}
             </button>
           </div>
         </div>
@@ -880,7 +881,7 @@ function ColumnView({
           <EmptyState
             title="Nenhum card aqui ainda"
             description="Arraste cards de outras colunas ou crie um novo"
-            icon="🗂️"
+            icon="ðŸ—‚ï¸"
             className="min-h-[80px] border-dashed"
           />
         ) : (
@@ -925,16 +926,16 @@ function DraggableCard({ card, column, isOpen, onToggle, onClose, cardProgress, 
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [card.id, onToggle])
 
-  // P2-01: Estados visuais refinados com ícones contextuais
+  // P2-01: Estados visuais refinados com Ã­cones contextuais
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return '🟢' // Verde para ativo
+        return 'ðŸŸ¢' // Verde para ativo
       case 'paused':
-        return '🟡' // Amarelo para pausado
+        return 'ðŸŸ¡' // Amarelo para pausado
       case 'onboarding':
       default:
-        return '🔵' // Azul para onboarding
+        return 'ðŸ”µ' // Azul para onboarding
     }
   }
 
@@ -959,7 +960,7 @@ function DraggableCard({ card, column, isOpen, onToggle, onClose, cardProgress, 
       className={`kanban-card group relative rounded-lg border bg-white px-3 py-2.5 text-sm shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-1 max-w-full ${isDragging ? 'ring-2 ring-primary/60 bg-primary/5 scale-[1.01] z-50' : ''}`}
       tabIndex={0}
       aria-label={`Mover aluno: ${card.title}`}
-      title={`${card.title}${card.status ? ` — ${card.status}` : ''}`}
+      title={`${card.title}${card.status ? ` â€” ${card.status}` : ''}`}
     >
       {/* P2-01: Indicador visual de foco */}
       <div className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-primary/20 group-focus:border-primary/40 transition-colors duration-200" />
@@ -973,7 +974,7 @@ function DraggableCard({ card, column, isOpen, onToggle, onClose, cardProgress, 
             </h4>
           </div>
           
-          {/* P2-01: Botão de Edição refinado */}
+          {/* P2-01: BotÃ£o de EdiÃ§Ã£o refinado */}
           <button 
             className="flex-shrink-0 rounded-md p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group-hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-1"
             onClick={(e)=> { e.preventDefault(); e.stopPropagation(); onToggle() }}
@@ -1006,7 +1007,7 @@ function DraggableCard({ card, column, isOpen, onToggle, onClose, cardProgress, 
         </div>
       </div>
 
-      {/* P2-01: Indicador de interação sutil */}
+      {/* P2-01: Indicador de interaÃ§Ã£o sutil */}
       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <div className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse" />
       </div>

@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
   // Step 3: Promote admins
   let adminsPromoted = 0
   for (const phone of adminSet) {
-    const resAdmin = await zapiGroupAddAdmin(groupId, [phone])
+    const resAdmin = await zapiGroupAddAdmin(groupId, [phone as any as string])
     if (resAdmin.ok) adminsPromoted++
     logAction('whatsapp.group_add_admin', { correlationId, groupId, phone, success: resAdmin.ok, httpStatus: resAdmin.status })
   }

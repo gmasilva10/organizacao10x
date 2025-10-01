@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -58,10 +58,10 @@ export default function NewAnamnesePage() {
       if (response.ok) {
         setServices(data.services || [])
       } else {
-        toast.error('Erro ao carregar serviços')
+        toast.error('Erro ao carregar serviÃ§os')
       }
     } catch (error) {
-      toast.error('Erro ao carregar serviços')
+      toast.error('Erro ao carregar serviÃ§os')
     } finally {
       setLoading(false)
     }
@@ -69,7 +69,7 @@ export default function NewAnamnesePage() {
 
   const handleGenerate = async () => {
     if (!formData.serviceId) {
-      toast.error('Selecione um serviço')
+      toast.error('Selecione um serviÃ§o')
       return
     }
 
@@ -132,19 +132,19 @@ export default function NewAnamnesePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Configuração da Anamnese
+            ConfiguraÃ§Ã£o da Anamnese
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Serviço */}
+          {/* ServiÃ§o */}
           <div className="space-y-2">
-            <Label htmlFor="service">Serviço *</Label>
+            <Label htmlFor="service">ServiÃ§o *</Label>
             <Select 
               value={formData.serviceId} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, serviceId: value }))}
+              onValueChange={(value: string) => setFormData(prev => ({ ...prev, serviceId: value }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione um serviço" />
+                <SelectValue placeholder="Selecione um serviÃ§o" />
               </SelectTrigger>
               <SelectContent>
                 {services.map((service) => (
@@ -155,7 +155,7 @@ export default function NewAnamnesePage() {
               </SelectContent>
             </Select>
             <p className="text-sm text-gray-600">
-              O serviço define o protocolo e personalização da anamnese
+              O serviÃ§o define o protocolo e personalizaÃ§Ã£o da anamnese
             </p>
           </div>
 
@@ -164,7 +164,7 @@ export default function NewAnamnesePage() {
             <Label>Destino do envio</Label>
             <RadioGroup 
               value={formData.destination} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, destination: value as 'group' | 'student' }))}
+              onValueChange={(value: string) => setFormData(prev => ({ ...prev, destination: value as 'group' | 'student' }))}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="group" id="group" />
@@ -176,7 +176,7 @@ export default function NewAnamnesePage() {
               </div>
             </RadioGroup>
             <p className="text-sm text-gray-600">
-              Escolha como a anamnese será enviada ao aluno
+              Escolha como a anamnese serÃ¡ enviada ao aluno
             </p>
           </div>
 
@@ -186,7 +186,7 @@ export default function NewAnamnesePage() {
               <Label htmlFor="group">Grupo WhatsApp</Label>
               <Select 
                 value={formData.groupId} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, groupId: value }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, groupId: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um grupo" />
@@ -209,11 +209,11 @@ export default function NewAnamnesePage() {
               onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
             />
             <p className="text-sm text-gray-600">
-              Esta mensagem será incluída no convite enviado ao aluno
+              Esta mensagem serÃ¡ incluÃ­da no convite enviado ao aluno
             </p>
           </div>
 
-          {/* Botões */}
+          {/* BotÃµes */}
           <div className="flex gap-3 pt-4">
             <Button
               onClick={handleGenerate}

@@ -129,7 +129,7 @@ export async function PATCH(
 
       // Verificar limites se está ativando
       if (status === "active" && existingCollaborator.status === "inactive") {
-        const { data: currentCount } = await supabase
+        const { count: currentCount } = await supabase
           .from("collaborators")
           .select("id", { count: "exact", head: true })
           .eq("org_id", ctx.tenantId)

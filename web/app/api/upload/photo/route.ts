@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { resolveRequestContext } from "@/utils/context/request-context"
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,7 +8,7 @@ export async function POST(request: NextRequest) {
     
     if (!ctx || !ctx.tenantId) {
       return NextResponse.json(
-        { error: "unauthorized", message: "Tenant não resolvido no contexto da requisição." },
+        { error: "unauthorized", message: "Tenant nÃ£o resolvido no contexto da requisiÃ§Ã£o." },
         { status: 401 }
       )
     }
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     if (!file || !studentId) {
       return NextResponse.json(
-        { error: "bad_request", message: "Arquivo e ID do aluno são obrigatórios." },
+        { error: "bad_request", message: "Arquivo e ID do aluno sÃ£o obrigatÃ³rios." },
         { status: 400 }
       )
     }
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Validar tipo de arquivo
     if (!file.type.startsWith('image/')) {
       return NextResponse.json(
-        { error: "invalid_file_type", message: "Apenas arquivos de imagem são permitidos." },
+        { error: "invalid_file_type", message: "Apenas arquivos de imagem sÃ£o permitidos." },
         { status: 400 }
       )
     }
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Validar tamanho (10MB)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
-        { error: "file_too_large", message: "Arquivo deve ter no máximo 10MB." },
+        { error: "file_too_large", message: "Arquivo deve ter no mÃ¡ximo 10MB." },
         { status: 400 }
       )
     }
@@ -44,16 +45,17 @@ export async function POST(request: NextRequest) {
     
     if (!url || !key) {
       return NextResponse.json(
-        { error: "service_unavailable", message: "Variáveis de ambiente do Supabase ausentes." },
+        { error: "service_unavailable", message: "VariÃ¡veis de ambiente do Supabase ausentes." },
         { status: 503 }
       )
     }
+    const supabase = createClient(url, key)
 
     // Converter arquivo para buffer
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Nome único para o arquivo
+    // Nome Ãºnico para o arquivo
     const fileExtension = file.name.split('.').pop() || 'jpg'
     const fileName = `${studentId}-${Date.now()}.${fileExtension}`
     
@@ -71,13 +73,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'upload_failed', message: `Erro ao fazer upload da foto: ${error.message}` }, { status: 500 })
     }
 
-    // Obter URL pública
+    // Obter URL pÃºblica
     const { data: publicUrlData } = supabase.storage
       .from('student-photos')
       .getPublicUrl(fileName)
 
     if (!publicUrlData || !publicUrlData.publicUrl) {
-      return NextResponse.json({ error: 'url_not_found', message: 'Não foi possível obter a URL pública da foto.' }, { status: 500 })
+      return NextResponse.json({ error: 'url_not_found', message: 'NÃ£o foi possÃ­vel obter a URL pÃºblica da foto.' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, photo_url: publicUrlData.publicUrl }, { status: 200 })

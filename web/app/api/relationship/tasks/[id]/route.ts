@@ -120,7 +120,7 @@ export async function DELETE(
         }
       })
     
-    console.log(`✅ Tarefa deletada (soft): ${task.student?.name || 'Aluno'} - ${params.id}`)
+    console.log(`✅ Tarefa deletada (soft): ${Array.isArray((task as any).student) ? (task as any).student[0]?.name : (task as any).student?.name || 'Aluno'} - ${params.id}`)
     
     return NextResponse.json({ 
       success: true, 

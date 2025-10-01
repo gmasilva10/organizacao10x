@@ -84,9 +84,9 @@ export async function GET(request: NextRequest) {
       })
 
       const t0 = Date.now()
-      const { data, error, count } = await QueryMonitor.monitorQuery(
+      const { data, error, count } = await QueryMonitor.monitorQuery<any>(
         'list_occurrences',
-        () => query
+        async () => query
           .order(sortBy, { ascending: sortOrder === 'asc' })
           .range(fromIdx, toIdx),
         {

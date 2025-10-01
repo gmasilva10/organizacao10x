@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { resolveRequestContext } from '@/server/context'
 
@@ -47,16 +47,16 @@ export async function POST(
       return NextResponse.json({ error: "professional_not_found" }, { status: 404 })
     }
 
-    // Verificar se já está vinculado
+    // Verificar se jÃ¡ estÃ¡ vinculado
     if (professional.user_id) {
       return NextResponse.json({ error: "already_linked" }, { status: 400 })
     }
 
-    // Verificar se usuário já existe
-    const { data: existingUser, error: userError } = await supabase.auth.admin.getUserByEmail(email)
+    // Verificar se usuÃ¡rio jÃ¡ existe
+    const { data: existingUser, error: userError } = await (supabase.auth.admin as any).getUserByEmail(email)
 
     if (userError && userError.code !== 'PGRST116') {
-      console.error('Erro ao verificar usuário:', userError)
+      console.error('Erro ao verificar usuÃ¡rio:', userError)
       return NextResponse.json({ error: "database_error" }, { status: 500 })
     }
 
@@ -64,7 +64,7 @@ export async function POST(
     let tempPassword = null
 
     if (existingUser) {
-      // Verificar se usuário já está vinculado a outro profissional
+      // Verificar se usuÃ¡rio jÃ¡ estÃ¡ vinculado a outro profissional
       const { data: linkedProfessional, error: linkError } = await supabase
         .from('professionals')
         .select('id, full_name')
@@ -72,24 +72,24 @@ export async function POST(
         .single()
 
       if (linkError && linkError.code !== 'PGRST116') {
-        console.error('Erro ao verificar vínculo:', linkError)
+        console.error('Erro ao verificar vÃ­nculo:', linkError)
         return NextResponse.json({ error: "database_error" }, { status: 500 })
       }
 
       if (linkedProfessional) {
         return NextResponse.json({ 
           error: "email_already_linked", 
-          message: `E-mail já vinculado ao profissional: ${linkedProfessional.full_name}` 
+          message: `E-mail jÃ¡ vinculado ao profissional: ${linkedProfessional.full_name}` 
         }, { status: 409 })
       }
 
       user_id = existingUser.id
     } else {
-      // Gerar senha temporária
+      // Gerar senha temporÃ¡ria
       const randomDigits = Math.floor(1000 + Math.random() * 9000)
       tempPassword = `Temp${randomDigits}!`
 
-      // Criar usuário
+      // Criar usuÃ¡rio
       const { data: newUser, error: createUserError } = await supabase.auth.admin.createUser({
         email,
         password: tempPassword,
@@ -97,7 +97,7 @@ export async function POST(
       })
 
       if (createUserError) {
-        console.error('Erro ao criar usuário:', createUserError)
+        console.error('Erro ao criar usuÃ¡rio:', createUserError)
         return NextResponse.json({ error: "user_creation_failed" }, { status: 500 })
       }
 
@@ -145,7 +145,7 @@ export async function POST(
       professional: updatedProfessional,
       tempPassword: tempPassword ? {
         password: tempPassword,
-        message: 'Usuário criado com senha temporária'
+        message: 'UsuÃ¡rio criado com senha temporÃ¡ria'
       } : null
     })
 

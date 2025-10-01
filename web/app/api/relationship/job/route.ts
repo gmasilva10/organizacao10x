@@ -309,7 +309,8 @@ async function processAnchor(
 
   try {
     // Buscar alunos para esta âncora
-    const { data: students, error: studentsError } = await supabase
+    const students = await fetchStudentsForAnchor(anchor, tenantId)
+    const studentsError = null as any
 
     if (studentsError) {
       errors.push(`Erro ao buscar alunos para âncora ${anchor}: ${studentsError.message}`)
@@ -401,12 +402,12 @@ async function processAnchor(
             }
           }
         } catch (error) {
-          errors.push(`Erro ao processar aluno ${student.name}: ${error.message}`)
+          errors.push(`Erro ao processar aluno ${student.name}: ${(error as any)?.message || String(error)}`)
         }
       }
     }
   } catch (error) {
-    errors.push(`Erro geral ao processar âncora ${anchor}: ${error.message}`)
+    errors.push(`Erro geral ao processar âncora ${anchor}: ${(error as any)?.message || String(error)}`)
   }
 
   return { created, updated, skipped, errors }

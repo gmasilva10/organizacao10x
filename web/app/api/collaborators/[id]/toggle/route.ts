@@ -55,7 +55,7 @@ export async function PATCH(
 
     // Se está ativando, verificar limites por plano
     if (newStatus === "active") {
-      const { data: currentCount } = await supabase
+      const { count: currentCount } = await supabase
         .from("collaborators")
         .select("id", { count: "exact", head: true })
         .eq("org_id", ctx.tenantId)

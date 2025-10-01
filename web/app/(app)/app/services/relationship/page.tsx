@@ -286,7 +286,7 @@ export default function RelationshipServicesPage() {
                       <label className="text-sm font-medium">Âncora</label>
                       <Select
                         value={formData.anchor || ''}
-                        onValueChange={(value) => setFormData({ ...formData, anchor: value })}
+                        onValueChange={(value: string) => setFormData({ ...formData, anchor: value })}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione a âncora" />
@@ -304,7 +304,7 @@ export default function RelationshipServicesPage() {
                       <label className="text-sm font-medium">Canal Padrão</label>
                       <Select
                         value={formData.channel_default || ''}
-                        onValueChange={(value) => setFormData({ ...formData, channel_default: value })}
+                        onValueChange={(value: string) => setFormData({ ...formData, channel_default: value })}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o canal" />

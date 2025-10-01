@@ -49,9 +49,9 @@ export async function GET(request: NextRequest) {
       ...(defaults.especificos_professional_ids || [])
     ]
 
-    let principalProfessional = null
-    let apoioProfessionals = []
-    let especificosProfessionals = []
+    let principalProfessional: any = null
+    let apoioProfessionals: any[] = []
+    let especificosProfessionals: any[] = []
 
     if (allProfessionalIds.length > 0) {
       const { data: professionals, error: professionalsError } = await supabase
@@ -174,9 +174,9 @@ export async function POST(request: NextRequest) {
       ...(defaults.especificos_professional_ids || [])
     ]
 
-    let principalProfessionals = []
-    let apoioProfessionals = []
-    let especificosProfessionals = []
+    let principalProfessionals: any[] = []
+    let apoioProfessionals: any[] = []
+    let especificosProfessionals: any[] = []
 
     if (allProfessionalIds.length > 0) {
       const { data: professionals, error: professionalsError } = await supabase
