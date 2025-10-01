@@ -42,7 +42,10 @@ export async function GET(request: NextRequest) {
       last_sync: integration.last_sync,
       token_valid: !tokenExpired,
       token_expires_at: integration.token_expires_at,
-      error_message: integration.error_message
+      error_message: integration.error_message,
+      // Retornar credenciais para o frontend
+      client_id: integration.client_id,
+      basic_token: integration.basic_token
     })
     
   } catch (error: any) {

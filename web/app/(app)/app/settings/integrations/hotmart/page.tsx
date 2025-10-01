@@ -48,6 +48,9 @@ export default function HotmartIntegrationPage() {
       
       if (data.connected) {
         setConnected(true)
+        // Carregar credenciais salvas
+        if (data.client_id) setClientId(data.client_id)
+        if (data.basic_token) setBasicToken(data.basic_token)
       }
     } catch (error) {
       console.error('Erro ao carregar status:', error)
