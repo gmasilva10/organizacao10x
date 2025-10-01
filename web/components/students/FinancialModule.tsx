@@ -799,7 +799,7 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
               <Switch
                 id="generate_billing"
                 checked={formData.generate_billing}
-                onCheckedChange={(checked) => setFormData({ ...formData, generate_billing: !!checked })}
+                onCheckedChange={(checked: boolean) => setFormData({ ...formData, generate_billing: !!checked })}
               />
               <Label htmlFor="generate_billing">Gerar cobrança desta competência</Label>
             </div>

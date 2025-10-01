@@ -522,7 +522,7 @@ export function StudentOccurrenceModal({
                       <Switch
                         id="reminder_enabled"
                         checked={formData.reminder_enabled}
-                        onCheckedChange={(checked) => handleInputChange('reminder_enabled', checked)}
+                        onCheckedChange={(checked: boolean) => handleInputChange('reminder_enabled', checked)}
                       />
                       <Label htmlFor="reminder_enabled" className="text-sm font-medium">Ativar Lembrete</Label>
                     </div>

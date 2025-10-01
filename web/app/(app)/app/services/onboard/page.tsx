@@ -774,7 +774,7 @@ function ManageTemplatesForm({
                   <td className="p-3">
                     <Switch
                       checked={template.is_required}
-                      onCheckedChange={() => handleToggleRequired(template.id, template.is_required)}
+                      onCheckedChange={(_checked: boolean) => handleToggleRequired(template.id, template.is_required)}
                     />
                     <span className="ml-2 text-xs text-muted-foreground">
                       {template.is_required ? 'Obrigatória' : 'Opcional'}

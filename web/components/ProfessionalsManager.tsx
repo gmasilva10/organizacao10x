@@ -567,7 +567,7 @@ export function ProfessionalsManager() {
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={professional.is_active}
-                      onCheckedChange={() => handleToggleStatus(professional)}
+                      onCheckedChange={(_checked: boolean) => handleToggleStatus(professional)}
                       disabled={saving}
                     />
                     <span className="text-sm text-muted-foreground">
@@ -830,7 +830,7 @@ export function ProfessionalsManager() {
                           <Switch
                             id="is_active"
                             checked={formData.is_active}
-                            onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                            onCheckedChange={(checked: boolean) => setFormData({ ...formData, is_active: checked })}
                           />
                         </div>
                       </div>
@@ -917,7 +917,7 @@ export function ProfessionalsManager() {
                         <Switch
                           id="user_active"
                           checked={userFormData.isActive}
-                          onCheckedChange={(checked) => setUserFormData(prev => ({ ...prev, isActive: checked }))}
+                          onCheckedChange={(checked: boolean) => setUserFormData(prev => ({ ...prev, isActive: checked }))}
                         />
                       </div>
                     </div>
