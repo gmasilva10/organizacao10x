@@ -32,21 +32,12 @@ export function GlobeBackground({ className, sizeDesktop = 640, sizeMobile = 320
 	}, [sizeDesktop, sizeMobile])
 
 
-  // Usa texturas remotas confiáveis por padrão (podem ser trocadas por arquivos locais depois)
-  const textureUrl = "https://unpkg.com/three-globe/example/img/earth-day.jpg"
-  const bumpUrl = "https://unpkg.com/three-globe/example/img/earth-topology.png"
 
 	return (
 		<div ref={containerRef} className={className} style={{ pointerEvents: "none" }}>
       <Globe
 				width={size.w}
 				height={size.h}
-				backgroundColor="rgba(0,0,0,0)"
-        globeImageUrl={textureUrl}
-        bumpImageUrl={bumpUrl}
-				showAtmosphere={true}
-				atmosphereAltitude={0.15}
-				animateIn={true}
 			/>
 		</div>
 	)
