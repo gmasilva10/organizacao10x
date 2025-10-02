@@ -282,6 +282,17 @@ async function processPurchaseApproved(
   
   const billingCycle = cycleMapping[mapping.plan.ciclo] || 'one_off'
   
+  // Mapear método de pagamento para valores aceitos pela constraint
+  const paymentMethodMapping: Record<string, string> = {
+    'CREDIT_CARD': 'card',
+    'DEBIT_CARD': 'card',
+    'PIX': 'pix',
+    'BOLETO': 'boleto',
+    'TRANSFER': 'transfer'
+  }
+  
+  const paymentMethod = paymentMethodMapping[data.purchase.payment.type] || 'other'
+  
   // Criar vínculo na tabela student_services
   const { error: serviceError } = await supabase
     .from('student_services')
@@ -295,7 +306,7 @@ async function processPurchaseApproved(
       price_cents: Math.round((data.purchase.price.value || 0) * 100),
       currency: data.purchase.price.currency_code || 'BRL',
       purchase_status: 'paid',
-      payment_method: data.purchase.payment.type?.toLowerCase(),
+      payment_method: paymentMethod,
       installments: data.purchase.payment.installments_number,
       billing_cycle: billingCycle,
       start_date: new Date(data.purchase.approved_date).toISOString().split('T')[0],
