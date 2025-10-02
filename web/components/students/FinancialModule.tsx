@@ -111,26 +111,47 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
   async function loadData() {
     setLoading(true)
     try {
-      const [contractsRes, billingRes, plansRes] = await Promise.all([
-        fetch(`/api/students/${studentId}/contracts`),
-        fetch(`/api/students/${studentId}/billing`),
+      const [servicesRes, plansRes] = await Promise.all([
+        fetch(`/api/students/${studentId}/services`),
         fetch('/api/plans')
       ])
 
-      if (contractsRes.ok) {
-        const contractsData = await contractsRes.json()
-        setContracts(contractsData.contracts || [])
-      }
-
-      if (billingRes.ok) {
-        const billingData = await billingRes.json()
-        setBilling(billingData.billing || [])
+      if (servicesRes.ok) {
+        const servicesData = await servicesRes.json()
+        // Converter student_services para formato de contratos para compatibilidade
+        const contracts = (servicesData.services || []).map((service: any) => ({
+          id: service.id,
+          student_id: service.student_id,
+          plan_code: service.name,
+          unit_price: service.price_cents / 100,
+          currency: service.currency,
+          cycle: service.billing_cycle,
+          duration_cycles: null,
+          start_date: service.start_date,
+          end_date: service.end_date,
+          status: service.is_active ? 'ativo' : 'inativo',
+          notes: service.notes,
+          created_at: service.created_at,
+          updated_at: service.updated_at,
+          plans: {
+            nome: service.name,
+            descricao: service.notes,
+            valor: service.price_cents / 100,
+            moeda: service.currency,
+            ciclo: service.billing_cycle,
+            duracao_em_ciclos: null
+          }
+        }))
+        setContracts(contracts)
       }
 
       if (plansRes.ok) {
         const plansData = await plansRes.json()
         setPlans(plansData.plans?.filter((p: Plan) => p.ativo) || [])
       }
+
+      // Simular dados de billing vazios por enquanto
+      setBilling([])
 
       calculateSummary()
     } catch (error) {
@@ -212,34 +233,38 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
 
   async function createContract() {
     try {
-      const response = await fetch(`/api/students/${studentId}/contracts`, {
+      const response = await fetch(`/api/students/${studentId}/services`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
-          unit_price: formData.unit_price ? parseFloat(formData.unit_price) : undefined,
-          duration_cycles: formData.duration_cycles ? parseInt(formData.duration_cycles) : undefined,
-          cycle: formData.cycle || undefined,
-          end_date: formData.end_date || undefined
+          name: formData.plan_code,
+          type: 'plan',
+          status: 'active',
+          price_cents: formData.unit_price ? Math.round(parseFloat(formData.unit_price) * 100) : 0,
+          currency: formData.currency,
+          purchase_status: 'paid',
+          billing_cycle: formData.cycle || 'one_off',
+          start_date: formData.start_date,
+          end_date: formData.end_date || undefined,
+          notes: formData.notes,
+          is_active: true
         })
       })
 
       if (response.ok) {
-        showSuccess("Contrato criado com sucesso!")
+        showSuccess("Serviço criado com sucesso!")
         setNewContractModal({ open: false })
         resetForm()
         loadData()
       } else {
         const error = await response.json()
-        showError(error.error === 'active_contract_exists' 
-          ? 'Já existe um contrato ativo para este plano' 
-          : error.error === 'plan_not_found_or_inactive'
-          ? 'Plano não encontrado ou inativo'
-          : 'Erro ao criar contrato')
+        showError(error.error === 'student_not_found'
+          ? 'Aluno não encontrado'
+          : 'Erro ao criar serviço')
       }
     } catch (error) {
-      console.error('Erro ao criar contrato:', error)
-      showError("Erro ao criar contrato")
+      console.error('Erro ao criar serviço:', error)
+      showError("Erro ao criar serviço")
     }
   }
 
@@ -247,14 +272,14 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
     if (!editContractModal.contract) return
 
     try {
-      const response = await fetch(`/api/students/${studentId}/contracts/${editContractModal.contract.id}`, {
+      const response = await fetch(`/api/students/${studentId}/services/${editContractModal.contract.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          unit_price: formData.unit_price ? parseFloat(formData.unit_price) : undefined,
+          name: formData.plan_code,
+          price_cents: formData.unit_price ? Math.round(parseFloat(formData.unit_price) * 100) : undefined,
           currency: formData.currency,
-          cycle: formData.cycle || undefined,
-          duration_cycles: formData.duration_cycles ? parseInt(formData.duration_cycles) : undefined,
+          billing_cycle: formData.cycle || undefined,
           start_date: formData.start_date,
           end_date: formData.end_date || undefined,
           notes: formData.notes
@@ -262,16 +287,16 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
       })
 
       if (response.ok) {
-        showSuccess("Contrato atualizado com sucesso!")
+        showSuccess("Serviço atualizado com sucesso!")
         setEditContractModal({ open: false, contract: null })
         resetForm()
         loadData()
       } else {
-        showError("Erro ao atualizar contrato")
+        showError("Erro ao atualizar serviço")
       }
     } catch (error) {
-      console.error('Erro ao atualizar contrato:', error)
-      showError("Erro ao atualizar contrato")
+      console.error('Erro ao atualizar serviço:', error)
+      showError("Erro ao atualizar serviço")
     }
   }
 
@@ -279,43 +304,46 @@ export function FinancialModule({ studentId, onSummaryChange }: FinancialModuleP
     if (!deleteConfirmModal.contract) return
 
     try {
-      const response = await fetch(`/api/students/${studentId}/contracts/${deleteConfirmModal.contract.id}`, {
+      const response = await fetch(`/api/students/${studentId}/services/${deleteConfirmModal.contract.id}`, {
         method: 'DELETE'
       })
 
       if (response.ok) {
-        showSuccess("Contrato deletado com sucesso!")
+        showSuccess("Serviço deletado com sucesso!")
         setDeleteConfirmModal({ open: false, contract: null })
         loadData()
       } else {
         const error = await response.json()
-        showError(error.error === 'cannot_delete_contract_with_pending_billing'
-          ? 'Não é possível deletar contrato com cobranças pendentes'
-          : 'Erro ao deletar contrato')
+        showError(error.error === 'service_not_found'
+          ? 'Serviço não encontrado'
+          : 'Erro ao deletar serviço')
       }
     } catch (error) {
-      console.error('Erro ao deletar contrato:', error)
-      showError("Erro ao deletar contrato")
+      console.error('Erro ao deletar serviço:', error)
+      showError("Erro ao deletar serviço")
     }
   }
 
   async function updateContractStatus(contract: Contract, status: 'ativo' | 'encerrado' | 'cancelado') {
     try {
-      const response = await fetch(`/api/students/${studentId}/contracts/${contract.id}`, {
+      const response = await fetch(`/api/students/${studentId}/services/${contract.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ 
+          is_active: status === 'ativo',
+          status: status === 'ativo' ? 'active' : status === 'encerrado' ? 'completed' : 'cancelled'
+        })
       })
 
       if (response.ok) {
-        showSuccess(`Contrato ${status === 'ativo' ? 'ativado' : status === 'encerrado' ? 'encerrado' : 'cancelado'} com sucesso!`)
+        showSuccess(`Serviço ${status === 'ativo' ? 'ativado' : status === 'encerrado' ? 'encerrado' : 'cancelado'} com sucesso!`)
         loadData()
       } else {
-        showError("Erro ao atualizar status do contrato")
+        showError("Erro ao atualizar status do serviço")
       }
     } catch (error) {
       console.error('Erro ao atualizar status:', error)
-      showError("Erro ao atualizar status do contrato")
+      showError("Erro ao atualizar status do serviço")
     }
   }
 

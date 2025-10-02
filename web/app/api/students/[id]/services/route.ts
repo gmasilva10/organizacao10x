@@ -1,75 +1,153 @@
-import { NextResponse } from "next/server"
-import { resolveRequestContext } from "@/server/context"
-import { logEvent } from "@/server/events"
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { resolveRequestContext } from '@/server/context'
 
-function isAllowedRead(role: string) {
-  return role === 'admin' || role === 'manager' || role === 'seller' || role === 'trainer' || role === 'support'
-}
-function isAllowedWrite(role: string) {
-  return role === 'admin' || role === 'manager' || role === 'seller'
-}
+const WRITERS = new Set(['admin', 'manager'])
 
-function validateXorDiscount(payload: Record<string, unknown>) {
-  const hasAmount = (payload as Record<string, unknown>).discount_amount_cents != null
-  const hasPct = (payload as Record<string, unknown>).discount_pct != null
-  if (hasAmount && hasPct) return false
-  return true
-}
-
-export async function GET(request: Request, ctxParam: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const ctx = await resolveRequestContext(request)
-  if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-  if (!isAllowedRead(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  const { id } = await ctxParam.params
-  const url = process.env.SUPABASE_URL!
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const resp = await fetch(`${url}/rest/v1/student_services?tenant_id=eq.${ctx.tenantId}&student_id=eq.${id}&order=created_at.desc`, {
-    headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
-  })
-  const items = await resp.json().catch(()=>[])
-  return NextResponse.json({ items })
-}
+  if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
 
-export async function POST(request: Request, ctxParam: { params: Promise<{ id: string }> }) {
-  const ctx = await resolveRequestContext(request)
-  if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-  if (!isAllowedWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  const { id } = await ctxParam.params
-  const body: Record<string, unknown> = await request.json().catch(()=> ({} as Record<string, unknown>))
-  if (!validateXorDiscount(body)) return NextResponse.json({ error: 'invalid_discount' }, { status: 400 })
-  const url = process.env.SUPABASE_URL!
+  const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const row: Record<string, unknown> = {
-    tenant_id: ctx.tenantId,
-    student_id: id,
-    name: String((body as Record<string, unknown>)['name'] || ''),
-    type: String((body as Record<string, unknown>)['type'] || ''),
-    status: String((body as Record<string, unknown>)['status'] || 'active'),
-    price_cents: Number((body as Record<string, unknown>)['price_cents'] || 0),
-    currency: String((body as Record<string, unknown>)['currency'] || 'BRL'),
-    discount_amount_cents: (body as Record<string, unknown>)['discount_amount_cents'] != null ? Number((body as Record<string, unknown>)['discount_amount_cents']) : null,
-    discount_pct: (body as Record<string, unknown>)['discount_pct'] != null ? Number((body as Record<string, unknown>)['discount_pct']) : null,
-    purchase_status: String((body as Record<string, unknown>)['purchase_status'] || 'pending'),
-    payment_method: (body as Record<string, unknown>)['payment_method'] != null ? String((body as Record<string, unknown>)['payment_method']) : null,
-    installments: (body as Record<string, unknown>)['installments'] != null ? Number((body as Record<string, unknown>)['installments']) : null,
-    billing_cycle: (body as Record<string, unknown>)['billing_cycle'] != null ? String((body as Record<string, unknown>)['billing_cycle']) : null,
-    start_date: (body as Record<string, unknown>)['start_date'] != null ? String((body as Record<string, unknown>)['start_date']) : null,
-    delivery_date: (body as Record<string, unknown>)['delivery_date'] != null ? String((body as Record<string, unknown>)['delivery_date']) : null,
-    end_date: (body as Record<string, unknown>)['end_date'] != null ? String((body as Record<string, unknown>)['end_date']) : null,
-    last_payment_at: (body as Record<string, unknown>)['last_payment_at'] != null ? String((body as Record<string, unknown>)['last_payment_at']) : null,
-    next_payment_at: (body as Record<string, unknown>)['next_payment_at'] != null ? String((body as Record<string, unknown>)['next_payment_at']) : null,
-    is_active: Boolean((body as Record<string, unknown>)['is_active']) || false,
-    notes: (body as Record<string, unknown>)['notes'] != null ? String((body as Record<string, unknown>)['notes']) : null,
+  if (!url || !key) return NextResponse.json({ error: "service_unavailable" }, { status: 503 })
+
+  const supabase = createClient(url, key)
+
+  try {
+    const { data: services, error } = await supabase
+      .from('student_services')
+      .select(`
+        *,
+        plans:name (
+          nome,
+          descricao,
+          valor,
+          moeda,
+          ciclo,
+          duracao_em_ciclos
+        )
+      `)
+      .eq('student_id', params.id)
+      .eq('org_id', ctx.tenantId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Erro ao buscar serviços do aluno:', error)
+      return NextResponse.json({ error: "database_error" }, { status: 500 })
+    }
+
+    return NextResponse.json({ services })
+  } catch (error) {
+    console.error('Erro inesperado:', error)
+    return NextResponse.json({ error: "internal_error" }, { status: 500 })
   }
-  // Enviar
-  const resp = await fetch(`${url}/rest/v1/student_services`, {
-    method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-    body: JSON.stringify(row)
-  })
-  if (!resp.ok) return NextResponse.json({ error: 'insert_failed' }, { status: 500 })
-  const res = await resp.json()
-  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'students.service.created', student_id: id, service_id: res?.[0]?.id || null } })
-  return NextResponse.json({ ok: true, id: res?.[0]?.id || null })
 }
 
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const ctx = await resolveRequestContext(request)
+  if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
+  if (!WRITERS.has(ctx.role)) return NextResponse.json({ error: "forbidden" }, { status: 403 })
 
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+  if (!url || !key) return NextResponse.json({ error: "service_unavailable" }, { status: 503 })
+
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "invalid_payload" }, { status: 400 })
+  }
+
+  const b = (body || {}) as Partial<{
+    name: string
+    type: string
+    status: string
+    price_cents: number
+    currency: string
+    discount_amount_cents?: number
+    discount_pct?: number
+    purchase_status: string
+    payment_method?: string
+    installments?: number
+    billing_cycle?: string
+    start_date: string
+    end_date?: string
+    notes?: string
+    is_active: boolean
+  }>
+
+  // Validações
+  const name = String((b.name ?? "").toString()).trim()
+  if (name.length < 2) {
+    return NextResponse.json({ error: "invalid_name" }, { status: 400 })
+  }
+
+  const start_date = b.start_date
+  if (!start_date || !Date.parse(start_date)) {
+    return NextResponse.json({ error: "invalid_start_date" }, { status: 400 })
+  }
+
+  const supabase = createClient(url, key)
+
+  try {
+    // Verificar se o aluno existe
+    const { data: student, error: studentError } = await supabase
+      .from('students')
+      .select('id')
+      .eq('id', params.id)
+      .eq('org_id', ctx.tenantId)
+      .single()
+
+    if (studentError || !student) {
+      return NextResponse.json({ error: "student_not_found" }, { status: 404 })
+    }
+
+    // Criar serviço
+    const { data: service, error: createError } = await supabase
+      .from('student_services')
+      .insert({
+        student_id: params.id,
+        name,
+        type: b.type || 'plan',
+        status: b.status || 'active',
+        price_cents: b.price_cents || 0,
+        currency: b.currency || 'BRL',
+        discount_amount_cents: b.discount_amount_cents || null,
+        discount_pct: b.discount_pct || null,
+        purchase_status: b.purchase_status || 'paid',
+        payment_method: b.payment_method || null,
+        installments: b.installments || null,
+        billing_cycle: b.billing_cycle || 'one_off',
+        start_date,
+        end_date: b.end_date || null,
+        notes: b.notes || null,
+        is_active: b.is_active !== false,
+        org_id: ctx.tenantId,
+        tenant_id: ctx.tenantId
+      })
+      .select()
+      .single()
+
+    if (createError) {
+      console.error('Erro ao criar serviço:', createError)
+      return NextResponse.json({ error: "database_error" }, { status: 500 })
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Serviço criado com sucesso',
+      service 
+    })
+  } catch (error) {
+    console.error('Erro inesperado:', error)
+    return NextResponse.json({ error: "internal_error" }, { status: 500 })
+  }
+}

@@ -6,7 +6,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClientAdmin } from '@/utils/supabase/server'
 
+// Forçar runtime Node.js para compatibilidade com Buffer e service role
+export const runtime = 'nodejs'
+
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+  let eventId = 'unknown'
+  let orgId = 'unknown'
+  let transactionId = 'unknown'
+  
   try {
     const supabase = await createClientAdmin()
     
@@ -27,7 +35,8 @@ export async function POST(request: NextRequest) {
     
     // 2. PARSEAR PAYLOAD
     const payload = await request.json()
-    const { event, data, id: eventId } = payload
+    const { event, data, id: parsedEventId } = payload
+    eventId = parsedEventId || 'unknown'
     
     console.log(`[HOTMART WEBHOOK] Event: ${event}, ID: ${eventId}`)
     
@@ -39,7 +48,7 @@ export async function POST(request: NextRequest) {
       .single()
     
     if (intError || !integration) {
-      console.error('[HOTMART WEBHOOK] Integration not found for basic_token')
+      console.error(`[HOTMART WEBHOOK] Integration not found for basic_token - Event: ${eventId}`)
       // IMPORTANTE: Retornar 200 mesmo assim para Hotmart não reenviar
       return NextResponse.json({ 
         success: false,
@@ -47,21 +56,23 @@ export async function POST(request: NextRequest) {
       }, { status: 200 })
     }
     
-    const orgId = integration.org_id
+    orgId = integration.org_id
     
     if (integration.status !== 'connected') {
-      console.warn(`[HOTMART WEBHOOK] Integration is ${integration.status}`)
+      console.warn(`[HOTMART WEBHOOK] Integration is ${integration.status} - Event: ${eventId}, Org: ${orgId}`)
     }
     
     // 4. VERIFICAR IDEMPOTÊNCIA (evitar processar 2x)
+    const hotmartTransactionId = data.purchase?.transaction || eventId
     const { data: existing } = await supabase
       .from('hotmart_transactions')
       .select('id, processed')
-      .eq('hotmart_transaction_id', data.purchase?.transaction || eventId)
+      .eq('org_id', orgId)
+      .eq('hotmart_transaction_id', hotmartTransactionId)
       .single()
     
     if (existing) {
-      console.log(`[HOTMART WEBHOOK] Transaction already exists: ${existing.id}`)
+      console.log(`[HOTMART WEBHOOK] Transaction already exists: ${existing.id} - Event: ${eventId}, Org: ${orgId}`)
       return NextResponse.json({ 
         success: true, 
         message: 'Already processed',
@@ -69,12 +80,12 @@ export async function POST(request: NextRequest) {
       })
     }
     
-    // 5. REGISTRAR TRANSAÇÃO (AUDITORIA)
+    // 5. REGISTRAR TRANSAÇÃO (AUDITORIA) com idempotência
     const { data: transaction, error: txError } = await supabase
       .from('hotmart_transactions')
-      .insert({
+      .upsert({
         org_id: orgId,
-        hotmart_transaction_id: data.purchase?.transaction || eventId,
+        hotmart_transaction_id: hotmartTransactionId,
         hotmart_order_ref: data.purchase?.order_ref,
         hotmart_subscriber_code: data.purchase?.subscription?.subscriber?.code,
         event_type: event,
@@ -96,13 +107,20 @@ export async function POST(request: NextRequest) {
         subscription_plan: data.purchase?.subscription?.plan?.name,
         raw_payload: payload,
         processed: false
+      }, {
+        onConflict: 'org_id,hotmart_transaction_id',
+        ignoreDuplicates: false
       })
       .select()
       .single()
     
-    if (txError) throw txError
+    if (txError) {
+      console.error(`[HOTMART WEBHOOK] Error registering transaction - Event: ${eventId}, Org: ${orgId}`, txError)
+      throw txError
+    }
     
-    console.log(`[HOTMART WEBHOOK] Transaction registered: ${transaction.id}`)
+    transactionId = transaction.id
+    console.log(`[HOTMART WEBHOOK] Transaction registered: ${transactionId} - Event: ${eventId}, Org: ${orgId}`)
     
     // 6. PROCESSAR EVENTO
     try {
@@ -139,15 +157,19 @@ export async function POST(request: NextRequest) {
     }
     
     // 7. SEMPRE RETORNAR 200 OK (obrigatório para Hotmart)
+    const duration = Date.now() - startTime
+    console.log(`[HOTMART WEBHOOK] Success - Event: ${eventId}, Org: ${orgId}, Transaction: ${transactionId}, Duration: ${duration}ms`)
+    
     return NextResponse.json({ 
       success: true,
       message: 'Webhook processed',
       event_id: eventId,
-      transaction_id: transaction.id
+      transaction_id: transactionId
     })
     
   } catch (error: any) {
-    console.error('[HOTMART WEBHOOK] Fatal error:', error)
+    const duration = Date.now() - startTime
+    console.error(`[HOTMART WEBHOOK] Fatal error - Event: ${eventId}, Org: ${orgId}, Transaction: ${transactionId}, Duration: ${duration}ms`, error)
     // IMPORTANTE: Retornar 200 mesmo com erro fatal
     return NextResponse.json({ 
       success: false, 
@@ -250,10 +272,11 @@ async function processPurchaseApproved(
   console.log(`[PURCHASE_APPROVED] Creating student_service link: Student ${studentId} → Plan ${mapping.internal_plan_id}`)
   
   // Criar vínculo na tabela student_services
-  await supabase
+  const { error: serviceError } = await supabase
     .from('student_services')
     .insert({
-      tenant_id: orgId,
+      org_id: orgId,
+      tenant_id: orgId, // Manter compatibilidade
       student_id: studentId,
       name: mapping.plan.nome,
       type: 'plan',
@@ -267,6 +290,11 @@ async function processPurchaseApproved(
       start_date: new Date(data.purchase.approved_date).toISOString().split('T')[0],
       is_active: mapping.auto_activate
     })
+  
+  if (serviceError) {
+    console.error(`[PURCHASE_APPROVED] Error creating student_service: ${serviceError.message}`)
+    throw serviceError
+  }
   
   // 5. DISPARAR ONBOARDING (se configurado)
   if (mapping.trigger_onboarding) {

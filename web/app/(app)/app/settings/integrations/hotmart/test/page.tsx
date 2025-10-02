@@ -22,7 +22,7 @@ const MOCK_PAYLOADS = {
     creation_date: Date.now(),
     data: {
       product: {
-        id: 123456,
+        id: 6352170,
         name: "Plano Mensal - Personal Trainer",
         ucode: "abc-def-ghi-123"
       },
@@ -108,9 +108,20 @@ export default function HotmartTestPage() {
       // Parse payload
       const parsedPayload = JSON.parse(payload)
       
+      // Carregar credenciais reais da integração
+      const statusResponse = await fetch('/api/integrations/hotmart/status')
+      const statusData = await statusResponse.json()
+      
+      if (!statusData.connected || !statusData.basic_token) {
+        toast.error('Integração Hotmart não está conectada ou token não encontrado')
+        setTesting(false)
+        return
+      }
+
       // Simular webhook (chamando nossa própria API)
-      const basicToken = 'XER95WjZMxAV41vvAVzfo70g8JVEzs67296990' // Token real da Hotmart
-      const hottok = `Basic ${Buffer.from(`gma_silva@yahoo.com.br:${basicToken}`).toString('base64')}`
+      const basicToken = statusData.basic_token
+      const clientId = statusData.client_id || 'gma_silva@yahoo.com.br'
+      const hottok = `Basic ${Buffer.from(`${clientId}:${basicToken}`).toString('base64')}`
       
       const response = await fetch('/api/webhooks/hotmart', {
         method: 'POST',
