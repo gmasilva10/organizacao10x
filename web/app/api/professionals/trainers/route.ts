@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const { data: professionals, error } = await supabase
       .from('professionals')
       .select('id, user_id, full_name, email')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .not('user_id', 'is', null)
       .order('full_name')
 
@@ -43,3 +43,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "internal_error" }, { status: 500 })
   }
 }
+

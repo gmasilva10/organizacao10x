@@ -1,16 +1,16 @@
-﻿import { NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { z } from "zod"
 import { createClient } from "@/utils/supabase/server"
 
-// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
+// Forçar execução dinâmica para evitar problemas de renderização estática
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 
 const createGuidelineSchema = z.object({
-  name: z.string().min(1, "Nome Ã© obrigatÃ³rio"),
+  name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional()
 })
 
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
     }, {
       headers: {
         'Cache-Control': 'public, max-age=30, stale-while-revalidate=60',
-        'X-Query-Time': '0' // TODO: implementar mediÃ§Ã£o real
+        'X-Query-Time': '0' // TODO: implementar medição real
       }
     })
 
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Erro ao criar diretrizes" }, { status: 500 })
     }
 
-    // Criar versÃ£o inicial
+    // Criar versão inicial
     const { error: versionError } = await supabase
       .from('training_guideline_versions')
       .insert({
@@ -137,15 +137,15 @@ export async function POST(request: Request) {
       })
 
     if (versionError) {
-      console.error('Erro ao criar versÃ£o inicial:', versionError)
-      return NextResponse.json({ error: "Erro ao criar versÃ£o inicial" }, { status: 500 })
+      console.error('Erro ao criar versão inicial:', versionError)
+      return NextResponse.json({ error: "Erro ao criar versão inicial" }, { status: 500 })
     }
 
     return NextResponse.json({ data: guideline }, { status: 201 })
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Dados invÃ¡lidos", details: error.issues }, { status: 400 })
+      return NextResponse.json({ error: "Dados inválidos", details: error.issues }, { status: 400 })
     }
     console.error('Erro interno:', error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
@@ -161,7 +161,7 @@ export async function PUT(request: Request) {
   const guidelineId = url.pathname.split('/').pop()
   
   if (!guidelineId) {
-    return NextResponse.json({ error: "ID das diretrizes Ã© obrigatÃ³rio" }, { status: 400 })
+    return NextResponse.json({ error: "ID das diretrizes é obrigatório" }, { status: 400 })
   }
 
   const supabase = await createClient()
@@ -187,14 +187,14 @@ export async function PUT(request: Request) {
     }
 
     if (!guideline) {
-      return NextResponse.json({ error: "Diretrizes nÃ£o encontradas" }, { status: 404 })
+      return NextResponse.json({ error: "Diretrizes não encontradas" }, { status: 404 })
     }
 
     return NextResponse.json({ data: guideline })
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Dados invÃ¡lidos", details: error.issues }, { status: 400 })
+      return NextResponse.json({ error: "Dados inválidos", details: error.issues }, { status: 400 })
     }
     console.error('Erro interno:', error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
@@ -210,7 +210,7 @@ export async function DELETE(request: Request) {
   const guidelineId = url.pathname.split('/').pop()
   
   if (!guidelineId) {
-    return NextResponse.json({ error: "ID das diretrizes Ã© obrigatÃ³rio" }, { status: 400 })
+    return NextResponse.json({ error: "ID das diretrizes é obrigatório" }, { status: 400 })
   }
 
   const supabase = await createClient()
@@ -237,3 +237,4 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
+

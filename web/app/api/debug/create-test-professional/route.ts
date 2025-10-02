@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       .from('professionals')
       .select('user_id')
       .eq('user_id', user.id)
-      .eq('tenant_id', tenant.id)
+      .eq('org_id', tenant.id)
       .single()
     
     if (existingProfessional) {
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       .from('memberships')
       .select('user_id, tenant_id, role')
       .eq('user_id', user.id)
-      .eq('tenant_id', tenant.id)
+      .eq('org_id', tenant.id)
       .single()
     
     if (!existingMembership) {
@@ -145,3 +145,4 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
   }
 }
+

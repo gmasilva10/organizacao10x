@@ -1,11 +1,11 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export async function GET(_request: NextRequest) {
-  // Guard: somente disponÃ­vel em dev ou quando explicitamente habilitado
+  // Guard: somente disponível em dev ou quando explicitamente habilitado
   if (
     process.env.NODE_ENV !== 'development' &&
     process.env.ENABLE_DEBUG_ROUTES !== '1'
@@ -13,7 +13,7 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json({ error: 'Debug endpoint disabled' }, { status: 403 })
   }
   try {
-    // LÃª configuraÃ§Ãµes do ambiente (nÃ£o hardcode tokens)
+    // Lê configurações do ambiente (não hardcode tokens)
     const instance = process.env.ZAPI_INSTANCE_ID
     const token = process.env.ZAPI_INSTANCE_TOKEN
     const clientToken = process.env.ZAPI_CLIENT_TOKEN
@@ -39,7 +39,7 @@ export async function GET(_request: NextRequest) {
       console.log('URL:', zapiUrl)
       console.log('Instance:', instance)
       console.log('Token length:', token.length)
-      console.log('Client Token prefix:', clientToken.substring(0, 6) + 'â€¦')
+      console.log('Client Token prefix:', clientToken.substring(0, 6) + '…')
       console.log('Payload:', JSON.stringify(payload, null, 2))
     }
 
@@ -67,8 +67,8 @@ export async function GET(_request: NextRequest) {
       test: {
         url: zapiUrl,
         instance,
-        token: token.substring(0, 4) + 'â€¦',
-        clientToken: clientToken.substring(0, 8) + 'â€¦',
+        token: token.substring(0, 4) + '…',
+        clientToken: clientToken.substring(0, 8) + '…',
         payload
       },
       response: {
@@ -89,3 +89,4 @@ export async function GET(_request: NextRequest) {
     )
   }
 }
+

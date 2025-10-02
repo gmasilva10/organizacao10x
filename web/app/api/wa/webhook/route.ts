@@ -113,3 +113,4 @@ export async function GET(request: NextRequest) {
     message: 'Webhook WhatsApp ativo'
   })
 }
+

@@ -1,8 +1,8 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 
-// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
+// Forçar execução dinâmica para evitar problemas de renderização estática
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const cookieStore = cookies()
     const supabase = await createClient()
     
-    // Verificar autenticaÃ§Ã£o
+    // Verificar autenticação
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -22,10 +22,10 @@ export async function POST(request: NextRequest) {
     const { cardId } = await request.json()
     
     if (!cardId) {
-      return NextResponse.json({ error: 'Card ID Ã© obrigatÃ³rio' }, { status: 400 })
+      return NextResponse.json({ error: 'Card ID é obrigatório' }, { status: 400 })
     }
 
-    // Buscar informaÃ§Ãµes do card
+    // Buscar informações do card
     const { data: card, error: cardError } = await supabase
       .from('kanban_items')
       .select(`
@@ -39,18 +39,18 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (cardError || !card) {
-      return NextResponse.json({ error: 'Card nÃ£o encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'Card não encontrado' }, { status: 404 })
     }
 
-    // Verificar se estÃ¡ na coluna de entrega (99)
+    // Verificar se está na coluna de entrega (99)
     const stageInfo: any = Array.isArray((card as any).kanban_stages)
       ? (card as any).kanban_stages[0]
       : (card as any).kanban_stages
     if (stageInfo?.position !== 99 && !(stageInfo?.title || '').toLowerCase().includes('entrega')) {
-      return NextResponse.json({ error: 'SÃ³ Ã© possÃ­vel encerrar cards na coluna de entrega' }, { status: 403 })
+      return NextResponse.json({ error: 'Só é possível encerrar cards na coluna de entrega' }, { status: 403 })
     }
 
-    // Verificar se todas as tarefas obrigatÃ³rias estÃ£o concluÃ­das
+    // Verificar se todas as tarefas obrigatórias estão concluídas
     const { data: requiredTasks, error: tasksError } = await supabase
       .from('card_tasks')
       .select(`
@@ -67,10 +67,10 @@ export async function POST(request: NextRequest) {
 
     const incompleteRequired = requiredTasks?.some((task: any) => task.is_completed !== true)
     if (incompleteRequired) {
-      return NextResponse.json({ error: 'Todas as tarefas obrigatÃ³rias devem estar concluÃ­das' }, { status: 400 })
+      return NextResponse.json({ error: 'Todas as tarefas obrigatórias devem estar concluídas' }, { status: 400 })
     }
 
-    // Marcar o card como concluÃ­do (soft delete ou status)
+    // Marcar o card como concluído (soft delete ou status)
     const { error: updateError } = await supabase
       .from('kanban_items')
       .update({ 
@@ -80,11 +80,11 @@ export async function POST(request: NextRequest) {
       .eq('id', cardId)
 
     if (updateError) {
-      console.error('Erro ao marcar card como concluÃ­do:', updateError)
+      console.error('Erro ao marcar card como concluído:', updateError)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
-    // Log da conclusÃ£o
+    // Log da conclusão
     try {
       await supabase
         .from('kanban_logs')
@@ -102,12 +102,12 @@ export async function POST(request: NextRequest) {
         })
     } catch (logError) {
       console.error('Erro ao criar log:', logError)
-      // NÃ£o falha a operaÃ§Ã£o se o log falhar
+      // Não falha a operação se o log falhar
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: `Onboarding do aluno concluÃ­do com sucesso`
+      message: `Onboarding do aluno concluído com sucesso`
     })
 
   } catch (error) {
@@ -115,3 +115,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
+

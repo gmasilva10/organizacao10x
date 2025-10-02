@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         apoio_professional_ids,
         especificos_professional_ids
       `)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (defaultsError && defaultsError.code !== 'PGRST116') {
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         .from('professionals')
         .select('id, full_name, email, whatsapp_work, is_active')
         .in('id', allProfessionalIds)
-        .eq('tenant_id', ctx.tenantId)
+        .eq('org_id', ctx.tenantId)
         .eq('is_active', true)
 
       if (!professionalsError && professionals) {
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
         .from('professionals')
         .select('id, full_name, is_active')
         .in('id', allIds)
-        .eq('tenant_id', ctx.tenantId)
+        .eq('org_id', ctx.tenantId)
 
       if (professionalsError) {
         console.error('Erro ao verificar profissionais:', professionalsError)
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
         .from('professionals')
         .select('id, full_name, email, whatsapp_work, is_active')
         .in('id', allProfessionalIds)
-        .eq('tenant_id', ctx.tenantId)
+        .eq('org_id', ctx.tenantId)
         .eq('is_active', true)
 
       if (!professionalsError && professionals) {
@@ -218,3 +218,4 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
   }
 }
+

@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase
       .from('student_whatsapp_groups')
       .delete()
-      .eq('tenant_id', (user.user_metadata as any)?.tenant_id)
+      .eq('org_id', (user.user_metadata as any)?.tenant_id)
       .eq('student_id', studentId)
       .eq('group_id', groupId)
     if (error) return NextResponse.json({ error: 'Falha ao desvincular' }, { status: 500 })
@@ -27,5 +27,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
+
 
 

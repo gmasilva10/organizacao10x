@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
       const { data: tmplRows } = await supabase
         .from('relationship_templates')
         .select('id, content')
-        .eq('tenant_id', student.tenant_id)
+        .eq('org_id', student.tenant_id)
 
       let foundTemplate: any = null
       for (const row of (tmplRows || [])) {
@@ -431,3 +431,4 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+

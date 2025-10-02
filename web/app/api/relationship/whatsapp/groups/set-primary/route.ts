@@ -17,13 +17,13 @@ export async function POST(request: NextRequest) {
     await supabase
       .from('student_whatsapp_groups')
       .update({ is_primary: false })
-      .eq('tenant_id', tenantId)
+      .eq('org_id', tenantId)
       .eq('student_id', studentId)
 
     const { error } = await supabase
       .from('student_whatsapp_groups')
       .update({ is_primary: true })
-      .eq('tenant_id', tenantId)
+      .eq('org_id', tenantId)
       .eq('student_id', studentId)
       .eq('group_id', groupId)
     if (error) return NextResponse.json({ error: 'Falha ao definir padrão' }, { status: 500 })
@@ -34,5 +34,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
+
 
 

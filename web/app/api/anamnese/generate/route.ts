@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     const { data: maxSeq } = await admin
       .from('anamnese_versions')
       .select('seq')
-      .eq('tenant_id', student.tenant_id)
+      .eq('org_id', student.tenant_id)
       .eq('student_id', alunoId)
       .order('seq', { ascending: false })
       .limit(1)
@@ -206,5 +206,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Erro interno', correlationId }, { status: 500 })
   }
 }
+
 
 

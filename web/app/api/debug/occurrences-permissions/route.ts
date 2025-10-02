@@ -56,19 +56,19 @@ export async function GET(request: NextRequest) {
     const { data: occurrenceGroups } = await supabase
       .from('occurrence_groups')
       .select('id, name, tenant_id')
-      .eq('tenant_id', membership.tenant_id)
+      .eq('org_id', membership.tenant_id)
       .limit(5)
 
     const { data: occurrenceTypes } = await supabase
       .from('occurrence_types')
       .select('id, name, group_id, tenant_id')
-      .eq('tenant_id', membership.tenant_id)
+      .eq('org_id', membership.tenant_id)
       .limit(5)
 
     const { data: students } = await supabase
       .from('students')
       .select('id, name, tenant_id')
-      .eq('tenant_id', membership.tenant_id)
+      .eq('org_id', membership.tenant_id)
       .limit(5)
 
     return NextResponse.json({
@@ -103,3 +103,4 @@ export async function GET(request: NextRequest) {
     }, { status: 500 })
   }
 }
+

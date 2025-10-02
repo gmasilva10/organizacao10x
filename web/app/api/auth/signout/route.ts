@@ -17,3 +17,4 @@ export async function POST() {
   try { res.cookies.set('pg.active_org', '', { path: '/', maxAge: 0 }) } catch {}
   return res
 }
+

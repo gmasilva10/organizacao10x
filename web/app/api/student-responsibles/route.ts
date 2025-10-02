@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       .from('students')
       .select('id')
       .eq('id', student_id)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (studentError || !student) {
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       .from('professionals')
       .select('id')
       .eq('id', professional_id)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (professionalError || !professional) {
@@ -183,3 +183,4 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "internal_error" }, { status: 500 })
   }
 }
+

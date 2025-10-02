@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const { data: profiles, error } = await supabase
       .from('professional_profiles')
       .select('*')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .order('name', { ascending: true })
 
     if (error) {
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const { data: existingProfile, error: checkError } = await supabase
       .from('professional_profiles')
       .select('id')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('name', name)
       .single()
 
@@ -106,3 +106,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "internal_error" }, { status: 500 })
   }
 }
+

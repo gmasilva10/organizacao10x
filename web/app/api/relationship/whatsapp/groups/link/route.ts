@@ -47,13 +47,13 @@ export async function POST(request: NextRequest) {
       await supabase
         .from('student_whatsapp_groups')
         .update({ is_primary: false })
-        .eq('tenant_id', (user.user_metadata as any)?.tenant_id)
+        .eq('org_id', (user.user_metadata as any)?.tenant_id)
         .eq('student_id', studentId)
         .neq('group_id', group.id)
       await supabase
         .from('student_whatsapp_groups')
         .update({ is_primary: true })
-        .eq('tenant_id', (user.user_metadata as any)?.tenant_id)
+        .eq('org_id', (user.user_metadata as any)?.tenant_id)
         .eq('student_id', studentId)
         .eq('group_id', group.id)
     }
@@ -64,5 +64,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
+
 
 

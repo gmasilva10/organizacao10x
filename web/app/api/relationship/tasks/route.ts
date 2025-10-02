@@ -1,5 +1,5 @@
-﻿
-// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
+
+// Forçar execução dinâmica para evitar problemas de renderização estática
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -8,10 +8,10 @@ export const revalidate = 0;
  * GATE 10.6.3 - API para Tarefas de Relacionamento
  * 
  * Funcionalidades:
- * - Listar tarefas com filtros avanÃ§ados
- * - PaginaÃ§Ã£o e ordenaÃ§Ã£o
- * - Filtros por status, Ã¢ncora, template, canal, datas
- * - Performance otimizada com Ã­ndices
+ * - Listar tarefas com filtros avançados
+ * - Paginação e ordenação
+ * - Filtros por status, âncora, template, canal, datas
+ * - Performance otimizada com índices
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -23,10 +23,10 @@ export async function GET(request: NextRequest) {
     // Para desenvolvimento, usar tenant fixo
     const tenant_id = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
     
-    // TODO: Implementar autenticaÃ§Ã£o real em produÃ§Ã£o
+    // TODO: Implementar autenticação real em produção
     // const ctx = await resolveRequestContext(request)
     // if (!ctx) {
-    //   return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
+    //   return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     // }
     // const { tenant_id } = ctx
     try {
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       const student_id = searchParams.get('student_id')
       const q = searchParams.get('q')?.trim() || ''
       
-      // PaginaÃ§Ã£o e ordenaÃ§Ã£o
+      // Paginação e ordenação
       const sort_by = searchParams.get('sort_by') || 'created_at'
       const sort_order = searchParams.get('sort_order') || 'desc'
       const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
@@ -73,12 +73,12 @@ export async function GET(request: NextRequest) {
           updated_at
         `, { count: 'exact' })
 
-      // Excluir tarefas deletadas por padrão (soft delete)
+      // Excluir tarefas deletadas por padr�o (soft delete)
       query = query.neq('status', 'deleted')
 
       // Aplicar filtros
       if (status && status !== 'all') {
-        // Se o filtro for especificamente 'deleted', sobrescrever o filtro padrão
+        // Se o filtro for especificamente 'deleted', sobrescrever o filtro padr�o
         if (status === 'deleted') {
           query = query.eq('status', 'deleted')
         } else {
@@ -98,8 +98,8 @@ export async function GET(request: NextRequest) {
         query = query.gte('scheduled_for', date_from)
       }
       if (date_to) {
-        // date_to já deve vir em formato ISO UTC com endOfDay aplicado no frontend
-        // Mas garantimos que a comparação seja <= (less than or equal)
+        // date_to j� deve vir em formato ISO UTC com endOfDay aplicado no frontend
+        // Mas garantimos que a compara��o seja <= (less than or equal)
         query = query.lte('scheduled_for', date_to)
       }
       if (student_id) {
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Aplicar paginaÃ§Ã£o e ordenaÃ§Ã£o
+      // Aplicar paginação e ordenação
       const from_idx = (page - 1) * page_size
       const to_idx = from_idx + page_size - 1
 
@@ -137,14 +137,14 @@ export async function GET(request: NextRequest) {
           .from('students')
           .select('id, name, email, phone, status')
           .in('id', student_ids)
-          .eq('tenant_id', tenant_id)
+          .eq('org_id', tenant_id)
         
         for (const student of students || []) {
           student_map[student.id] = student
         }
       }
 
-      // Enriquecer dados com informaÃ§Ãµes do aluno
+      // Enriquecer dados com informações do aluno
       const enriched_tasks = (tasks || []).map(task => ({
         ...task,
         student: student_map[task.student_id] || null
@@ -188,9 +188,9 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
   } catch (error) {
-    console.error('Erro na autenticaÃ§Ã£o /relationship/tasks:', error)
+    console.error('Erro na autenticação /relationship/tasks:', error)
     return NextResponse.json({ 
-      error: 'Erro de autenticaÃ§Ã£o',
+      error: 'Erro de autenticação',
       details: (error as any)?.message || String(error) 
     }, { status: 401 })
   }
@@ -202,10 +202,10 @@ export async function PATCH(request: NextRequest) {
     const tenant_id = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
     const userId = 'dev-user-id'
     
-    // TODO: Implementar autenticaÃ§Ã£o real em produÃ§Ã£o
+    // TODO: Implementar autenticação real em produção
     // const ctx = await resolveRequestContext(request)
     // if (!ctx) {
-    //   return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
+    //   return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     // }
     // const { tenant_id, userId } = ctx
     try {
@@ -214,7 +214,7 @@ export async function PATCH(request: NextRequest) {
       const { task_id, status, notes, scheduled_for, postpone_days } = await request.json()
 
       if (!task_id) {
-        return NextResponse.json({ error: 'task_id é obrigatório' }, { status: 400 })
+        return NextResponse.json({ error: 'task_id � obrigat�rio' }, { status: 400 })
       }
 
       // Verificar se a tarefa pertence ao tenant (join com students)
@@ -235,15 +235,15 @@ export async function PATCH(request: NextRequest) {
         .single()
 
       if (taskError || !task) {
-        return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 })
+        return NextResponse.json({ error: 'Tarefa n�o encontrada' }, { status: 404 })
       }
 
-      // Preparar dados de atualização
+      // Preparar dados de atualiza��o
       const updateData: any = {
         updated_at: new Date().toISOString()
       }
 
-      // Determinar ação para log de auditoria
+      // Determinar a��o para log de auditoria
       let action = 'updated'
 
       if (status) {
@@ -292,7 +292,7 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: 'Erro ao atualizar tarefa' }, { status: 500 })
       }
 
-      // Log da ação
+      // Log da a��o
       await supabase
         .from('relationship_logs')
         .insert({
@@ -330,10 +330,11 @@ export async function PATCH(request: NextRequest) {
       }, { status: 500 })
     }
   } catch (error) {
-    console.error('Erro na autenticação PATCH /relationship/tasks:', error)
+    console.error('Erro na autentica��o PATCH /relationship/tasks:', error)
     return NextResponse.json({ 
-      error: 'Erro de autenticação',
+      error: 'Erro de autentica��o',
       details: (error as any)?.message || String(error) 
     }, { status: 401 })
   }
 }
+

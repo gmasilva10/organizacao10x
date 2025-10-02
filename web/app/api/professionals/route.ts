@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
         is_active,
         professional_profiles!inner(name)
       `)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
 
     // Filtro por status (active/inactive)
     if (status === 'active') {
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
       .from('professional_profiles')
       .select('id')
       .eq('id', profile_id)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (profileError || !profile) {
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
     const { data: existingCPF, error: cpfError } = await supabase
       .from('professionals')
       .select('id')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('cpf', cpf)
       .single()
 
@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
     const { data: existingEmail, error: emailError } = await supabase
       .from('professionals')
       .select('id')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('email', email)
       .single()
 
@@ -365,3 +365,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "internal_error" }, { status: 500 })
   }
 }
+

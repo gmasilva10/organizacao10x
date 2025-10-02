@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from('student_occurrences')
       .select('id, student_id, status, occurred_at')
-      .eq('tenant_id', membership.tenant_id)
+      .eq('org_id', membership.tenant_id)
       .eq('status', 'OPEN')
       .limit(5)
 
@@ -43,3 +43,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Erro interno do servidor', details: e }, { status: 500 })
   }
 }
+

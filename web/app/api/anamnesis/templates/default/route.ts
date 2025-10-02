@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const { data: template, error: templateError } = await supabase
       .from('anamnesis_templates')
       .select('*')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('is_default', true)
       .eq('status', 'PUBLISHED')
       .single()
@@ -41,3 +41,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
+

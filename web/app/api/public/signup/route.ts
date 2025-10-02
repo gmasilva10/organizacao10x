@@ -181,7 +181,7 @@ export async function POST(request: Request) {
         .from('memberships')
         .select('user_id')
         .eq('user_id', user.id)
-        .eq('tenant_id', org.id)
+        .eq('org_id', org.id)
         .maybeSingle()
       if (!exists.error && exists.data) {
         membershipError = null
@@ -378,3 +378,4 @@ export async function POST(request: Request) {
     }, { status: 500 })
   }
 }
+

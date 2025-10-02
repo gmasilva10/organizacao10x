@@ -1,9 +1,9 @@
-﻿import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { RELATIONSHIP_TEMPLATE_SEEDS } from '@/lib/relationship/template-seeds'
 
-// ForÃ§ar execuÃ§Ã£o dinÃ¢mica para evitar problemas de renderizaÃ§Ã£o estÃ¡tica
+// Forçar execução dinâmica para evitar problemas de renderização estática
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,11 +14,11 @@ export async function POST(request: NextRequest) {
     try {
       const supabase = await createClient()
       
-      // Verificar se jÃ¡ existem templates para este tenant
+      // Verificar se já existem templates para este tenant
       const { data: existingTemplates, error: checkError } = await supabase
         .from('relationship_templates')
         .select('id')
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .limit(1)
       
       if (checkError) {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       
       if (existingTemplates && existingTemplates.length > 0) {
         return NextResponse.json({ 
-          message: 'Templates jÃ¡ existem para este tenant',
+          message: 'Templates já existem para este tenant',
           count: existingTemplates.length
         })
       }
@@ -68,3 +68,4 @@ export async function POST(request: NextRequest) {
     }
   })
 }
+

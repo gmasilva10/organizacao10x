@@ -1,10 +1,10 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-// ForÃ§ar Node runtime para compatibilidade com bibliotecas
+// Forçar Node runtime para compatibilidade com bibliotecas
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-// ConfiguraÃ§Ãµes de cache
+// Configurações de cache
 export const revalidate = 0
 
 
@@ -25,7 +25,7 @@ type CreateGroupRequest = {
 }
 
 
-// FunÃ§Ã£o para mascarar logs sensÃ­veis
+// Função para mascarar logs sensíveis
 function maskSensitiveData(data: MaskableData): MaskableData {
   const masked: MaskableData = { ...data }
 
@@ -59,7 +59,7 @@ function maskSensitiveData(data: MaskableData): MaskableData {
   return masked
 }
 
-// FunÃ§Ã£o para log estruturado
+// Função para log estruturado
 function logAction(action: string, data: MaskableData, status?: number) {
   const timestamp = new Date().toISOString()
   const maskedData = maskSensitiveData(data)
@@ -85,36 +85,36 @@ export async function POST(request: NextRequest) {
     // Debug detalhado do payload recebido
     console.log('=== PAYLOAD RECEBIDO ===')
     console.log('Body completo:', JSON.stringify(body, null, 2))
-    console.log('Name extraÃ­do:', name)
+    console.log('Name extraído:', name)
     console.log('Name type:', typeof name)
     console.log('Name length:', name ? name.length : 'undefined')
     console.log('Name trim:', name ? name.trim() : 'undefined')
     console.log('Participants:', participantList)
 
-    // Dados da Z-API via variÃ¡veis de ambiente
+    // Dados da Z-API via variáveis de ambiente
     const instance = process.env.ZAPI_INSTANCE_ID
     const token = process.env.ZAPI_TOKEN
     const clientToken = process.env.ZAPI_CLIENT_TOKEN
 
     if (!instance || !token || !clientToken) {
-      console.error('âŒ Z-API credentials nÃ£o configuradas')
+      console.error('❌ Z-API credentials não configuradas')
       return NextResponse.json(
-        { error: 'ConfiguraÃ§Ã£o da API WhatsApp nÃ£o disponÃ­vel' },
+        { error: 'Configuração da API WhatsApp não disponível' },
         { status: 503 }
       )
     }
 
-    // ValidaÃ§Ã£o de parÃ¢metros obrigatÃ³rios
+    // Validação de parâmetros obrigatórios
     if (!name || !participantList?.length) {
-      console.log('âŒ VALIDAÃ‡ÃƒO FALHOU:', { name, participants: participantList })
+      console.log('❌ VALIDAÇÃO FALHOU:', { name, participants: participantList })
       logAction('CREATE_GROUP_ERROR', { name, participants: participantList }, 400)
       return NextResponse.json(
-        { error: 'ParÃ¢metros obrigatÃ³rios: name, participants' },
+        { error: 'Parâmetros obrigatórios: name, participants' },
         { status: 400 }
       )
     }
 
-    // NormalizaÃ§Ã£o E.164 com DDD 11 fallback
+    // Normalização E.164 com DDD 11 fallback
     const normalizedParticipants = (participantList ?? []).map((phone) => 
       phone.startsWith('+55') ? phone : 
       phone.startsWith('55') ? `+${phone}` :
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
       `+5511${phone.replace(/\D/g, '')}`
     )
 
-    // URL da Z-API com HTTPS garantido - usando documentaÃ§Ã£o oficial
+    // URL da Z-API com HTTPS garantido - usando documentação oficial
     const zapiUrl = `https://api.z-api.io/instances/${instance}/token/${token}/create-group`
     
     const payload = {
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       autoInvite: true
     }
 
-    // Debug seguro (nÃ£o expor secrets)
+    // Debug seguro (não expor secrets)
     if (process.env.NODE_ENV !== 'production') {
       console.log('=== DEBUG Z-API GROUP ===')
       console.log('URL:', zapiUrl)
@@ -177,14 +177,14 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const message = String(((responseData as any)?.message) || response.statusText || '')
-      // Mapear erros especÃ­ficos do Z-API
-      let errorMessage = 'Falha na criaÃ§Ã£o do grupo'
-      if (message?.includes('already exists') || message?.includes('jÃ¡ existe')) {
-        errorMessage = 'Este grupo jÃ¡ existe no WhatsApp'
-      } else if (message?.includes('invalid participants') || message?.includes('participantes invÃ¡lidos')) {
-        errorMessage = 'Participantes invÃ¡lidos para o grupo'
-      } else if (message?.includes('unauthorized') || message?.includes('nÃ£o autorizado')) {
-        errorMessage = 'Erro de autorizaÃ§Ã£o com a API do WhatsApp'
+      // Mapear erros específicos do Z-API
+      let errorMessage = 'Falha na criação do grupo'
+      if (message?.includes('already exists') || message?.includes('já existe')) {
+        errorMessage = 'Este grupo já existe no WhatsApp'
+      } else if (message?.includes('invalid participants') || message?.includes('participantes inválidos')) {
+        errorMessage = 'Participantes inválidos para o grupo'
+      } else if (message?.includes('unauthorized') || message?.includes('não autorizado')) {
+        errorMessage = 'Erro de autorização com a API do WhatsApp'
       } else if (message) {
         errorMessage = `Erro: ${message}`
       }
@@ -217,6 +217,7 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
 
 
 

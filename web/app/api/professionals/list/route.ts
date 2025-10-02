@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         email,
         professional_profiles!inner(name)
       `)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .order('full_name', { ascending: true })
 
     if (error) {
@@ -35,3 +35,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "internal_error" }, { status: 500 })
   }
 }
+

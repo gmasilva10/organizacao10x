@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         is_active,
         professional_profiles!inner(name)
       `)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('is_active', true)
       .order('full_name', { ascending: true })
 
@@ -58,3 +58,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "internal_error" }, { status: 500 })
   }
 }
+

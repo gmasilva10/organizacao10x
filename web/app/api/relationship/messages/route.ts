@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { logEvent } from "@/server/events"
 
@@ -97,6 +97,7 @@ export async function GET(request: Request) {
   const total = Number(contentRange.split('/').pop() || 0)
   return NextResponse.json({ items, messages: items, page, pageSize, total })
 }
+
 
 
 

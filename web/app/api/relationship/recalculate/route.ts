@@ -1,10 +1,10 @@
-ï»¿/**
- * GATE 10.6.2 - Endpoint de Rec Â¡lculo Manual
+/**
+ * GATE 10.6.2 - Endpoint de Rec ¡lculo Manual
  * 
  * Funcionalidades:
- * - Lock para evitar execu   Âµes simult Â¢neas
+ * - Lock para evitar execu   µes simult ¢neas
  * - Dry-run mode para preview
- * - Rec Â¡lculo completo ou por  Â¢ncora espec Â­fica
+ * - Rec ¡lculo completo ou por  ¢ncora espec ­fica
  * - Telemetria detalhada
  */
 
@@ -20,7 +20,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Lock para evitar execu   Âµes simult Â¢neas
+// Lock para evitar execu   µes simult ¢neas
 const recalculationLocks = new Map<string, boolean>()
 
 interface RecalculateRequest {
@@ -46,7 +46,7 @@ interface RecalculateResponse {
 }
 
 /**
- * Verificar se h Â¡ lock ativo
+ * Verificar se h ¡ lock ativo
  */
 function isLocked(tenantId: string): boolean {
   return recalculationLocks.get(tenantId) || false
@@ -64,7 +64,7 @@ function setLock(tenantId: string, locked: boolean): void {
 }
 
 /**
- * Executar rec Â¡lculo usando a fun   Â£o do banco
+ * Executar rec ¡lculo usando a fun   £o do banco
  */
 async function executeRecalculation(
   tenantId: string, 
@@ -91,7 +91,7 @@ async function executeRecalculation(
 }
 
 /**
- * Executar rec Â¡lculo manual completo
+ * Executar rec ¡lculo manual completo
  */
 async function executeManualRecalculation(
   tenantId: string,
@@ -104,7 +104,7 @@ async function executeManualRecalculation(
     const { data: tmplRows, error: tmplErr } = await supabase
       .from('relationship_templates')
       .select('id, tenant_id, content')
-      .eq('tenant_id', tenantId)
+      .eq('org_id', tenantId)
 
     if (tmplErr) {
       throw new Error(`Failed to fetch templates: ${tmplErr.message}`)
@@ -137,7 +137,7 @@ async function executeManualRecalculation(
       const { count: studentsCount } = await supabase
         .from('students')
         .select('*', { count: 'exact', head: true })
-        .eq('tenant_id', tenantId)
+        .eq('org_id', tenantId)
         .eq('status', 'active')
 
       return {
@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
       let result: RecalculateResponse
 
       if (anchor) {
-        // Rec Â¡lculo por  Â¢ncora espec Â­fica (implementar se necess Â¡rio)
+        // Rec ¡lculo por  ¢ncora espec ­fica (implementar se necess ¡rio)
         result = await executeManualRecalculation(tenant_id, dry_run)
         // Evitar log global com student_id nulo (constraint NOT NULL)
         return NextResponse.json(result)
@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
       // Evitar log global com student_id nulo (constraint NOT NULL)
       return NextResponse.json(result)
       } else {
-        // Rec Â¡lculo completo
+        // Rec ¡lculo completo
         result = await executeManualRecalculation(tenant_id, dry_run)
       }
 
@@ -301,3 +301,4 @@ export async function GET(request: NextRequest) {
   
   return NextResponse.json(result)
 }
+
