@@ -97,7 +97,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     date_to: '',
     q: ''
   }
-  const updateFilters = () => {}
+  const updateFilters = (filters: any) => {}
   const resetFilters = () => {}
   const hasActiveFilters = () => false
   const getApiFilters = () => ({})

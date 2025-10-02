@@ -194,7 +194,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     q: ''
   }
   const debouncedFilters = filters
-  const updateFilters = () => {}
+  const updateFilters = (filters: any) => {}
   const resetFilters = () => {}
   const setToday = () => {}
   const hasActiveFilters = () => false
