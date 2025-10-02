@@ -25,31 +25,31 @@ export async function GET(request: Request) {
       // Opcional: validar que existe membership para este org
       const { data: mem } = await supabase
         .from("memberships")
-        .select("tenant_id")
+        .select("org_id")
         .eq("user_id", user.id)
-        .eq("tenant_id", activeOrgCookie)
+        .eq("org_id", activeOrgCookie)
         .limit(1)
         .maybeSingle()
-      if (mem?.tenant_id) {
-        return NextResponse.json({ orgId: mem.tenant_id as string, source: "cookie" })
+      if (mem?.org_id) {
+        return NextResponse.json({ orgId: mem.org_id as string, source: "cookie" })
       }
     }
 
     // Fallback: primeira membership ativa do usuário
     const { data: membership } = await supabase
       .from("memberships")
-      .select("tenant_id")
+      .select("org_id")
       .eq("user_id", user.id)
       .limit(1)
       .maybeSingle()
 
-    if (membership?.tenant_id) {
+    if (membership?.org_id) {
       // Telemetria best-effort
       try {
         const { logEvent } = await import("@/server/events")
-        await logEvent({ tenantId: membership.tenant_id as string, userId: user.id, eventType: "auth.org_resolved", payload: { source: "membership" } })
+        await logEvent({ tenantId: membership.org_id as string, userId: user.id, eventType: "auth.org_resolved", payload: { source: "membership" } })
       } catch {}
-      return NextResponse.json({ orgId: membership.tenant_id as string, source: "membership" })
+      return NextResponse.json({ orgId: membership.org_id as string, source: "membership" })
     }
 
     // Nenhuma org

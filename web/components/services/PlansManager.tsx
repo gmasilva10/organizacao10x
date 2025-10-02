@@ -29,6 +29,7 @@ interface Plan {
 export default function PlansManager() {
   const [plans, setPlans] = useState<Plan[]>([])
   const [loading, setLoading] = useState(true)
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const loadPlans = async () => {
     try {
@@ -73,6 +74,22 @@ export default function PlansManager() {
     return cycles[ciclo as keyof typeof cycles] || ciclo
   }
 
+  const handleCreatePlan = () => {
+    setShowCreateModal(true)
+  }
+
+  const handleEditPlan = (plan: Plan) => {
+    toast.info('Funcionalidade de edição será implementada em breve')
+  }
+
+  const handleDeletePlan = (plan: Plan) => {
+    toast.info('Funcionalidade de exclusão será implementada em breve')
+  }
+
+  const handleViewPlan = (plan: Plan) => {
+    toast.info('Funcionalidade de visualização será implementada em breve')
+  }
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -106,7 +123,7 @@ export default function PlansManager() {
             Gerencie seus planos de venda e assinatura
           </p>
         </div>
-        <Button>
+        <Button onClick={handleCreatePlan}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Plano
         </Button>
@@ -120,7 +137,7 @@ export default function PlansManager() {
               <p className="text-muted-foreground mb-4">
                 Crie seu primeiro plano para começar a vender
               </p>
-              <Button>
+              <Button onClick={handleCreatePlan}>
                 <Plus className="h-4 w-4 mr-2" />
                 Criar Primeiro Plano
               </Button>
@@ -160,15 +177,15 @@ export default function PlansManager() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-4">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleViewPlan(plan)}>
                     <Eye className="h-4 w-4 mr-1" />
                     Ver
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
                     <Edit className="h-4 w-4 mr-1" />
                     Editar
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleDeletePlan(plan)}>
                     <Trash2 className="h-4 w-4 mr-1" />
                     Excluir
                   </Button>

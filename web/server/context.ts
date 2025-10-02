@@ -22,12 +22,12 @@ export async function resolveRequestContext(_request: Request): Promise<RequestC
 
   const { data: membership } = await supabase
     .from("memberships")
-    .select("tenant_id, role")
+    .select("org_id, role")
     .eq("user_id", userId)
     .limit(1)
     .maybeSingle()
 
-  const tenantId = (membership?.tenant_id as string) || ""
+  const tenantId = (membership?.org_id as string) || ""
   const role = (membership?.role as RoleName) || ""
   if (!tenantId || !role) return null
   return { userId, tenantId, role }
