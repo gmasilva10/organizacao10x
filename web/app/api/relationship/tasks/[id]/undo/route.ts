@@ -36,7 +36,7 @@ export async function POST(
         deleted_at,
         updated_at,
         student_id,
-        student:students(name, tenant_id)
+        student:students(name, org_id)
       `)
       .eq('id', params.id)
       .single()

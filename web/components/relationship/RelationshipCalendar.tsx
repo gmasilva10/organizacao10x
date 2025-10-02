@@ -118,7 +118,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
         throw new Error(data.error || 'Erro ao buscar tarefas')
       }
 
-      setTasks(data.data || [])
+      setTasks(data.tasks || [])
     } catch (error) {
       console.error('Erro ao buscar tarefas:', error)
       toast.error('Erro ao buscar tarefas')

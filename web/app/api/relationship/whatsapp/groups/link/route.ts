@@ -19,13 +19,13 @@ export async function POST(request: NextRequest) {
     const { data: group, error: gErr } = await supabase
       .from('whatsapp_groups')
       .upsert({
-        tenant_id: (user.user_metadata as any)?.tenant_id,
+        org_id: (user.user_metadata as any)?.org_id,
         external_id: externalId,
         name,
         platform: 'z-api',
         is_active: true,
         created_by: user.id,
-      }, { onConflict: 'tenant_id,external_id' })
+      }, { onConflict: 'org_id,external_id' })
       .select('id')
       .single()
     if (gErr || !group) return NextResponse.json({ error: 'Falha ao criar grupo' }, { status: 500 })
@@ -34,26 +34,26 @@ export async function POST(request: NextRequest) {
     const { error: linkErr } = await supabase
       .from('student_whatsapp_groups')
       .upsert({
-        tenant_id: (user.user_metadata as any)?.tenant_id,
+        org_id: (user.user_metadata as any)?.org_id,
         student_id: studentId,
         group_id: group.id,
         is_primary: !!isPrimary,
         active: true,
         created_by: user.id,
-      }, { onConflict: 'tenant_id,student_id,group_id' })
+      }, { onConflict: 'org_id,student_id,group_id' })
     if (linkErr) return NextResponse.json({ error: 'Falha ao vincular grupo' }, { status: 500 })
 
     if (isPrimary) {
       await supabase
         .from('student_whatsapp_groups')
         .update({ is_primary: false })
-        .eq('org_id', (user.user_metadata as any)?.tenant_id)
+        .eq('org_id', (user.user_metadata as any)?.org_id)
         .eq('student_id', studentId)
         .neq('group_id', group.id)
       await supabase
         .from('student_whatsapp_groups')
         .update({ is_primary: true })
-        .eq('org_id', (user.user_metadata as any)?.tenant_id)
+        .eq('org_id', (user.user_metadata as any)?.org_id)
         .eq('student_id', studentId)
         .eq('group_id', group.id)
     }

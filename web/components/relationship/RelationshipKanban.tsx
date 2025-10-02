@@ -223,8 +223,8 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
         throw new Error(data.error || 'Erro ao buscar tarefas')
       }
 
-      console.log(`ðŸ   [FETCH] Tarefas recebidas: ${data.data?.length || 0}`)
-      setTasks(data.data || [])
+      console.log(`ðŸ   [FETCH] Tarefas recebidas: ${data.tasks?.length || 0}`)
+      setTasks(data.tasks || [])
       setPagination(data.pagination || pagination)
     } catch (error) {
       console.error('Erro ao buscar tarefas:', error)

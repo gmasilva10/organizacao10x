@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     // obter tenant do aluno
     const { data: student, error: stuErr } = await admin
       .from('students')
-      .select('id, tenant_id')
+      .select('id, org_id')
       .eq('id', studentId)
       .single()
     if (stuErr || !student) {
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const { error: insErr } = await admin
       .from('relationship_whatsapp_history')
       .insert({
-        tenant_id: student.tenant_id,
+        org_id: student.org_id,
         student_id: studentId,
         action,
         target_type,

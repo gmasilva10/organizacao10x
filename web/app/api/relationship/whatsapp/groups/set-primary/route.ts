@@ -13,17 +13,17 @@ export async function POST(request: NextRequest) {
     const { studentId, groupId } = await request.json()
     if (!studentId || !groupId) return NextResponse.json({ error: 'studentId e groupId são obrigatórios' }, { status: 400 })
 
-    const tenantId = (user.user_metadata as any)?.tenant_id
+    const orgId = (user.user_metadata as any)?.org_id
     await supabase
       .from('student_whatsapp_groups')
       .update({ is_primary: false })
-      .eq('org_id', tenantId)
+      .eq('org_id', orgId)
       .eq('student_id', studentId)
 
     const { error } = await supabase
       .from('student_whatsapp_groups')
       .update({ is_primary: true })
-      .eq('org_id', tenantId)
+      .eq('org_id', orgId)
       .eq('student_id', studentId)
       .eq('group_id', groupId)
     if (error) return NextResponse.json({ error: 'Falha ao definir padrão' }, { status: 500 })

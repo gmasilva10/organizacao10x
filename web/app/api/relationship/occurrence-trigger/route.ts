@@ -25,7 +25,7 @@ interface OccurrenceTriggerRequest {
   reminder_at: string
   occurrence_type?: string
   occurrence_notes?: string
-  tenant_id: string
+  org_id: string
 }
 
 interface OccurrenceTriggerResponse {
@@ -49,7 +49,7 @@ async function createOccurrenceFollowupTask(
     // Buscar dados do aluno
     const { data: student, error: studentError } = await supabase
       .from('students')
-      .select('id, name, email, phone, tenant_id')
+      .select('id, name, email, phone, org_id')
       .eq('id', studentId)
       .single()
 
@@ -239,14 +239,14 @@ export async function POST(request: NextRequest) {
       reminder_at, 
       occurrence_type, 
       occurrence_notes, 
-      tenant_id 
+      org_id 
     } = body
 
     // Validações
-    if (!student_id || !occurrence_id || !reminder_at || !tenant_id) {
+    if (!student_id || !occurrence_id || !reminder_at || !org_id) {
       return NextResponse.json({
         success: false,
-        error: 'Missing required fields: student_id, occurrence_id, reminder_at, tenant_id'
+        error: 'Missing required fields: student_id, occurrence_id, reminder_at, org_id'
       }, { status: 400 })
     }
 

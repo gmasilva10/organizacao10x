@@ -12,7 +12,7 @@ export async function GET(request: Request, ctxParam: { params: Promise<{ id: st
   const rangeEnd = rangeStart + pageSize - 1
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const resp = await fetch(`${url}/rest/v1/relationship_messages?tenant_id=eq.${ctx.tenantId}&student_id=eq.${id}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`!, Range: `${rangeStart}-${rangeEnd}`, Prefer: 'count=exact' } })
+  const resp = await fetch(`${url}/rest/v1/relationship_messages?org_id=eq.${ctx.tenantId}&student_id=eq.${id}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`!, Range: `${rangeStart}-${rangeEnd}`, Prefer: 'count=exact' } })
   const items = await resp.json().catch(()=>[])
   const contentRange = resp.headers.get('content-range') || '0-0/0'
   const total = Number(contentRange.split('/').pop() || 0)
