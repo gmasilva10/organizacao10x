@@ -212,7 +212,7 @@ async function processPurchaseApproved(
   const { data: existingStudent } = await supabase
     .from('students')
     .select('id, status, name, email, phone')
-    .or(`tenant_id.eq.${orgId},org_id.eq.${orgId}`)
+    .eq('org_id', orgId)
     .or(`email.eq.${buyerEmail},cpf.eq.${buyerCpf}`)
     .single()
   
