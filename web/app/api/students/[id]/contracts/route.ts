@@ -32,7 +32,8 @@ export async function GET(
         )
       `)
       .eq('student_id', params.id)
-      .eq('tenant_id', ctx.tenantId)
+      // Fase 1 migração: filtrar por org_id OU tenant_id
+      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -97,7 +98,8 @@ export async function POST(
       .from('plans')
       .select('*')
       .eq('plan_code', plan_code)
-      .eq('tenant_id', ctx.tenantId)
+      // Fase 1 migração: filtrar por org_id OU tenant_id
+      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
       .eq('ativo', true)
       .single()
 

@@ -72,7 +72,8 @@ export async function PATCH(
       .select('*')
       .eq('id', params.contractId)
       .eq('student_id', params.id)
-      .eq('tenant_id', ctx.tenantId)
+      // Fase 1 migração: filtrar por org_id OU tenant_id
+      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
       .single()
 
     if (checkError || !contract) {
@@ -96,7 +97,8 @@ export async function PATCH(
       .update(updateData)
       .eq('id', params.contractId)
       .eq('student_id', params.id)
-      .eq('tenant_id', ctx.tenantId)
+      // Fase 1 migração: filtrar por org_id OU tenant_id
+      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
       .select()
       .single()
 
@@ -137,7 +139,8 @@ export async function DELETE(
       .select('*')
       .eq('id', params.contractId)
       .eq('student_id', params.id)
-      .eq('tenant_id', ctx.tenantId)
+      // Fase 1 migração: filtrar por org_id OU tenant_id
+      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
       .single()
 
     if (checkError || !contract) {
@@ -169,7 +172,8 @@ export async function DELETE(
       .delete()
       .eq('id', params.contractId)
       .eq('student_id', params.id)
-      .eq('tenant_id', ctx.tenantId)
+      // Fase 1 migração: filtrar por org_id OU tenant_id
+      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
 
     if (error) {
       console.error('Erro ao deletar contrato:', error)

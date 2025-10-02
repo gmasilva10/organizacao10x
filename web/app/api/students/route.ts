@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     // Construir filtros
     const filters: string[] = []
-    if (ctx?.tenantId) filters.push(`tenant_id=eq.${ctx.tenantId}`)
+    if (ctx?.tenantId) filters.push(`or=(org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId})`)
     if (softDelete) filters.push(`deleted_at=is.null`)
     if (status) filters.push(`status=eq.${status}`)
     
@@ -210,6 +210,7 @@ export async function POST(request: NextRequest) {
       phone: phoneDigits,
       status,
       tenant_id: ctx?.tenantId || null,
+      org_id: ctx?.tenantId || null,
     }
 
     const resp = await fetch(`${url}/rest/v1/students`, {

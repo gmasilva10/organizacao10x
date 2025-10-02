@@ -32,7 +32,8 @@ export async function GET(
         )
       `)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      // Fase 1 migração: filtrar por org_id OU tenant_id
+      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
       .order('created_at', { ascending: false })
 
     if (error) {
