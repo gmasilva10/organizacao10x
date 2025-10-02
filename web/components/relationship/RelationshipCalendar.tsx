@@ -191,34 +191,10 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     fetchTasks()
   }, [fetchTasks])
 
-  // Calcular datas baseadas na visão
-  const { startDate, endDate, days } = useMemo(() => {
-    let start: Date
-    let end: Date
-
-    switch (viewMode) {
-      case 'day':
-        start = currentDate
-        end = currentDate
-        break
-      case 'week':
-        start = startOfWeek(currentDate, { locale: ptBR })
-        end = endOfWeek(currentDate, { locale: ptBR })
-        break
-      case 'month':
-        start = startOfMonth(currentDate)
-        end = endOfMonth(currentDate)
-        break
-    }
-
-    const daysArray = eachDayOfInterval({ start, end })
-
-    return {
-      startDate: start,
-      endDate: end,
-      days: daysArray
-    }
-  }, [currentDate, viewMode])
+  // Calcular datas baseadas na visão - versão simplificada
+  const startDate = startOfMonth(currentDate)
+  const endDate = endOfMonth(currentDate)
+  const days = eachDayOfInterval({ start: startDate, end: endDate })
 
   // Filtrar tarefas por data
   const getTasksForDate = (date: Date) => {

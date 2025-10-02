@@ -326,67 +326,8 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     fetchTasks()
   }, [fetchTasks])
 
-  // Determinar colunas vis veis baseadas no intervalo de datas
-  const visibleColumns = useMemo(() => {
-    try {
-      const { date_from, date_to } = debouncedFilters
-      
-      // Se n o h filtro de data, mostrar todas as colunas
-      if (!date_from || !date_to) {
-        return ALL_COLUMNS
-      }
-      
-      const dateFrom = new Date(date_from)
-      const dateTo = new Date(date_to)
-      
-      // Verificar se as datas são válidas
-      if (isNaN(dateFrom.getTime()) || isNaN(dateTo.getTime())) {
-        console.warn('Datas inválidas no filtro:', { date_from, date_to })
-        return ALL_COLUMNS
-      }
-      
-      // Verificar se o intervalo cont m passado, hoje e futuro
-      const hasPast = isPast(dateFrom) || isPast(dateTo)
-      const hasToday = isToday(dateFrom) || isToday(dateTo) || 
-                       (isPast(dateFrom) && isFuture(dateTo))
-      const hasFuture = isFuture(dateFrom) || isFuture(dateTo)
-      
-      // Verificar se   100% futuro (para mostrar "Pendentes de Envio")
-      const isFullyFuture = isFuture(dateFrom) && isFuture(dateTo)
-      
-      const columns: KanbanColumn[] = []
-      
-      // Atrasadas - aparece quando o intervalo inclui datas passadas
-      if (hasPast) {
-        const overdueColumn = ALL_COLUMNS.find(c => c.id === 'overdue')
-        if (overdueColumn) columns.push(overdueColumn)
-      }
-      
-      // Para Hoje - aparece quando o intervalo inclui hoje
-      if (hasToday) {
-        const dueTodayColumn = ALL_COLUMNS.find(c => c.id === 'due_today')
-        if (dueTodayColumn) columns.push(dueTodayColumn)
-      }
-      
-      // Pendentes de Envio - aparece SOMENTE quando o intervalo   100% futuro
-      if (isFullyFuture) {
-        const pendingFutureColumn = ALL_COLUMNS.find(c => c.id === 'pending_future')
-        if (pendingFutureColumn) columns.push(pendingFutureColumn)
-      }
-      
-      // Enviadas e Adiadas/Puladas - sempre vis veis
-      const sentColumn = ALL_COLUMNS.find(c => c.id === 'sent')
-      const postponedColumn = ALL_COLUMNS.find(c => c.id === 'postponed_skipped')
-      
-      if (sentColumn) columns.push(sentColumn)
-      if (postponedColumn) columns.push(postponedColumn)
-      
-      return columns
-    } catch (error) {
-      console.error('Erro ao calcular colunas visíveis:', error)
-      return ALL_COLUMNS
-    }
-  }, [debouncedFilters])
+  // Determinar colunas vis veis - versão simplificada para evitar loops
+  const visibleColumns = ALL_COLUMNS
 
   // Agrupar tarefas por coluna usando timezone
   const getTasksByColumn = (columnId: string) => {
