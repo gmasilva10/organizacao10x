@@ -87,13 +87,20 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
   const [modalDate, setModalDate] = useState<Date | null>(null)
   const [filtersOpen, setFiltersOpen] = useState(false)
   
-  const { 
-    debouncedFilters, 
-    updateFilters, 
-    resetFilters, 
-    hasActiveFilters,
-    getApiFilters 
-  } = useRelationshipFilters()
+  // Temporariamente desabilitar hook de filtros para evitar erros
+  const debouncedFilters = {
+    status: 'all',
+    anchor: 'all',
+    template_code: 'all',
+    channel: 'all',
+    date_from: '',
+    date_to: '',
+    q: ''
+  }
+  const updateFilters = (filters: any) => {}
+  const resetFilters = () => {}
+  const hasActiveFilters = () => false
+  const getApiFilters = () => ({})
 
   // Buscar tarefas
   const fetchTasks = useCallback(async () => {
