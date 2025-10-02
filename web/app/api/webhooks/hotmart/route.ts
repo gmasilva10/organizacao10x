@@ -271,6 +271,17 @@ async function processPurchaseApproved(
   // 4. CRIAR VÍNCULO ALUNO-PLANO (student_services)
   console.log(`[PURCHASE_APPROVED] Creating student_service link: Student ${studentId} → Plan ${mapping.internal_plan_id}`)
   
+  // Mapear ciclo do plano para valores aceitos pela constraint
+  const cycleMapping: Record<string, string> = {
+    'mensal': 'monthly',
+    'trimestral': 'quarterly',
+    'semestral': 'semiannual',
+    'anual': 'annual',
+    'avulso': 'one_off'
+  }
+  
+  const billingCycle = cycleMapping[mapping.plan.ciclo] || 'one_off'
+  
   // Criar vínculo na tabela student_services
   const { error: serviceError } = await supabase
     .from('student_services')
@@ -286,7 +297,7 @@ async function processPurchaseApproved(
       purchase_status: 'paid',
       payment_method: data.purchase.payment.type?.toLowerCase(),
       installments: data.purchase.payment.installments_number,
-      billing_cycle: mapping.plan.ciclo || 'one_off',
+      billing_cycle: billingCycle,
       start_date: new Date(data.purchase.approved_date).toISOString().split('T')[0],
       is_active: mapping.auto_activate
     })
