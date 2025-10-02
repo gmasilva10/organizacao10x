@@ -191,16 +191,31 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     fetchTasks()
   }, [fetchTasks])
 
-  // Calcular datas baseadas na visão
+  // Calcular datas baseadas na visão - versão simplificada
   const { startDate, endDate, days } = useMemo(() => {
-    const start = startOfMonth(currentDate)
-    const end = endOfMonth(currentDate)
-    const daysArray = eachDayOfInterval({ start, end })
-    
-    return {
-      startDate: start,
-      endDate: end,
-      days: daysArray
+    try {
+      const start = startOfMonth(currentDate)
+      const end = endOfMonth(currentDate)
+      const daysArray = eachDayOfInterval({ start, end })
+      
+      return {
+        startDate: start,
+        endDate: end,
+        days: daysArray
+      }
+    } catch (error) {
+      console.error('Erro ao calcular datas do calendário:', error)
+      // Fallback para o mês atual
+      const now = new Date()
+      const fallbackStart = new Date(now.getFullYear(), now.getMonth(), 1)
+      const fallbackEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      const fallbackDays = eachDayOfInterval({ start: fallbackStart, end: fallbackEnd })
+      
+      return {
+        startDate: fallbackStart,
+        endDate: fallbackEnd,
+        days: fallbackDays
+      }
     }
   }, [currentDate])
 

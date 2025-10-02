@@ -326,59 +326,43 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     fetchTasks()
   }, [fetchTasks])
 
-  // Determinar colunas visíveis baseadas no intervalo de datas
+  // Determinar colunas visíveis - versão simplificada para evitar erros
   const visibleColumns = useMemo(() => {
     try {
       const { date_from, date_to } = debouncedFilters
       
+      // Se não há filtros de data, mostrar todas as colunas
       if (!date_from || !date_to) {
         return ALL_COLUMNS
       }
       
+      // Verificar se as datas são válidas
       const dateFrom = new Date(date_from)
       const dateTo = new Date(date_to)
       
       if (isNaN(dateFrom.getTime()) || isNaN(dateTo.getTime())) {
-        console.warn('Datas inválidas no filtro:', { date_from, date_to })
+        console.warn('Datas inválidas no filtro, usando todas as colunas:', { date_from, date_to })
         return ALL_COLUMNS
       }
       
-      const hasPast = isPast(dateFrom) || isPast(dateTo)
-      const hasToday = isToday(dateFrom) || isToday(dateTo) || 
-                       (isPast(dateFrom) && isFuture(dateTo))
-      const hasFuture = isFuture(dateFrom) || isFuture(dateTo)
-      
-      const isFullyFuture = isFuture(dateFrom) && isFuture(dateTo)
-      
+      // Versão simplificada: sempre mostrar colunas básicas
       const columns: KanbanColumn[] = []
       
-      if (hasPast) {
-        const overdueColumn = ALL_COLUMNS.find(c => c.id === 'overdue')
-        if (overdueColumn) columns.push(overdueColumn)
-      }
-      
-      if (hasToday) {
-        const dueTodayColumn = ALL_COLUMNS.find(c => c.id === 'due_today')
-        if (dueTodayColumn) columns.push(dueTodayColumn)
-      }
-      
-      if (isFullyFuture) {
-        const pendingFutureColumn = ALL_COLUMNS.find(c => c.id === 'pending_future')
-        if (pendingFutureColumn) columns.push(pendingFutureColumn)
-      }
-      
+      // Sempre incluir colunas essenciais
+      const dueTodayColumn = ALL_COLUMNS.find(c => c.id === 'due_today')
       const sentColumn = ALL_COLUMNS.find(c => c.id === 'sent')
       const postponedColumn = ALL_COLUMNS.find(c => c.id === 'postponed_skipped')
       
+      if (dueTodayColumn) columns.push(dueTodayColumn)
       if (sentColumn) columns.push(sentColumn)
       if (postponedColumn) columns.push(postponedColumn)
       
-      return columns
+      return columns.length > 0 ? columns : ALL_COLUMNS
     } catch (error) {
       console.error('Erro ao calcular colunas visíveis:', error)
       return ALL_COLUMNS
     }
-  }, [debouncedFilters])
+  }, [debouncedFilters.date_from, debouncedFilters.date_to])
 
   // Agrupar tarefas por coluna usando timezone
   const getTasksByColumn = (columnId: string) => {
