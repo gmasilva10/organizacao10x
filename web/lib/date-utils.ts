@@ -263,12 +263,29 @@ export function fromUTC(utcDate: Date | string, timezone: string = TIMEZONE): Da
  *   }
  */
 export function getTodayInterval(timezone: string = TIMEZONE): { date_from: string; date_to: string } {
-  const start = startOfToday(timezone)
-  const end = endOfToday(timezone)
-  
-  // Verificar se as datas são válidas
-  if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
-    console.error('Erro ao gerar intervalo de hoje:', { start, end, timezone })
+  try {
+    const start = startOfToday(timezone)
+    const end = endOfToday(timezone)
+    
+    // Verificar se as datas são válidas
+    if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
+      console.error('Erro ao gerar intervalo de hoje:', { start, end, timezone })
+      // Fallback para hoje em UTC
+      const now = new Date()
+      const fallbackStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const fallbackEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+      return {
+        date_from: fallbackStart.toISOString(),
+        date_to: fallbackEnd.toISOString()
+      }
+    }
+    
+    return {
+      date_from: start.toISOString(),
+      date_to: end.toISOString()
+    }
+  } catch (error) {
+    console.error('Erro em getTodayInterval:', error)
     // Fallback para hoje em UTC
     const now = new Date()
     const fallbackStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -277,11 +294,6 @@ export function getTodayInterval(timezone: string = TIMEZONE): { date_from: stri
       date_from: fallbackStart.toISOString(),
       date_to: fallbackEnd.toISOString()
     }
-  }
-  
-  return {
-    date_from: start.toISOString(),
-    date_to: end.toISOString()
   }
 }
 
