@@ -50,6 +50,9 @@ export function useRelationshipFilters() {
   // Carregar filtros do localStorage na inicialização
   // Se não houver filtros salvos, usar filtro padrão "hoje"
   useEffect(() => {
+    // Verificar se estamos no cliente
+    if (typeof window === 'undefined') return
+    
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
@@ -73,6 +76,9 @@ export function useRelationshipFilters() {
 
   // Salvar filtros no localStorage quando mudarem
   useEffect(() => {
+    // Verificar se estamos no cliente
+    if (typeof window === 'undefined') return
+    
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(filters))
     } catch (error) {

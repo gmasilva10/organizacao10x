@@ -118,16 +118,27 @@ export function endOfDayInTimezone(date: Date | string, timezone: string = TIMEZ
  * - isToday('2025-09-29T23:00:00Z') → false
  */
 export function isToday(date: Date | string, timezone: string = TIMEZONE): boolean {
-  const dateObj = typeof date === 'string' ? new Date(date) : date
-  const now = new Date()
-  
-  const zonedDate = toZonedTime(dateObj, timezone)
-  const zonedNow = toZonedTime(now, timezone)
-  
-  const startOfDateDay = startOfDay(zonedDate)
-  const startOfNowDay = startOfDay(zonedNow)
-  
-  return isEqual(startOfDateDay, startOfNowDay)
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    
+    // Verificar se a data é válida
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      console.warn('isToday: data inválida', { date, dateObj })
+      return false
+    }
+    
+    const now = new Date()
+    const zonedDate = toZonedTime(dateObj, timezone)
+    const zonedNow = toZonedTime(now, timezone)
+    
+    const startOfDateDay = startOfDay(zonedDate)
+    const startOfNowDay = startOfDay(zonedNow)
+    
+    return isEqual(startOfDateDay, startOfNowDay)
+  } catch (error) {
+    console.error('Erro em isToday:', error, { date, timezone })
+    return false
+  }
 }
 
 /**
@@ -142,10 +153,28 @@ export function isToday(date: Date | string, timezone: string = TIMEZONE): boole
  * - isPast('2025-09-30T00:00:00Z') → false (é hoje)
  */
 export function isPast(date: Date | string, timezone: string = TIMEZONE): boolean {
-  const dateObj = typeof date === 'string' ? new Date(date) : date
-  const todayStart = startOfToday(timezone)
-  
-  return isBefore(dateObj, todayStart)
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    
+    // Verificar se a data é válida
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      console.warn('isPast: data inválida', { date, dateObj })
+      return false
+    }
+    
+    const todayStart = startOfToday(timezone)
+    
+    // Verificar se todayStart é válido
+    if (!todayStart || isNaN(todayStart.getTime())) {
+      console.warn('isPast: todayStart inválido', { todayStart, timezone })
+      return false
+    }
+    
+    return isBefore(dateObj, todayStart)
+  } catch (error) {
+    console.error('Erro em isPast:', error, { date, timezone })
+    return false
+  }
 }
 
 /**
@@ -160,10 +189,28 @@ export function isPast(date: Date | string, timezone: string = TIMEZONE): boolea
  * - isFuture('2025-09-30T23:00:00Z') → false (é hoje)
  */
 export function isFuture(date: Date | string, timezone: string = TIMEZONE): boolean {
-  const dateObj = typeof date === 'string' ? new Date(date) : date
-  const todayEnd = endOfToday(timezone)
-  
-  return isAfter(dateObj, todayEnd)
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    
+    // Verificar se a data é válida
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      console.warn('isFuture: data inválida', { date, dateObj })
+      return false
+    }
+    
+    const todayEnd = endOfToday(timezone)
+    
+    // Verificar se todayEnd é válido
+    if (!todayEnd || isNaN(todayEnd.getTime())) {
+      console.warn('isFuture: todayEnd inválido', { todayEnd, timezone })
+      return false
+    }
+    
+    return isAfter(dateObj, todayEnd)
+  } catch (error) {
+    console.error('Erro em isFuture:', error, { date, timezone })
+    return false
+  }
 }
 
 /**
