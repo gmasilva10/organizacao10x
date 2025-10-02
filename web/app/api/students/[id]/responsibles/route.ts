@@ -21,7 +21,7 @@ export async function GET(
     // Verificar se o aluno pertence ao tenant
     const { data: student, error: studentError } = await supabase
       .from('students')
-      .select('id, name, tenant_id')
+      .select('id, name')
       .eq('id', studentId)
       .eq('org_id', ctx.tenantId)
       .single()
@@ -118,7 +118,7 @@ export async function POST(
     // Verificar se o aluno pertence ao tenant
     const { data: student, error: studentError } = await supabase
       .from('students')
-      .select('id, name, tenant_id')
+      .select('id, name')
       .eq('id', studentId)
       .eq('org_id', ctx.tenantId)
       .single()
@@ -130,7 +130,7 @@ export async function POST(
     // Verificar se o profissional existe e está ativo
     const { data: professional, error: professionalError } = await supabase
       .from('professionals')
-      .select('id, full_name, is_active, tenant_id')
+      .select('id, full_name, is_active')
       .eq('id', professional_id)
       .eq('org_id', ctx.tenantId)
       .single()
@@ -174,9 +174,9 @@ export async function POST(
         professional_id: professional_id,
         roles,
         note: note || null,
-        tenant_id: ctx.tenantId
+        org_id: ctx.tenantId
       }, {
-        onConflict: 'tenant_id,student_id,professional_id'
+        onConflict: 'org_id,student_id,professional_id'
       })
       .select(`
         id,
