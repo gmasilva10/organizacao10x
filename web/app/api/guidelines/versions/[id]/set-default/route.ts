@@ -27,7 +27,7 @@ export async function POST(
       .from('guidelines_versions')
       .select('*')
       .eq('id', versionId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (versionError || !version) {
@@ -42,7 +42,7 @@ export async function POST(
     const { error: clearError } = await supabase
       .from('guidelines_versions')
       .update({ is_default: false })
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .neq('id', versionId)
 
     if (clearError) {

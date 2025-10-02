@@ -26,7 +26,7 @@ export async function GET(
       .from('students')
       .select('id, name, email, status, tenant_id')
       .eq('id', studentId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (studentError || !student) {

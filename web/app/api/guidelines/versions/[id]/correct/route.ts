@@ -51,7 +51,7 @@ export async function POST(
     const { data: versions, error: versionError } = await supabase
       .from('guidelines_versions')
       .select('version')
-      .eq('tenant_id', currentVersion.tenant_id)
+      .eq('org_id', currentVersion.tenant_id)
       .order('version', { ascending: false })
       .limit(1)
 

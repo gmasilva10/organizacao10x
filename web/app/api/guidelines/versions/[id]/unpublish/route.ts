@@ -27,7 +27,7 @@ export async function POST(
       .from('guidelines_versions')
       .select('*')
       .eq('id', versionId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (versionError || !version) {

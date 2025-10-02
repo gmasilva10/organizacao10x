@@ -38,7 +38,7 @@ export async function DELETE(
       .select('id, file_path, occurrence_id, tenant_id')
       .eq('id', attachmentId)
       .eq('occurrence_id', id)
-      .eq('tenant_id', membership.tenant_id)
+      .eq('org_id', membership.tenant_id)
       .single()
 
     if (fetchError || !attachment) {
@@ -79,7 +79,7 @@ export async function DELETE(
       .from('student_occurrence_attachments')
       .delete()
       .eq('id', attachmentId)
-      .eq('tenant_id', membership.tenant_id)
+      .eq('org_id', membership.tenant_id)
 
     if (dbError) {
       console.error('Error deleting attachment from database:', dbError)

@@ -74,7 +74,7 @@ export async function GET(
         created_at,
         updated_at
       `)
-      .eq('tenant_id', membership.tenant_id)
+      .eq('org_id', membership.tenant_id)
       .eq('student_id', studentId)
       .order('occurred_at', { ascending: false })
 

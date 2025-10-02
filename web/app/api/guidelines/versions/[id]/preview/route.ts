@@ -225,7 +225,7 @@ export async function POST(
       const { data: defaultVersion } = await supabase
         .from('guidelines_versions')
         .select('id, status, version')
-        .eq('tenant_id', ctx.tenantId)
+        .eq('org_id', ctx.tenantId)
         .eq('is_default', true)
         .single()
       version = defaultVersion
@@ -234,7 +234,7 @@ export async function POST(
         .from('guidelines_versions')
         .select('id, status, version')
         .eq('id', versionId)
-        .eq('tenant_id', ctx.tenantId)
+        .eq('org_id', ctx.tenantId)
         .single()
       
       if (versionError || !versionData) {
@@ -252,7 +252,7 @@ export async function POST(
       .from('guideline_rules')
       .select('*')
       .eq('guidelines_version_id', version.id)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .order('priority_clinical', { ascending: false })
       .order('created_at', { ascending: true })
 

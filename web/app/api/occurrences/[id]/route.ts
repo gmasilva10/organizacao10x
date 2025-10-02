@@ -53,7 +53,7 @@ export async function GET(
 					updated_at
 				`)
 				.eq('id', id)
-				.eq('tenant_id', tenant_id)
+				.eq('org_id', tenant_id)
 				.single()
 
 			if (error || !occurrence) {
@@ -64,16 +64,16 @@ export async function GET(
 			// Buscar nomes relacionados separadamente
 			const [studentRes, groupRes, typeRes, ownerRes] = await Promise.all([
 				occurrence.student_id
-					? supabase.from('students').select('id, name').eq('id', occurrence.student_id).eq('tenant_id', tenant_id).single()
+					? supabase.from('students').select('id, name').eq('id', occurrence.student_id).eq('org_id', tenant_id).single()
 					: Promise.resolve({ data: null } as any),
 				occurrence.group_id
-					? supabase.from('occurrence_groups').select('id, name').eq('id', occurrence.group_id).eq('tenant_id', tenant_id).single()
+					? supabase.from('occurrence_groups').select('id, name').eq('id', occurrence.group_id).eq('org_id', tenant_id).single()
 					: Promise.resolve({ data: null } as any),
 				occurrence.type_id
-					? supabase.from('occurrence_types').select('id, name').eq('id', occurrence.type_id).eq('tenant_id', tenant_id).single()
+					? supabase.from('occurrence_types').select('id, name').eq('id', occurrence.type_id).eq('org_id', tenant_id).single()
 					: Promise.resolve({ data: null } as any),
 				occurrence.owner_user_id
-					? supabase.from('professionals').select('user_id, full_name').eq('user_id', occurrence.owner_user_id).eq('tenant_id', tenant_id).single()
+					? supabase.from('professionals').select('user_id, full_name').eq('user_id', occurrence.owner_user_id).eq('org_id', tenant_id).single()
 					: Promise.resolve({ data: null } as any)
 			])
 
@@ -128,7 +128,7 @@ export async function PATCH(
 				.from('student_occurrences')
 				.select('id, owner_user_id, group_id, type_id, notes, priority, is_sensitive, reminder_at, reminder_status, occurred_at')
 				.eq('id', id)
-				.eq('tenant_id', tenant_id)
+				.eq('org_id', tenant_id)
 				.single()
 
 			if (!existingOccurrence) {
@@ -150,7 +150,7 @@ export async function PATCH(
 					.from('occurrence_groups')
 					.select('id')
 					.eq('id', validatedData.group_id)
-					.eq('tenant_id', tenant_id)
+					.eq('org_id', tenant_id)
 					.single()
 
 				if (!group) {
@@ -166,7 +166,7 @@ export async function PATCH(
 					.from('occurrence_types')
 					.select('id')
 					.eq('id', validatedData.type_id)
-					.eq('tenant_id', tenant_id)
+					.eq('org_id', tenant_id)
 					.single()
 
 				if (!type) {
@@ -199,7 +199,7 @@ export async function PATCH(
 					updated_at: new Date().toISOString()
 				})
 				.eq('id', id)
-				.eq('tenant_id', tenant_id)
+				.eq('org_id', tenant_id)
 				.select()
 				.single()
 

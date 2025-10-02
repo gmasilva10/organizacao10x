@@ -47,7 +47,7 @@ export async function POST(
       .from('professionals')
       .select('id, email, user_id')
       .eq('id', professionalId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (fetchProfessionalError) {
@@ -99,7 +99,7 @@ export async function POST(
         .from('memberships')
         .select('id, role, status')
         .eq('user_id', user_id)
-        .eq('tenant_id', ctx.tenantId)
+        .eq('org_id', ctx.tenantId)
         .single()
 
       if (membershipCheckError && membershipCheckError.code !== 'PGRST116') {
@@ -174,7 +174,7 @@ export async function POST(
       .from('professionals')
       .update({ user_id, updated_at: new Date().toISOString() })
       .eq('id', professionalId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .select(`
         *,
         professional_profiles!inner(name)

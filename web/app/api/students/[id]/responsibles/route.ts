@@ -23,7 +23,7 @@ export async function GET(
       .from('students')
       .select('id, name, tenant_id')
       .eq('id', studentId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (studentError || !student) {
@@ -49,7 +49,7 @@ export async function GET(
         )
       `)
       .eq('student_id', studentId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .order('created_at', { ascending: true })
 
     if (responsiblesError) {
@@ -120,7 +120,7 @@ export async function POST(
       .from('students')
       .select('id, name, tenant_id')
       .eq('id', studentId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (studentError || !student) {
@@ -132,7 +132,7 @@ export async function POST(
       .from('professionals')
       .select('id, full_name, is_active, tenant_id')
       .eq('id', professional_id)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (professionalError || !professional) {
@@ -149,7 +149,7 @@ export async function POST(
         .from('student_responsibles')
         .select('id, professional_id')
         .eq('student_id', studentId)
-        .eq('tenant_id', ctx.tenantId)
+        .eq('org_id', ctx.tenantId)
         .contains('roles', ['principal'])
         .neq('professional_id', professional_id)
         .single()

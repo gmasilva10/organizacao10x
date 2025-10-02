@@ -31,7 +31,7 @@ export async function PATCH(
       .from('students')
       .select('id, tenant_id')
       .eq('id', studentId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (studentError || !student) {
@@ -43,7 +43,7 @@ export async function PATCH(
       .from('student_anamnesis_versions')
       .select('version_n')
       .eq('student_id', studentId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .order('version_n', { ascending: false })
       .limit(1)
       .single()
@@ -54,7 +54,7 @@ export async function PATCH(
     const { data: template, error: templateError } = await supabase
       .from('anamnesis_templates')
       .select('id')
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('is_default', true)
       .eq('status', 'PUBLISHED')
       .single()

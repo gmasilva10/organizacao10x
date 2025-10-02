@@ -29,7 +29,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         .from('student_occurrences')
         .select('id, student_id, owner_user_id')
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .single()
       
       if (!existing) return NextResponse.json({ error: 'OcorrÃªncia nÃ£o encontrada' }, { status: 404 })
@@ -57,7 +57,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           updated_at: new Date().toISOString()
         })
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
 
       if (error) {
         console.error('Erro ao encerrar ocorrÃªncia:', error)

@@ -186,7 +186,7 @@ export async function POST(
         .from('occurrence_groups')
         .select('id')
         .eq('name', 'Saúde')
-        .eq('tenant_id', 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7') // Tenant fixo por enquanto
+        .eq('org_id', 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7') // Tenant fixo por enquanto
         .maybeSingle()
 
       const { data: occurrenceType } = await admin
@@ -194,7 +194,7 @@ export async function POST(
         .select('id')
         .eq('name', 'Anamnese Respondida')
         .eq('group_id', occurrenceGroup?.id)
-        .eq('tenant_id', 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7') // Tenant fixo por enquanto
+        .eq('org_id', 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7') // Tenant fixo por enquanto
         .maybeSingle()
 
       if (occurrenceGroup && occurrenceType) {

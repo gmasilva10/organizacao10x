@@ -31,7 +31,7 @@ export async function PATCH(
         .from('student_occurrences')
         .select('id, reminder_at, reminder_status, reminder_created_by')
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .single()
 
       if (!currentOccurrence) {
@@ -51,7 +51,7 @@ export async function PATCH(
           updated_by: user.id
         })
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .select()
         .single()
 

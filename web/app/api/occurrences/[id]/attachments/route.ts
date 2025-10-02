@@ -38,7 +38,7 @@ export async function GET(
       .from('student_occurrence_attachments')
       .select('id, filename, file_size, mime_type, created_at')
       .eq('occurrence_id', id)
-      .eq('tenant_id', membership.tenant_id)
+      .eq('org_id', membership.tenant_id)
       .order('created_at', { ascending: false })
 
     if (error) {

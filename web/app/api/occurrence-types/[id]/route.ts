@@ -36,7 +36,7 @@ export async function GET(
           occurrence_groups!inner(name)
         `)
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .single()
 
       if (error || !type) {
@@ -66,7 +66,7 @@ export async function PATCH(
         .from('occurrence_types')
         .select('*')
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .single()
 
       if (!currentType) {
@@ -83,7 +83,7 @@ export async function PATCH(
         const { data: existingType } = await supabase
           .from('occurrence_types')
           .select('id')
-          .eq('tenant_id', tenant_id)
+          .eq('org_id', tenant_id)
           .eq('group_id', groupId)
           .eq('name', validatedData.name)
           .neq('id', id)
@@ -103,7 +103,7 @@ export async function PATCH(
           .from('occurrence_groups')
           .select('id')
           .eq('id', validatedData.group_id)
-          .eq('tenant_id', tenant_id)
+          .eq('org_id', tenant_id)
           .single()
 
         if (!group) {
@@ -123,7 +123,7 @@ export async function PATCH(
           updated_by: user.id
         })
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .select(`
           *,
           occurrence_groups!inner(name)
@@ -204,7 +204,7 @@ export async function DELETE(
         .from('occurrence_types')
         .select('*')
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .single()
 
       if (!type) {
@@ -216,7 +216,7 @@ export async function DELETE(
         .from('student_occurrences')
         .select('id')
         .eq('type_id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .limit(1)
 
       if (occurrences && occurrences.length > 0) {
@@ -231,7 +231,7 @@ export async function DELETE(
         .from('occurrence_types')
         .delete()
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
 
       if (error) {
         console.error('Erro ao excluir tipo:', error)

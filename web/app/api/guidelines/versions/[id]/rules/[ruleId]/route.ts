@@ -67,7 +67,7 @@ export async function PUT(
       .from('guidelines_versions')
       .select('id, status')
       .eq('id', versionId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (versionError || !version) {
@@ -83,7 +83,7 @@ export async function PUT(
       .from('guideline_rules')
       .select('id')
       .eq('id', ruleId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('guidelines_version_id', versionId)
       .single()
 
@@ -101,7 +101,7 @@ export async function PUT(
         updated_at: new Date().toISOString()
       })
       .eq('id', ruleId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .select()
       .single()
 
@@ -142,7 +142,7 @@ export async function DELETE(
       .from('guidelines_versions')
       .select('id, status')
       .eq('id', versionId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (versionError || !version) {
@@ -158,7 +158,7 @@ export async function DELETE(
       .from('guideline_rules')
       .select('id')
       .eq('id', ruleId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .eq('guidelines_version_id', versionId)
       .single()
 
@@ -171,7 +171,7 @@ export async function DELETE(
       .from('guideline_rules')
       .delete()
       .eq('id', ruleId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
 
     if (error) {
       console.error('Erro ao deletar regra:', error)

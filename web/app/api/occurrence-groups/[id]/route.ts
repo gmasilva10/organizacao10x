@@ -31,7 +31,7 @@ export async function GET(
         .from('occurrence_groups')
         .select('*')
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .single()
 
       if (error || !group) {
@@ -61,7 +61,7 @@ export async function PATCH(
         .from('occurrence_groups')
         .select('*')
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .single()
 
       if (!currentGroup) {
@@ -77,7 +77,7 @@ export async function PATCH(
         const { data: existingGroup } = await supabase
           .from('occurrence_groups')
           .select('id')
-          .eq('tenant_id', tenant_id)
+          .eq('org_id', tenant_id)
           .eq('name', validatedData.name)
           .neq('id', id)
           .single()
@@ -99,7 +99,7 @@ export async function PATCH(
           updated_by: user.id
         })
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .select()
         .single()
 
@@ -177,7 +177,7 @@ export async function DELETE(
         .from('occurrence_groups')
         .select('*')
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .single()
 
       if (!group) {
@@ -189,7 +189,7 @@ export async function DELETE(
         .from('occurrence_types')
         .select('id')
         .eq('group_id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
         .limit(1)
 
       if (types && types.length > 0) {
@@ -204,7 +204,7 @@ export async function DELETE(
         .from('occurrence_groups')
         .delete()
         .eq('id', id)
-        .eq('tenant_id', tenant_id)
+        .eq('org_id', tenant_id)
 
       if (error) {
         console.error('Erro ao excluir grupo:', error)

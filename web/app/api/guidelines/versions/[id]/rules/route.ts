@@ -64,7 +64,7 @@ export async function GET(
       .from('guidelines_versions')
       .select('id, status')
       .eq('id', versionId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (versionError || !version) {
@@ -76,7 +76,7 @@ export async function GET(
       .from('guideline_rules')
       .select('*')
       .eq('guidelines_version_id', versionId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .order('priority_clinical', { ascending: false })
       .order('created_at', { ascending: true })
 
@@ -117,7 +117,7 @@ export async function POST(
       .from('guidelines_versions')
       .select('id, status')
       .eq('id', versionId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (versionError || !version) {

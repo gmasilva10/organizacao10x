@@ -40,7 +40,7 @@ export async function POST(
       .from('professionals')
       .select('id, tenant_id, email, user_id')
       .eq('id', professionalId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (fetchError || !professional) {
@@ -127,7 +127,7 @@ export async function POST(
         updated_at: new Date().toISOString()
       })
       .eq('id', professionalId)
-      .eq('tenant_id', ctx.tenantId)
+      .eq('org_id', ctx.tenantId)
       .select(`
         *,
         professional_profiles!inner(name)
