@@ -40,9 +40,9 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('q') || ''
     const status = searchParams.get('status') || ''
 
-    // Construir filtros
+    // Construir filtros (org_id apenas)
     const filters: string[] = []
-    if (ctx?.tenantId) filters.push(`or=(org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId})`)
+    if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.tenantId}`)
     if (softDelete) filters.push(`deleted_at=is.null`)
     if (status) filters.push(`status=eq.${status}`)
     
@@ -203,13 +203,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'service_unavailable', message: 'Variáveis de ambiente do Supabase ausentes.' }, { status: 503, headers: { 'X-Query-Time': String(t) } })
     }
 
-    // Montar corpo conforme schema
+    // Montar corpo conforme schema (org_id apenas)
     const body = {
       name,
       email,
       phone: phoneDigits,
       status,
-      tenant_id: ctx?.tenantId || null,
       org_id: ctx?.tenantId || null,
     }
 

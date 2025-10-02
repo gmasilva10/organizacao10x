@@ -298,7 +298,6 @@ async function processPurchaseApproved(
     .from('student_services')
     .insert({
       org_id: orgId,
-      tenant_id: orgId, // Manter compatibilidade
       student_id: studentId,
       name: mapping.plan.nome,
       type: 'plan',

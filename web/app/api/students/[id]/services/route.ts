@@ -32,8 +32,7 @@ export async function GET(
         )
       `)
       .eq('student_id', params.id)
-      // Fase 1 migração: filtrar por org_id OU tenant_id
-      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
+      .eq('org_id', ctx.tenantId)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -115,6 +114,7 @@ export async function POST(
     const { data: service, error: createError } = await supabase
       .from('student_services')
       .insert({
+        org_id: ctx.tenantId,
         student_id: params.id,
         name,
         type: b.type || 'plan',
@@ -130,9 +130,7 @@ export async function POST(
         start_date,
         end_date: b.end_date || null,
         notes: b.notes || null,
-        is_active: b.is_active !== false,
-        org_id: ctx.tenantId,
-        tenant_id: ctx.tenantId
+        is_active: b.is_active !== false
       })
       .select()
       .single()

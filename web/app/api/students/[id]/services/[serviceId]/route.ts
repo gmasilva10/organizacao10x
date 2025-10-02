@@ -33,8 +33,7 @@ export async function GET(
       `)
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      // Fase 1 migração: filtrar por org_id OU tenant_id
-      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (error) {
@@ -98,8 +97,7 @@ export async function PATCH(
       .select('id')
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      // Fase 1 migração: filtrar por org_id OU tenant_id
-      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (serviceError || !existingService) {
@@ -131,8 +129,7 @@ export async function PATCH(
       .update(updateData)
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      // Fase 1 migração: filtrar por org_id OU tenant_id
-      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
+      .eq('org_id', ctx.tenantId)
       .select()
       .single()
 
@@ -173,8 +170,7 @@ export async function DELETE(
       .select('id')
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      // Fase 1 migração: filtrar por org_id OU tenant_id
-      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
+      .eq('org_id', ctx.tenantId)
       .single()
 
     if (serviceError || !existingService) {
@@ -187,8 +183,7 @@ export async function DELETE(
       .delete()
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      // Fase 1 migração: filtrar por org_id OU tenant_id
-      .or(`org_id.eq.${ctx.tenantId},tenant_id.eq.${ctx.tenantId}`)
+      .eq('org_id', ctx.tenantId)
 
     if (deleteError) {
       console.error('Erro ao deletar serviço:', deleteError)
