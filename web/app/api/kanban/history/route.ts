@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number(searchParams.get('page') || 1))
   const pageSize = Math.min(100, Math.max(1, Number(searchParams.get('pageSize') || 20)))
 
-  const filters = [`tenant_id=eq.${ctx.tenantId}`]
+  const filters = [`org_id=eq.${ctx.tenantId}`]
   if (from) filters.push(`completed_at=gte.${from}`)
   if (to) filters.push(`completed_at=lte.${to}T23:59:59`)
   if (trainerId) {

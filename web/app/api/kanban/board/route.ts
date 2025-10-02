@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       // Fallback para modelo antigo (onboarding_columns)
       const t = await colsResp.text().catch(()=>"")
       try {
-        const legacy = await fetch(`${url}/rest/v1/onboarding_columns?tenant_id=eq.${ctx.tenantId}&select=id,title,sort&order=sort.asc`, {
+        const legacy = await fetch(`${url}/rest/v1/onboarding_columns?org_id=eq.${ctx.tenantId}&select=id,title,sort&order=sort.asc`, {
           headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
         })
         if (legacy.ok) {
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
       const t = await cardsResp.text().catch(()=>"")
       // Fallback para modelo antigo
       try {
-        const legacy = await fetch(`${url}/rest/v1/onboarding_cards?tenant_id=eq.${ctx.tenantId}&select=id,student_id,column_id,sort,created_at,completed_at&order=sort.asc`, {
+        const legacy = await fetch(`${url}/rest/v1/onboarding_cards?org_id=eq.${ctx.tenantId}&select=id,student_id,column_id,sort,created_at,completed_at&order=sort.asc`, {
           headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
         })
         if (legacy.ok) {
@@ -125,7 +125,7 @@ export async function GET(request: Request) {
   const studentsMap: Record<string, { status?: string; name?: string; phone?: string }> = {}
   if (studentIds.length > 0) {
     const inList = studentIds.map(encodeURIComponent).join(',')
-    const stuResp = await fetch(`${url}/rest/v1/students?tenant_id=eq.${ctx.tenantId}&id=in.(${inList})&select=id,name,status,phone`, {
+    const stuResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.tenantId}&id=in.(${inList})&select=id,name,status,phone`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (!stuResp.ok) {

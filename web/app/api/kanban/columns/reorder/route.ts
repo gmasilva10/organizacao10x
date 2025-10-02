@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   // Buscar colunas atuais para preservar fixas nas extremidades
   const colsResp = await fetch(
-    `${url}/rest/v1/onboarding_columns?tenant_id=eq.${ctx.tenantId}&select=id,title,sort&order=sort.asc`,
+    `${url}/rest/v1/onboarding_columns?org_id=eq.${ctx.tenantId}&select=id,title,sort&order=sort.asc`,
     { headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: "no-store" }
   )
   const current: Array<{ id: string; title: string; sort: number }> = await colsResp
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
   for (const u of updates) {
     const resp = await fetch(
-      `${url}/rest/v1/onboarding_columns?id=eq.${u.id}&tenant_id=eq.${ctx.tenantId}`,
+      `${url}/rest/v1/onboarding_columns?id=eq.${u.id}&org_id=eq.${ctx.tenantId}`,
       {
         method: "PATCH",
         headers: {

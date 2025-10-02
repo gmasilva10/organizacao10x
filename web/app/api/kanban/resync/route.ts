@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     }
 
     // Lógica original para resync geral
-    const toCreateResp = await fetch(`${url}/rest/v1/students?tenant_id=eq.${ctx.tenantId}&or=(onboard_opt.eq.enviar,onboard_opt.eq.enviado)&select=id`, { headers, cache:'no-store' })
+    const toCreateResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.tenantId}&or=(onboard_opt.eq.enviar,onboard_opt.eq.enviado)&select=id`, { headers, cache:'no-store' })
     const rows: Array<{ id:string }> = await toCreateResp.json().catch(()=>[])
     let created = 0
     for (const r of rows) {

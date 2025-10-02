@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   // sort sequencial (10,20,30,...) para espaço futuro
   const updates = cardIds.map((id, idx) => ({ id, sort: (idx+1)*10 }))
   for (const u of updates) {
-    const resp = await fetch(`${url}/rest/v1/onboarding_cards?id=eq.${u.id}&tenant_id=eq.${ctx.tenantId}`, {
+    const resp = await fetch(`${url}/rest/v1/onboarding_cards?id=eq.${u.id}&org_id=eq.${ctx.tenantId}`, {
       method: 'PATCH', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json' },
       body: JSON.stringify({ sort: u.sort, column_id: columnId })
     })

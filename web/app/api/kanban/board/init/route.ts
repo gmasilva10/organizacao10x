@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     }
     if (stage?.id) {
       // alunos enviados (ou marcados para enviar) sem card
-      const studentsResp = await fetch(`${url}/rest/v1/students?tenant_id=eq.${ctx.tenantId}&or=(onboard_opt.eq.enviar,onboard_opt.eq.enviado)&select=id`, { headers, cache:'no-store' })
+      const studentsResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.tenantId}&or=(onboard_opt.eq.enviar,onboard_opt.eq.enviado)&select=id`, { headers, cache:'no-store' })
       const students = await studentsResp.json().catch(()=>[])
       for (const st of students) {
         const exist = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&student_id=eq.${st.id}&select=id&limit=1`, { headers, cache:'no-store' })
