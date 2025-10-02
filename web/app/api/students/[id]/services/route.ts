@@ -155,11 +155,11 @@ export async function POST(
   // Validação com Zod
   const validationResult = CreateServiceSchema.safeParse(body)
   if (!validationResult.success) {
-    console.error(`[${correlationId}] Validation error:`, validationResult.error.errors)
+    console.error(`[${correlationId}] Validation error:`, validationResult.error.issues)
     return NextResponse.json({
       error: "validation_error",
       correlationId,
-      details: validationResult.error.errors
+      details: validationResult.error.issues
     }, { status: 400 })
   }
 

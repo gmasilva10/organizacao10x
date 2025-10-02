@@ -321,7 +321,7 @@ export default function PlansManager() {
       )}
 
       {/* Modal de Criação/Edição */}
-      <Dialog open={showCreateModal || showEditModal} onOpenChange={(open) => {
+      <Dialog open={showCreateModal || showEditModal} onOpenChange={(open: boolean) => {
         if (!open) {
           setShowCreateModal(false)
           setShowEditModal(false)
@@ -386,7 +386,7 @@ export default function PlansManager() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="moeda">Moeda</Label>
-                <Select value={formData.moeda} onValueChange={(value) => setFormData(prev => ({ ...prev, moeda: value }))}>
+                <Select value={formData.moeda} onValueChange={(value: string) => setFormData(prev => ({ ...prev, moeda: value }))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -399,7 +399,7 @@ export default function PlansManager() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="ciclo">Ciclo</Label>
-                <Select value={formData.ciclo} onValueChange={(value) => setFormData(prev => ({ ...prev, ciclo: value }))}>
+                <Select value={formData.ciclo} onValueChange={(value: string) => setFormData(prev => ({ ...prev, ciclo: value }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -428,7 +428,7 @@ export default function PlansManager() {
               <Switch
                 id="ativo"
                 checked={formData.ativo}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, ativo: checked }))}
+                onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, ativo: checked }))}
               />
               <Label htmlFor="ativo">Plano ativo</Label>
             </div>

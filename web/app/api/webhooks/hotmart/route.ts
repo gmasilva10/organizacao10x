@@ -432,7 +432,8 @@ async function processPurchaseRefunded(
   supabase: any, 
   orgId: string, 
   transactionId: string, 
-  data: any
+  data: any,
+  correlationId: string
 ) {
   console.log(`[PURCHASE_REFUNDED] Processing for org ${orgId}`)
   
@@ -474,7 +475,8 @@ async function processSubscriptionCancellation(
   supabase: any, 
   orgId: string, 
   transactionId: string, 
-  data: any
+  data: any,
+  correlationId: string
 ) {
   console.log(`[SUBSCRIPTION_CANCELLATION] Processing for org ${orgId}`)
   
