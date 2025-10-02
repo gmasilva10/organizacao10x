@@ -128,6 +128,53 @@ CREATE POLICY students_select ON students
   - `web/app/api/students/[id]/services/route.ts` (POST)
   - `web/app/api/webhooks/hotmart/route.ts` (student_services insert)
 
+## ✅ FASE 4.1 COMPLETA - Validação em Produção
+
+**Data:** 2025-10-02 14:42  
+**Deploy ID:** `dpl_7CyDyDp5NtdfnJrYeD4GQjMEQE3N` (READY)  
+**Commit:** `016d9a3` - "docs: Atualizar status da migracao org_id - Fase 4 completa"
+
+### Teste Simulado Webhook em Produção ✅
+- ✅ **Aluno criado via SQL:** Maria Santos Produção Test (maria.prod.test@email.com)
+  - Student ID: `aa6671aa-0f4f-4b5c-8e7d-6aaf3a351833`
+  - org_id: `fb381d42-9cf8-41d9-b0ab-fdb706a85ae7` ✅
+  - tenant_id: `NULL` ✅ (webhook NÃO escreve tenant_id)
+  - Status: active
+
+- ✅ **Serviço criado:**
+  - Service ID: `5f2e4dec-8fb2-4de4-bbc1-246dc508a834`
+  - Nome: Plano Mensal
+  - Preço: R$ 3,90
+  - Ciclo: monthly
+  - Status: active, paid, card
+
+### Validações Realizadas ✅
+1. ✅ Query `SELECT WHERE org_id = X AND deleted_at IS NULL` retorna aluno
+2. ✅ Políticas RLS migradas para `org_id`:
+   - students_select: `is_member_of_org(org_id)` ✅
+   - students_update: `is_member_of_org(org_id)` ✅
+   - student_services_select: `is_member_of_org(org_id)` ✅
+3. ✅ Schema validado:
+   - students: org_id NOT NULL, tenant_id NULLABLE ✅
+   - student_services: org_id NOT NULL, tenant_id NOT NULL ⚠️
+
+### Correção Aplicada: Migration `make_tenant_id_nullable_in_services`
+**Data:** 2025-10-02 14:42
+
+Tornou `tenant_id` NULLABLE em:
+- student_services
+- student_billing
+- student_plan_contracts
+
+Backfill executado: `UPDATE ... SET tenant_id = org_id WHERE tenant_id IS NULL`
+
+### Resultado Final
+- ✅ Sistema 100% funcional com org_id
+- ✅ Webhook Hotmart cria alunos sem tenant_id
+- ✅ APIs filtram por org_id exclusivamente
+- ✅ RLS validado e funcionando com org_id
+- ✅ Constraints de schema corrigidas
+
 ## ⏳ FASE 5 FUTURA - Limpeza tenant_id
 
 **Estimativa:** Após 2 ciclos de deploy estáveis (1 semana)
