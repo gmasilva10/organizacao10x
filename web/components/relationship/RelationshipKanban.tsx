@@ -371,49 +371,74 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     }
   }, [debouncedFilters.date_from, debouncedFilters.date_to])
 
-  // Agrupar tarefas por coluna usando timezone
+  // Agrupar tarefas por coluna usando timezone - versão simplificada
   const getTasksByColumn = (columnId: string) => {
-    return tasks.filter(task => {
-      // Atrasadas: scheduled_for < startOfToday e status = 'pending'
-      if (columnId === 'overdue') {
-        return task.status === 'pending' && isPast(task.scheduled_for)
-      }
-      
-      // Para Hoje: scheduled_for ∈ hoje e status = 'pending'
-      if (columnId === 'due_today') {
-        return task.status === 'pending' && isToday(task.scheduled_for)
-      }
-      
-      // Pendentes de Envio: scheduled_for > endOfToday e status = 'pending'
-      if (columnId === 'pending_future') {
-        return task.status === 'pending' && isFuture(task.scheduled_for)
-      }
-      
-      // Enviadas: status = 'sent'
-      if (columnId === 'sent') {
-        return task.status === 'sent'
-      }
-      
-      // Adiadas/Puladas: status in ('postponed', 'skipped')
-      if (columnId === 'postponed_skipped') {
-        return task.status === 'postponed' || task.status === 'skipped'
-      }
-      
-      return false
-    }).sort((a, b) => {
-      // Ordena  o: scheduled_for ASC, depois created_at ASC
-      const dateA = new Date(a.scheduled_for).getTime()
-      const dateB = new Date(b.scheduled_for).getTime()
-      
-      if (dateA !== dateB) {
-        return dateA - dateB
-      }
-      
-      // Se datas iguais, ordenar por created_at
-      const createdA = new Date(a.created_at).getTime()
-      const createdB = new Date(b.created_at).getTime()
-      return createdA - createdB
-    })
+    try {
+      return tasks.filter(task => {
+        // Atrasadas: scheduled_for < startOfToday e status = 'pending'
+        if (columnId === 'overdue') {
+          try {
+            return task.status === 'pending' && isPast(task.scheduled_for)
+          } catch (error) {
+            console.warn('Erro em isPast, ignorando tarefa:', error)
+            return false
+          }
+        }
+        
+        // Para Hoje: scheduled_for ∈ hoje e status = 'pending'
+        if (columnId === 'due_today') {
+          try {
+            return task.status === 'pending' && isToday(task.scheduled_for)
+          } catch (error) {
+            console.warn('Erro em isToday, ignorando tarefa:', error)
+            return false
+          }
+        }
+        
+        // Pendentes de Envio: scheduled_for > endOfToday e status = 'pending'
+        if (columnId === 'pending_future') {
+          try {
+            return task.status === 'pending' && isFuture(task.scheduled_for)
+          } catch (error) {
+            console.warn('Erro em isFuture, ignorando tarefa:', error)
+            return false
+          }
+        }
+        
+        // Enviadas: status = 'sent'
+        if (columnId === 'sent') {
+          return task.status === 'sent'
+        }
+        
+        // Adiadas/Puladas: status in ('postponed', 'skipped')
+        if (columnId === 'postponed_skipped') {
+          return task.status === 'postponed' || task.status === 'skipped'
+        }
+        
+        return false
+      }).sort((a, b) => {
+        try {
+          // Ordena  o: scheduled_for ASC, depois created_at ASC
+          const dateA = new Date(a.scheduled_for).getTime()
+          const dateB = new Date(b.scheduled_for).getTime()
+          
+          if (dateA !== dateB) {
+            return dateA - dateB
+          }
+          
+          // Se datas iguais, ordenar por created_at
+          const createdA = new Date(a.created_at).getTime()
+          const createdB = new Date(b.created_at).getTime()
+          return createdA - createdB
+        } catch (error) {
+          console.warn('Erro ao ordenar tarefas:', error)
+          return 0
+        }
+      })
+    } catch (error) {
+      console.error('Erro em getTasksByColumn:', error)
+      return []
+    }
   }
 
   // Fun  o de Undo (desfazer a  o)
