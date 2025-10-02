@@ -331,7 +331,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
   // Buscar tarefas quando filtros mudarem
   useEffect(() => {
     fetchTasks()
-  }, [fetchTasks])
+  }, [])
 
   // Determinar colunas visíveis - versão ultra-simplificada
   const visibleColumns = ALL_COLUMNS
