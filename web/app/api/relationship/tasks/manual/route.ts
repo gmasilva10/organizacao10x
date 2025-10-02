@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
     // Verificar se o aluno existe (sem filtro de tenant para desenvolvimento)
     const { data: student, error: studentError } = await supabase
       .from('students')
-      .select('id, name, email, phone, status, tenant_id')
+      .select('id, name, email, phone, status, org_id')
       .eq('id', studentId)
       .single()
 
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
       const { data: tmplRows } = await supabase
         .from('relationship_templates')
         .select('id, content')
-        .eq('org_id', student.tenant_id)
+        .eq('org_id', student.org_id)
 
       let foundTemplate: any = null
       for (const row of (tmplRows || [])) {
