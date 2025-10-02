@@ -87,27 +87,21 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
   const [modalDate, setModalDate] = useState<Date | null>(null)
   const [filtersOpen, setFiltersOpen] = useState(false)
   
-  // Desativar filtros temporariamente para estabilização
-  const debouncedFilters = {
-    status: 'all',
-    anchor: 'all',
-    template_code: 'all',
-    channel: 'all',
-    date_from: '',
-    date_to: '',
-    q: ''
-  }
-  const updateFilters = (filters: any) => {}
-  const resetFilters = () => {}
-  const hasActiveFilters = () => false
-  const getApiFilters = () => ({})
+  const { 
+    debouncedFilters, 
+    updateFilters, 
+    resetFilters, 
+    hasActiveFilters,
+    getApiFilters 
+  } = useRelationshipFilters()
 
-  // Buscar tarefas - versão simplificada sem filtros
+  // Buscar tarefas
   const fetchTasks = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
-        page_size: '1000' // Buscar todas as tarefas para o calendário
+        page_size: '1000', // Buscar todas as tarefas para o calendário
+        ...getApiFilters()
       })
 
       const response = await fetch(`/api/relationship/tasks?${params}`)
@@ -124,7 +118,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [getApiFilters])
 
   // Atualizar status da tarefa
   const updateTaskStatus = async (taskId: string, status: string, notes?: string) => {
@@ -192,15 +186,23 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     refresh: fetchTasks
   }))
 
-  // Buscar tarefas na inicialização
+  // Buscar tarefas quando filtros mudarem
   useEffect(() => {
     fetchTasks()
-  }, [])
+  }, [fetchTasks])
 
-  // Calcular datas baseadas na visão - versão simplificada
-  const startDate = startOfMonth(currentDate)
-  const endDate = endOfMonth(currentDate)
-  const days = eachDayOfInterval({ start: startDate, end: endDate })
+  // Calcular datas baseadas na visão
+  const { startDate, endDate, days } = useMemo(() => {
+    const start = startOfMonth(currentDate)
+    const end = endOfMonth(currentDate)
+    const daysArray = eachDayOfInterval({ start, end })
+    
+    return {
+      startDate: start,
+      endDate: end,
+      days: daysArray
+    }
+  }, [currentDate])
 
   // Filtrar tarefas por data
   const getTasksForDate = (date: Date) => {
