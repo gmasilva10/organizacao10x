@@ -27,47 +27,37 @@ export async function POST(request: NextRequest) {
     // Obter org_id do contexto de autenticação
     const org_id = ctx.tenantId
     
-    // Para testes: pular validação OAuth2 se credenciais forem de teste
-    const isTestCredentials = client_id.includes('@yahoo.com.br') || client_id.includes('test')
+    // Testar conexão OAuth2 com Hotmart
+    const authString = Buffer.from(`${client_id}:${client_secret}`).toString('base64')
     
-    let access_token = 'test-access-token'
-    let tokenExpiresAt = new Date()
-    
-    if (!isTestCredentials) {
-      // Testar conexão OAuth2 com Hotmart apenas para credenciais reais
-      const authString = Buffer.from(`${client_id}:${client_secret}`).toString('base64')
-      
-      const tokenResponse = await fetch('https://api-sec-vlc.hotmart.com/security/oauth/token', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${authString}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          grant_type: 'client_credentials',
-          client_id: client_id,
-          client_secret: client_secret
-        })
+    const tokenResponse = await fetch('https://api-sec-vlc.hotmart.com/security/oauth/token', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${authString}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        grant_type: 'client_credentials',
+        client_id: client_id,
+        client_secret: client_secret
       })
-      
-      if (!tokenResponse.ok) {
-        const errorData = await tokenResponse.json().catch(() => ({}))
-        return NextResponse.json({
-          error: 'Credenciais inválidas',
-          details: errorData.error_description || 'Erro ao conectar com Hotmart'
-        }, { status: 401 })
-      }
-      
-      const tokenData = await tokenResponse.json()
-      access_token = tokenData.access_token
-      const { expires_in } = tokenData
-      
-      // Calcular expiração do token
-      tokenExpiresAt.setSeconds(tokenExpiresAt.getSeconds() + expires_in)
-    } else {
-      // Para credenciais de teste, definir expiração em 1 hora
-      tokenExpiresAt.setHours(tokenExpiresAt.getHours() + 1)
+    })
+    
+    if (!tokenResponse.ok) {
+      const errorData = await tokenResponse.json().catch(() => ({}))
+      return NextResponse.json({
+        error: 'Credenciais inválidas',
+        details: errorData.error_description || 'Erro ao conectar com Hotmart'
+      }, { status: 401 })
     }
+    
+    const tokenData = await tokenResponse.json()
+    const access_token = tokenData.access_token
+    const { expires_in } = tokenData
+    
+    // Calcular expiração do token
+    const tokenExpiresAt = new Date()
+    tokenExpiresAt.setSeconds(tokenExpiresAt.getSeconds() + expires_in)
     
     // Verificar se já existe integração
     const { data: existing } = await supabase
