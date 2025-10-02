@@ -131,6 +131,15 @@ export function isToday(date: Date | string, timezone: string = TIMEZONE): boole
     const zonedDate = toZonedTime(dateObj, timezone)
     const zonedNow = toZonedTime(now, timezone)
     
+    // Verificar se as datas zonadas são válidas
+    if (!zonedDate || !zonedNow || isNaN(zonedDate.getTime()) || isNaN(zonedNow.getTime())) {
+      console.warn('isToday: datas zonadas inválidas, usando fallback', { zonedDate, zonedNow, timezone })
+      // Fallback: comparar apenas o dia em UTC
+      const dateDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate())
+      const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      return isEqual(dateDay, nowDay)
+    }
+    
     const startOfDateDay = startOfDay(zonedDate)
     const startOfNowDay = startOfDay(zonedNow)
     
@@ -166,8 +175,11 @@ export function isPast(date: Date | string, timezone: string = TIMEZONE): boolea
     
     // Verificar se todayStart é válido
     if (!todayStart || isNaN(todayStart.getTime())) {
-      console.warn('isPast: todayStart inválido', { todayStart, timezone })
-      return false
+      console.warn('isPast: todayStart inválido, usando fallback', { todayStart, timezone })
+      // Fallback: comparar com início do dia atual em UTC
+      const now = new Date()
+      const fallbackStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      return isBefore(dateObj, fallbackStart)
     }
     
     return isBefore(dateObj, todayStart)
@@ -202,8 +214,11 @@ export function isFuture(date: Date | string, timezone: string = TIMEZONE): bool
     
     // Verificar se todayEnd é válido
     if (!todayEnd || isNaN(todayEnd.getTime())) {
-      console.warn('isFuture: todayEnd inválido', { todayEnd, timezone })
-      return false
+      console.warn('isFuture: todayEnd inválido, usando fallback', { todayEnd, timezone })
+      // Fallback: comparar com fim do dia atual em UTC
+      const now = new Date()
+      const fallbackEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+      return isAfter(dateObj, fallbackEnd)
     }
     
     return isAfter(dateObj, todayEnd)
