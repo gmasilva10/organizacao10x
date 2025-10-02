@@ -10,6 +10,7 @@
 
 import { useState } from "react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import RelationshipKanban from "@/components/relationship/RelationshipKanban"
 import RelationshipKanbanSimple from "@/components/relationship/RelationshipKanbanSimple"
 import RelationshipCalendar from "@/components/relationship/RelationshipCalendar"
 
@@ -34,7 +35,11 @@ export default function RelationshipPage() {
 
       {/* Conteúdo por aba */}
       <div>
-        {activeTab === 'kanban' && <RelationshipKanbanSimple />}
+        {activeTab === 'kanban' && (
+          process.env.NEXT_PUBLIC_REL_KANBAN_SIMPLE === '1' ? 
+            <RelationshipKanbanSimple /> : 
+            <RelationshipKanban />
+        )}
         {activeTab === 'calendar' && <RelationshipCalendar />}
       </div>
     </div>

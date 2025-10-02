@@ -16,6 +16,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createClientAdmin } from '@/utils/supabase/server'
 import { resolveRequestContext } from '@/server/context'
+import { normalizePagination, normalizeDateFilters, normalizeStringFilters } from '@/lib/query-utils'
 
 interface TaskFilters {
   status?: string
@@ -37,7 +38,7 @@ interface TaskResponse {
   tasks: any[]
   pagination: {
     page: number
-    limit: number
+    page_size: number
     total: number
     total_pages: number
   }
@@ -67,7 +68,7 @@ function buildTaskQuery(supabase: any, filters: TaskFilters, tenantId: string) {
       created_at,
       updated_at,
       created_by,
-      students!inner(
+      student:students!inner(
         id,
         name,
         email,
@@ -119,9 +120,8 @@ function buildTaskQuery(supabase: any, filters: TaskFilters, tenantId: string) {
   query = query.order(sortBy, { ascending: sortOrder === 'asc' })
 
   // Paginacao
-  const page = Math.max(1, filters.page || 1)
-  const limit = Math.min(100, Math.max(1, filters.limit || 20))
-  const from = (page - 1) * limit
+  const { page, limit, offset } = normalizePagination(filters.page, filters.limit)
+  const from = offset
   const to = from + limit - 1
 
   query = query.range(from, to)
@@ -189,22 +189,42 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Parsear filtros da query string
+    // Parsear filtros da query string com normalização segura
     const url = new URL(request.url)
+    const rawFilters = {
+      status: url.searchParams.get('status'),
+      anchor: url.searchParams.get('anchor'),
+      template_code: url.searchParams.get('template_code'),
+      channel: url.searchParams.get('channel'),
+      student_id: url.searchParams.get('student_id'),
+      scheduled_from: url.searchParams.get('scheduled_from'),
+      scheduled_to: url.searchParams.get('scheduled_to'),
+      created_from: url.searchParams.get('created_from'),
+      created_to: url.searchParams.get('created_to'),
+      page: url.searchParams.get('page'),
+      limit: url.searchParams.get('limit'),
+      sort_by: url.searchParams.get('sort_by'),
+      sort_order: url.searchParams.get('sort_order')
+    }
+
+    // Normalizar filtros de string
+    const stringFilters = normalizeStringFilters(rawFilters)
+    
+    // Normalizar filtros de data
+    const dateFilters = normalizeDateFilters(rawFilters.scheduled_from, rawFilters.scheduled_to)
+    const createdDateFilters = normalizeDateFilters(rawFilters.created_from, rawFilters.created_to)
+    
+    // Normalizar paginação
+    const pagination = normalizePagination(rawFilters.page, rawFilters.limit)
+
     const filters: TaskFilters = {
-      status: url.searchParams.get('status') || undefined,
-      anchor: url.searchParams.get('anchor') || undefined,
-      template_code: url.searchParams.get('template_code') || undefined,
-      channel: url.searchParams.get('channel') || undefined,
-      student_id: url.searchParams.get('student_id') || undefined,
-      scheduled_from: url.searchParams.get('scheduled_from') || undefined,
-      scheduled_to: url.searchParams.get('scheduled_to') || undefined,
-      created_from: url.searchParams.get('created_from') || undefined,
-      created_to: url.searchParams.get('created_to') || undefined,
-      page: parseInt(url.searchParams.get('page') || '1'),
-      limit: parseInt(url.searchParams.get('limit') || '20'),
-      sort_by: url.searchParams.get('sort_by') || undefined,
-      sort_order: (url.searchParams.get('sort_order') as 'asc' | 'desc') || undefined
+      ...stringFilters,
+      ...dateFilters,
+      created_from: createdDateFilters.date_from,
+      created_to: createdDateFilters.date_to,
+      page: pagination.page,
+      limit: pagination.limit,
+      sort_order: (rawFilters.sort_order as 'asc' | 'desc') || undefined
     }
 
     // Criar cliente Supabase
@@ -238,7 +258,7 @@ export async function GET(request: NextRequest) {
       tasks: tasks || [],
       pagination: {
         page,
-        limit,
+        page_size: limit,
         total,
         total_pages: totalPages
       },

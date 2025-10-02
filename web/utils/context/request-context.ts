@@ -23,12 +23,12 @@ export async function resolveRequestContext(_request?: Request): Promise<Request
   if (user) {
     const { data: membership } = await (await createClient())
       .from("memberships")
-      .select("tenant_id, role")
+      .select("org_id, role")
       .eq("user_id", user.id)
       .limit(1)
       .maybeSingle()
 
-    tenantId = tenantId || membership?.tenant_id || null
+    tenantId = tenantId || membership?.org_id || null
     role = membership?.role || null
   }
 

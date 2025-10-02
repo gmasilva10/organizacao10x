@@ -15,18 +15,29 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClientAdmin } from '@/utils/supabase/server'
+import { resolveRequestContext } from '@/server/context'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // Resolver contexto de autenticação
+    const ctx = await resolveRequestContext(request)
+    
+    if (!ctx || !ctx.tenantId) {
+      return NextResponse.json(
+        { error: "unauthorized", message: "Tenant não resolvido no contexto da requisição." },
+        { status: 401 }
+      )
+    }
+
     const supabase = await createClientAdmin()
     const { previous_status, previous_scheduled_for } = await request.json()
     
-    console.log(`ðŸ”„ Iniciando undo para tarefa: ${params.id}`)
+    console.log(`🔄 Iniciando undo para tarefa: ${params.id}`)
     
-    // 1. Buscar a tarefa atual
+    // 1. Buscar a tarefa atual com validação de org_id
     const { data: task, error: fetchError } = await supabase
       .from('relationship_tasks')
       .select(`
@@ -36,9 +47,11 @@ export async function POST(
         deleted_at,
         updated_at,
         student_id,
+        org_id,
         student:students(name, org_id)
       `)
       .eq('id', params.id)
+      .eq('org_id', ctx.tenantId)
       .single()
     
     if (fetchError || !task) {
@@ -108,6 +121,7 @@ export async function POST(
     await supabase
       .from('relationship_logs')
       .insert({
+        org_id: ctx.tenantId,
         student_id: task.student_id,
         task_id: params.id,
         action: 'undo',
@@ -117,7 +131,7 @@ export async function POST(
           restored_status: restoreData.status,
           undone_scheduled_for: task.scheduled_for,
           restored_scheduled_for: restoreData.scheduled_for,
-          undo_performed_by: 'dev-user-id', // TODO: pegar do contexto de autentica   £o
+          undo_performed_by: ctx.userId || 'system',
           elapsed_seconds: Math.floor(diffSeconds),
           student_name: (Array.isArray((task as any).student) ? (task as any).student[0]?.name : (task as any).student?.name)
         }

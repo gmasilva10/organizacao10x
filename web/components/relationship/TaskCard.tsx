@@ -35,7 +35,7 @@ import { ptBR } from 'date-fns/locale'
 interface Task {
   id: string
   student_id: string
-  template_code: string
+  template_code: string | null
   anchor: string
   scheduled_for: string
   channel: string
@@ -46,7 +46,7 @@ interface Task {
     student_email: string
     student_phone: string
   }
-  variables_used: string[]
+  variables_used: any
   created_by: string
   sent_at?: string
   notes?: string
@@ -54,8 +54,10 @@ interface Task {
   created_at: string
   updated_at: string
   student: {
+    id: string
     name: string
-    phone?: string
+    email: string
+    phone: string
   }
 }
 

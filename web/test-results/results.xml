@@ -1,27 +1,220 @@
-<testsuites id="" name="" tests="12" failures="10" skipped="0" errors="0" time="36.602268">
-<testsuite name="smoke-auth-nav.spec.ts" timestamp="2025-10-02T19:18:51.558Z" hostname="chromium" tests="6" failures="5" skipped="0" time="121.989" errors="0">
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como admin redireciona para /app" classname="smoke-auth-nav.spec.ts" time="30.536">
+<testsuites id="" name="" tests="24" failures="16" skipped="0" errors="0" time="19.424198">
+<testsuite name="hotmart-webhooks.spec.ts" timestamp="2025-10-02T22:29:43.501Z" hostname="chromium" tests="6" failures="5" skipped="0" time="34.587" errors="0">
+<testcase name="Hotmart Webhooks E2E @smoke › PURCHASE_APPROVED webhook creates student and service" classname="hotmart-webhooks.spec.ts" time="9.651">
+<failure message="hotmart-webhooks.spec.ts:12:7 PURCHASE_APPROVED webhook creates student and service" type="FAILURE">
+<![CDATA[  [chromium] › hotmart-webhooks.spec.ts:12:7 › Hotmart Webhooks E2E @smoke › PURCHASE_APPROVED webhook creates student and service 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('h1')
+    Expected string: "Teste de Webhook Hotmart"
+    Received string: "404"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('h1')
+        9 × locator resolved to <h1 class="next-error-h1">404</h1>
+          - unexpected value "404"
+
+
+      16 |
+      17 |     // Verificar se a página carregou
+    > 18 |     await expect(adminPage.locator('h1')).toContainText('Teste de Webhook Hotmart');
+         |                                           ^
+      19 |
+      20 |     // Simular webhook PURCHASE_APPROVED
+      21 |     const webhookPayload = {
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:18:43
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-chromium\video.webm]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › PURCHASE_REFUNDED webhook updates service status" classname="hotmart-webhooks.spec.ts" time="7.815">
+<failure message="hotmart-webhooks.spec.ts:83:7 PURCHASE_REFUNDED webhook updates service status" type="FAILURE">
+<![CDATA[  [chromium] › hotmart-webhooks.spec.ts:83:7 › Hotmart Webhooks E2E @smoke › PURCHASE_REFUNDED webhook updates service status 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      186 |     expect(response.status()).toBe(200);
+      187 |     const responseData = await response.json();
+    > 188 |     expect(responseData.success).toBe(true);
+          |                                  ^
+      189 |     expect(responseData.correlationId).toBeDefined();
+      190 |   });
+      191 |
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:188:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-4bdc7-hook-updates-service-status-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-4bdc7-hook-updates-service-status-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-4bdc7-hook-updates-service-status-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-4bdc7-hook-updates-service-status-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › SUBSCRIPTION_CANCELLATION webhook updates subscription status" classname="hotmart-webhooks.spec.ts" time="7.832">
+<failure message="hotmart-webhooks.spec.ts:192:7 SUBSCRIPTION_CANCELLATION webhook updates subscription status" type="FAILURE">
+<![CDATA[  [chromium] › hotmart-webhooks.spec.ts:192:7 › Hotmart Webhooks E2E @smoke › SUBSCRIPTION_CANCELLATION webhook updates subscription status 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      295 |     expect(response.status()).toBe(200);
+      296 |     const responseData = await response.json();
+    > 297 |     expect(responseData.success).toBe(true);
+          |                                  ^
+      298 |     expect(responseData.correlationId).toBeDefined();
+      299 |   });
+      300 |
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:297:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-0f402-updates-subscription-status-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-0f402-updates-subscription-status-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-0f402-updates-subscription-status-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-0f402-updates-subscription-status-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › Webhook with invalid credentials returns 401" classname="hotmart-webhooks.spec.ts" time="3.548">
+<failure message="hotmart-webhooks.spec.ts:301:7 Webhook with invalid credentials returns 401" type="FAILURE">
+<![CDATA[  [chromium] › hotmart-webhooks.spec.ts:301:7 › Hotmart Webhooks E2E @smoke › Webhook with invalid credentials returns 401 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 200
+
+      314 |     });
+      315 |
+    > 316 |     expect(response.status()).toBe(401);
+          |                               ^
+      317 |     const responseData = await response.json();
+      318 |     expect(responseData.error).toContain('Unauthorized');
+      319 |   });
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:316:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-a599e-lid-credentials-returns-401-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-a599e-lid-credentials-returns-401-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-a599e-lid-credentials-returns-401-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-a599e-lid-credentials-returns-401-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › Webhook with missing headers returns 401" classname="hotmart-webhooks.spec.ts" time="2.246">
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › Webhook idempotency prevents duplicate processing" classname="hotmart-webhooks.spec.ts" time="3.495">
+<failure message="hotmart-webhooks.spec.ts:340:7 Webhook idempotency prevents duplicate processing" type="FAILURE">
+<![CDATA[  [chromium] › hotmart-webhooks.spec.ts:340:7 › Hotmart Webhooks E2E @smoke › Webhook idempotency prevents duplicate processing 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      390 |     expect(response1.status()).toBe(200);
+      391 |     const responseData1 = await response1.json();
+    > 392 |     expect(responseData1.success).toBe(true);
+          |                                   ^
+      393 |
+      394 |     // Segundo envio (deve ser idempotente)
+      395 |     const response2 = await adminPage.request.post('/api/webhooks/hotmart', {
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:392:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-2d5a9-events-duplicate-processing-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-2d5a9-events-duplicate-processing-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-2d5a9-events-duplicate-processing-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-2d5a9-events-duplicate-processing-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="smoke-auth-nav.spec.ts" timestamp="2025-10-02T22:29:43.501Z" hostname="chromium" tests="6" failures="3" skipped="0" time="43.079" errors="0">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como admin redireciona para /app" classname="smoke-auth-nav.spec.ts" time="9.136">
 <failure message="smoke-auth-nav.spec.ts:12:7 Login como admin redireciona para /app" type="FAILURE">
 <![CDATA[  [chromium] › smoke-auth-nav.spec.ts:12:7 › Smoke Tests - Autenticação e Navegação @smoke › Login como admin redireciona para /app 
 
-    Test timeout of 30000ms exceeded.
+    Error: expect(page).toHaveURL(expected) failed
 
-    Error: page.waitForURL: Test timeout of 30000ms exceeded.
-    =========================== logs ===========================
-    waiting for navigation to "/app" until "load"
-    ============================================================
+    Expected string: "http://localhost:3000/app"
+    Received string: "http://localhost:3000/app/dashboard"
+    Timeout: 5000ms
 
-       at ..\utils\test-helpers.ts:18
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        9 × unexpected value "http://localhost:3000/app/dashboard"
 
-      16 |     
-      17 |     // Aguardar redirecionamento para /app
-    > 18 |     await this.page.waitForURL('/app');
-         |                     ^
-      19 |     await this.page.waitForLoadState('networkidle');
-      20 |   }
-      21 |
-        at TestHelpers.loginAsAdmin (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:18:21)
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:13:5
+
+      12 |   test('Login como admin redireciona para /app', async ({ adminPage }) => {
+      13 |     await adminPage.goto('/app');
+    > 14 |     await expect(adminPage).toHaveURL('/app');
+         |                             ^
+      15 |   });
+      16 |
+      17 |   test('Login como trainer redireciona para /app', async ({ trainerPage }) => {
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:14:29
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-11b3c--admin-redireciona-para-app-chromium\test-failed-1.png
@@ -44,28 +237,29 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como trainer redireciona para /app" classname="smoke-auth-nav.spec.ts" time="30.541">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como trainer redireciona para /app" classname="smoke-auth-nav.spec.ts" time="8.941">
 <failure message="smoke-auth-nav.spec.ts:17:7 Login como trainer redireciona para /app" type="FAILURE">
 <![CDATA[  [chromium] › smoke-auth-nav.spec.ts:17:7 › Smoke Tests - Autenticação e Navegação @smoke › Login como trainer redireciona para /app 
 
-    Test timeout of 30000ms exceeded.
+    Error: expect(page).toHaveURL(expected) failed
 
-    Error: page.waitForURL: Test timeout of 30000ms exceeded.
-    =========================== logs ===========================
-    waiting for navigation to "/app" until "load"
-    ============================================================
+    Expected string: "http://localhost:3000/app"
+    Received string: "http://localhost:3000/app/dashboard"
+    Timeout: 5000ms
 
-       at ..\utils\test-helpers.ts:32
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        9 × unexpected value "http://localhost:3000/app/dashboard"
 
-      30 |     
-      31 |     // Aguardar redirecionamento para /app
-    > 32 |     await this.page.waitForURL('/app');
-         |                     ^
-      33 |     await this.page.waitForLoadState('networkidle');
-      34 |   }
-      35 |
-        at TestHelpers.loginAsTrainer (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:32:21)
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:18:5
+
+      17 |   test('Login como trainer redireciona para /app', async ({ trainerPage }) => {
+      18 |     await trainerPage.goto('/app');
+    > 19 |     await expect(trainerPage).toHaveURL('/app');
+         |                               ^
+      20 |   });
+      21 |
+      22 |   test('Página de login carrega corretamente', async ({ page }) => {
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:19:31
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-89cff-rainer-redireciona-para-app-chromium\test-failed-1.png
@@ -88,30 +282,31 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Página de login carrega corretamente" classname="smoke-auth-nav.spec.ts" time="2.819">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Página de login carrega corretamente" classname="smoke-auth-nav.spec.ts" time="3.366">
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Navegação após login funciona" classname="smoke-auth-nav.spec.ts" time="30.506">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Navegação após login funciona" classname="smoke-auth-nav.spec.ts" time="9.131">
 <failure message="smoke-auth-nav.spec.ts:28:7 Navegação após login funciona" type="FAILURE">
 <![CDATA[  [chromium] › smoke-auth-nav.spec.ts:28:7 › Smoke Tests - Autenticação e Navegação @smoke › Navegação após login funciona 
 
-    Test timeout of 30000ms exceeded.
+    Error: expect(page).toHaveURL(expected) failed
 
-    Error: page.waitForURL: Test timeout of 30000ms exceeded.
-    =========================== logs ===========================
-    waiting for navigation to "/app" until "load"
-    ============================================================
+    Expected string: "http://localhost:3000/app"
+    Received string: "http://localhost:3000/app/dashboard"
+    Timeout: 5000ms
 
-       at ..\utils\test-helpers.ts:18
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        9 × unexpected value "http://localhost:3000/app/dashboard"
 
-      16 |     
-      17 |     // Aguardar redirecionamento para /app
-    > 18 |     await this.page.waitForURL('/app');
-         |                     ^
-      19 |     await this.page.waitForLoadState('networkidle');
-      20 |   }
-      21 |
-        at TestHelpers.loginAsAdmin (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:18:21)
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:29:5
+
+      29 |     // Dashboard
+      30 |     await adminPage.goto('/app');
+    > 31 |     await expect(adminPage).toHaveURL('/app');
+         |                             ^
+      32 |     
+      33 |     // Students
+      34 |     await adminPage.goto('/app/students');
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:31:29
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-chromium\test-failed-1.png
@@ -134,100 +329,227 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Skeletons exibidos durante carregamento" classname="smoke-auth-nav.spec.ts" time="13.671">
-<failure message="smoke-auth-nav.spec.ts:48:7 Skeletons exibidos durante carregamento" type="FAILURE">
-<![CDATA[  [chromium] › smoke-auth-nav.spec.ts:48:7 › Smoke Tests - Autenticação e Navegação @smoke › Skeletons exibidos durante carregamento 
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Skeletons exibidos durante carregamento" classname="smoke-auth-nav.spec.ts" time="4.31">
+</testcase>
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Performance headers presentes nas rotas principais" classname="smoke-auth-nav.spec.ts" time="8.195">
+</testcase>
+</testsuite>
+<testsuite name="hotmart-webhooks.spec.ts" timestamp="2025-10-02T22:29:43.501Z" hostname="firefox" tests="6" failures="5" skipped="0" time="20.646" errors="0">
+<testcase name="Hotmart Webhooks E2E @smoke › PURCHASE_APPROVED webhook creates student and service" classname="hotmart-webhooks.spec.ts" time="6.978">
+<failure message="hotmart-webhooks.spec.ts:12:7 PURCHASE_APPROVED webhook creates student and service" type="FAILURE">
+<![CDATA[  [firefox] › hotmart-webhooks.spec.ts:12:7 › Hotmart Webhooks E2E @smoke › PURCHASE_APPROVED webhook creates student and service 
 
-    Error: page.goto: net::ERR_TOO_MANY_REDIRECTS at http://localhost:3000/app/students
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('h1')
+    Expected string: "Teste de Webhook Hotmart"
+    Received string: "404"
+    Timeout: 5000ms
+
     Call log:
-      - navigating to "http://localhost:3000/app/students", waiting until "load"
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('h1')
+        9 × locator resolved to <h1 class="next-error-h1">404</h1>
+          - unexpected value "404"
 
 
-      48 |   test('Skeletons exibidos durante carregamento', async ({ page }) => {
-      49 |     // Navegar para Students e verificar skeleton
-    > 50 |     await page.goto('/app/students');
-         |                ^
-      51 |     
-      52 |     // Verificar se há skeleton (pode não aparecer se carregar muito rápido)
-      53 |     const skeleton = page.locator(TEST_IDS.skeleton);
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:50:16
+      16 |
+      17 |     // Verificar se a página carregou
+    > 18 |     await expect(adminPage.locator('h1')).toContainText('Teste de Webhook Hotmart');
+         |                                           ^
+      19 |
+      20 |     // Simular webhook PURCHASE_APPROVED
+      21 |     const webhookPayload = {
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:18:43
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-chromium\test-failed-1.png
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-firefox\test-failed-1.png
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
     attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-chromium\video.webm
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-firefox\video.webm
     ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-firefox\error-context.md
 ]]>
 </failure>
 <system-out>
 <![CDATA[
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-chromium\test-failed-1.png]]
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-firefox\test-failed-1.png]]
 
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-chromium\video.webm]]
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-firefox\video.webm]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-86e1c-creates-student-and-service-firefox\error-context.md]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Performance headers presentes nas rotas principais" classname="smoke-auth-nav.spec.ts" time="13.916">
-<failure message="smoke-auth-nav.spec.ts:62:7 Performance headers presentes nas rotas principais" type="FAILURE">
-<![CDATA[  [chromium] › smoke-auth-nav.spec.ts:62:7 › Smoke Tests - Autenticação e Navegação @smoke › Performance headers presentes nas rotas principais 
+<testcase name="Hotmart Webhooks E2E @smoke › PURCHASE_REFUNDED webhook updates service status" classname="hotmart-webhooks.spec.ts" time="4.687">
+<failure message="hotmart-webhooks.spec.ts:83:7 PURCHASE_REFUNDED webhook updates service status" type="FAILURE">
+<![CDATA[  [firefox] › hotmart-webhooks.spec.ts:83:7 › Hotmart Webhooks E2E @smoke › PURCHASE_REFUNDED webhook updates service status 
 
-    Error: page.goto: net::ERR_TOO_MANY_REDIRECTS at http://localhost:3000/app/students
-    Call log:
-      - navigating to "http://localhost:3000/app/students", waiting until "load"
+    Error: expect(received).toBe(expected) // Object.is equality
 
+    Expected: true
+    Received: false
 
-      65 |     await page.waitForLoadState('networkidle');
-      66 |     
-    > 67 |     await page.goto('/app/students');
-         |                ^
-      68 |     await page.waitForLoadState('networkidle');
-      69 |     
-      70 |     await page.goto('/app/kanban');
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:67:16
+      186 |     expect(response.status()).toBe(200);
+      187 |     const responseData = await response.json();
+    > 188 |     expect(responseData.success).toBe(true);
+          |                                  ^
+      189 |     expect(responseData.correlationId).toBeDefined();
+      190 |   });
+      191 |
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:188:34
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-chromium\test-failed-1.png
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-4bdc7-hook-updates-service-status-firefox\test-failed-1.png
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
     attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-chromium\video.webm
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-4bdc7-hook-updates-service-status-firefox\video.webm
     ────────────────────────────────────────────────────────────────────────────────────────────────
 ]]>
 </failure>
 <system-out>
 <![CDATA[
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-chromium\test-failed-1.png]]
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-4bdc7-hook-updates-service-status-firefox\test-failed-1.png]]
 
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-chromium\video.webm]]
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-4bdc7-hook-updates-service-status-firefox\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › SUBSCRIPTION_CANCELLATION webhook updates subscription status" classname="hotmart-webhooks.spec.ts" time="5.042">
+<failure message="hotmart-webhooks.spec.ts:192:7 SUBSCRIPTION_CANCELLATION webhook updates subscription status" type="FAILURE">
+<![CDATA[  [firefox] › hotmart-webhooks.spec.ts:192:7 › Hotmart Webhooks E2E @smoke › SUBSCRIPTION_CANCELLATION webhook updates subscription status 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      295 |     expect(response.status()).toBe(200);
+      296 |     const responseData = await response.json();
+    > 297 |     expect(responseData.success).toBe(true);
+          |                                  ^
+      298 |     expect(responseData.correlationId).toBeDefined();
+      299 |   });
+      300 |
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:297:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-0f402-updates-subscription-status-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-0f402-updates-subscription-status-firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-0f402-updates-subscription-status-firefox\test-failed-1.png]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-0f402-updates-subscription-status-firefox\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › Webhook with invalid credentials returns 401" classname="hotmart-webhooks.spec.ts" time="2.081">
+<failure message="hotmart-webhooks.spec.ts:301:7 Webhook with invalid credentials returns 401" type="FAILURE">
+<![CDATA[  [firefox] › hotmart-webhooks.spec.ts:301:7 › Hotmart Webhooks E2E @smoke › Webhook with invalid credentials returns 401 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 200
+
+      314 |     });
+      315 |
+    > 316 |     expect(response.status()).toBe(401);
+          |                               ^
+      317 |     const responseData = await response.json();
+      318 |     expect(responseData.error).toContain('Unauthorized');
+      319 |   });
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:316:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-a599e-lid-credentials-returns-401-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-a599e-lid-credentials-returns-401-firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-a599e-lid-credentials-returns-401-firefox\test-failed-1.png]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-a599e-lid-credentials-returns-401-firefox\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › Webhook with missing headers returns 401" classname="hotmart-webhooks.spec.ts" time="1.455">
+</testcase>
+<testcase name="Hotmart Webhooks E2E @smoke › Webhook idempotency prevents duplicate processing" classname="hotmart-webhooks.spec.ts" time="0.403">
+<failure message="hotmart-webhooks.spec.ts:340:7 Webhook idempotency prevents duplicate processing" type="FAILURE">
+<![CDATA[  [firefox] › hotmart-webhooks.spec.ts:340:7 › Hotmart Webhooks E2E @smoke › Webhook idempotency prevents duplicate processing 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      390 |     expect(response1.status()).toBe(200);
+      391 |     const responseData1 = await response1.json();
+    > 392 |     expect(responseData1.success).toBe(true);
+          |                                   ^
+      393 |
+      394 |     // Segundo envio (deve ser idempotente)
+      395 |     const response2 = await adminPage.request.post('/api/webhooks/hotmart', {
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\hotmart-webhooks.spec.ts:392:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-2d5a9-events-duplicate-processing-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\hotmart-webhooks-Hotmart-W-2d5a9-events-duplicate-processing-firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-2d5a9-events-duplicate-processing-firefox\test-failed-1.png]]
+
+[[ATTACHMENT|hotmart-webhooks-Hotmart-W-2d5a9-events-duplicate-processing-firefox\video.webm]]
 ]]>
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="smoke-auth-nav.spec.ts" timestamp="2025-10-02T19:18:51.558Z" hostname="firefox" tests="6" failures="5" skipped="0" time="118.317" errors="0">
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como admin redireciona para /app" classname="smoke-auth-nav.spec.ts" time="30.102">
+<testsuite name="smoke-auth-nav.spec.ts" timestamp="2025-10-02T22:29:43.501Z" hostname="firefox" tests="6" failures="3" skipped="0" time="29.827" errors="0">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como admin redireciona para /app" classname="smoke-auth-nav.spec.ts" time="6.299">
 <failure message="smoke-auth-nav.spec.ts:12:7 Login como admin redireciona para /app" type="FAILURE">
 <![CDATA[  [firefox] › smoke-auth-nav.spec.ts:12:7 › Smoke Tests - Autenticação e Navegação @smoke › Login como admin redireciona para /app 
 
-    Test timeout of 30000ms exceeded.
+    Error: expect(page).toHaveURL(expected) failed
 
-    Error: page.waitForURL: Test timeout of 30000ms exceeded.
-    =========================== logs ===========================
-    waiting for navigation to "/app" until "load"
-    ============================================================
+    Expected string: "http://localhost:3000/app"
+    Received string: "http://localhost:3000/app/dashboard"
+    Timeout: 5000ms
 
-       at ..\utils\test-helpers.ts:18
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        9 × unexpected value "http://localhost:3000/app/dashboard"
 
-      16 |     
-      17 |     // Aguardar redirecionamento para /app
-    > 18 |     await this.page.waitForURL('/app');
-         |                     ^
-      19 |     await this.page.waitForLoadState('networkidle');
-      20 |   }
-      21 |
-        at TestHelpers.loginAsAdmin (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:18:21)
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:13:5
+
+      12 |   test('Login como admin redireciona para /app', async ({ adminPage }) => {
+      13 |     await adminPage.goto('/app');
+    > 14 |     await expect(adminPage).toHaveURL('/app');
+         |                             ^
+      15 |   });
+      16 |
+      17 |   test('Login como trainer redireciona para /app', async ({ trainerPage }) => {
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:14:29
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-11b3c--admin-redireciona-para-app-firefox\test-failed-1.png
@@ -250,28 +572,29 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como trainer redireciona para /app" classname="smoke-auth-nav.spec.ts" time="30.102">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Login como trainer redireciona para /app" classname="smoke-auth-nav.spec.ts" time="6.336">
 <failure message="smoke-auth-nav.spec.ts:17:7 Login como trainer redireciona para /app" type="FAILURE">
 <![CDATA[  [firefox] › smoke-auth-nav.spec.ts:17:7 › Smoke Tests - Autenticação e Navegação @smoke › Login como trainer redireciona para /app 
 
-    Test timeout of 30000ms exceeded.
+    Error: expect(page).toHaveURL(expected) failed
 
-    Error: page.waitForURL: Test timeout of 30000ms exceeded.
-    =========================== logs ===========================
-    waiting for navigation to "/app" until "load"
-    ============================================================
+    Expected string: "http://localhost:3000/app"
+    Received string: "http://localhost:3000/app/dashboard"
+    Timeout: 5000ms
 
-       at ..\utils\test-helpers.ts:32
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        9 × unexpected value "http://localhost:3000/app/dashboard"
 
-      30 |     
-      31 |     // Aguardar redirecionamento para /app
-    > 32 |     await this.page.waitForURL('/app');
-         |                     ^
-      33 |     await this.page.waitForLoadState('networkidle');
-      34 |   }
-      35 |
-        at TestHelpers.loginAsTrainer (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:32:21)
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:18:5
+
+      17 |   test('Login como trainer redireciona para /app', async ({ trainerPage }) => {
+      18 |     await trainerPage.goto('/app');
+    > 19 |     await expect(trainerPage).toHaveURL('/app');
+         |                               ^
+      20 |   });
+      21 |
+      22 |   test('Página de login carrega corretamente', async ({ page }) => {
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:19:31
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-89cff-rainer-redireciona-para-app-firefox\test-failed-1.png
@@ -294,30 +617,31 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Página de login carrega corretamente" classname="smoke-auth-nav.spec.ts" time="5.3">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Página de login carrega corretamente" classname="smoke-auth-nav.spec.ts" time="1.281">
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Navegação após login funciona" classname="smoke-auth-nav.spec.ts" time="30.099">
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Navegação após login funciona" classname="smoke-auth-nav.spec.ts" time="6.613">
 <failure message="smoke-auth-nav.spec.ts:28:7 Navegação após login funciona" type="FAILURE">
 <![CDATA[  [firefox] › smoke-auth-nav.spec.ts:28:7 › Smoke Tests - Autenticação e Navegação @smoke › Navegação após login funciona 
 
-    Test timeout of 30000ms exceeded.
+    Error: expect(page).toHaveURL(expected) failed
 
-    Error: page.waitForURL: Test timeout of 30000ms exceeded.
-    =========================== logs ===========================
-    waiting for navigation to "/app" until "load"
-    ============================================================
+    Expected string: "http://localhost:3000/app"
+    Received string: "http://localhost:3000/app/dashboard"
+    Timeout: 5000ms
 
-       at ..\utils\test-helpers.ts:18
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        9 × unexpected value "http://localhost:3000/app/dashboard"
 
-      16 |     
-      17 |     // Aguardar redirecionamento para /app
-    > 18 |     await this.page.waitForURL('/app');
-         |                     ^
-      19 |     await this.page.waitForLoadState('networkidle');
-      20 |   }
-      21 |
-        at TestHelpers.loginAsAdmin (C:\Projetos\Organizacao10x\web\tests\e2e\utils\test-helpers.ts:18:21)
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:29:5
+
+      29 |     // Dashboard
+      30 |     await adminPage.goto('/app');
+    > 31 |     await expect(adminPage).toHaveURL('/app');
+         |                             ^
+      32 |     
+      33 |     // Students
+      34 |     await adminPage.goto('/app/students');
+        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:31:29
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-94b1c-vegação-após-login-funciona-firefox\test-failed-1.png
@@ -340,83 +664,9 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Skeletons exibidos durante carregamento" classname="smoke-auth-nav.spec.ts" time="12.484">
-<failure message="smoke-auth-nav.spec.ts:48:7 Skeletons exibidos durante carregamento" type="FAILURE">
-<![CDATA[  [firefox] › smoke-auth-nav.spec.ts:48:7 › Smoke Tests - Autenticação e Navegação @smoke › Skeletons exibidos durante carregamento 
-
-    Error: page.goto: NS_ERROR_REDIRECT_LOOP
-    Call log:
-      - navigating to "http://localhost:3000/app/students", waiting until "load"
-
-
-      48 |   test('Skeletons exibidos durante carregamento', async ({ page }) => {
-      49 |     // Navegar para Students e verificar skeleton
-    > 50 |     await page.goto('/app/students');
-         |                ^
-      51 |     
-      52 |     // Verificar se há skeleton (pode não aparecer se carregar muito rápido)
-      53 |     const skeleton = page.locator(TEST_IDS.skeleton);
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:50:16
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-firefox\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-firefox\video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-firefox\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-firefox\test-failed-1.png]]
-
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-firefox\video.webm]]
-
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-d8f11-ibidos-durante-carregamento-firefox\error-context.md]]
-]]>
-</system-out>
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Skeletons exibidos durante carregamento" classname="smoke-auth-nav.spec.ts" time="3.672">
 </testcase>
-<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Performance headers presentes nas rotas principais" classname="smoke-auth-nav.spec.ts" time="10.23">
-<failure message="smoke-auth-nav.spec.ts:62:7 Performance headers presentes nas rotas principais" type="FAILURE">
-<![CDATA[  [firefox] › smoke-auth-nav.spec.ts:62:7 › Smoke Tests - Autenticação e Navegação @smoke › Performance headers presentes nas rotas principais 
-
-    Error: page.goto: NS_ERROR_REDIRECT_LOOP
-    Call log:
-      - navigating to "http://localhost:3000/app/students", waiting until "load"
-
-
-      65 |     await page.waitForLoadState('networkidle');
-      66 |     
-    > 67 |     await page.goto('/app/students');
-         |                ^
-      68 |     await page.waitForLoadState('networkidle');
-      69 |     
-      70 |     await page.goto('/app/kanban');
-        at C:\Projetos\Organizacao10x\web\tests\e2e\specs\smoke-auth-nav.spec.ts:67:16
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-firefox\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-firefox\video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\..\test-results\smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-firefox\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-firefox\test-failed-1.png]]
-
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-firefox\video.webm]]
-
-[[ATTACHMENT|smoke-auth-nav-Smoke-Tests-fa077-sentes-nas-rotas-principais-firefox\error-context.md]]
-]]>
-</system-out>
+<testcase name="Smoke Tests - Autenticação e Navegação @smoke › Performance headers presentes nas rotas principais" classname="smoke-auth-nav.spec.ts" time="5.626">
 </testcase>
 </testsuite>
 </testsuites>
