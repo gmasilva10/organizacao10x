@@ -371,36 +371,57 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     }
   }, [debouncedFilters.date_from, debouncedFilters.date_to])
 
-  // Agrupar tarefas por coluna usando timezone - versão simplificada
+  // Agrupar tarefas por coluna usando timezone - versão ultra-simplificada
   const getTasksByColumn = (columnId: string) => {
     try {
       return tasks.filter(task => {
+        // Validação básica da tarefa
+        if (!task || typeof task !== 'object') {
+          return false
+        }
+        
         // Atrasadas: scheduled_for < startOfToday e status = 'pending'
         if (columnId === 'overdue') {
+          if (task.status !== 'pending') return false
           try {
-            return task.status === 'pending' && isPast(task.scheduled_for)
+            const taskDate = new Date(task.scheduled_for)
+            if (isNaN(taskDate.getTime())) return false
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
+            return taskDate < today
           } catch (error) {
-            console.warn('Erro em isPast, ignorando tarefa:', error)
+            console.warn('Erro em overdue, ignorando tarefa:', error)
             return false
           }
         }
         
         // Para Hoje: scheduled_for ∈ hoje e status = 'pending'
         if (columnId === 'due_today') {
+          if (task.status !== 'pending') return false
           try {
-            return task.status === 'pending' && isToday(task.scheduled_for)
+            const taskDate = new Date(task.scheduled_for)
+            if (isNaN(taskDate.getTime())) return false
+            const today = new Date()
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+            const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999)
+            return taskDate >= todayStart && taskDate <= todayEnd
           } catch (error) {
-            console.warn('Erro em isToday, ignorando tarefa:', error)
+            console.warn('Erro em due_today, ignorando tarefa:', error)
             return false
           }
         }
         
         // Pendentes de Envio: scheduled_for > endOfToday e status = 'pending'
         if (columnId === 'pending_future') {
+          if (task.status !== 'pending') return false
           try {
-            return task.status === 'pending' && isFuture(task.scheduled_for)
+            const taskDate = new Date(task.scheduled_for)
+            if (isNaN(taskDate.getTime())) return false
+            const today = new Date()
+            const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999)
+            return taskDate > todayEnd
           } catch (error) {
-            console.warn('Erro em isFuture, ignorando tarefa:', error)
+            console.warn('Erro em pending_future, ignorando tarefa:', error)
             return false
           }
         }
@@ -418,17 +439,17 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
         return false
       }).sort((a, b) => {
         try {
-          // Ordena  o: scheduled_for ASC, depois created_at ASC
-          const dateA = new Date(a.scheduled_for).getTime()
-          const dateB = new Date(b.scheduled_for).getTime()
+          // Ordenação simplificada
+          const dateA = new Date(a.scheduled_for || 0).getTime()
+          const dateB = new Date(b.scheduled_for || 0).getTime()
           
           if (dateA !== dateB) {
             return dateA - dateB
           }
           
           // Se datas iguais, ordenar por created_at
-          const createdA = new Date(a.created_at).getTime()
-          const createdB = new Date(b.created_at).getTime()
+          const createdA = new Date(a.created_at || 0).getTime()
+          const createdB = new Date(b.created_at || 0).getTime()
           return createdA - createdB
         } catch (error) {
           console.warn('Erro ao ordenar tarefas:', error)

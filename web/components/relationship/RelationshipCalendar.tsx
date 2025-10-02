@@ -198,12 +198,24 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     fetchTasks()
   }, [fetchTasks])
 
-  // Calcular datas baseadas na visão - versão simplificada
+  // Calcular datas baseadas na visão - versão ultra-simplificada
   const { startDate, endDate, days } = useMemo(() => {
     try {
-      const start = startOfMonth(currentDate)
-      const end = endOfMonth(currentDate)
-      const daysArray = eachDayOfInterval({ start, end })
+      // Usar apenas JavaScript nativo para evitar dependências problemáticas
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth()
+      
+      const start = new Date(year, month, 1)
+      const end = new Date(year, month + 1, 0) // Último dia do mês
+      
+      // Gerar array de dias manualmente
+      const daysArray = []
+      const current = new Date(start)
+      while (current <= end) {
+        daysArray.push(new Date(current))
+        current.setDate(current.getDate() + 1)
+      }
       
       return {
         startDate: start,
@@ -212,11 +224,20 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
       }
     } catch (error) {
       console.error('Erro ao calcular datas do calendário:', error)
-      // Fallback para o mês atual
+      // Fallback ultra-simples
       const now = new Date()
-      const fallbackStart = new Date(now.getFullYear(), now.getMonth(), 1)
-      const fallbackEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      const fallbackDays = eachDayOfInterval({ start: fallbackStart, end: fallbackEnd })
+      const year = now.getFullYear()
+      const month = now.getMonth()
+      
+      const fallbackStart = new Date(year, month, 1)
+      const fallbackEnd = new Date(year, month + 1, 0)
+      
+      const fallbackDays = []
+      const current = new Date(fallbackStart)
+      while (current <= fallbackEnd) {
+        fallbackDays.push(new Date(current))
+        current.setDate(current.getDate() + 1)
+      }
       
       return {
         startDate: fallbackStart,
