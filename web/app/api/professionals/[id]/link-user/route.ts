@@ -38,7 +38,7 @@ export async function POST(
     // Verificar se o profissional existe e pertence ao tenant
     const { data: professional, error: fetchError } = await supabase
       .from('professionals')
-      .select('id, tenant_id, email, user_id')
+      .select('id, org_id, email, user_id')
       .eq('id', professionalId)
       .eq('org_id', ctx.tenantId)
       .single()
@@ -108,7 +108,7 @@ export async function POST(
         .from('memberships')
         .insert({
           user_id,
-          tenant_id: ctx.tenantId,
+          org_id: ctx.tenantId,
           role: 'trainer',
           status: 'active'
         })

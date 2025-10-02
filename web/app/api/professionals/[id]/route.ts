@@ -94,7 +94,7 @@ export async function PATCH(
       // Verificar se o profissional existe e pertence ao tenant
       const { data: existingProfessional, error: fetchError } = await supabase
         .from('professionals')
-        .select('id, tenant_id, full_name')
+        .select('id, org_id, full_name')
         .eq('id', professionalId)
         .eq('org_id', ctx.tenantId)
         .single()
@@ -154,7 +154,7 @@ export async function PATCH(
     // Verificar se o profissional existe e pertence ao tenant
     const { data: existingProfessional, error: fetchError } = await supabase
       .from('professionals')
-      .select('id, tenant_id, email, cpf')
+      .select('id, org_id, email, cpf')
       .eq('id', professionalId)
       .eq('org_id', ctx.tenantId)
       .single()
@@ -266,7 +266,7 @@ export async function DELETE(
     // Verificar se o profissional existe e pertence ao tenant
     const { data: existingProfessional, error: fetchError } = await supabase
       .from('professionals')
-      .select('id, tenant_id, full_name')
+      .select('id, org_id, full_name')
       .eq('id', professionalId)
       .eq('org_id', ctx.tenantId)
       .single()

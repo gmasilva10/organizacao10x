@@ -18,11 +18,11 @@ export async function GET(request: Request) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   const readV2 = process.env.REL_TEMPLATES_V2_READ === '1'
   if (readV2) {
-    const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?tenant_id=eq.${tenantId}&order=priority.asc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+    const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${tenantId}&order=priority.asc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
     const itemsV2 = await respV2.json().catch(()=>[])
     return NextResponse.json({ items: itemsV2 })
   }
-  const resp = await fetch(`${url}/rest/v1/relationship_templates?tenant_id=eq.${tenantId}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+  const resp = await fetch(`${url}/rest/v1/relationship_templates?org_id=eq.${tenantId}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
   const items = await resp.json().catch(()=>[])
   
   // Processar items para extrair dados do content JSON
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       const contentData = JSON.parse(item.content || '{}')
       return {
         id: item.id,
-        tenant_id: item.tenant_id,
+        org_id: item.org_id,
         created_at: item.created_at,
         updated_at: item.updated_at,
         ...contentData // Spread dos dados do content
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
       // Se não conseguir parsear, retornar dados básicos
       return {
         id: item.id,
-        tenant_id: item.tenant_id,
+        org_id: item.org_id,
         title: item.title,
         type: item.type,
         content: item.content,
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
   }
   
   const rowMVP = { 
-    tenant_id: tenantId, 
+    org_id: tenantId, 
     title: String(body.title||''), 
     type: 'whatsapp',
     content: JSON.stringify(templateData)
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
   
   // Dual-write v2 (best-effort)
   const rowV2 = {
-    tenant_id: tenantId,
+    org_id: tenantId,
     code: templateData.code,
     anchor: templateData.anchor,
     touchpoint: templateData.touchpoint,

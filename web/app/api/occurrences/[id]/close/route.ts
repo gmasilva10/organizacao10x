@@ -18,7 +18,7 @@ const closeSchema = z.object({
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  return withOccurrencesRBAC(request, 'occurrences.close', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.close', async (request, { user, membership, org_id }) => {
     try {
       const supabase = await createClient()
 
@@ -29,7 +29,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         .from('student_occurrences')
         .select('id, student_id, owner_user_id')
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
       
       if (!existing) return NextResponse.json({ error: 'OcorrÃªncia nÃ£o encontrada' }, { status: 404 })
@@ -57,7 +57,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           updated_at: new Date().toISOString()
         })
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
 
       if (error) {
         console.error('Erro ao encerrar ocorrÃªncia:', error)
@@ -67,7 +67,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       // Log de auditoria
       try {
         await auditLogger.log({
-          organization_id: tenant_id,
+          organization_id: org_id,
           user_id: user.id,
           action: 'update',
           resource_type: 'occurrence' as any,

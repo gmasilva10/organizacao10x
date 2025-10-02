@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   }
   const body: Body = await request.json().catch(()=>({}))
   const row = {
-    tenant_id: ctx.tenantId,
+    org_id: ctx.tenantId,
     student_id: String((body as Body).student_id||''),
     type: String((body as Body).type||'nota'),
     channel: (body as Body).channel != null ? String((body as Body).channel) : null,
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
   const rangeEnd = rangeStart + pageSize - 1
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const base = `${url}/rest/v1/relationship_messages?tenant_id=eq.${ctx.tenantId}${studentId?`&student_id=eq.${studentId}`:''}`
+  const base = `${url}/rest/v1/relationship_messages?org_id=eq.${ctx.tenantId}${studentId?`&student_id=eq.${studentId}`:''}`
   const resp = await fetch(`${base}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`!, Range: `${rangeStart}-${rangeEnd}`, Prefer: 'count=exact' } })
   const items = await resp.json().catch(()=>[])
   const contentRange = resp.headers.get('content-range') || '0-0/0'

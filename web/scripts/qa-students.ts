@@ -93,7 +93,7 @@ async function run() {
   if (target) {
     // buscar trainer_id válido via Admin API
     const admin = createClient(url, service!, { auth: { autoRefreshToken: false, persistSession: false } })
-    const { data: trainers } = await admin.from('memberships').select('user_id').eq('tenant_id','0f3ec75c-6eb9-4443-8c48-49eca6e6d00f').eq('role','trainer').limit(1)
+    const { data: trainers } = await admin.from('memberships').select('user_id').eq('org_id','0f3ec75c-6eb9-4443-8c48-49eca6e6d00f').eq('role','trainer').limit(1)
     const trainerId = (trainers?.[0] as any)?.user_id
     const pa = await http('PATCH', `/api/students/${target.id}`, { trainer_id: trainerId }, cManagerEnt)
     results.steps.push({ id: 'patch-assign', status: pa.status })
@@ -107,9 +107,9 @@ async function run() {
   if (!own && service) {
     // preparar um aluno onboarding para o trainer.ent (auto-heal)
     const admin = createClient(url, service, { auth: { autoRefreshToken: false, persistSession: false } })
-    const { data: trainers } = await admin.from('memberships').select('user_id').eq('tenant_id','0f3ec75c-6eb9-4443-8c48-49eca6e6d00f').eq('role','trainer').limit(1)
+    const { data: trainers } = await admin.from('memberships').select('user_id').eq('org_id','0f3ec75c-6eb9-4443-8c48-49eca6e6d00f').eq('role','trainer').limit(1)
     const trainerId = (trainers?.[0] as any)?.user_id
-    const { data: candidates } = await admin.from('students').select('id').eq('tenant_id', '0f3ec75c-6eb9-4443-8c48-49eca6e6d00f').is('deleted_at', null).limit(1)
+    const { data: candidates } = await admin.from('students').select('id').eq('org_id', '0f3ec75c-6eb9-4443-8c48-49eca6e6d00f').is('deleted_at', null).limit(1)
     const candidate = (candidates || [])[0] as any
     if (candidate && trainerId) {
       await admin.from('students').update({ trainer_id: trainerId, status: 'onboarding' }).eq('id', candidate.id)
@@ -132,8 +132,8 @@ async function run() {
     for (const t of tenants) {
       const { data } = await admin
         .from('events')
-        .select('tenant_id,user_id,event_type,payload,created_at')
-        .eq('tenant_id', t)
+        .select('org_id,user_id,event_type,payload,created_at')
+        .eq('org_id', t)
         .order('created_at', { ascending: false })
         .limit(25)
       events[t] = data || []

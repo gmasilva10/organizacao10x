@@ -45,7 +45,7 @@ export async function GET(
     // Verificar membership
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -74,7 +74,7 @@ export async function GET(
         created_at,
         updated_at
       `)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('student_id', studentId)
       .order('occurred_at', { ascending: false })
 

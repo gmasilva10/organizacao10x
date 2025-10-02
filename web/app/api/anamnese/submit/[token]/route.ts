@@ -30,7 +30,7 @@ export async function POST(
         service_id,
         status,
         expires_at,
-        tenant_id
+        org_id
       `)
       .eq('token', token)
       .maybeSingle()
@@ -94,7 +94,7 @@ export async function POST(
         .insert({
           anamnese_version_id: version.id,
           student_id: invite.student_id,
-          tenant_id: invite.tenant_id,
+          org_id: invite.org_id,
           responses: payload
         })
 
@@ -115,7 +115,7 @@ export async function POST(
           // Limpa respostas anteriores desta versão
           await admin.from('anamnese_answers').delete().eq('anamnese_version_id', version.id)
           const rows = entries.map(([key, value]) => ({
-            tenant_id: invite.tenant_id,
+            org_id: invite.org_id,
             anamnese_version_id: version.id,
             key,
             value,
@@ -152,7 +152,7 @@ export async function POST(
             .from('anexos')
             .insert({
               student_id: invite.student_id,
-              tenant_id: invite.tenant_id,
+              org_id: invite.org_id,
               tipo: 'ANAMNESE',
               nome_arquivo: fileName,
               caminho_arquivo: uploadData.path,
@@ -202,7 +202,7 @@ export async function POST(
           .from('student_occurrences')
           .insert({
             student_id: invite.student_id,
-            tenant_id: invite.tenant_id,
+            org_id: invite.org_id,
             group_id: occurrenceGroup.id,
             type_id: occurrenceType.id,
             occurred_at: new Date().toISOString().split('T')[0],

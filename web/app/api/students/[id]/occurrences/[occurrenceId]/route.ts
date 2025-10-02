@@ -45,7 +45,7 @@ export async function GET(
     // Verificar membership
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -63,7 +63,7 @@ export async function GET(
         owner_user_id
       `)
       .eq('id', occurrenceId)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('student_id', studentId)
       .single()
 
@@ -96,7 +96,7 @@ export async function PATCH(
     // Verificar membership
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -109,7 +109,7 @@ export async function PATCH(
       .from('student_occurrences')
       .select('id, status')
       .eq('id', occurrenceId)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('student_id', studentId)
       .single()
 
@@ -128,7 +128,7 @@ export async function PATCH(
         .from('professionals')
         .select('id, user_id')
         .eq('id', validatedData.owner_user_id)
-        .eq('org_id', membership.tenant_id)
+        .eq('org_id', membership.org_id)
         .single()
 
       if (!professional) {
@@ -146,7 +146,7 @@ export async function PATCH(
         updated_at: new Date().toISOString()
       })
       .eq('id', occurrenceId)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('student_id', studentId)
       .select(`
         *,
@@ -194,7 +194,7 @@ export async function DELETE(
     // Verificar membership
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -207,7 +207,7 @@ export async function DELETE(
       .from('student_occurrences')
       .select('id')
       .eq('id', occurrenceId)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('student_id', studentId)
       .single()
 
@@ -220,7 +220,7 @@ export async function DELETE(
       .from('student_occurrences')
       .delete()
       .eq('id', occurrenceId)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('student_id', studentId)
 
     if (error) {

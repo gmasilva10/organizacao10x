@@ -25,7 +25,7 @@ const UpdateOccurrenceGroupSchema = z.object({
 
 // GET - Listar grupos de ocorrências (com filtros)
 export async function GET(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, org_id }) => {
     try {
       const supabase = await createClient()
       
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
           *,
           occurrence_types(count)
         `)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
 
       if (statusFilter !== 'all') {
         query = query.eq('is_active', statusFilter === 'active')
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
 
 // POST - Criar novo grupo
 export async function POST(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, org_id }) => {
     try {
       const supabase = await createClient()
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         .from('occurrence_groups')
         .select('id')
         .eq('name', validatedData.name)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (existingGroup) {
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
         .from('occurrence_groups')
         .insert({
           ...validatedData,
-          tenant_id,
+          org_id,
           created_by: user.id
         })
         .select()

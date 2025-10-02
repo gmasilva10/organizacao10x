@@ -24,7 +24,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, org_id }) => {
     try {
       const { id } = await params
       const supabase = await createClient()
@@ -36,7 +36,7 @@ export async function GET(
           occurrence_groups!inner(name)
         `)
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (error || !type) {
@@ -56,7 +56,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, org_id }) => {
     try {
       const { id } = await params
       const supabase = await createClient()
@@ -66,7 +66,7 @@ export async function PATCH(
         .from('occurrence_types')
         .select('*')
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!currentType) {
@@ -83,7 +83,7 @@ export async function PATCH(
         const { data: existingType } = await supabase
           .from('occurrence_types')
           .select('id')
-          .eq('org_id', tenant_id)
+          .eq('org_id', org_id)
           .eq('group_id', groupId)
           .eq('name', validatedData.name)
           .neq('id', id)
@@ -103,7 +103,7 @@ export async function PATCH(
           .from('occurrence_groups')
           .select('id')
           .eq('id', validatedData.group_id)
-          .eq('org_id', tenant_id)
+          .eq('org_id', org_id)
           .single()
 
         if (!group) {
@@ -123,7 +123,7 @@ export async function PATCH(
           updated_by: user.id
         })
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .select(`
           *,
           occurrence_groups!inner(name)
@@ -162,7 +162,7 @@ export async function PATCH(
               previousValues
             },
             actorId: user.id,
-            tenantId: tenant_id
+            tenantId: org_id
           } as any, supabase)
         }
       } catch (auditError) {
@@ -194,7 +194,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, org_id }) => {
     try {
       const { id } = await params
       const supabase = await createClient()
@@ -204,7 +204,7 @@ export async function DELETE(
         .from('occurrence_types')
         .select('*')
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!type) {
@@ -216,7 +216,7 @@ export async function DELETE(
         .from('student_occurrences')
         .select('id')
         .eq('type_id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .limit(1)
 
       if (occurrences && occurrences.length > 0) {
@@ -231,7 +231,7 @@ export async function DELETE(
         .from('occurrence_types')
         .delete()
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
 
       if (error) {
         console.error('Erro ao excluir tipo:', error)
@@ -250,7 +250,7 @@ export async function DELETE(
             group_id: type.group_id
           },
           actorId: user.id,
-          tenantId: tenant_id
+          tenantId: org_id
         } as any, supabase)
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)

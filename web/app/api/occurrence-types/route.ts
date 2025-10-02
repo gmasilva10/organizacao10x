@@ -20,7 +20,7 @@ const OccurrenceTypeSchema = z.object({
 
 // GET - Listar tipos de ocorrências (com filtros)
 export async function GET(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, org_id }) => {
     try {
       const supabase = await createClient()
       
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
             is_active
           )
         `)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
 
       if (contextFor === 'student') {
         query = query.in('applies_to', ['student','both'])
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
 
 // POST - Criar novo tipo
 export async function POST(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, org_id }) => {
     try {
       const supabase = await createClient()
 
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         .from('occurrence_groups')
         .select('id')
         .eq('id', validatedData.group_id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!group) {
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
         .select('id')
         .eq('group_id', validatedData.group_id)
         .eq('name', validatedData.name)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (existingType) {
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         .from('occurrence_types')
         .insert({
           ...validatedData,
-          tenant_id,
+          org_id,
           created_by: user.id
         })
         .select()

@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, org_id }) => {
     try {
       const supabase = await createClient()
 
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           priority,
           is_sensitive
         `, { count: 'exact' })
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
 
       if (status && status !== 'all') query = query.eq('status', status)
       if (groupId) query = query.eq('group_id', groupId)
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       const toIdx = fromIdx + pageSize - 1
       console.log('🔍 Debug API /occurrences:', {
         status,
-        tenant_id,
+        org_id,
         page,
         pageSize,
         fromIdx,
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
           .range(fromIdx, toIdx),
         {
           userId: user.id,
-          tenantId: tenant_id,
+          tenantId: org_id,
           operation: 'list_occurrences'
         }
       )
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
           .from('students')
           .select('id, name')
           .in('id', studentIds)
-          .eq('org_id', tenant_id)
+          .eq('org_id', org_id)
         for (const s of students || []) studentMap[s.id] = s.name
       }
 
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
           .from('occurrence_groups')
           .select('id, name')
           .in('id', groupIds)
-          .eq('org_id', tenant_id)
+          .eq('org_id', org_id)
         for (const g of groups || []) groupMap[g.id] = g.name
       }
 
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
           .from('occurrence_types')
           .select('id, name')
           .in('id', typeIds)
-          .eq('org_id', tenant_id)
+          .eq('org_id', org_id)
         for (const t of types || []) typeMap[t.id] = t.name
       }
 
@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
           .from('professionals')
           .select('user_id, full_name')
           .in('user_id', ownerIds)
-          .eq('org_id', tenant_id)
+          .eq('org_id', org_id)
         for (const o of owners || []) ownerMap[o.user_id] = o.full_name
       }
 
@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/occurrences
 export async function POST(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, org_id }) => {
     try {
       const supabase = await createClient()
       const startTime = Date.now()
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
         .from('students')
         .select('id')
         .eq('id', student_id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!student) {
@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
         .from('occurrence_groups')
         .select('id')
         .eq('id', group_id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!group) {
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
         .from('occurrence_types')
         .select('id')
         .eq('id', type_id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .eq('group_id', group_id)
         .single()
 
@@ -259,7 +259,7 @@ export async function POST(request: NextRequest) {
         .from('professionals')
         .select('user_id')
         .eq('user_id', owner_user_id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!professional) {
@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
       const { data: newOccurrence, error } = await supabase
         .from('student_occurrences')
         .insert({
-          tenant_id: tenant_id,
+          org_id: org_id,
           student_id: student_id,
           group_id: group_id,
           type_id: type_id,
@@ -325,7 +325,7 @@ export async function POST(request: NextRequest) {
             .from('occurrence_types')
             .select('name')
             .eq('id', type_id)
-            .eq('org_id', tenant_id)
+            .eq('org_id', org_id)
             .single()
 
           // Disparar gatilho de relacionamento
@@ -342,7 +342,7 @@ export async function POST(request: NextRequest) {
               reminder_at: reminder_at,
               occurrence_type: occurrenceType?.name || 'Ocorrência',
               occurrence_notes: notes.trim(),
-              tenant_id: tenant_id
+              org_id: org_id
             })
           })
 

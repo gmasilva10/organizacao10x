@@ -8,7 +8,7 @@ export type OccurrencesAction = 'occurrences.read' | 'occurrences.write' | 'occu
 export async function withOccurrencesRBAC(
   request: NextRequest,
   action: OccurrencesAction,
-  handler: (request: NextRequest, context: { user: any, membership: any, tenant_id: string }) => Promise<NextResponse>
+  handler: (request: NextRequest, context: { user: any, membership: any, org_id: string }) => Promise<NextResponse>
 ) {
   try {
     const supabase = await createClient()
@@ -22,7 +22,7 @@ export async function withOccurrencesRBAC(
     // Buscar membership e role
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -42,7 +42,7 @@ export async function withOccurrencesRBAC(
     return await handler(request, {
       user,
       membership,
-      tenant_id: membership.tenant_id
+      org_id: membership.org_id
     })
 
   } catch (error) {

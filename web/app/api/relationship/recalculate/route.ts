@@ -34,7 +34,7 @@ type EventCode =
   | 'occurrence_followup'
 
 interface RecalculateRequest {
-  tenant_id: string
+  org_id: string
   anchor?: EventCode
   dry_run?: boolean
   force?: boolean
@@ -111,7 +111,7 @@ async function removeLock(): Promise<void> {
 async function fetchActiveTemplates(tenantId: string): Promise<any[]> {
   const { data, error } = await supabase
     .from('relationship_templates')
-    .select('id, tenant_id, content')
+    .select('id, org_id, content')
     .eq('org_id', tenantId)
 
   if (error || !data) return []
@@ -141,7 +141,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
     if (anchor === 'sale_close') {
       const { data, error } = await supabase
         .from('students')
-        .select('id, name, email, phone, created_at, tenant_id')
+        .select('id, name, email, phone, created_at, org_id')
         .eq('org_id', tenantId)
         .eq('status', 'active')
       if (error) return []
@@ -151,7 +151,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
     if (anchor === 'birthday') {
       const { data, error } = await supabase
         .from('students')
-        .select('id, name, email, phone, birth_date, tenant_id')
+        .select('id, name, email, phone, birth_date, org_id')
         .eq('org_id', tenantId)
         .not('birth_date', 'is', null)
       if (error) return []
@@ -300,10 +300,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body: RecalculateRequest = await request.json()
-    const { tenant_id, anchor, dry_run = false, force = false } = body
+    const { org_id, anchor, dry_run = false, force = false } = body
 
-    if (!tenant_id) {
-      return NextResponse.json({ error: 'tenant_id required' }, { status: 400 })
+    if (!org_id) {
+      return NextResponse.json({ error: 'org_id required' }, { status: 400 })
     }
 
     // Verificar lock (exceto se force=true)
@@ -323,7 +323,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // Buscar templates ativos
-      const templates = await fetchActiveTemplates(tenant_id)
+      const templates = await fetchActiveTemplates(org_id)
       if (!templates || templates.length === 0) {
         return NextResponse.json({ 
           success: true, 
@@ -357,7 +357,7 @@ export async function POST(request: NextRequest) {
 
       if (anchor) {
         // Processar ancora especifica
-        const result = await processRecalculate(anchor, templates, tenant_id, dry_run)
+        const result = await processRecalculate(anchor, templates, org_id, dry_run)
         stats.tasks_created += result.created
         stats.tasks_updated += result.updated
         stats.tasks_deleted += result.deleted
@@ -367,7 +367,7 @@ export async function POST(request: NextRequest) {
         // Processar todas as ancoras
         const anchors = [...new Set(templates.map(t => t.anchor))] as EventCode[]
         for (const anc of anchors) {
-          const result = await processRecalculate(anc, templates, tenant_id, dry_run)
+          const result = await processRecalculate(anc, templates, org_id, dry_run)
           stats.tasks_created += result.created
           stats.tasks_updated += result.updated
           stats.tasks_deleted += result.deleted

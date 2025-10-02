@@ -24,7 +24,7 @@ export async function GET(
     // Verificar se o usuário tem permissão para acessar este aluno
     const { data: student, error: studentError } = await supabase
       .from('students')
-      .select('id, name, email, status, tenant_id')
+      .select('id, name, email, status, org_id')
       .eq('id', studentId)
       .eq('org_id', ctx.tenantId)
       .single()

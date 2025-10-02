@@ -21,7 +21,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, org_id }) => {
     try {
       const { id } = await params
       const supabase = await createClient()
@@ -31,7 +31,7 @@ export async function PATCH(
         .from('student_occurrences')
         .select('id, reminder_at, reminder_status, reminder_created_by')
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!currentOccurrence) {
@@ -51,7 +51,7 @@ export async function PATCH(
           updated_by: user.id
         })
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .select()
         .single()
 
@@ -79,7 +79,7 @@ export async function PATCH(
 
         if (Object.keys(changes).length > 0) {
           await auditLogger.log({
-            organization_id: tenant_id,
+            organization_id: org_id,
             user_id: user.id,
             action: 'update',
             resource_type: 'occurrence' as any,

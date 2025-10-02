@@ -22,7 +22,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, org_id }) => {
     try {
       const { id: studentId } = await params
       const supabase = await createClient()
@@ -48,7 +48,7 @@ export async function GET(
         .from('students')
         .select('id, name')
         .eq('id', studentId)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (studentError || !student) {
@@ -122,7 +122,7 @@ export async function GET(
         totalCount: count,
         error: error?.message,
         studentId,
-        tenant_id
+        org_id
       })
 
       // Log detalhado dos dados retornados

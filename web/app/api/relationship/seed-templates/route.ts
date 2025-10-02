@@ -10,7 +10,7 @@ export const revalidate = 0;
 
 
 export async function POST(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, org_id }) => {
     try {
       const supabase = await createClient()
       
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       const { data: existingTemplates, error: checkError } = await supabase
         .from('relationship_templates')
         .select('id')
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .limit(1)
       
       if (checkError) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       
       // Aplicar seeds no modelo MVP (title/type/content)
       const templatesToInsert = RELATIONSHIP_TEMPLATE_SEEDS.map(template => ({
-        tenant_id,
+        org_id,
         title: `${template.code} - ${template.touchpoint}`,
         type: 'whatsapp',
         content: JSON.stringify({ ...template, active: template.active ?? true }),

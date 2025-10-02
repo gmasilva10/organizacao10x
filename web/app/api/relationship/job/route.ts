@@ -39,7 +39,7 @@ interface StudentData {
   email: string
   phone: string
   anchor_date: string
-  tenant_id: string
+  org_id: string
 }
 
 interface TemplateData {
@@ -170,7 +170,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
     if (anchor === 'sale_close') {
       const { data, error } = await supabase
         .from('students')
-        .select('id, name, email, phone, created_at, tenant_id')
+        .select('id, name, email, phone, created_at, org_id')
         .eq('org_id', tenantId)
         .eq('status', 'active')
         .gte('created_at', startOfDayISO())
@@ -182,14 +182,14 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
         email: s.email,
         phone: s.phone,
         anchor_date: s.created_at,
-        tenant_id: s.tenant_id,
+        org_id: s.org_id,
       }))
     }
 
     if (anchor === 'birthday') {
       const { data, error } = await supabase
         .from('students')
-        .select('id, name, email, phone, birth_date, tenant_id')
+        .select('id, name, email, phone, birth_date, org_id')
         .eq('org_id', tenantId)
         .not('birth_date', 'is', null)
       if (error) return []
@@ -208,14 +208,14 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
           email: s.email,
           phone: s.phone,
           anchor_date: s.birth_date,
-          tenant_id: s.tenant_id,
+          org_id: s.org_id,
         }))
     }
 
     if (anchor === 'occurrence_followup') {
       const { data: occs, error: occErr } = await supabase
         .from('student_occurrences')
-        .select('student_id, reminder_at, tenant_id')
+        .select('student_id, reminder_at, org_id')
         .eq('org_id', tenantId)
         .gte('reminder_at', startOfDayISO())
         .lte('reminder_at', endOfDayISO())
@@ -224,7 +224,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
       const studentIds = Array.from(new Set(occs.map((o: any) => o.student_id)))
       const { data: students, error: stuErr } = await supabase
         .from('students')
-        .select('id, name, email, phone, tenant_id')
+        .select('id, name, email, phone, org_id')
         .in('id', studentIds)
       if (stuErr) return []
       const map = new Map<string, any>()
@@ -240,7 +240,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
             email: s.email,
             phone: s.phone,
             anchor_date: o.reminder_at,
-            tenant_id: s.tenant_id,
+            org_id: s.org_id,
           } as StudentData
         })
         .filter(Boolean) as StudentData[]
@@ -258,7 +258,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
 async function fetchActiveTemplates(tenantId: string): Promise<TemplateData[]> {
   const { data, error } = await supabase
     .from('relationship_templates')
-    .select('id, tenant_id, content')
+    .select('id, org_id, content')
     .eq('org_id', tenantId)
   if (error || !data) return []
 
@@ -425,13 +425,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { tenant_id } = await request.json().catch(() => ({}))
-    if (!tenant_id) {
-      return NextResponse.json({ error: 'tenant_id required' }, { status: 400 })
+    const { org_id } = await request.json().catch(() => ({}))
+    if (!org_id) {
+      return NextResponse.json({ error: 'org_id required' }, { status: 400 })
     }
 
     // Buscar templates ativos (MVP via JSON em content)
-    const templates = await fetchActiveTemplates(tenant_id)
+    const templates = await fetchActiveTemplates(org_id)
 
     if (!templates || templates.length === 0) {
       return NextResponse.json({ 
@@ -463,7 +463,7 @@ export async function POST(request: NextRequest) {
     const anchors = [...new Set(templates.map(t => t.anchor))] as EventCode[]
     
     for (const anchor of anchors) {
-      const result = await processAnchor(anchor, templates, tenant_id)
+      const result = await processAnchor(anchor, templates, org_id)
       stats.tasks_created += result.created
       stats.tasks_updated += result.updated
       stats.tasks_skipped += result.skipped

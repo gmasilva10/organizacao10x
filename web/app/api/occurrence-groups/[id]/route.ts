@@ -22,7 +22,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, org_id }) => {
     try {
       const { id } = await params
       const supabase = await createClient()
@@ -31,7 +31,7 @@ export async function GET(
         .from('occurrence_groups')
         .select('*')
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (error || !group) {
@@ -51,7 +51,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, org_id }) => {
     try {
       const { id } = await params
       const supabase = await createClient()
@@ -61,7 +61,7 @@ export async function PATCH(
         .from('occurrence_groups')
         .select('*')
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!currentGroup) {
@@ -77,7 +77,7 @@ export async function PATCH(
         const { data: existingGroup } = await supabase
           .from('occurrence_groups')
           .select('id')
-          .eq('org_id', tenant_id)
+          .eq('org_id', org_id)
           .eq('name', validatedData.name)
           .neq('id', id)
           .single()
@@ -99,7 +99,7 @@ export async function PATCH(
           updated_by: user.id
         })
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .select()
         .single()
 
@@ -135,7 +135,7 @@ export async function PATCH(
               previousValues
             },
             actorId: user.id,
-            tenantId: tenant_id
+            tenantId: org_id
           } as any, supabase)
         }
       } catch (auditError) {
@@ -167,7 +167,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, tenant_id }) => {
+  return withOccurrencesRBAC(request, 'occurrences.manage', async (request, { user, membership, org_id }) => {
     try {
       const { id } = await params
       const supabase = await createClient()
@@ -177,7 +177,7 @@ export async function DELETE(
         .from('occurrence_groups')
         .select('*')
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .single()
 
       if (!group) {
@@ -189,7 +189,7 @@ export async function DELETE(
         .from('occurrence_types')
         .select('id')
         .eq('group_id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
         .limit(1)
 
       if (types && types.length > 0) {
@@ -204,7 +204,7 @@ export async function DELETE(
         .from('occurrence_groups')
         .delete()
         .eq('id', id)
-        .eq('org_id', tenant_id)
+        .eq('org_id', org_id)
 
       if (error) {
         console.error('Erro ao excluir grupo:', error)
@@ -222,7 +222,7 @@ export async function DELETE(
             description: group.description
           },
           actorId: user.id,
-          tenantId: tenant_id
+          tenantId: org_id
         } as any, supabase)
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)

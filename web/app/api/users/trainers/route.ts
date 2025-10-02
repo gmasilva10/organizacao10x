@@ -12,7 +12,7 @@ async function countTenantTrainers(tenantId: string): Promise<number> {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return 0
   const resp = await fetch(
-    `${url}/rest/v1/memberships?tenant_id=eq.${tenantId}&role=eq.trainer&select=user_id`,
+    `${url}/rest/v1/memberships?org_id=eq.${tenantId}&role=eq.trainer&select=user_id`,
     {
       headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact" },
       cache: "no-store",
@@ -48,7 +48,7 @@ async function insertMembership(userId: string, tenantId: string): Promise<boole
       "Content-Type": "application/json",
       Prefer: "resolution=merge-duplicates,return=representation",
     },
-    body: JSON.stringify({ user_id: userId, tenant_id: tenantId, role: "trainer" }),
+    body: JSON.stringify({ user_id: userId, org_id: tenantId, role: "trainer" }),
   })
   return resp.ok
 }
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
 
   // Limite por plano
   // Obter a policy para saber o limite
-  const policyResp = await fetch(`${process.env.SUPABASE_URL}/rest/v1/plan_policies?tenant_id=eq.${ctx.tenantId}&select=limits`, {
+  const policyResp = await fetch(`${process.env.SUPABASE_URL}/rest/v1/plan_policies?org_id=eq.${ctx.tenantId}&select=limits`, {
     headers: {
       apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "",
       Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY}`,
@@ -115,7 +115,7 @@ export async function GET(request: Request) {
   if (!url || !service) return NextResponse.json({ error: "service_unavailable" }, { status: 503 })
 
   // 1) pegar user_ids de trainers no tenant
-  const idsResp = await fetch(`${url}/rest/v1/memberships?tenant_id=eq.${ctx.tenantId}&role=eq.trainer&select=user_id`, {
+  const idsResp = await fetch(`${url}/rest/v1/memberships?org_id=eq.${ctx.tenantId}&role=eq.trainer&select=user_id`, {
     headers: { apikey: service, Authorization: `Bearer ${service}` },
     cache: "no-store",
   })

@@ -27,13 +27,13 @@ export async function GET(
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const { id } = await params
-	return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, tenant_id }) => {
+	return withOccurrencesRBAC(request, 'occurrences.read', async (request, { user, membership, org_id }) => {
 		try {
 			const supabase = await createClient()
 			const t0 = Date.now()
 			
 			// Buscar ocorrÃªncia sem joins (evitar 404 por RLS/joins)
-			console.log('ðŸ”Ž GET /api/occurrences/[id]', { id, tenant_id })
+			console.log('ðŸ”Ž GET /api/occurrences/[id]', { id, org_id })
 			const { data: occurrence, error } = await supabase
 				.from('student_occurrences')
 				.select(`
@@ -53,27 +53,27 @@ export async function GET(
 					updated_at
 				`)
 				.eq('id', id)
-				.eq('org_id', tenant_id)
+				.eq('org_id', org_id)
 				.single()
 
 			if (error || !occurrence) {
-				console.warn('âš ï¸ Occurrence not found or error', { id, tenant_id, error })
+				console.warn('âš ï¸ Occurrence not found or error', { id, org_id, error })
 				return NextResponse.json({ error: 'Occurrence not found' }, { status: 404 })
 			}
 
 			// Buscar nomes relacionados separadamente
 			const [studentRes, groupRes, typeRes, ownerRes] = await Promise.all([
 				occurrence.student_id
-					? supabase.from('students').select('id, name').eq('id', occurrence.student_id).eq('org_id', tenant_id).single()
+					? supabase.from('students').select('id, name').eq('id', occurrence.student_id).eq('org_id', org_id).single()
 					: Promise.resolve({ data: null } as any),
 				occurrence.group_id
-					? supabase.from('occurrence_groups').select('id, name').eq('id', occurrence.group_id).eq('org_id', tenant_id).single()
+					? supabase.from('occurrence_groups').select('id, name').eq('id', occurrence.group_id).eq('org_id', org_id).single()
 					: Promise.resolve({ data: null } as any),
 				occurrence.type_id
-					? supabase.from('occurrence_types').select('id, name').eq('id', occurrence.type_id).eq('org_id', tenant_id).single()
+					? supabase.from('occurrence_types').select('id, name').eq('id', occurrence.type_id).eq('org_id', org_id).single()
 					: Promise.resolve({ data: null } as any),
 				occurrence.owner_user_id
-					? supabase.from('professionals').select('user_id, full_name').eq('user_id', occurrence.owner_user_id).eq('org_id', tenant_id).single()
+					? supabase.from('professionals').select('user_id, full_name').eq('user_id', occurrence.owner_user_id).eq('org_id', org_id).single()
 					: Promise.resolve({ data: null } as any)
 			])
 
@@ -114,7 +114,7 @@ export async function PATCH(
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const { id } = await params
-	return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, tenant_id }) => {
+	return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, org_id }) => {
 		try {
 			const supabase = await createClient()
 			
@@ -128,7 +128,7 @@ export async function PATCH(
 				.from('student_occurrences')
 				.select('id, owner_user_id, group_id, type_id, notes, priority, is_sensitive, reminder_at, reminder_status, occurred_at')
 				.eq('id', id)
-				.eq('org_id', tenant_id)
+				.eq('org_id', org_id)
 				.single()
 
 			if (!existingOccurrence) {
@@ -150,7 +150,7 @@ export async function PATCH(
 					.from('occurrence_groups')
 					.select('id')
 					.eq('id', validatedData.group_id)
-					.eq('org_id', tenant_id)
+					.eq('org_id', org_id)
 					.single()
 
 				if (!group) {
@@ -166,7 +166,7 @@ export async function PATCH(
 					.from('occurrence_types')
 					.select('id')
 					.eq('id', validatedData.type_id)
-					.eq('org_id', tenant_id)
+					.eq('org_id', org_id)
 					.single()
 
 				if (!type) {
@@ -199,7 +199,7 @@ export async function PATCH(
 					updated_at: new Date().toISOString()
 				})
 				.eq('id', id)
-				.eq('org_id', tenant_id)
+				.eq('org_id', org_id)
 				.select()
 				.single()
 
@@ -227,7 +227,7 @@ export async function PATCH(
 				if (Object.keys(changes).length > 0) {
 					try {
 						await auditLogger.log({
-							organization_id: tenant_id,
+							organization_id: org_id,
 							user_id: user.id,
 							action: 'update',
 							resource_type: 'occurrence' as any,
@@ -242,7 +242,7 @@ export async function PATCH(
 							details: e?.details || null
 						}
 						await admin.from('audit_log_degraded').insert({
-							org_id: tenant_id,
+							org_id: org_id,
 							entity_type: 'student_occurrence',
 							entity_id: id,
 							action: 'occurrence_updated',
@@ -262,7 +262,7 @@ export async function PATCH(
 						details: auditError?.details || null
 					}
 					await admin.from('audit_log_degraded').insert({
-						org_id: tenant_id,
+						org_id: org_id,
 						entity_type: 'student_occurrence',
 						entity_id: id,
 						action: 'occurrence_updated',

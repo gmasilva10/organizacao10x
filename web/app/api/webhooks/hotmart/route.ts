@@ -352,7 +352,7 @@ async function processPurchaseRefunded(
   const { data: student } = await supabase
     .from('students')
     .select('id, status')
-    .or(`tenant_id.eq.${orgId},org_id.eq.${orgId}`)
+    .eq('org_id', orgId)
     .eq('email', data.buyer.email)
     .single()
   
@@ -394,7 +394,7 @@ async function processSubscriptionCancellation(
   const { data: student } = await supabase
     .from('students')
     .select('id, name, email')
-    .or(`tenant_id.eq.${orgId},org_id.eq.${orgId}`)
+    .eq('org_id', orgId)
     .eq('email', data.buyer.email)
     .single()
   

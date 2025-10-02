@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
     
     if (studentIds.length > 0) {
       const studentFilters = [`student_id=in.(${studentIds.join(',')})`, `role=eq.principal`]
-      if (ctx?.tenantId) studentFilters.push(`tenant_id=eq.${ctx.tenantId}`)
+      if (ctx?.tenantId) studentFilters.push(`org_id=eq.${ctx.tenantId}`)
       
       const responsibleUrl = `${url}/rest/v1/student_responsibles?${studentFilters.join('&')}&select=student_id,professional_id,professionals(id,full_name)`
       

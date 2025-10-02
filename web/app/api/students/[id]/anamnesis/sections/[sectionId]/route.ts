@@ -29,7 +29,7 @@ export async function PATCH(
     // Verificar se o usuário tem permissão para acessar este aluno
     const { data: student, error: studentError } = await supabase
       .from('students')
-      .select('id, tenant_id')
+      .select('id, org_id')
       .eq('id', studentId)
       .eq('org_id', ctx.tenantId)
       .single()
@@ -71,7 +71,7 @@ export async function PATCH(
         version_n: nextVersion,
         answers_json: answers,
         template_version_id: template.id,
-        tenant_id: ctx.tenantId,
+        org_id: ctx.tenantId,
         created_by: ctx.userId
       })
       .select()
@@ -90,7 +90,7 @@ export async function PATCH(
         version_id: newVersion.id,
         answers_json: answers,
         active_tags: active_tags || [],
-        tenant_id: ctx.tenantId,
+        org_id: ctx.tenantId,
         updated_at: new Date().toISOString()
       })
 
