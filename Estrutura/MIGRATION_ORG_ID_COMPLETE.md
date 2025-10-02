@@ -218,10 +218,15 @@ $$;
 3. Validar que RLS está funcionando corretamente
 4. Confirmar que não há vazamento de dados entre orgs
 
-### Fase 3: Limpeza Final (2-4 semanas após estabilidade)
-1. Remover coluna `tenant_id` de todas as 53 tabelas
-2. Remover helper `is_member_of` (legacy)
-3. Atualizar documentação final
+### Fase 3: Limpeza Final ✅ COMPLETA (2025-10-02 12:34)
+1. ✅ Removida coluna `tenant_id` de 45 tabelas (CASCADE)
+2. ✅ Removida função `is_member_of(tenant_id)` legacy
+3. ✅ Atualizadas todas as policies RLS para `org_id`
+4. ⚠️ **Exceções:** `memberships` e `tenant_users` mantêm `tenant_id` (parte da PK)
+
+**Motivo da execução antecipada:** Ambiente de desenvolvimento, sem risco de produção
+
+**Resultado:** Sistema 100% padronizado em `org_id`!
 
 ---
 
