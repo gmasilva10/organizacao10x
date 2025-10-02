@@ -333,43 +333,8 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     fetchTasks()
   }, [fetchTasks])
 
-  // Determinar colunas visíveis - versão simplificada para evitar erros
-  const visibleColumns = useMemo(() => {
-    try {
-      const { date_from, date_to } = debouncedFilters
-      
-      // Se não há filtros de data, mostrar todas as colunas
-      if (!date_from || !date_to) {
-        return ALL_COLUMNS
-      }
-      
-      // Verificar se as datas são válidas
-      const dateFrom = new Date(date_from)
-      const dateTo = new Date(date_to)
-      
-      if (isNaN(dateFrom.getTime()) || isNaN(dateTo.getTime())) {
-        console.warn('Datas inválidas no filtro, usando todas as colunas:', { date_from, date_to })
-        return ALL_COLUMNS
-      }
-      
-      // Versão simplificada: sempre mostrar colunas básicas
-      const columns: KanbanColumn[] = []
-      
-      // Sempre incluir colunas essenciais
-      const dueTodayColumn = ALL_COLUMNS.find(c => c.id === 'due_today')
-      const sentColumn = ALL_COLUMNS.find(c => c.id === 'sent')
-      const postponedColumn = ALL_COLUMNS.find(c => c.id === 'postponed_skipped')
-      
-      if (dueTodayColumn) columns.push(dueTodayColumn)
-      if (sentColumn) columns.push(sentColumn)
-      if (postponedColumn) columns.push(postponedColumn)
-      
-      return columns.length > 0 ? columns : ALL_COLUMNS
-    } catch (error) {
-      console.error('Erro ao calcular colunas visíveis:', error)
-      return ALL_COLUMNS
-    }
-  }, [debouncedFilters.date_from, debouncedFilters.date_to])
+  // Determinar colunas visíveis - versão ultra-simplificada
+  const visibleColumns = ALL_COLUMNS
 
   // Agrupar tarefas por coluna - versão ultra-simplificada sem dependências
   const getTasksByColumn = (columnId: string) => {
