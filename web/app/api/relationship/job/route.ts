@@ -1,11 +1,11 @@
 /**
  * GATE 10.6.2 - Motor de Relacionamento
- * Job diário 03:00 para gerar/atualizar tarefas em lote
+ * Job diario 03:00 para gerar/atualizar tarefas em lote
  * 
  * Funcionalidades:
- * - Queries únicas por âncora + índices
- * - Rate limiting (máx. N tarefas/dia por aluno)
- * - Dedup por chave lógica
+ * - Queries unicas por ancora + indices
+ * - Rate limiting (max. N tarefas/dia por aluno)
+ * - Dedup por chave logica
  * - Telemetria e logs
  */
 
@@ -21,7 +21,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Rate limiting: máximo de tarefas por aluno por dia
+// Rate limiting: maximo de tarefas por aluno por dia
 const MAX_TASKS_PER_STUDENT_PER_DAY = 3
 
 type EventCode =
@@ -66,7 +66,7 @@ interface TaskStats {
 }
 
 /**
- * Aplicar filtros de audiência em memória
+ * Aplicar filtros de audiencia em memoria
  */
 function applyAudienceFilter(students: StudentData[], filter: any): StudentData[] {
   if (!filter || Object.keys(filter).length === 0) {
@@ -76,18 +76,18 @@ function applyAudienceFilter(students: StudentData[], filter: any): StudentData[
   return students.filter(student => {
     // Filtro por status (se especificado)
     if (filter.status && Array.isArray(filter.status)) {
-      // Para simplificar, assumimos que todos os alunos retornados são 'active'
-      // Em implementação real, você verificaria o status real do aluno
+      // Para simplificar, assumimos que todos os alunos retornados sao 'active'
+      // Em implementacao real, voce verificaria o status real do aluno
     }
 
     // Filtro por tags (se especificado)
     if (filter.tags && Array.isArray(filter.tags)) {
-      // Implementar filtro por tags quando disponível
+      // Implementar filtro por tags quando disponivel
     }
 
     // Filtro por trainer_id (se especificado)
     if (filter.trainer_id) {
-      // Implementar filtro por trainer quando disponível
+      // Implementar filtro por trainer quando disponivel
     }
 
     return true
@@ -117,12 +117,12 @@ function calculateScheduledDate(anchorDate: string, offset: string): Date {
 }
 
 /**
- * Renderizar mensagem com variáveis
+ * Renderizar mensagem com variaveis
  */
 function renderMessage(template: string, student: StudentData): string {
   let message = template
   
-  // Substituir variáveis básicas
+  // Substituir variaveis basicas
   message = message.replace(/\[Nome do Cliente\]/g, student.name)
   message = message.replace(/\[Nome\]/g, student.name)
   message = message.replace(/\[PrimeiroNome\]/g, student.name.split(' ')[0])
@@ -164,7 +164,7 @@ function endOfDayISO(date = new Date()) {
   return d.toISOString()
 }
 
-// Buscar alunos elegíveis por âncora sem usar RPCs (sem recursão)
+// Buscar alunos elegiveis por ancora sem usar RPCs (sem recursao)
 async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Promise<StudentData[]> {
   try {
     if (anchor === 'sale_close') {
@@ -247,7 +247,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
     }
 
     // first_workout, weekly_followup, monthly_review, renewal_window
-    // Campos podem não existir ainda; retornar vazio
+    // Campos podem nao existir ainda; retornar vazio
     return []
   } catch {
     return []
@@ -283,14 +283,14 @@ async function fetchActiveTemplates(tenantId: string): Promise<TemplateData[]> {
         active: true,
       })
     } catch {
-      // ignora linhas inválidas
+      // ignora linhas invalidas
     }
   }
   return templates
 }
 
 /**
- * Processar uma âncora específica
+ * Processar uma ancora especifica
  */
 async function processAnchor(
   anchor: EventCode,
@@ -308,12 +308,12 @@ async function processAnchor(
   const errors: string[] = []
 
   try {
-    // Buscar alunos para esta âncora
+    // Buscar alunos para esta ancora
     const students = await fetchStudentsForAnchor(anchor, tenantId)
     const studentsError = null as any
 
     if (studentsError) {
-      errors.push(`Erro ao buscar alunos para âncora ${anchor}: ${studentsError.message}`)
+      errors.push(`Erro ao buscar alunos para ancora ${anchor}: ${studentsError.message}`)
       return { created, updated, skipped, errors }
     }
 
@@ -321,9 +321,9 @@ async function processAnchor(
       return { created, updated, skipped, errors }
     }
 
-    // Processar cada template desta âncora
+    // Processar cada template desta ancora
     for (const template of anchorTemplates) {
-      // Aplicar filtros de audiência
+      // Aplicar filtros de audiencia
       const filteredStudents = applyAudienceFilter(students, template.audience_filter)
 
       for (const student of filteredStudents) {
@@ -338,7 +338,7 @@ async function processAnchor(
           // Calcular data agendada
           const scheduledDate = calculateScheduledDate(student.anchor_date, template.suggested_offset)
           
-          // Verificar se já existe tarefa para este aluno/template/data
+          // Verificar se ja existe tarefa para este aluno/template/data
           const { data: existingTask } = await supabase
             .from('relationship_tasks')
             .select('id')
@@ -407,7 +407,7 @@ async function processAnchor(
       }
     }
   } catch (error) {
-    errors.push(`Erro geral ao processar âncora ${anchor}: ${(error as any)?.message || String(error)}`)
+    errors.push(`Erro geral ao processar ancora ${anchor}: ${(error as any)?.message || String(error)}`)
   }
 
   return { created, updated, skipped, errors }
@@ -417,7 +417,7 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    // Verificar se é chamada autorizada (cron job ou admin)
+    // Verificar se e chamada autorizada (cron job ou admin)
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET || 'default-secret'
     
@@ -449,7 +449,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Processar cada âncora
+    // Processar cada ancora
     const stats: TaskStats = {
       templates_processed: templates.length,
       students_found: 0,
@@ -489,5 +489,3 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
   }
 }
-
-

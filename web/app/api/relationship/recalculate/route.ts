@@ -1,10 +1,10 @@
 /**
- * GATE 10.6.2 - Endpoint de Rec °lculo Manual
+ * GATE 10.6.2 - Endpoint de Recalculo Manual
  * 
  * Funcionalidades:
- * - Lock para evitar execu   µes simult ¢neas
+ * - Lock para evitar execucoes simultaneas
  * - Dry-run mode para preview
- * - Rec °lculo completo ou por  ¢ncora espec ≠fica
+ * - Recalculo completo ou por ancora especifica
  * - Telemetria detalhada
  */
 
@@ -20,285 +20,388 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Lock para evitar execu   µes simult ¢neas
-const recalculationLocks = new Map<string, boolean>()
+// Lock para evitar execucoes simultaneas
+const LOCK_KEY = 'relationship_recalculate_lock'
+const LOCK_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutos
+
+type EventCode =
+  | 'sale_close'
+  | 'first_workout'
+  | 'weekly_followup'
+  | 'monthly_review'
+  | 'birthday'
+  | 'renewal_window'
+  | 'occurrence_followup'
 
 interface RecalculateRequest {
   tenant_id: string
+  anchor?: EventCode
   dry_run?: boolean
-  anchor?: string
   force?: boolean
 }
 
-interface RecalculateResponse {
-  success: boolean
+interface RecalculateStats {
+  templates_processed: number
+  students_found: number
+  tasks_created: number
+  tasks_updated: number
+  tasks_deleted: number
+  tasks_skipped: number
+  errors: string[]
+  duration_ms: number
   dry_run: boolean
-  stats: {
-    templates_processed: number
-    students_found: number
-    tasks_created: number
-    tasks_updated: number
-    tasks_skipped: number
-    errors: string[]
-    duration_ms: number
-  }
-  message: string
 }
 
 /**
- * Verificar se h ° lock ativo
+ * Verificar se existe lock ativo
  */
-function isLocked(tenantId: string): boolean {
-  return recalculationLocks.get(tenantId) || false
-}
-
-/**
- * Definir lock
- */
-function setLock(tenantId: string, locked: boolean): void {
-  if (locked) {
-    recalculationLocks.set(tenantId, true)
-  } else {
-    recalculationLocks.delete(tenantId)
-  }
-}
-
-/**
- * Executar rec °lculo usando a fun   £o do banco
- */
-async function executeRecalculation(
-  tenantId: string, 
-  dryRun: boolean = true
-): Promise<{ success: boolean; result: any; error?: string }> {
+async function checkLock(): Promise<boolean> {
   try {
-    const { data, error } = await supabase
-      .rpc('recalculate_relationship_tasks', {
-        p_dry_run: dryRun
+    const { data } = await supabase
+      .from('system_locks')
+      .select('id, created_at')
+      .eq('key', LOCK_KEY)
+      .single()
+
+    if (!data) return false
+
+    const lockAge = Date.now() - new Date(data.created_at).getTime()
+    return lockAge < LOCK_TIMEOUT_MS
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Criar lock
+ */
+async function createLock(): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('system_locks')
+      .insert({
+        key: LOCK_KEY,
+        created_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + LOCK_TIMEOUT_MS).toISOString()
       })
 
-    if (error) {
-      return { success: false, result: null, error: (error as any)?.message || String(error) }
-    }
-
-    return { success: true, result: data, error: undefined }
-  } catch (error) {
-    return { 
-      success: false, 
-      result: null, 
-      error: (error as any)?.message || String(error) 
-    }
+    return !error
+  } catch {
+    return false
   }
 }
 
 /**
- * Executar rec °lculo manual completo
+ * Remover lock
  */
-async function executeManualRecalculation(
-  tenantId: string,
-  dryRun: boolean = true
-): Promise<RecalculateResponse> {
-  const startTime = Date.now()
-  
+async function removeLock(): Promise<void> {
   try {
-    // Buscar templates ativos (MVP via JSON em content)
-    const { data: tmplRows, error: tmplErr } = await supabase
-      .from('relationship_templates')
-      .select('id, tenant_id, content')
-      .eq('org_id', tenantId)
+    await supabase
+      .from('system_locks')
+      .delete()
+      .eq('key', LOCK_KEY)
+  } catch {
+    // Ignorar erros ao remover lock
+  }
+}
 
-    if (tmplErr) {
-      throw new Error(`Failed to fetch templates: ${tmplErr.message}`)
-    }
+/**
+ * Buscar templates ativos
+ */
+async function fetchActiveTemplates(tenantId: string): Promise<any[]> {
+  const { data, error } = await supabase
+    .from('relationship_templates')
+    .select('id, tenant_id, content')
+    .eq('org_id', tenantId)
 
-    const templates = (tmplRows || []).map((row: any) => {
-      try { return JSON.parse(row.content || '{}') } catch { return null }
-    }).filter((t: any) => t && t.active)
+  if (error || !data) return []
 
-    if (!templates || templates.length === 0) {
-      return {
-        success: true,
-        dry_run: dryRun,
-        stats: {
-          templates_processed: 0,
-          students_found: 0,
-          tasks_created: 0,
-          tasks_updated: 0,
-          tasks_skipped: 0,
-          errors: [],
-          duration_ms: Date.now() - startTime
-        },
-        message: 'No active templates found'
+  const templates: any[] = []
+  for (const row of data) {
+    try {
+      const parsed = JSON.parse((row as any).content || '{}')
+      if (parsed && parsed.active === true) {
+        templates.push({
+          id: (row as any).id,
+          ...parsed
+        })
       }
-    }
-
-    // Em modo dry-run, apenas simular
-    if (dryRun) {
-      // Contar alunos que seriam afetados
-      const { count: studentsCount } = await supabase
-        .from('students')
-        .select('*', { count: 'exact', head: true })
-        .eq('org_id', tenantId)
-        .eq('status', 'active')
-
-      return {
-        success: true,
-        dry_run: true,
-        stats: {
-          templates_processed: templates.length,
-          students_found: studentsCount || 0,
-          tasks_created: 0,
-          tasks_updated: 0,
-          tasks_skipped: 0,
-          errors: [],
-          duration_ms: Date.now() - startTime
-        },
-        message: 'Dry-run completed - no tasks were created/updated'
-      }
-    }
-
-    // Modo real - chamar o job
-    const jobResponse = await fetch(`http://localhost:3000/api/relationship/job`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.CRON_SECRET || 'default-secret'}`
-      },
-      body: JSON.stringify({ tenant_id: tenantId })
-    })
-
-    if (!jobResponse.ok) {
-      const errorData = await jobResponse.json()
-      throw new Error(`Job execution failed: ${errorData.error || 'Unknown error'}`)
-    }
-
-    const jobResult = await jobResponse.json()
-    
-    return {
-      success: true,
-      dry_run: false,
-      stats: jobResult.stats || {
-        templates_processed: 0,
-        students_found: 0,
-        tasks_created: 0,
-        tasks_updated: 0,
-        tasks_skipped: 0,
-        errors: [],
-        duration_ms: Date.now() - startTime
-      },
-      message: 'Recalculation completed successfully'
-    }
-
-  } catch (error) {
-    return {
-      success: false,
-      dry_run: dryRun,
-      stats: {
-        templates_processed: 0,
-        students_found: 0,
-        tasks_created: 0,
-        tasks_updated: 0,
-        tasks_skipped: 0,
-        errors: [(error as any)?.message || String(error)],
-        duration_ms: Date.now() - startTime
-      },
-      message: `Recalculation failed: ${(error as any)?.message || String(error)}`
+    } catch {
+      // Ignorar templates invalidos
     }
   }
+  return templates
+}
+
+/**
+ * Buscar alunos para uma ancora especifica
+ */
+async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Promise<any[]> {
+  try {
+    if (anchor === 'sale_close') {
+      const { data, error } = await supabase
+        .from('students')
+        .select('id, name, email, phone, created_at, tenant_id')
+        .eq('org_id', tenantId)
+        .eq('status', 'active')
+      if (error) return []
+      return data || []
+    }
+
+    if (anchor === 'birthday') {
+      const { data, error } = await supabase
+        .from('students')
+        .select('id, name, email, phone, birth_date, tenant_id')
+        .eq('org_id', tenantId)
+        .not('birth_date', 'is', null)
+      if (error) return []
+      return data || []
+    }
+
+    // Outras ancoras podem ser implementadas aqui
+    return []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Deletar tarefas existentes para uma ancora
+ */
+async function deleteExistingTasks(anchor: EventCode, tenantId: string, dryRun: boolean): Promise<number> {
+  if (dryRun) {
+    const { count } = await supabase
+      .from('relationship_tasks')
+      .select('*', { count: 'exact', head: true })
+      .eq('anchor', anchor)
+    return count || 0
+  }
+
+  // Primeiro contar as tarefas que ser√£o deletadas
+  const { count: countBefore } = await supabase
+    .from('relationship_tasks')
+    .select('*', { count: 'exact', head: true })
+    .eq('anchor', anchor)
+
+  // Deletar as tarefas
+  await supabase
+    .from('relationship_tasks')
+    .delete()
+    .eq('anchor', anchor)
+
+  return countBefore || 0
+}
+
+/**
+ * Processar recalculo para uma ancora
+ */
+async function processRecalculate(
+  anchor: EventCode,
+  templates: any[],
+  tenantId: string,
+  dryRun: boolean
+): Promise<{ created: number; updated: number; deleted: number; skipped: number; errors: string[] }> {
+  const anchorTemplates = templates.filter(t => t.anchor === anchor)
+  if (anchorTemplates.length === 0) {
+    return { created: 0, updated: 0, deleted: 0, skipped: 0, errors: [] }
+  }
+
+  let created = 0
+  let updated = 0
+  let deleted = 0
+  let skipped = 0
+  const errors: string[] = []
+
+  try {
+    // Deletar tarefas existentes
+    deleted = await deleteExistingTasks(anchor, tenantId, dryRun)
+
+    if (dryRun) {
+      // Em dry-run, apenas simular criacao
+      const students = await fetchStudentsForAnchor(anchor, tenantId)
+      created = students.length * anchorTemplates.length
+      return { created, updated, deleted, skipped, errors }
+    }
+
+    // Buscar alunos para esta ancora
+    const students = await fetchStudentsForAnchor(anchor, tenantId)
+    if (!students || students.length === 0) {
+      return { created, updated, deleted, skipped, errors }
+    }
+
+    // Processar cada template
+    for (const template of anchorTemplates) {
+      for (const student of students) {
+        try {
+          // Calcular data agendada
+          const baseDate = new Date(student.created_at || student.birth_date || new Date())
+          const offset = template.suggested_offset || '+0d'
+          const match = offset.match(/^([+-]?)(\d+)d/)
+          if (!match) continue
+
+          const sign = match[1] === '-' ? -1 : 1
+          const days = parseInt(match[2]) * sign
+          const scheduledDate = new Date(baseDate)
+          scheduledDate.setDate(scheduledDate.getDate() + days)
+
+          // Renderizar mensagem
+          let message = template.message_v1 || ''
+          message = message.replace(/\[Nome do Cliente\]/g, student.name)
+          message = message.replace(/\[Nome\]/g, student.name)
+          message = message.replace(/\[PrimeiroNome\]/g, student.name.split(' ')[0])
+
+          // Criar tarefa
+          const { error: insertError } = await supabase
+            .from('relationship_tasks')
+            .insert({
+              student_id: student.id,
+              template_code: template.code,
+              anchor: anchor,
+              scheduled_for: scheduledDate.toISOString(),
+              channel: template.channel_default || 'whatsapp',
+              status: 'pending',
+              payload: {
+                message: message,
+                student_name: student.name,
+                student_email: student.email,
+                student_phone: student.phone
+              },
+              variables_used: template.variables || [],
+              created_by: 'manual_recalculate'
+            })
+
+          if (insertError) {
+            errors.push(`Erro ao criar tarefa para ${student.name}: ${insertError.message}`)
+          } else {
+            created++
+          }
+        } catch (error) {
+          errors.push(`Erro ao processar aluno ${student.name}: ${(error as any)?.message || String(error)}`)
+        }
+      }
+    }
+  } catch (error) {
+    errors.push(`Erro geral ao processar ancora ${anchor}: ${(error as any)?.message || String(error)}`)
+  }
+
+  return { created, updated, deleted, skipped, errors }
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+  
   try {
-    const body: RecalculateRequest = await request.json()
-    const { tenant_id, dry_run = true, anchor, force = false } = body
-
-    if (!tenant_id) {
-      return NextResponse.json({ 
-        error: 'tenant_id is required' 
-      }, { status: 400 })
+    // Verificar autorizacao
+    const authHeader = request.headers.get('authorization')
+    const cronSecret = process.env.CRON_SECRET || 'default-secret'
+    
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Verificar lock (exceto se for  ado)
-    if (!force && isLocked(tenant_id)) {
-      return NextResponse.json({
-        success: false,
-        error: 'Recalculation already in progress for this tenant',
-        message: 'Please wait for the current recalculation to complete'
+    const body: RecalculateRequest = await request.json()
+    const { tenant_id, anchor, dry_run = false, force = false } = body
+
+    if (!tenant_id) {
+      return NextResponse.json({ error: 'tenant_id required' }, { status: 400 })
+    }
+
+    // Verificar lock (exceto se force=true)
+    if (!force && await checkLock()) {
+      return NextResponse.json({ 
+        error: 'Recalculo ja em andamento',
+        message: 'Use force=true para forcar execucao'
       }, { status: 409 })
     }
 
-    // Definir lock
-    setLock(tenant_id, true)
+    // Criar lock
+    if (!force && !await createLock()) {
+      return NextResponse.json({ 
+        error: 'Nao foi possivel criar lock para execucao'
+      }, { status: 500 })
+    }
 
     try {
-      let result: RecalculateResponse
-
-      if (anchor) {
-        // Rec °lculo por  ¢ncora espec ≠fica (implementar se necess °rio)
-        result = await executeManualRecalculation(tenant_id, dry_run)
-        // Evitar log global com student_id nulo (constraint NOT NULL)
-        return NextResponse.json(result)
-      
-      // Evitar log global com student_id nulo (constraint NOT NULL)
-      return NextResponse.json(result)
-      } else {
-        // Rec °lculo completo
-        result = await executeManualRecalculation(tenant_id, dry_run)
+      // Buscar templates ativos
+      const templates = await fetchActiveTemplates(tenant_id)
+      if (!templates || templates.length === 0) {
+        return NextResponse.json({ 
+          success: true, 
+          message: 'No active templates found',
+          stats: {
+            templates_processed: 0,
+            students_found: 0,
+            tasks_created: 0,
+            tasks_updated: 0,
+            tasks_deleted: 0,
+            tasks_skipped: 0,
+            errors: [],
+            duration_ms: Date.now() - startTime,
+            dry_run: dry_run
+          }
+        })
       }
 
-      // Removido log global (student_id nulo)     retorna resultado diretamente
-      return NextResponse.json(result)
+      // Processar recalculo
+      const stats: RecalculateStats = {
+        templates_processed: templates.length,
+        students_found: 0,
+        tasks_created: 0,
+        tasks_updated: 0,
+        tasks_deleted: 0,
+        tasks_skipped: 0,
+        errors: [],
+        duration_ms: 0,
+        dry_run: dry_run
+      }
+
+      if (anchor) {
+        // Processar ancora especifica
+        const result = await processRecalculate(anchor, templates, tenant_id, dry_run)
+        stats.tasks_created += result.created
+        stats.tasks_updated += result.updated
+        stats.tasks_deleted += result.deleted
+        stats.tasks_skipped += result.skipped
+        stats.errors.push(...result.errors)
+      } else {
+        // Processar todas as ancoras
+        const anchors = [...new Set(templates.map(t => t.anchor))] as EventCode[]
+        for (const anc of anchors) {
+          const result = await processRecalculate(anc, templates, tenant_id, dry_run)
+          stats.tasks_created += result.created
+          stats.tasks_updated += result.updated
+          stats.tasks_deleted += result.deleted
+          stats.tasks_skipped += result.skipped
+          stats.errors.push(...result.errors)
+        }
+      }
+
+      stats.duration_ms = Date.now() - startTime
+
+      return NextResponse.json({
+        success: true,
+        message: dry_run ? 'Dry run completed' : 'Recalculo completed',
+        stats
+      })
 
     } finally {
-      // Liberar lock
-      setLock(tenant_id, false)
+      // Remover lock
+      if (!force) {
+        await removeLock()
+      }
     }
 
   } catch (error) {
-    console.error('Recalculation error:', error)
+    console.error('Recalculate error:', error)
+    
+    // Remover lock em caso de erro
+    await removeLock()
     
     return NextResponse.json({
       success: false,
       error: 'Internal server error',
-      message: (error as any)?.message || String(error),
-      dry_run: true,
-      stats: {
-        templates_processed: 0,
-        students_found: 0,
-        tasks_created: 0,
-        tasks_updated: 0,
-        tasks_skipped: 0,
-        errors: [(error as any)?.message || String(error)],
-        duration_ms: 0
-      }
+      details: (error as any)?.message || String(error),
+      duration_ms: Date.now() - startTime
     }, { status: 500 })
   }
 }
-
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const tenantId = searchParams.get('tenant_id')
-  const dryRun = searchParams.get('dry_run') === 'true'
-
-  if (!tenantId) {
-    return NextResponse.json({ 
-      error: 'tenant_id is required' 
-    }, { status: 400 })
-  }
-
-  // Verificar status do lock
-  const isLockedNow = isLocked(tenantId)
-  
-  if (isLockedNow) {
-    return NextResponse.json({
-      success: false,
-      message: 'Recalculation in progress',
-      locked: true
-    }, { status: 409 })
-  }
-
-  // Executar dry-run
-  const result = await executeManualRecalculation(tenantId, true)
-  
-  return NextResponse.json(result)
-}
-

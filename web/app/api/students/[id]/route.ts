@@ -90,7 +90,7 @@ export async function GET(
     // Buscar dados do treinador se existir
     let trainer = null
     if (student.trainer_id) {
-      const trainerTenant = ctx?.tenantId ? `&tenant_id=eq.${ctx.tenantId}` : ''
+      const trainerTenant = ctx?.tenantId ? `&org_id=eq.${ctx.tenantId}` : ''
       const trainerUrl = `${url}/rest/v1/profiles?id=eq.${student.trainer_id}${trainerTenant}&select=id,full_name`
       
       try {
@@ -222,7 +222,7 @@ export async function PUT(
     // Log para debug
     console.log('Dados sendo enviados para atualização:', JSON.stringify(updateData, null, 2))
 
-    const updateUrl = `${url}/rest/v1/students?id=eq.${studentId}&tenant_id=eq.${ctx.tenantId}`
+    const updateUrl = `${url}/rest/v1/students?id=eq.${studentId}&org_id=eq.${ctx.tenantId}`
     
     const updateResponse = await fetch(updateUrl, {
       method: 'PATCH',
