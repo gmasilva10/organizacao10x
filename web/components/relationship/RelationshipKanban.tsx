@@ -11,7 +11,7 @@
 
 'use client'
 
-import React, { useState, useEffect, useImperativeHandle, forwardRef, useMemo } from 'react'
+import React, { useState, useEffect, useImperativeHandle, forwardRef, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -195,7 +195,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
   } = useRelationshipFilters()
 
   // Buscar tarefas
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -225,7 +225,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     } finally {
       setLoading(false)
     }
-  }
+  }, [pagination.page, pagination.page_size, getApiFilters])
 
   // Atualizar status da tarefa
   const updateTaskStatus = async (taskId: string, status: string, notes?: string) => {
@@ -323,11 +323,8 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
 
   // Buscar tarefas quando filtros mudarem
   useEffect(() => {
-    // Evitar chamadas desnecessárias durante a inicialização
-    if (loading) return
-    
     fetchTasks()
-  }, [debouncedFilters, pagination.page])
+  }, [fetchTasks])
 
   // Determinar colunas vis veis baseadas no intervalo de datas
   const visibleColumns = useMemo(() => {

@@ -10,7 +10,7 @@
 
 'use client'
 
-import React, { useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react'
+import React, { useState, useEffect, useMemo, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -96,7 +96,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
   } = useRelationshipFilters()
 
   // Buscar tarefas
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -118,7 +118,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     } finally {
       setLoading(false)
     }
-  }
+  }, [getApiFilters])
 
   // Atualizar status da tarefa
   const updateTaskStatus = async (taskId: string, status: string, notes?: string) => {
@@ -189,7 +189,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
   // Buscar tarefas quando filtros mudarem
   useEffect(() => {
     fetchTasks()
-  }, [debouncedFilters])
+  }, [fetchTasks])
 
   // Calcular datas baseadas na visão
   const { startDate, endDate, days } = useMemo(() => {
