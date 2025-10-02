@@ -5,15 +5,25 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClientAdmin } from '@/utils/supabase/server'
+import { v4 as uuidv4 } from 'uuid'
 
 // Forçar runtime Node.js para compatibilidade com Buffer e service role
 export const runtime = 'nodejs'
 
+// Helper para logs estruturados
+function logWebhook(level: 'info' | 'warn' | 'error', message: string, data: any = {}) {
+  const timestamp = new Date().toISOString()
+  console[level](`[${timestamp}] [HOTMART WEBHOOK] ${message}`, data)
+}
+
 export async function POST(request: NextRequest) {
+  const correlationId = uuidv4()
   const startTime = Date.now()
   let eventId = 'unknown'
   let orgId = 'unknown'
   let transactionId = 'unknown'
+  
+  logWebhook('info', 'Webhook received', { correlationId })
   
   try {
     const supabase = await createClientAdmin()
@@ -22,23 +32,33 @@ export async function POST(request: NextRequest) {
     const hottok = request.headers.get('X-Hotmart-Hottok') || request.headers.get('x-hotmart-hottok')
     
     if (!hottok || !hottok.startsWith('Basic ')) {
-      console.warn('[HOTMART WEBHOOK] Missing or invalid Hottok header')
+      logWebhook('warn', 'Missing or invalid Hottok header', { correlationId })
       return NextResponse.json({ 
-        error: 'Unauthorized: Missing X-Hotmart-Hottok header' 
+        error: 'Unauthorized: Missing X-Hotmart-Hottok header',
+        correlationId
       }, { status: 401 })
     }
     
     const credentials = Buffer.from(hottok.split(' ')[1], 'base64').toString()
     const [email, basicToken] = credentials.split(':')
     
-    console.log(`[HOTMART WEBHOOK] Received webhook from: ${email}`)
+    logWebhook('info', 'Webhook authenticated', { 
+      correlationId, 
+      email,
+      hasBasicToken: !!basicToken
+    })
     
     // 2. PARSEAR PAYLOAD
     const payload = await request.json()
     const { event, data, id: parsedEventId } = payload
     eventId = parsedEventId || 'unknown'
     
-    console.log(`[HOTMART WEBHOOK] Event: ${event}, ID: ${eventId}`)
+    logWebhook('info', 'Payload parsed', { 
+      correlationId, 
+      event, 
+      eventId,
+      hasData: !!data
+    })
     
     // 3. IDENTIFICAR ORGANIZAÇÃO (pelo basic_token)
     const { data: integration, error: intError } = await supabase
@@ -48,18 +68,28 @@ export async function POST(request: NextRequest) {
       .single()
     
     if (intError || !integration) {
-      console.error(`[HOTMART WEBHOOK] Integration not found for basic_token - Event: ${eventId}`)
+      logWebhook('error', 'Integration not found', { 
+        correlationId, 
+        eventId, 
+        error: intError?.message 
+      })
       // IMPORTANTE: Retornar 200 mesmo assim para Hotmart não reenviar
       return NextResponse.json({ 
         success: false,
-        error: 'Integration not configured' 
+        error: 'Integration not configured',
+        correlationId
       }, { status: 200 })
     }
     
     orgId = integration.org_id
     
     if (integration.status !== 'connected') {
-      console.warn(`[HOTMART WEBHOOK] Integration is ${integration.status} - Event: ${eventId}, Org: ${orgId}`)
+      logWebhook('warn', 'Integration not connected', { 
+        correlationId, 
+        eventId, 
+        orgId, 
+        status: integration.status 
+      })
     }
     
     // 4. VERIFICAR IDEMPOTÊNCIA (evitar processar 2x)
@@ -72,11 +102,18 @@ export async function POST(request: NextRequest) {
       .single()
     
     if (existing) {
-      console.log(`[HOTMART WEBHOOK] Transaction already exists: ${existing.id} - Event: ${eventId}, Org: ${orgId}`)
+      logWebhook('info', 'Transaction already processed', { 
+        correlationId, 
+        eventId, 
+        orgId, 
+        transactionId: existing.id,
+        processed: existing.processed
+      })
       return NextResponse.json({ 
         success: true, 
         message: 'Already processed',
-        transaction_id: existing.id
+        transaction_id: existing.id,
+        correlationId
       })
     }
     
@@ -115,23 +152,47 @@ export async function POST(request: NextRequest) {
       .single()
     
     if (txError) {
-      console.error(`[HOTMART WEBHOOK] Error registering transaction - Event: ${eventId}, Org: ${orgId}`, txError)
+      logWebhook('error', 'Error registering transaction', { 
+        correlationId, 
+        eventId, 
+        orgId, 
+        error: txError.message 
+      })
       throw txError
     }
     
     transactionId = transaction.id
-    console.log(`[HOTMART WEBHOOK] Transaction registered: ${transactionId} - Event: ${eventId}, Org: ${orgId}`)
+    logWebhook('info', 'Transaction registered', { 
+      correlationId, 
+      eventId, 
+      orgId, 
+      transactionId 
+    })
     
     // 6. PROCESSAR EVENTO
     try {
+      logWebhook('info', 'Processing event', { 
+        correlationId, 
+        eventId, 
+        orgId, 
+        transactionId, 
+        event 
+      })
+      
       if (event === 'PURCHASE_APPROVED' || event === 'PURCHASE_COMPLETE') {
-        await processPurchaseApproved(supabase, orgId, transaction.id, data)
+        await processPurchaseApproved(supabase, orgId, transaction.id, data, correlationId)
       } else if (event === 'PURCHASE_REFUNDED') {
-        await processPurchaseRefunded(supabase, orgId, transaction.id, data)
+        await processPurchaseRefunded(supabase, orgId, transaction.id, data, correlationId)
       } else if (event === 'SUBSCRIPTION_CANCELLATION') {
-        await processSubscriptionCancellation(supabase, orgId, transaction.id, data)
+        await processSubscriptionCancellation(supabase, orgId, transaction.id, data, correlationId)
       } else {
-        console.log(`[HOTMART WEBHOOK] Event ${event} não processado (apenas registrado)`)
+        logWebhook('info', 'Event not processed (only registered)', { 
+          correlationId, 
+          eventId, 
+          orgId, 
+          transactionId, 
+          event 
+        })
       }
       
       // Marcar como processado
@@ -144,7 +205,13 @@ export async function POST(request: NextRequest) {
         .eq('id', transaction.id)
       
     } catch (processError: any) {
-      console.error('[HOTMART WEBHOOK] Processing error:', processError)
+      logWebhook('error', 'Processing error', { 
+        correlationId, 
+        eventId, 
+        orgId, 
+        transactionId, 
+        error: processError.message 
+      })
       
       // Marcar erro mas NÃO falhar (para Hotmart não reenviar)
       await supabase
@@ -158,22 +225,38 @@ export async function POST(request: NextRequest) {
     
     // 7. SEMPRE RETORNAR 200 OK (obrigatório para Hotmart)
     const duration = Date.now() - startTime
-    console.log(`[HOTMART WEBHOOK] Success - Event: ${eventId}, Org: ${orgId}, Transaction: ${transactionId}, Duration: ${duration}ms`)
+    logWebhook('info', 'Webhook processed successfully', { 
+      correlationId, 
+      eventId, 
+      orgId, 
+      transactionId, 
+      duration: `${duration}ms` 
+    })
     
     return NextResponse.json({ 
       success: true,
       message: 'Webhook processed',
       event_id: eventId,
-      transaction_id: transactionId
+      transaction_id: transactionId,
+      correlationId,
+      duration: `${duration}ms`
     })
     
   } catch (error: any) {
     const duration = Date.now() - startTime
-    console.error(`[HOTMART WEBHOOK] Fatal error - Event: ${eventId}, Org: ${orgId}, Transaction: ${transactionId}, Duration: ${duration}ms`, error)
+    logWebhook('error', 'Fatal error', { 
+      correlationId, 
+      eventId, 
+      orgId, 
+      transactionId, 
+      duration: `${duration}ms`, 
+      error: error.message 
+    })
     // IMPORTANTE: Retornar 200 mesmo com erro fatal
     return NextResponse.json({ 
       success: false, 
-      error: error.message 
+      error: error.message,
+      correlationId
     }, { status: 200 })
   }
 }
@@ -185,9 +268,14 @@ async function processPurchaseApproved(
   supabase: any, 
   orgId: string, 
   transactionId: string, 
-  data: any
+  data: any,
+  correlationId: string
 ) {
-  console.log(`[PURCHASE_APPROVED] Processing for org ${orgId}`)
+  logWebhook('info', 'Processing PURCHASE_APPROVED', { 
+    correlationId, 
+    orgId, 
+    transactionId 
+  })
   
   // 1. BUSCAR MAPEAMENTO DO PRODUTO
   const { data: mapping } = await supabase

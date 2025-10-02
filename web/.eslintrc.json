@@ -8,6 +8,21 @@
   ],
   "rules": {
     "unused-imports/no-unused-imports": "error",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Literal[value=/tenant_id/]",
+        "message": "Use 'org_id' instead of 'tenant_id' - migration completed"
+      },
+      {
+        "selector": "Identifier[name='tenant_id']",
+        "message": "Use 'org_id' instead of 'tenant_id' - migration completed"
+      },
+      {
+        "selector": "MemberExpression[property.name='tenant_id']",
+        "message": "Use 'org_id' instead of 'tenant_id' - migration completed"
+      }
+    ]
   }
 }

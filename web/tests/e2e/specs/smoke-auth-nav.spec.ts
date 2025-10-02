@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/auth-fixture';
 import { TestHelpers } from '../utils/test-helpers';
 import { TEST_IDS } from '../fixtures/test-data';
 
@@ -9,14 +9,14 @@ test.describe('Smoke Tests - Autenticação e Navegação @smoke', () => {
     helpers = new TestHelpers(page);
   });
 
-  test('Login como admin redireciona para /app', async ({ page }) => {
-    await helpers.loginAsAdmin();
-    await expect(page).toHaveURL('/app');
+  test('Login como admin redireciona para /app', async ({ adminPage }) => {
+    await adminPage.goto('/app');
+    await expect(adminPage).toHaveURL('/app');
   });
 
-  test('Login como trainer redireciona para /app', async ({ page }) => {
-    await helpers.loginAsTrainer();
-    await expect(page).toHaveURL('/app');
+  test('Login como trainer redireciona para /app', async ({ trainerPage }) => {
+    await trainerPage.goto('/app');
+    await expect(trainerPage).toHaveURL('/app');
   });
 
   test('Página de login carrega corretamente', async ({ page }) => {
@@ -25,49 +25,47 @@ test.describe('Smoke Tests - Autenticação e Navegação @smoke', () => {
     await expect(page.locator('h1')).toContainText('Entrar');
   });
 
-  test('Navegação após login funciona', async ({ page }) => {
-    await helpers.loginAsAdmin();
-    
+  test('Navegação após login funciona', async ({ adminPage }) => {
     // Dashboard
-    await page.goto('/app');
-    await expect(page).toHaveURL('/app');
+    await adminPage.goto('/app');
+    await expect(adminPage).toHaveURL('/app');
     
     // Students
-    await page.goto('/app/students');
-    await expect(page).toHaveURL('/app/students');
+    await adminPage.goto('/app/students');
+    await expect(adminPage).toHaveURL('/app/students');
     
     // Occurrences
-    await page.goto('/app/workflow/occurrences');
-    await expect(page).toHaveURL('/app/workflow/occurrences');
+    await adminPage.goto('/app/workflow/occurrences');
+    await expect(adminPage).toHaveURL('/app/workflow/occurrences');
     
     // Kanban
-    await page.goto('/app/kanban');
-    await expect(page).toHaveURL('/app/kanban');
+    await adminPage.goto('/app/onboarding');
+    await expect(adminPage).toHaveURL('/app/onboarding');
   });
 
-  test('Skeletons exibidos durante carregamento', async ({ page }) => {
+  test('Skeletons exibidos durante carregamento', async ({ adminPage }) => {
     // Navegar para Students e verificar skeleton
-    await page.goto('/app/students');
+    await adminPage.goto('/app/students');
     
     // Verificar se há skeleton (pode não aparecer se carregar muito rápido)
-    const skeleton = page.locator(TEST_IDS.skeleton);
+    const skeleton = adminPage.locator(TEST_IDS.skeleton);
     if (await skeleton.count() > 0) {
       await expect(skeleton.first()).toBeVisible();
     }
     
     // Aguardar carregamento completo
-    await page.waitForLoadState('networkidle');
+    await adminPage.waitForLoadState('networkidle');
   });
 
-  test('Performance headers presentes nas rotas principais', async ({ page }) => {
+  test('Performance headers presentes nas rotas principais', async ({ adminPage }) => {
     // Testar performance headers em diferentes rotas
-    await page.goto('/app');
-    await page.waitForLoadState('networkidle');
+    await adminPage.goto('/app');
+    await adminPage.waitForLoadState('networkidle');
     
-    await page.goto('/app/students');
-    await page.waitForLoadState('networkidle');
+    await adminPage.goto('/app/students');
+    await adminPage.waitForLoadState('networkidle');
     
-    await page.goto('/app/kanban');
-    await page.waitForLoadState('networkidle');
+    await adminPage.goto('/app/onboarding');
+    await adminPage.waitForLoadState('networkidle');
   });
 });

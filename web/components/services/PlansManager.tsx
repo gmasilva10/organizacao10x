@@ -9,7 +9,14 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
+import { Plus, Edit, Trash2, Eye, Save, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Plan {
@@ -30,11 +37,26 @@ export default function PlansManager() {
   const [plans, setPlans] = useState<Plan[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showViewModal, setShowViewModal] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
+  const [formData, setFormData] = useState({
+    plan_code: '',
+    nome: '',
+    descricao: '',
+    valor: '',
+    moeda: 'BRL',
+    ciclo: '',
+    duracao_em_ciclos: '',
+    ativo: true
+  })
+  const [saving, setSaving] = useState(false)
 
   const loadPlans = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/plans')
+      const response = await fetch('/api/services/plans')
       if (!response.ok) {
         throw new Error('Erro ao carregar planos')
       }
@@ -74,20 +96,122 @@ export default function PlansManager() {
     return cycles[ciclo as keyof typeof cycles] || ciclo
   }
 
+  const resetForm = () => {
+    setFormData({
+      plan_code: '',
+      nome: '',
+      descricao: '',
+      valor: '',
+      moeda: 'BRL',
+      ciclo: '',
+      duracao_em_ciclos: '',
+      ativo: true
+    })
+  }
+
   const handleCreatePlan = () => {
+    resetForm()
     setShowCreateModal(true)
   }
 
   const handleEditPlan = (plan: Plan) => {
-    toast.info('Funcionalidade de edição será implementada em breve')
+    setSelectedPlan(plan)
+    setFormData({
+      plan_code: plan.plan_code,
+      nome: plan.nome,
+      descricao: plan.descricao || '',
+      valor: plan.valor.toString(),
+      moeda: plan.moeda,
+      ciclo: plan.ciclo || '',
+      duracao_em_ciclos: plan.duracao_em_ciclos?.toString() || '',
+      ativo: plan.ativo
+    })
+    setShowEditModal(true)
   }
 
   const handleDeletePlan = (plan: Plan) => {
-    toast.info('Funcionalidade de exclusão será implementada em breve')
+    setSelectedPlan(plan)
+    setShowDeleteModal(true)
   }
 
   const handleViewPlan = (plan: Plan) => {
-    toast.info('Funcionalidade de visualização será implementada em breve')
+    setSelectedPlan(plan)
+    setShowViewModal(true)
+  }
+
+  const handleSavePlan = async () => {
+    try {
+      setSaving(true)
+      
+      const payload = {
+        ...formData,
+        valor: parseFloat(formData.valor),
+        duracao_em_ciclos: formData.duracao_em_ciclos ? parseInt(formData.duracao_em_ciclos) : undefined
+      }
+
+      const url = selectedPlan ? `/api/services/plans/${selectedPlan.id}` : '/api/services/plans'
+      const method = selectedPlan ? 'PUT' : 'POST'
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.details || errorData.error || 'Erro ao salvar plano')
+      }
+
+      const data = await response.json()
+      toast.success(data.message || 'Plano salvo com sucesso')
+      
+      await loadPlans()
+      
+      setShowCreateModal(false)
+      setShowEditModal(false)
+      setSelectedPlan(null)
+      resetForm()
+      
+    } catch (error: any) {
+      console.error('Erro ao salvar plano:', error)
+      toast.error(error.message || 'Erro ao salvar plano')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!selectedPlan) return
+
+    try {
+      setSaving(true)
+      
+      const response = await fetch(`/api/services/plans/${selectedPlan.id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.details || errorData.error || 'Erro ao excluir plano')
+      }
+
+      const data = await response.json()
+      toast.success(data.message || 'Plano excluído com sucesso')
+      
+      await loadPlans()
+      
+      setShowDeleteModal(false)
+      setSelectedPlan(null)
+      
+    } catch (error: any) {
+      console.error('Erro ao excluir plano:', error)
+      toast.error(error.message || 'Erro ao excluir plano')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) {
@@ -195,6 +319,225 @@ export default function PlansManager() {
           ))}
         </div>
       )}
+
+      {/* Modal de Criação/Edição */}
+      <Dialog open={showCreateModal || showEditModal} onOpenChange={(open) => {
+        if (!open) {
+          setShowCreateModal(false)
+          setShowEditModal(false)
+          setSelectedPlan(null)
+          resetForm()
+        }
+      }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedPlan ? 'Editar Plano' : 'Novo Plano'}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedPlan ? 'Atualize as informações do plano' : 'Preencha os dados para criar um novo plano'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="plan_code">Código do Plano *</Label>
+                <Input
+                  id="plan_code"
+                  value={formData.plan_code}
+                  onChange={(e) => setFormData(prev => ({ ...prev, plan_code: e.target.value }))}
+                  placeholder="Ex: PLANO_BASICO"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nome">Nome *</Label>
+                <Input
+                  id="nome"
+                  value={formData.nome}
+                  onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+                  placeholder="Ex: Plano Básico"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Textarea
+                id="descricao"
+                value={formData.descricao}
+                onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+                placeholder="Descreva o plano..."
+                rows={3}
+              />
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="valor">Valor *</Label>
+                <Input
+                  id="valor"
+                  type="number"
+                  step="0.01"
+                  value={formData.valor}
+                  onChange={(e) => setFormData(prev => ({ ...prev, valor: e.target.value }))}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="moeda">Moeda</Label>
+                <Select value={formData.moeda} onValueChange={(value) => setFormData(prev => ({ ...prev, moeda: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="BRL">BRL</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ciclo">Ciclo</Label>
+                <Select value={formData.ciclo} onValueChange={(value) => setFormData(prev => ({ ...prev, ciclo: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mensal">Mensal</SelectItem>
+                    <SelectItem value="trimestral">Trimestral</SelectItem>
+                    <SelectItem value="semestral">Semestral</SelectItem>
+                    <SelectItem value="anual">Anual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="duracao_em_ciclos">Duração em Ciclos</Label>
+              <Input
+                id="duracao_em_ciclos"
+                type="number"
+                value={formData.duracao_em_ciclos}
+                onChange={(e) => setFormData(prev => ({ ...prev, duracao_em_ciclos: e.target.value }))}
+                placeholder="Ex: 12"
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="ativo"
+                checked={formData.ativo}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, ativo: checked }))}
+              />
+              <Label htmlFor="ativo">Plano ativo</Label>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCreateModal(false)
+                setShowEditModal(false)
+                setSelectedPlan(null)
+                resetForm()
+              }}
+              disabled={saving}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cancelar
+            </Button>
+            <Button onClick={handleSavePlan} disabled={saving}>
+              <Save className="h-4 w-4 mr-2" />
+              {saving ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Visualização */}
+      <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Detalhes do Plano</DialogTitle>
+            <DialogDescription>
+              Informações completas do plano selecionado
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedPlan && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Código</Label>
+                  <p className="text-sm text-muted-foreground">{selectedPlan.plan_code}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Nome</Label>
+                  <p className="text-sm text-muted-foreground">{selectedPlan.nome}</p>
+                </div>
+              </div>
+              
+              {selectedPlan.descricao && (
+                <div>
+                  <Label className="text-sm font-medium">Descrição</Label>
+                  <p className="text-sm text-muted-foreground">{selectedPlan.descricao}</p>
+                </div>
+              )}
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Valor</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {formatCurrency(selectedPlan.valor, selectedPlan.moeda)}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Ciclo</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {getCycleLabel(selectedPlan.ciclo)}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Status</Label>
+                  <Badge variant={selectedPlan.ativo ? "default" : "secondary"}>
+                    {selectedPlan.ativo ? "Ativo" : "Inativo"}
+                  </Badge>
+                </div>
+              </div>
+              
+              {selectedPlan.duracao_em_ciclos && (
+                <div>
+                  <Label className="text-sm font-medium">Duração</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedPlan.duracao_em_ciclos} ciclos
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowViewModal(false)}>
+              <X className="h-4 w-4 mr-2" />
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Confirmação de Exclusão */}
+      <ConfirmDeleteDialog
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title="Excluir Plano"
+        description="Tem certeza que deseja excluir este plano?"
+        itemName={selectedPlan?.nome}
+        itemType="plano"
+        loading={saving}
+      />
     </div>
   )
 }
