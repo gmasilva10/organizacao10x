@@ -23,10 +23,28 @@ export const TIMEZONE = 'America/Sao_Paulo'
  * - Retorna: 2025-09-30 03:00:00Z (00:00 em São Paulo = 03:00 UTC)
  */
 export function startOfToday(timezone: string = TIMEZONE): Date {
-  const now = new Date()
-  const zonedNow = toZonedTime(now, timezone)
-  const zonedStartOfDay = startOfDay(zonedNow)
-  return fromZonedTime(zonedStartOfDay, timezone)
+  try {
+    const now = new Date()
+    const zonedNow = toZonedTime(now, timezone)
+    const zonedStartOfDay = startOfDay(zonedNow)
+    const result = fromZonedTime(zonedStartOfDay, timezone)
+    
+    if (!result || isNaN(result.getTime())) {
+      console.error('Erro em startOfToday:', { now, zonedNow, zonedStartOfDay, result, timezone })
+      // Fallback para hoje em UTC
+      const fallback = new Date()
+      fallback.setHours(0, 0, 0, 0)
+      return fallback
+    }
+    
+    return result
+  } catch (error) {
+    console.error('Erro em startOfToday:', error)
+    // Fallback para hoje em UTC
+    const fallback = new Date()
+    fallback.setHours(0, 0, 0, 0)
+    return fallback
+  }
 }
 
 /**
@@ -38,10 +56,28 @@ export function startOfToday(timezone: string = TIMEZONE): Date {
  * - Retorna: 2025-10-01 02:59:59.999Z (23:59:59 em São Paulo)
  */
 export function endOfToday(timezone: string = TIMEZONE): Date {
-  const now = new Date()
-  const zonedNow = toZonedTime(now, timezone)
-  const zonedEndOfDay = endOfDay(zonedNow)
-  return fromZonedTime(zonedEndOfDay, timezone)
+  try {
+    const now = new Date()
+    const zonedNow = toZonedTime(now, timezone)
+    const zonedEndOfDay = endOfDay(zonedNow)
+    const result = fromZonedTime(zonedEndOfDay, timezone)
+    
+    if (!result || isNaN(result.getTime())) {
+      console.error('Erro em endOfToday:', { now, zonedNow, zonedEndOfDay, result, timezone })
+      // Fallback para fim do dia em UTC
+      const fallback = new Date()
+      fallback.setHours(23, 59, 59, 999)
+      return fallback
+    }
+    
+    return result
+  } catch (error) {
+    console.error('Erro em endOfToday:', error)
+    // Fallback para fim do dia em UTC
+    const fallback = new Date()
+    fallback.setHours(23, 59, 59, 999)
+    return fallback
+  }
 }
 
 /**
@@ -180,9 +216,25 @@ export function fromUTC(utcDate: Date | string, timezone: string = TIMEZONE): Da
  *   }
  */
 export function getTodayInterval(timezone: string = TIMEZONE): { date_from: string; date_to: string } {
+  const start = startOfToday(timezone)
+  const end = endOfToday(timezone)
+  
+  // Verificar se as datas são válidas
+  if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
+    console.error('Erro ao gerar intervalo de hoje:', { start, end, timezone })
+    // Fallback para hoje em UTC
+    const now = new Date()
+    const fallbackStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const fallbackEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+    return {
+      date_from: fallbackStart.toISOString(),
+      date_to: fallbackEnd.toISOString()
+    }
+  }
+  
   return {
-    date_from: startOfToday(timezone).toISOString(),
-    date_to: endOfToday(timezone).toISOString()
+    date_from: start.toISOString(),
+    date_to: end.toISOString()
   }
 }
 
