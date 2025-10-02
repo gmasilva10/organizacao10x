@@ -87,21 +87,27 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
   const [modalDate, setModalDate] = useState<Date | null>(null)
   const [filtersOpen, setFiltersOpen] = useState(false)
   
-  const { 
-    debouncedFilters, 
-    updateFilters, 
-    resetFilters, 
-    hasActiveFilters,
-    getApiFilters 
-  } = useRelationshipFilters()
+  // Desativar filtros temporariamente para estabilização
+  const debouncedFilters = {
+    status: 'all',
+    anchor: 'all',
+    template_code: 'all',
+    channel: 'all',
+    date_from: '',
+    date_to: '',
+    q: ''
+  }
+  const updateFilters = () => {}
+  const resetFilters = () => {}
+  const hasActiveFilters = () => false
+  const getApiFilters = () => ({})
 
-  // Buscar tarefas
+  // Buscar tarefas - versão simplificada sem filtros
   const fetchTasks = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
-        page_size: '1000', // Buscar todas as tarefas para o calendário
-        ...getApiFilters()
+        page_size: '1000' // Buscar todas as tarefas para o calendário
       })
 
       const response = await fetch(`/api/relationship/tasks?${params}`)
@@ -118,7 +124,7 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     } finally {
       setLoading(false)
     }
-  }, [getApiFilters])
+  }, [])
 
   // Atualizar status da tarefa
   const updateTaskStatus = async (taskId: string, status: string, notes?: string) => {
@@ -186,10 +192,10 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, CalendarProps>(
     refresh: fetchTasks
   }))
 
-  // Buscar tarefas quando filtros mudarem
+  // Buscar tarefas na inicialização
   useEffect(() => {
     fetchTasks()
-  }, [fetchTasks])
+  }, [])
 
   // Calcular datas baseadas na visão - versão simplificada
   const startDate = startOfMonth(currentDate)

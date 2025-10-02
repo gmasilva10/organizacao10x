@@ -183,25 +183,31 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     total_pages: 0
   })
   
-  const { 
-    filters,
-    debouncedFilters, 
-    updateFilters, 
-    resetFilters, 
-    setToday,
-    hasActiveFilters,
-    getApiFilters,
-    getActiveFiltersCount 
-  } = useRelationshipFilters()
+  // Desativar filtros temporariamente para estabilização
+  const filters = {
+    status: 'all',
+    anchor: 'all',
+    template_code: 'all',
+    channel: 'all',
+    date_from: '',
+    date_to: '',
+    q: ''
+  }
+  const debouncedFilters = filters
+  const updateFilters = () => {}
+  const resetFilters = () => {}
+  const setToday = () => {}
+  const hasActiveFilters = () => false
+  const getApiFilters = () => ({})
+  const getActiveFiltersCount = () => 0
 
-  // Buscar tarefas
+  // Buscar tarefas - versão simplificada sem filtros
   const fetchTasks = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
         page: pagination.page.toString(),
-        page_size: pagination.page_size.toString(),
-        ...getApiFilters()
+        page_size: pagination.page_size.toString()
       })
 
       const response = await fetch(`/api/relationship/tasks?${params}`, {
@@ -225,7 +231,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     } finally {
       setLoading(false)
     }
-  }, [pagination.page, pagination.page_size, getApiFilters])
+  }, [pagination.page, pagination.page_size])
 
   // Atualizar status da tarefa
   const updateTaskStatus = async (taskId: string, status: string, notes?: string) => {
@@ -321,10 +327,10 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     refresh: fetchTasks
   }))
 
-  // Buscar tarefas quando filtros mudarem
+  // Buscar tarefas na inicialização
   useEffect(() => {
     fetchTasks()
-  }, [fetchTasks])
+  }, [])
 
   // Determinar colunas vis veis - versão simplificada para evitar loops
   const visibleColumns = ALL_COLUMNS
@@ -489,40 +495,36 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setShowFilters(true)}
+            disabled
             className="flex items-center gap-2"
           >
             <Filter className="h-4 w-4" />
             Filtros
-            {getActiveFiltersCount() > 0 && (
-              <Badge variant="destructive" className="ml-1 px-1.5 py-0.5 text-xs">
-                {getActiveFiltersCount()}
-              </Badge>
-            )}
+            <Badge variant="destructive" className="ml-1 px-1.5 py-0.5 text-xs">
+              0
+            </Badge>
           </Button>
           
           {/* Chip para filtrar apenas hoje */}
           <Button
             variant="outline"
             size="sm"
-            onClick={setToday}
+            disabled
             className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 border-blue-200"
           >
             <Calendar className="h-4 w-4" />
             Hoje
           </Button>
           
-          {(debouncedFilters.date_from || debouncedFilters.status !== 'all') && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetFilters}
-              className="flex items-center gap-2"
-            >
-              <X className="h-4 w-4" />
-              Limpar
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="flex items-center gap-2"
+          >
+            <X className="h-4 w-4" />
+            Limpar
+          </Button>
           
           <Button
             variant="outline"
