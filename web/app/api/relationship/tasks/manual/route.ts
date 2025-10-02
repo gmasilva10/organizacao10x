@@ -256,6 +256,7 @@ export async function POST(request: NextRequest) {
     // Preparar dados da tarefa
     const taskData = {
       student_id: studentId,
+      org_id: student.org_id, // Adicionar org_id obrigatório
       template_code: mode === 'template' ? body.templateCode : null,
       anchor: 'manual', // Sempre manual para tarefas criadas manualmente
       scheduled_for: sendNow ? new Date().toISOString() : body.scheduledFor,
@@ -293,6 +294,7 @@ export async function POST(request: NextRequest) {
     // Registrar log
     const logData = {
       student_id: studentId,
+      org_id: student.org_id, // Adicionar org_id obrigatório
       task_id: task.id,
       action: 'created',
       channel,
@@ -319,6 +321,7 @@ export async function POST(request: NextRequest) {
     if (sendNow) {
       const sentLogData = {
         student_id: studentId,
+        org_id: student.org_id, // Adicionar org_id obrigatório
         task_id: task.id,
         action: 'sent',
         channel,
