@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    // Usaremos client admin para contornar variações de tenant_id no JWT durante o DEV
+    // Usaremos client admin para garantir permissões adequadas
     const { createAdminClient } = await import('@/utils/supabase/admin')
     const admin = createAdminClient()
 
