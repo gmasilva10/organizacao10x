@@ -42,7 +42,7 @@ export function useOrganization(options: UseOrganizationOptions = {}) {
     },
     enabled: options.enabled !== false,
     staleTime: 5 * 60 * 1000, // 5 minutos
-    cacheTime: 10 * 60 * 1000, // 10 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos (garbage collection time)
   })
 
   // Mutation para atualizar dados da organização
