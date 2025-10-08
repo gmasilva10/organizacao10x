@@ -251,4 +251,8 @@ As inconsistências de nomenclatura encontradas são apenas em variáveis intern
 
 **Relatório gerado por:** Sistema de Auditoria Automatizada
 **Data de geração:** 08/10/2025
+<<<<<<< HEAD
 **Versão:** 1.0
+=======
+**Versão:** 1.0
+>>>>>>> remotes/origin/cursor/audit-for-old-tanant-id-references-d4ce

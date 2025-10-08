@@ -100,4 +100,8 @@ do código JavaScript/TypeScript, que funcionam corretamente.
 3. /workspace/VALIDACAO_TENANT_ORG_RESUMO.txt
    Este resumo
 
+<<<<<<< HEAD
 ═══════════════════════════════════════════════════════════════════════════════
+=======
+═══════════════════════════════════════════════════════════════════════════════
+>>>>>>> remotes/origin/cursor/audit-for-old-tanant-id-references-d4ce
