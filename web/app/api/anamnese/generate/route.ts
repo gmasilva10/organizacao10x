@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     // Carregar aluno e tenant
     const { data: student, error: stuErr } = await admin
       .from('students')
-      .select('id, tenant_id')
+      .select('id, org_id')
       .eq('id', alunoId)
       .single()
     if (stuErr || !student) return NextResponse.json({ error: 'Aluno não encontrado' }, { status: 404 })
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     const { data: maxSeq } = await admin
       .from('anamnese_versions')
       .select('seq')
-      .eq('org_id', student.tenant_id)
+      .eq('org_id', student.org_id)
       .eq('student_id', alunoId)
       .order('seq', { ascending: false })
       .limit(1)
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     const { data: version, error: verErr } = await admin
       .from('anamnese_versions')
       .insert({
-        tenant_id: student.tenant_id,
+        org_id: student.org_id,
         student_id: alunoId,
         seq: nextSeq,
         code,
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
 
       if (questions && questions.length > 0) {
         const snapshotRows = questions.map((q: any) => ({
-          tenant_id: student.tenant_id,
+          org_id: student.org_id,
           anamnese_version_id: version.id,
           key: q.question_id,
           label: q.label,
@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
       if (answersToUpsert.length > 0) {
         await admin.from('anamnese_answers').insert(
           answersToUpsert.map((a) => ({
-            tenant_id: student.tenant_id,
+            org_id: student.org_id,
             ...a,
             answered_at: new Date().toISOString()
           }))
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
         phone: 'placeholder',
         status: 'draft',
         expires_at: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
-        tenant_id: student.tenant_id,
+        org_id: student.org_id,
         message_sent: waShareText
       })
       .select('id')

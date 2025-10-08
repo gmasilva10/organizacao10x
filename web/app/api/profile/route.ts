@@ -32,13 +32,13 @@ export async function GET(request: Request) {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
     let memberships: Membership[] = []
     if (url && key) {
-      const memResp = await fetch(`${url}/rest/v1/memberships?user_id=eq.${user.id}&select=tenant_id,role`, {
+      const memResp = await fetch(`${url}/rest/v1/memberships?user_id=eq.${user.id}&select=org_id,role`, {
         headers: { apikey: key, Authorization: `Bearer ${key}` },
         cache: "no-store",
       })
-      const memRows: Array<{ tenant_id: string; role: string }> = await memResp.json().catch(() => [])
+      const memRows: Array<{ org_id: string; role: string }> = await memResp.json().catch(() => [])
       if (Array.isArray(memRows) && memRows.length > 0) {
-        const ids = memRows.map((m) => m.tenant_id).filter(Boolean)
+        const ids = memRows.map((m) => m.org_id).filter(Boolean)
         let idPart = ""
         if (ids.length > 0) {
           const list = ids.map((v) => `"${v}"`).join(",")
@@ -54,8 +54,8 @@ export async function GET(request: Request) {
           idToName = Object.fromEntries(tenRows.map((t) => [t.id, t.name]))
         }
         memberships = memRows.map((m) => ({
-          organization_id: m.tenant_id,
-          organization_name: idToName[m.tenant_id] || m.tenant_id,
+          organization_id: m.org_id,
+          organization_name: idToName[m.org_id] || m.org_id,
           role: m.role,
         }))
       }
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
           await fetch(`${eurl}/rest/v1/events`, {
             method: "POST",
             headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-            body: JSON.stringify({ tenant_id: null, user_id: user.id, event_type: "profile.view", payload: { source: "app.ui", ts: new Date().toISOString() } }),
+            body: JSON.stringify({ org_id: null, user_id: user.id, event_type: "profile.view", payload: { source: "app.ui", ts: new Date().toISOString() } }),
             cache: "no-store",
           })
         }
@@ -130,7 +130,7 @@ export async function PATCH(request: Request) {
             await fetch(`${eurl}/rest/v1/events`, {
               method: "POST",
               headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-              body: JSON.stringify({ tenant_id: null, user_id: user.id, event_type: "profile.edit_error", payload: { reason: "invalid_full_name", ts: new Date().toISOString() } }),
+              body: JSON.stringify({ org_id: null, user_id: user.id, event_type: "profile.edit_error", payload: { reason: "invalid_full_name", ts: new Date().toISOString() } }),
               cache: "no-store",
             })
           }
@@ -151,7 +151,7 @@ export async function PATCH(request: Request) {
             await fetch(`${eurl}/rest/v1/events`, {
               method: "POST",
               headers: { apikey: ekey, Authorization: `Bearer ${ekey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-              body: JSON.stringify({ tenant_id: null, user_id: user.id, event_type: "profile.edit_error", payload: { reason: "invalid_phone", ts: new Date().toISOString() } }),
+              body: JSON.stringify({ org_id: null, user_id: user.id, event_type: "profile.edit_error", payload: { reason: "invalid_phone", ts: new Date().toISOString() } }),
               cache: "no-store",
             })
           }

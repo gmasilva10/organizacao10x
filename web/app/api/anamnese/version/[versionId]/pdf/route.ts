@@ -23,7 +23,7 @@ export async function POST(
         code,
         status,
         student_id,
-        tenant_id,
+        org_id,
         students!anamnese_versions_student_id_fkey (
           name
         )
@@ -90,7 +90,7 @@ export async function POST(
         .from('anexos')
         .insert({
           student_id: version.student_id,
-          tenant_id: version.tenant_id,
+          org_id: version.org_id,
           tipo: 'ANAMNESE',
           nome_arquivo: fileName,
           caminho_arquivo: uploadData.path,

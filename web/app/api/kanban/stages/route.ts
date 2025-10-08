@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     // Buscar tenant_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id')
+      .select('org_id')
       .eq('user_id', user.id)
       .single()
 
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const { data: columns, error: columnsError } = await supabase
       .from('kanban_stages')
       .select('*')
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .order('position')
 
     if (columnsError) {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     // Buscar tenant_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id')
+      .select('org_id')
       .eq('user_id', user.id)
       .single()
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     const { data: existingColumn, error: checkError } = await supabase
       .from('kanban_stages')
       .select('id')
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('position', position)
       .single()
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     const { data: column, error: createError } = await supabase
       .from('kanban_stages')
       .insert({
-        org_id: membership.tenant_id,
+        org_id: membership.org_id,
         name: title.trim(),
         position: position,
         stage_code: stage_code || `stage_${position}`,
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
       await supabase
         .from('kanban_logs')
         .insert({
-          org_id: membership.tenant_id,
+          org_id: membership.org_id,
           user_id: user.id,
           action: 'column_created',
           entity_type: 'kanban_stage',

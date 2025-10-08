@@ -63,7 +63,7 @@ export async function POST(request: Request) {
               Prefer: "return=minimal",
             },
             body: JSON.stringify({
-              tenant_id: null,
+              org_id: null,
               user_id: user.id,
               event_type: "account.created",
               payload: { type: "personal", source: "app.ui", ts: new Date().toISOString() },

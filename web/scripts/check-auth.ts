@@ -54,7 +54,7 @@ async function checkAuth() {
     // Verificar se há memberships
     const { data: memberships, error: membershipsError } = await supabase
       .from('memberships')
-      .select('user_id, tenant_id, role')
+      .select('user_id, org_id, role')
       .limit(5)
     
     if (membershipsError) {
@@ -64,7 +64,7 @@ async function checkAuth() {
     
     console.log('🔗 Memberships encontrados:')
     memberships?.forEach(membership => {
-      console.log(`   - User: ${membership.user_id} - Tenant: ${membership.tenant_id} - Role: ${membership.role}`)
+      console.log(`   - User: ${membership.user_id} - Org: ${membership.org_id} - Role: ${membership.role}`)
     })
     
     // Verificar se há planos
@@ -80,7 +80,7 @@ async function checkAuth() {
     
     console.log('📋 Planos encontrados:')
     plans?.forEach(plan => {
-      console.log(`   - ${plan.nome} (${plan.plan_code}) - Tenant: ${plan.tenant_id}`)
+      console.log(`   - ${plan.nome} (${plan.plan_code}) - Org: ${plan.org_id}`)
     })
     
     console.log('✅ Verificação concluída!')

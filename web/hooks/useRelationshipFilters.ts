@@ -135,16 +135,22 @@ export function useRelationshipFilters() {
     ) || filters.q.trim() !== ''
   }, [filters])
 
-  // Obter filtros para API (remover campos vazios)
+  // Obter filtros para API (remover campos vazios e mapear nomes para a API)
   const getApiFilters = useCallback(() => {
     const apiFilters: Record<string, string> = {}
-    
-    Object.entries(debouncedFilters).forEach(([key, value]) => {
-      if (value && value !== 'all' && value.trim() !== '') {
-        apiFilters[key] = value
+
+    const entries = Object.entries(debouncedFilters)
+    for (const [key, value] of entries) {
+      if (!value || (typeof value === 'string' && value.trim() === '') || value === 'all') continue
+      if (key === 'date_from') {
+        apiFilters['scheduled_from'] = value as string
+      } else if (key === 'date_to') {
+        apiFilters['scheduled_to'] = value as string
+      } else {
+        apiFilters[key] = value as string
       }
-    })
-    
+    }
+
     return apiFilters
   }, [debouncedFilters])
 

@@ -18,7 +18,7 @@ export async function PATCH(request: Request, ctxParam: { params: Promise<{ id: 
     if (status === 'active') patch.activated_at = now
     if (status === 'paused') patch.paused_at = now
   }
-  const resp = await fetch(`${url}/rest/v1/tenant_users?tenant_id=eq.${ctx.tenantId}&user_id=eq.${id}`, { method:'PATCH', headers:{ apikey:key!, Authorization:`Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=minimal' }, body: JSON.stringify(patch) })
+  const resp = await fetch(`${url}/rest/v1/tenant_users?org_id=eq.${ctx.tenantId}&user_id=eq.${id}`, { method:'PATCH', headers:{ apikey:key!, Authorization:`Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=minimal' }, body: JSON.stringify(patch) })
   if (!resp.ok) return NextResponse.json({ error:'update_failed' }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

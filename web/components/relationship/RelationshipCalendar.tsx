@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useImperativeHandle, forwardRef, useCallback, useRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -461,9 +461,10 @@ const RelationshipCalendar = forwardRef<RelationshipCalendarRef, RelationshipCal
 
       {/* Modal de detalhes da tarefa */}
       <Dialog open={showTaskDetails} onOpenChange={setShowTaskDetails}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl" aria-describedby="rel-task-details-desc">
           <DialogHeader>
             <DialogTitle>Detalhes da Tarefa</DialogTitle>
+            <DialogDescription id="rel-task-details-desc">Informações detalhadas e ações sobre a tarefa selecionada</DialogDescription>
           </DialogHeader>
           {selectedTask && (
             <div className="space-y-4">

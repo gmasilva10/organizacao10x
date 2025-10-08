@@ -85,7 +85,7 @@ async function ensureUser(email: string, password: string) {
 async function upsertMembership(tenantId: string, userId: string, role: Role) {
   const { error } = await admin
     .from('memberships')
-    .upsert({ tenant_id: tenantId, user_id: userId, role }, { onConflict: 'tenant_id,user_id' })
+    .upsert({ org_id: tenantId, user_id: userId, role }, { onConflict: 'org_id,user_id' })
   if (error) throw error
 }
 

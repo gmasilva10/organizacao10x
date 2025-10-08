@@ -60,13 +60,13 @@ async function createPlansTables() {
           ciclo text CHECK (ciclo IN ('mensal','trimestral','semestral','anual')),
           duracao_em_ciclos int CHECK (duracao_em_ciclos > 0),
           ativo boolean NOT NULL DEFAULT true,
-          tenant_id uuid NOT NULL,
+          org_id uuid NOT NULL,
           created_at timestamptz NOT NULL DEFAULT now(),
           updated_at timestamptz NOT NULL DEFAULT now()
         );
         
-        CREATE UNIQUE INDEX IF NOT EXISTS plans_tenant_plan_code_idx ON plans (tenant_id, plan_code);
-        CREATE INDEX IF NOT EXISTS plans_tenant_active_idx ON plans (tenant_id, ativo);
+CREATE UNIQUE INDEX IF NOT EXISTS plans_org_plan_code_idx ON plans (org_id, plan_code);
+CREATE INDEX IF NOT EXISTS plans_org_active_idx ON plans (org_id, ativo);
         
         ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
         

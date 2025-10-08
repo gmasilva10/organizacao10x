@@ -6,14 +6,10 @@ function canRead(role: string) { return ['admin','manager','trainer','seller','s
 function canWrite(role: string) { return ['admin','manager','trainer'].includes(role) }
 
 export async function GET(request: Request) {
-  // Para desenvolvimento, usar tenant fixo
-  const tenantId = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
-  const role = 'admin'
-
-  // TODO: Implementar autenticação real em produção
-  // const ctx = await resolveRequestContext(request)
-  // if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-  // if (!canRead(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+  const ctx = await resolveRequestContext(request)
+  if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!canRead(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+  const tenantId = ctx.tenantId
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   const readV2 = process.env.REL_TEMPLATES_V2_READ === '1'
@@ -54,14 +50,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // Para desenvolvimento, usar tenant fixo
-  const tenantId = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
-  const userId = 'dev-user-id'
-
-  // TODO: Implementar autenticação real em produção
-  // const ctx = await resolveRequestContext(request)
-  // if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-  // if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+  const ctx = await resolveRequestContext(request)
+  if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+  const tenantId = ctx.tenantId
+  const userId = ctx.userId
   type Body = { 
     code?: string; 
     title?: string; 

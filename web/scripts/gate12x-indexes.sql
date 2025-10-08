@@ -7,7 +7,7 @@
 EXPLAIN (ANALYZE, BUFFERS) 
 SELECT id, name, status, created_at 
 FROM students 
-WHERE tenant_id = 'test-tenant-id' 
+WHERE org_id = 'test-tenant-id' 
   AND deleted_at IS NULL 
   AND status = 'active'
 ORDER BY created_at DESC 
@@ -17,7 +17,7 @@ LIMIT 20;
 EXPLAIN (ANALYZE, BUFFERS)
 SELECT id, student_id, occurred_at, status, group_id, type_id
 FROM student_occurrences 
-WHERE tenant_id = 'test-tenant-id' 
+WHERE org_id = 'test-tenant-id' 
   AND status = 'OPEN'
 ORDER BY occurred_at DESC 
 LIMIT 20;
@@ -33,22 +33,22 @@ ORDER BY position ASC;
 
 -- Students - índices para filtros comuns
 CREATE INDEX IF NOT EXISTS idx_students_tenant_status_created 
-ON students (tenant_id, status, created_at DESC) 
+ON students (org_id, status, created_at DESC) 
 WHERE deleted_at IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_students_tenant_deleted 
-ON students (tenant_id, deleted_at) 
+ON students (org_id, deleted_at) 
 WHERE deleted_at IS NULL;
 
 -- Student occurrences - índices para filtros e ordenação
 CREATE INDEX IF NOT EXISTS idx_occurrences_tenant_status_occurred 
-ON student_occurrences (tenant_id, status, occurred_at DESC);
+ON student_occurrences (org_id, status, occurred_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_occurrences_tenant_group_type 
-ON student_occurrences (tenant_id, group_id, type_id);
+ON student_occurrences (org_id, group_id, type_id);
 
 CREATE INDEX IF NOT EXISTS idx_occurrences_tenant_owner 
-ON student_occurrences (tenant_id, owner_user_id) 
+ON student_occurrences (org_id, owner_user_id) 
 WHERE owner_user_id IS NOT NULL;
 
 -- Kanban items - índices para ordenação e filtros
@@ -60,11 +60,11 @@ ON kanban_items (org_id, stage_id);
 
 -- Occurrence groups e types - índices para joins
 CREATE INDEX IF NOT EXISTS idx_occurrence_groups_tenant_active 
-ON occurrence_groups (tenant_id, is_active) 
+ON occurrence_groups (org_id, is_active) 
 WHERE is_active = true;
 
 CREATE INDEX IF NOT EXISTS idx_occurrence_types_tenant_group 
-ON occurrence_types (tenant_id, group_id, is_active) 
+ON occurrence_types (org_id, group_id, is_active) 
 WHERE is_active = true;
 
 -- 3. ANÁLISE PÓS-OTIMIZAÇÃO - Executar novamente para comparar
@@ -73,7 +73,7 @@ WHERE is_active = true;
 EXPLAIN (ANALYZE, BUFFERS) 
 SELECT id, name, status, created_at 
 FROM students 
-WHERE tenant_id = 'test-tenant-id' 
+WHERE org_id = 'test-tenant-id' 
   AND deleted_at IS NULL 
   AND status = 'active'
 ORDER BY created_at DESC 
@@ -83,7 +83,7 @@ LIMIT 20;
 EXPLAIN (ANALYZE, BUFFERS)
 SELECT id, student_id, occurred_at, status, group_id, type_id
 FROM student_occurrences 
-WHERE tenant_id = 'test-tenant-id' 
+WHERE org_id = 'test-tenant-id' 
   AND status = 'OPEN'
 ORDER BY occurred_at DESC 
 LIMIT 20;

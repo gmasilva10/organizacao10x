@@ -74,7 +74,7 @@ function buildTaskQuery(supabase: any, filters: TaskFilters, tenantId: string) {
         email,
         phone
       )
-    `)
+    `, { count: 'exact' })
     .eq('org_id', tenantId)
 
   // Filtros opcionais

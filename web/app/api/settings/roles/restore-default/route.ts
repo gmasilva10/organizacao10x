@@ -91,7 +91,7 @@ export async function POST(request: Request) {
   await fetch(`${url}/rest/v1/settings_audit`, {
     method: 'POST',
     headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-    body: JSON.stringify({ tenant_id: ctx.tenantId, actor_user_id: ctx.userId, area: 'roles', action: 'restore_default', before, after: rows })
+    body: JSON.stringify({ org_id: ctx.tenantId, actor_user_id: ctx.userId, area: 'roles', action: 'restore_default', before, after: rows })
   })
 
   return NextResponse.json({ ok: true, updated: rows.length })

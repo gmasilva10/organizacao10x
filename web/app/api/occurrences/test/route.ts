@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from('student_occurrences')
       .select('id, student_id, status, occurred_at')
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('status', 'OPEN')
       .limit(5)
 
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       data, 
       error,
       membership,
-      tenant_id: membership.tenant_id 
+      org_id: membership.org_id 
     })
   } catch (e) {
     console.error('Erro na API test /occurrences:', e)

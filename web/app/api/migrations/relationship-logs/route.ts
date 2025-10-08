@@ -87,8 +87,8 @@ export async function POST(request: NextRequest) {
         USING (
             student_id IN (
                 SELECT id FROM public.students 
-                WHERE tenant_id IN (
-                    SELECT tenant_id FROM public.memberships 
+                WHERE org_id IN (
+                    SELECT org_id FROM public.memberships 
                     WHERE user_id = auth.uid()
                 )
             )
@@ -98,8 +98,8 @@ export async function POST(request: NextRequest) {
         WITH CHECK (
             student_id IN (
                 SELECT id FROM public.students 
-                WHERE tenant_id IN (
-                    SELECT tenant_id FROM public.memberships 
+                WHERE org_id IN (
+                    SELECT org_id FROM public.memberships 
                     WHERE user_id = auth.uid()
                 )
             )
@@ -109,8 +109,8 @@ export async function POST(request: NextRequest) {
         USING (
             student_id IN (
                 SELECT id FROM public.students 
-                WHERE tenant_id IN (
-                    SELECT tenant_id FROM public.memberships 
+                WHERE org_id IN (
+                    SELECT org_id FROM public.memberships 
                     WHERE user_id = auth.uid()
                 )
             )
@@ -120,8 +120,8 @@ export async function POST(request: NextRequest) {
         USING (
             student_id IN (
                 SELECT id FROM public.students 
-                WHERE tenant_id IN (
-                    SELECT tenant_id FROM public.memberships 
+                WHERE org_id IN (
+                    SELECT org_id FROM public.memberships 
                     WHERE user_id = auth.uid()
                 )
             )

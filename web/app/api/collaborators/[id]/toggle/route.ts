@@ -125,7 +125,7 @@ export async function PATCH(
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              tenant_id: ctx.tenantId, 
+              org_id: ctx.tenantId, 
               user_id: user.id, 
               event_type: "collaborator.status_changed", 
               payload: { 

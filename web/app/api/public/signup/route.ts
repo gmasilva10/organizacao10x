@@ -191,7 +191,7 @@ export async function POST(request: Request) {
             .from("memberships")
             .insert({
               user_id: user.id,
-              tenant_id: org.id,
+              org_id: org.id,
               role: "admin",
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
@@ -267,7 +267,7 @@ export async function POST(request: Request) {
     ]
 
     const stageInserts = defaultStages.map(stage => ({
-      tenant_id: org.id,
+      org_id: org.id,
       name: stage.name,
       order: stage.order,
       color: stage.color,
@@ -287,7 +287,7 @@ export async function POST(request: Request) {
     const { error: serviceError } = await admin
       .from("services")
       .insert({
-        tenant_id: org.id,
+        org_id: org.id,
         name: "Avaliação Inicial",
         description: "Avaliação física e nutricional completa",
         price: 0,
@@ -304,31 +304,31 @@ export async function POST(request: Request) {
     // 7. Audit logs
     const auditEvents = [
       {
-        tenant_id: org.id,
+        org_id: org.id,
         user_id: user.id,
         event_type: "org.created",
         payload: { org_id: org.id, org_name: org_name, plan: plan }
       },
       {
-        tenant_id: org.id,
+        org_id: org.id,
         user_id: user.id,
         event_type: "user.created",
         payload: { user_id: user.id, email: email, full_name: full_name }
       },
       {
-        tenant_id: org.id,
+        org_id: org.id,
         user_id: user.id,
         event_type: "role.assigned",
         payload: { user_id: user.id, role: "admin", org_id: org.id }
       },
       {
-        tenant_id: org.id,
+        org_id: org.id,
         user_id: user.id,
         event_type: "collaborator.created",
         payload: { collaborator_id: null, user_id: user.id, role: "admin" }
       },
       {
-        tenant_id: org.id,
+        org_id: org.id,
         user_id: user.id,
         event_type: "org.plan_set",
         payload: { org_id: org.id, plan: plan }

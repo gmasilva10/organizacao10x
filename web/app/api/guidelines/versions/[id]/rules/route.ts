@@ -132,7 +132,7 @@ export async function POST(
     const { data: rule, error } = await supabase
       .from('guideline_rules')
       .insert({
-        tenant_id: ctx.tenantId,
+        org_id: ctx.tenantId,
         guidelines_version_id: versionId,
         priority_clinical: validatedData.priority_clinical,
         condition: validatedData.condition,

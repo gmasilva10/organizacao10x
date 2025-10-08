@@ -183,7 +183,7 @@ async function seedTemplates() {
     // Aplicar seeds
     const templatesToInsert = RELATIONSHIP_TEMPLATE_SEEDS.map(template => ({
       ...template,
-      tenant_id: 'test-tenant-id', // Tenant de teste
+      org_id: 'test-tenant-id', // Tenant de teste (org_id)
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }))

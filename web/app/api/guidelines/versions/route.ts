@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     const { data: version, error } = await supabase
       .from('guidelines_versions')
       .insert({
-        tenant_id: ctx.tenantId,
+        org_id: ctx.tenantId,
         version: nextVersion,
         status: 'DRAFT',
         is_default: false,

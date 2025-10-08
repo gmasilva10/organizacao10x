@@ -115,7 +115,7 @@ async function run() {
     ]
     const eventsByTenant: Record<string, any[]> = {}
     for (const t of tenants) {
-      const resp = await fetch(`${url}/rest/v1/events?tenant_id=eq.${t}&select=tenant_id,user_id,event_type,payload,created_at&order=created_at.desc&limit=15`, {
+      const resp = await fetch(`${url}/rest/v1/events?org_id=eq.${t}&select=org_id,user_id,event_type,payload,created_at&order=created_at.desc&limit=15`, {
         headers: { apikey: service, Authorization: `Bearer ${service}` },
       })
       const events = await resp.json()

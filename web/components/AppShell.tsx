@@ -85,7 +85,7 @@ const menuGroups: MenuGroup[] = [
       {
         id: "relationship",
         title: "Relacionamento",
-        href: "/app/relacionamento",
+        href: "/app/relationship",
         icon: MessageCircle
       },
       {

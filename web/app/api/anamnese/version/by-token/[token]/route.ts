@@ -16,7 +16,7 @@ export async function GET(
     // Resolve versão pela tabela de versões (token gerado na geração)
     const { data: version } = await admin
       .from('anamnese_versions')
-      .select('id, student_id, tenant_id, code, status')
+      .select('id, student_id, org_id, code, status')
       .eq('token', token)
       .maybeSingle()
 

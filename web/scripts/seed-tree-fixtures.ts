@@ -71,7 +71,7 @@ async function seed() {
       const ins = await fetch(`${SUPA_URL}/rest/v1/onboarding_cards`, {
         method:'POST',
         headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type':'application/json', Prefer:'return=representation' },
-        body: JSON.stringify({ tenant_id: undefined, student_id: stId, column_id: novoAlunoId })
+        body: JSON.stringify({ org_id: undefined, student_id: stId, column_id: novoAlunoId })
       })
       const body = await ins.text().catch(()=> '')
       resultsCards.push({ student: s?.body, status: ins.status, body })

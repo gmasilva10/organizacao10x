@@ -24,7 +24,7 @@ export async function GET() {
     const user = userData.user
     const { data: membership, error: memErr } = await supabase
       .from("memberships")
-      .select("tenant_id, role")
+      .select("org_id, role")
       .eq("user_id", user.id)
       .limit(1)
       .maybeSingle()

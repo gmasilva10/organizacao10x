@@ -31,7 +31,7 @@ export async function PATCH(
     // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id')
+      .select('org_id')
       .eq('user_id', user.id)
       .single()
 
@@ -44,7 +44,7 @@ export async function PATCH(
       .from('service_onboarding_tasks')
       .select('*')
       .eq('id', id)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .single()
 
     if (fetchError || !existingTask) {
@@ -79,7 +79,7 @@ export async function PATCH(
           'apply_catalog_to_existing_cards',
           {
             p_stage_code: existingTask.stage_code,
-            p_org_id: membership.tenant_id,
+            p_org_id: membership.org_id,
             p_apply_to_existing: true
           }
         )
@@ -97,7 +97,7 @@ export async function PATCH(
       await supabase
         .from('kanban_logs')
         .insert({
-          org_id: membership.tenant_id,
+          org_id: membership.org_id,
           user_id: user.id,
           action: 'task_catalog_updated',
           entity_type: 'service_onboarding_task',
@@ -151,7 +151,7 @@ export async function DELETE(
     // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id')
+      .select('org_id')
       .eq('user_id', user.id)
       .single()
 
@@ -164,7 +164,7 @@ export async function DELETE(
       .from('service_onboarding_tasks')
       .select('*')
       .eq('id', id)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .single()
 
     if (fetchError || !existingTask) {
@@ -191,7 +191,7 @@ export async function DELETE(
     }
 
     // Log da exclusão (simplificado - não usar kanban_logs que é específico para cards)
-    console.log(`Template excluído: ${existingTask.title} (${existingTask.stage_code}) por usuário ${user.id} na org ${membership.tenant_id}`)
+    console.log(`Template excluído: ${existingTask.title} (${existingTask.stage_code}) por usuário ${user.id} na org ${membership.org_id}`)
 
     return NextResponse.json({ 
       success: true, 

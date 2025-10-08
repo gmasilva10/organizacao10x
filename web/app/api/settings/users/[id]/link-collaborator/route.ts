@@ -60,9 +60,9 @@ export async function POST(
     // Verificar se o usuário existe e está na organização
     const { data: existingMembership } = await supabase
       .from("memberships")
-      .select("user_id, tenant_id")
+      .select("user_id, org_id")
       .eq("user_id", userId)
-      .eq("tenant_id", ctx.tenantId)
+      .eq("org_id", ctx.tenantId)
       .single()
 
     if (!existingMembership) {
@@ -161,7 +161,7 @@ export async function POST(
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              tenant_id: ctx.tenantId, 
+              org_id: ctx.tenantId, 
               user_id: user.id, 
               event_type: "settings.users.linked_to_collaborator", 
               payload: { 
@@ -223,9 +223,9 @@ export async function DELETE(
     // Verificar se o usuário existe e está na organização
     const { data: existingMembership } = await supabase
       .from("memberships")
-      .select("user_id, tenant_id")
+      .select("user_id, org_id")
       .eq("user_id", userId)
-      .eq("tenant_id", ctx.tenantId)
+      .eq("org_id", ctx.tenantId)
       .single()
 
     if (!existingMembership) {
@@ -281,7 +281,7 @@ export async function DELETE(
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              tenant_id: ctx.tenantId, 
+              org_id: ctx.tenantId, 
               user_id: user.id, 
               event_type: "settings.users.unlinked_from_collaborator", 
               payload: { 

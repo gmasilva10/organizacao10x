@@ -46,7 +46,8 @@ export async function logEvent(params: {
     tenant_id: tenantId,
     user_id: userId,
     event_type: eventType,
-    payload: payload ?? null,
+    // Compat payload: incluir org_id para consumidores que esperam novo campo
+    payload: payload ? { org_id: tenantId, ...payload } : { org_id: tenantId },
   })
 }
 

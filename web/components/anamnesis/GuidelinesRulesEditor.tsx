@@ -34,7 +34,7 @@ import { GuidelinesVersioningModal } from "./GuidelinesVersioningModal"
 // Tipos para as APIs
 interface GuidelineVersion {
   id: string
-  tenant_id: string
+  org_id: string
   version: number
   status: 'DRAFT' | 'PUBLISHED'
   is_default: boolean
@@ -47,7 +47,7 @@ interface GuidelineVersion {
 
 interface GuidelineRule {
   id: string
-  tenant_id: string
+  org_id: string
   guidelines_version_id: string
   priority_clinical: 'critica' | 'alta' | 'media' | 'baixa'
   condition: {

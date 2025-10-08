@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         message: 'Profissional já existe',
         data: {
           user_id: user.id,
-          tenant_id: tenant.id,
+          org_id: tenant.id,
           already_exists: true
         }
       })
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       .from('professionals')
       .insert({
         user_id: user.id,
-        tenant_id: tenant.id,
+        org_id: tenant.id,
         full_name: 'Profissional de Teste',
         email: user.email,
         phone: '+5511999999999',
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
-      .select('user_id, full_name, tenant_id, role')
+      .select('user_id, full_name, org_id, role')
       .single()
     
     if (createError) {
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     // 5. Verificar se o usuário tem membership
     const { data: existingMembership } = await supabase
       .from('memberships')
-      .select('user_id, tenant_id, role')
+      .select('user_id, org_id, role')
       .eq('user_id', user.id)
       .eq('org_id', tenant.id)
       .single()
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         .from('memberships')
         .insert({
           user_id: user.id,
-          tenant_id: tenant.id,
+          org_id: tenant.id,
           role: 'trainer',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()

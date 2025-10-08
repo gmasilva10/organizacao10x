@@ -5,14 +5,9 @@ import { logEvent } from "@/server/events"
 function canWrite(role: string) { return ['admin','manager','trainer'].includes(role) }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  // Para desenvolvimento, usar tenant fixo
-  const tenantId = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
-  const userId = 'dev-user-id'
-
-  // TODO: Implementar autenticação real em produção
-  // const ctx = await resolveRequestContext(request)
-  // if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-  // if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+  const ctx = await resolveRequestContext(request)
+  if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   
   const { id } = await params
   type Body = { title?: unknown; type?: unknown; content?: unknown }
@@ -28,7 +23,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     updated_at: new Date().toISOString()
   }
   
-  const resp = await fetch(`${url}/rest/v1/relationship_templates?id=eq.${id}&org_id=eq.${tenantId}`, { 
+  const resp = await fetch(`${url}/rest/v1/relationship_templates?id=eq.${id}&org_id=eq.${ctx.tenantId}`, { 
     method: 'PATCH', 
     headers: { 
       apikey: key!, 
@@ -47,7 +42,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const parsed = JSON.parse(String(body.content||''))
     if (parsed && parsed.code) {
       const rowV2 = {
-        org_id: tenantId,
+        org_id: ctx.tenantId,
         code: String(parsed.code||''),
         anchor: String(parsed.anchor||''),
         touchpoint: String(parsed.touchpoint||''),
@@ -69,8 +64,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   } catch {}
   
   await logEvent({ 
-    tenantId: tenantId, 
-    userId: userId, 
+    tenantId: ctx.tenantId, 
+    userId: ctx.userId, 
     eventType: 'feature.used', 
     payload: { feature: 'relationship.template.updated', id } 
   })
@@ -79,20 +74,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  // Para desenvolvimento, usar tenant fixo
-  const tenantId = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
-  const userId = 'dev-user-id'
-
-  // TODO: Implementar autenticação real em produção
-  // const ctx = await resolveRequestContext(request)
-  // if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-  // if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+  const ctx = await resolveRequestContext(request)
+  if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   
   const { id } = await params
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   
-  const resp = await fetch(`${url}/rest/v1/relationship_templates?id=eq.${id}&org_id=eq.${tenantId}`, { 
+  const resp = await fetch(`${url}/rest/v1/relationship_templates?id=eq.${id}&org_id=eq.${ctx.tenantId}`, { 
     method: 'DELETE',
     headers: { 
       apikey: key!, 
@@ -104,19 +94,19 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   
   // Dual-write v2: tentar identificar o code a partir do registro MVP
   try {
-    const resGet = await fetch(`${url}/rest/v1/relationship_templates?id=eq.${id}&org_id=eq.${tenantId}`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+    const resGet = await fetch(`${url}/rest/v1/relationship_templates?id=eq.${id}&org_id=eq.${ctx.tenantId}`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
     const rows = await resGet.json().catch(()=>[])
     const content = rows?.[0]?.content
     const parsed = content ? JSON.parse(content) : null
     const code = parsed?.code
     if (code) {
-      await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${tenantId}&code=eq.${code}`, { method: 'DELETE', headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+      await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${ctx.tenantId}&code=eq.${code}`, { method: 'DELETE', headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
     }
   } catch {}
 
   await logEvent({ 
-    tenantId: tenantId, 
-    userId: userId, 
+    tenantId: ctx.tenantId, 
+    userId: ctx.userId, 
     eventType: 'feature.used', 
     payload: { feature: 'relationship.template.deleted', id } 
   })

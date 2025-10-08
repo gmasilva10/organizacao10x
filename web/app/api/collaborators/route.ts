@@ -97,7 +97,7 @@ export async function GET(request: Request) {
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              tenant_id: ctx.tenantId, 
+              org_id: ctx.tenantId, 
               user_id: user.id, 
               event_type: "collaborators.list", 
               payload: { 
@@ -283,7 +283,7 @@ export async function POST(request: Request) {
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              tenant_id: ctx.tenantId, 
+              org_id: ctx.tenantId, 
               user_id: user.id, 
               event_type: "collaborator.created", 
               payload: { 

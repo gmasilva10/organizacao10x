@@ -14,7 +14,15 @@ function findFiles(dir, pattern) {
       const fullPath = path.join(currentDir, item);
       const stat = fs.statSync(fullPath);
       
-      if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
+      if (
+        stat.isDirectory() &&
+        !item.startsWith('.') &&
+        item !== 'node_modules' &&
+        !fullPath.includes(path.join('web', 'evidencias')) &&
+        !fullPath.includes(path.join('web', 'Estrutura')) &&
+        !fullPath.includes(path.join('web', 'testsprite_tests')) &&
+        !fullPath.includes(path.join('web', 'tests'))
+      ) {
         traverse(fullPath);
       } else if (stat.isFile() && pattern.test(item)) {
         files.push(fullPath);
@@ -32,10 +40,13 @@ function checkTenantIdUsage(filePath) {
   const issues = [];
   
   lines.forEach((line, index) => {
-    if (line.includes('tenant_id') && !line.includes('org_id')) {
+    const trimmed = line.trim();
+    const isComment = trimmed.startsWith('//') || trimmed.startsWith('--') || trimmed.startsWith('/*') || trimmed.startsWith('*');
+    if (isComment) return;
+    if (trimmed.includes('tenant_id') && !trimmed.includes('org_id')) {
       issues.push({
         line: index + 1,
-        content: line.trim(),
+        content: trimmed,
         file: filePath
       });
     }
@@ -45,15 +56,20 @@ function checkTenantIdUsage(filePath) {
 }
 
 function main() {
-  console.log('🔍 Verificando uso de tenant_id em APIs...\n');
+  console.log('🔍 Verificando uso indevido de tenant_id no código (fora das áreas permitidas)...\n');
   
-  const apiDir = path.join(__dirname, '..', 'app', 'api');
-  const files = findFiles(apiDir, /\.ts$/);
+  const webDir = path.join(__dirname, '..');
+  const files = findFiles(webDir, /\.(ts|tsx|js|sql)$/);
   
   let totalIssues = 0;
   const filesWithIssues = [];
   
   for (const file of files) {
+    // Permitir tenant_id em migrações antigas e server/events.ts (tabela events usa tenant_id)
+    if (file.includes(path.join('web', 'supabase', 'migrations')) || 
+        file.includes(path.join('server', 'events.ts'))) {
+      continue;
+    }
     const issues = checkTenantIdUsage(file);
     if (issues.length > 0) {
       filesWithIssues.push({ file, issues });
@@ -62,11 +78,11 @@ function main() {
   }
   
   if (totalIssues === 0) {
-    console.log('✅ Nenhum uso de tenant_id encontrado!');
+    console.log('✅ Nenhum uso indevido de tenant_id encontrado!');
     process.exit(0);
   }
   
-  console.log(`❌ Encontrados ${totalIssues} usos de tenant_id em ${filesWithIssues.length} arquivos:\n`);
+  console.log(`❌ Encontrados ${totalIssues} usos de tenant_id (sem org_id) em ${filesWithIssues.length} arquivos:\n`);
   
   filesWithIssues.forEach(({ file, issues }) => {
     const relativePath = path.relative(process.cwd(), file);

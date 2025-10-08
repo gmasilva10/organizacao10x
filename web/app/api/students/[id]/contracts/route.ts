@@ -160,7 +160,7 @@ export async function POST(
         end_date,
         status: 'ativo',
         notes: b.notes || null,
-        tenant_id: ctx.tenantId
+        org_id: ctx.tenantId
       })
       .select()
       .single()
@@ -185,7 +185,7 @@ export async function POST(
           moeda: currency,
           status: 'pendente',
           created_by: ctx.userId,
-          tenant_id: ctx.tenantId
+          org_id: ctx.tenantId
         })
 
       if (billingError) {

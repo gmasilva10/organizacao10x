@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     // Buscar aluno
     const { data: student, error: studentError } = await admin
       .from('students')
-      .select('id, name, tenant_id, phone')
+      .select('id, name, org_id, phone')
       .eq('id', studentId)
       .single()
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     const { data: maxSeqData } = await admin
       .from('anamnese_versions')
       .select('seq')
-      .eq('org_id', student.tenant_id)
+      .eq('org_id', student.org_id)
       .eq('student_id', studentId)
       .order('seq', { ascending: false })
       .limit(1)
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     const { data: version, error: versionError } = await admin
       .from('anamnese_versions')
       .insert({
-        tenant_id: student.tenant_id,
+        org_id: student.org_id,
         student_id: studentId,
         seq: nextSeq,
         code,
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
         phone: normalizedPhone,
         status: inviteStatus,
         expires_at: expiresAt,
-        tenant_id: student.tenant_id
+        org_id: student.org_id
       })
       .select('id, expires_at')
       .single()
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
 
         // Log no relacionamento_messages
         await admin.from('relacionamento_messages').insert({
-          tenant_id: student.tenant_id,
+          org_id: student.org_id,
           student_id: studentId,
           channel: 'whatsapp',
           direction: 'outbound',

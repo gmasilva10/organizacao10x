@@ -24,7 +24,7 @@ export async function DELETE(
     // Verificar membership
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -35,10 +35,10 @@ export async function DELETE(
     // Buscar anexo
     const { data: attachment, error: fetchError } = await supabase
       .from('student_occurrence_attachments')
-      .select('id, file_path, occurrence_id, tenant_id')
+      .select('id, file_path, occurrence_id, org_id')
       .eq('id', attachmentId)
       .eq('occurrence_id', id)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .single()
 
     if (fetchError || !attachment) {
@@ -48,11 +48,11 @@ export async function DELETE(
     // Verificar permissões (admin/manager ou owner da ocorrência)
     const { data: occurrence } = await supabase
       .from('student_occurrences')
-      .select('owner_user_id, tenant_id')
+      .select('owner_user_id, org_id')
       .eq('id', id)
       .single()
 
-    if (!occurrence || occurrence.tenant_id !== membership.tenant_id) {
+    if (!occurrence || occurrence.org_id !== membership.org_id) {
       return NextResponse.json({ error: 'Occurrence not found' }, { status: 404 })
     }
 
@@ -79,7 +79,7 @@ export async function DELETE(
       .from('student_occurrence_attachments')
       .delete()
       .eq('id', attachmentId)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
 
     if (dbError) {
       console.error('Error deleting attachment from database:', dbError)

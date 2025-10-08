@@ -31,7 +31,7 @@ import { ptBR } from 'date-fns/locale'
 import { useRelationshipFilters } from '@/hooks/useRelationshipFilters'
 import { isPast, isToday, isFuture } from '@/lib/date-utils'
 import { safeQueryString } from '@/lib/query-utils'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter, DrawerDescription } from '@/components/ui/drawer'
 import { Label } from '@/components/ui/label'
 import { StandardizedCalendar } from '@/components/ui/standardized-calendar'
 
@@ -106,16 +106,26 @@ export interface RelationshipKanbanRef {
 const ALL_COLUMNS: KanbanColumn[] = [
   { id: 'overdue', title: 'Atrasadas', icon: Clock, color: 'text-red-500' },
   { id: 'due_today', title: 'Para Hoje', icon: Calendar, color: 'text-blue-500' },
-  { id: 'pending_future', title: 'Pendentes de Envio', icon: Pause, color: 'text-yellow-500' },
-  { id: 'sent', title: 'Enviadas', icon: CheckCircle, color: 'text-green-500' },
+  { id: 'pending_future', title: 'Pendentes de Envio', icon: Pause, color: 'text-yellow-600' },
+  { id: 'sent', title: 'Enviadas', icon: CheckCircle, color: 'text-green-600' },
   { id: 'postponed_skipped', title: 'Adiadas/Puladas', icon: X, color: 'text-gray-500' },
 ]
+
+// Estilo visual por coluna (aproximação do print 1)
+const columnStyleById: Record<string, { header: string; card: string }> = {
+  overdue: { header: 'bg-red-100 border-red-200', card: 'ring-1 ring-red-200' },
+  due_today: { header: 'bg-blue-100 border-blue-200', card: 'ring-1 ring-blue-200' },
+  pending_future: { header: 'bg-yellow-100 border-yellow-200', card: 'ring-1 ring-yellow-200' },
+  sent: { header: 'bg-green-100 border-green-200', card: 'ring-1 ring-green-200' },
+  postponed_skipped: { header: 'bg-gray-100 border-gray-200', card: 'ring-1 ring-gray-200' },
+}
 
 const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanProps>(({ onTaskUpdate }, ref) => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [pagination, setPagination] = useState({ page: 1, page_size: 20, total: 0, total_pages: 0 })
   const [showComposer, setShowComposer] = useState(false)
+  const [expandedColumns, setExpandedColumns] = useState<Record<string, boolean>>({})
   const mountedRef = useRef(true)
 
   // Hook de filtros com proteção SSR
@@ -133,41 +143,63 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
   // Buscar tarefas com useCallback estável
   const fetchTasks = useCallback(async () => {
     if (!mountedRef.current) return
-    
+
+    // Abort previous in-flight request when filters change quickly
+    const controller = new AbortController()
+    const signal = controller.signal
+    ;(fetchTasks as any)._controller?.abort()
+    ;(fetchTasks as any)._controller = controller
+
     setLoading(true)
+    const t0 = performance.now()
+    // Safety guard: ensure loading cannot hang forever
+    const guard = setTimeout(() => {
+      if (mountedRef.current) {
+        console.warn('[REL] fetch guard timeout - forcing loading=false')
+        setLoading(false)
+      }
+    }, 8000)
     try {
       const apiFilters = getApiFilters()
       const params = safeQueryString({
         page: pagination.page,
-        page_size: pagination.page_size,
+        limit: pagination.page_size,
         ...apiFilters
       })
 
-      const response = await fetch(`/api/relationship/tasks?${params}`, {
+      const url = `/api/relationship/tasks?${params}`
+      if (process.env.NEXT_PUBLIC_DEBUG_REL === '1') {
+        console.debug('[REL] fetching', url)
+      }
+      const response = await fetch(url, {
         cache: 'no-cache',
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
+        headers: { 'Cache-Control': 'no-cache' },
+        signal
       })
+
+
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erro ao buscar tarefas')
+        const errMsg = data?.error || `HTTP ${response.status}`
+        throw new Error(errMsg)
       }
 
       if (process.env.NEXT_PUBLIC_DEBUG_REL === '1') {
-        console.log(`📊 [FETCH] Tarefas recebidas: ${data.tasks?.length || 0}`)
+        console.debug('[REL] fetch ok', { rows: data.tasks?.length || 0, ms: Math.round(performance.now() - t0) })
       }
-      
-      setTasks(data.tasks || [])
+
+      setTasks(Array.isArray(data.tasks) ? data.tasks : [])
       setPagination(data.pagination || pagination)
-    } catch (error) {
+      // Garantir que o loading finalize logo após sucesso
+      setLoading(false)
+    } catch (error: any) {
+      if (error?.name === 'AbortError') return
       console.error('Erro ao buscar tarefas:', error)
       toast.error('Erro ao buscar tarefas')
     } finally {
-      if (mountedRef.current) {
-        setLoading(false)
-      }
+      clearTimeout(guard)
+      if (mountedRef.current) setLoading(false)
     }
   }, [pagination.page, pagination.page_size, debouncedFilters, getApiFilters])
 
@@ -404,24 +436,62 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-start justify-between mb-6 gap-4">
         <div className="flex flex-col">
           <h2 className="text-2xl font-bold">Relacionamento</h2>
           <p className="text-muted-foreground">Gerencie mensagens e lembretes com seus alunos</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button onClick={() => setShowComposer(true)}>
-            <MessageSquare className="mr-2 h-4 w-4" /> Nova Mensagem
-          </Button>
-          <Button variant="outline" onClick={() => setToday()}>
-            <Calendar className="mr-2 h-4 w-4" /> Hoje
-          </Button>
-          <Button variant="outline" onClick={resetFilters}>
-            <X className="mr-2 h-4 w-4" /> Limpar
-          </Button>
-          <Button variant="outline" onClick={fetchTasks}>
-            <RefreshCw className="mr-2 h-4 w-4" /> Atualizar
-          </Button>
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={filters.status} onValueChange={(v) => updateFilters({ status: v })}>
+              <SelectTrigger className="h-10 w-44">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os status</SelectItem>
+                <SelectItem value="pending">Pendente</SelectItem>
+                <SelectItem value="sent">Enviada</SelectItem>
+                <SelectItem value="skipped">Pulada</SelectItem>
+                <SelectItem value="postponed">Adiada</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filters.anchor} onValueChange={(v) => updateFilters({ anchor: v })}>
+              <SelectTrigger className="h-10 w-48">
+                <SelectValue placeholder="Âncora" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as âncoras</SelectItem>
+                {Object.entries(ANCHOR_LABELS).map(([k, label]) => (
+                  <SelectItem key={k} value={k}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filters.channel} onValueChange={(v) => updateFilters({ channel: v })}>
+              <SelectTrigger className="h-10 w-44">
+                <SelectValue placeholder="Canal" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os canais</SelectItem>
+                <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                <SelectItem value="email">E-mail</SelectItem>
+                <SelectItem value="sms">SMS</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={() => setToday()}>
+              <Calendar className="mr-2 h-4 w-4" /> Hoje
+            </Button>
+            <div className="flex items-center gap-2 justify-end">
+              <Button variant="outline" onClick={resetFilters}>
+                <X className="mr-2 h-4 w-4" /> Limpar
+              </Button>
+              <Button variant="default" onClick={fetchTasks}>
+                <RefreshCw className="mr-2 h-4 w-4" /> Atualizar
+              </Button>
+              <Button onClick={() => setShowComposer(true)}>
+                <MessageSquare className="mr-2 h-4 w-4" /> Nova Mensagem
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -433,12 +503,14 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       ) : (
         <div className="flex flex-1 space-x-4 overflow-x-auto pb-4">
           {visibleColumns.map(column => (
-            <Card key={column.id} className="flex-shrink-0 w-80 bg-muted/40">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card key={column.id} className={`flex-shrink-0 w-80 bg-white ${columnStyleById[column.id]?.card || ''}`}>
+              <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 border rounded-t-md ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
                 <CardTitle className="text-sm font-medium flex items-center">
                   <column.icon className={`h-4 w-4 mr-2 ${column.color}`} /> {column.title}
                 </CardTitle>
-                <Badge variant="secondary">{getTasksByColumn(column.id).length}</Badge>
+                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
+                  {getTasksByColumn(column.id).length}
+                </Badge>
               </CardHeader>
               <CardContent className="pt-4">
                 {getTasksByColumn(column.id).length === 0 ? (
@@ -455,7 +527,14 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {getTasksByColumn(column.id).map(task => (
+                    {(() => {
+                      const items = getTasksByColumn(column.id)
+                      const limit = 200
+                      const isExpanded = !!expandedColumns[column.id]
+                      const visible = isExpanded ? items : items.slice(0, limit)
+                      return (
+                        <>
+                          {visible.map(task => (
                       <TaskCard
                         key={task.id}
                         task={task}
@@ -465,7 +544,17 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                         onSnoozeTask={snoozeTask}
                         onDeleteTask={deleteTask}
                       />
-                    ))}
+                          ))}
+                          {!isExpanded && items.length > limit && (
+                            <div className="text-center">
+                              <Button variant="outline" size="sm" onClick={() => setExpandedColumns(prev => ({ ...prev, [column.id]: true }))}>
+                                Mostrar mais ({items.length - limit})
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )
+                    })()}
                   </div>
                 )}
               </CardContent>

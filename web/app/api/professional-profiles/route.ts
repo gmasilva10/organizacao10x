@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name,
         description: b.description || null,
-        tenant_id: ctx.tenantId
+        org_id: ctx.tenantId
       })
       .select()
       .single()

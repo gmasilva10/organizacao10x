@@ -74,7 +74,7 @@ async function checkRelationshipData() {
     console.log('\n👥 ALUNOS:')
     const { data: students, error: studentsError } = await supabase
       .from('students')
-      .select('id, name, status, tenant_id')
+      .select('id, name, status, org_id')
       .limit(5)
     
     if (studentsError) {
@@ -82,7 +82,7 @@ async function checkRelationshipData() {
     } else {
       console.log(`✅ ${students?.length || 0} alunos encontrados`)
       students?.forEach(student => {
-        console.log(`   - ${student.name}: ${student.status} (${student.tenant_id})`)
+        console.log(`   - ${student.name}: ${student.status} (${student.org_id})`)
       })
     }
     

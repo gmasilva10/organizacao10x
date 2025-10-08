@@ -22,7 +22,7 @@ export async function POST(
         code,
         status,
         student_id,
-        tenant_id,
+        org_id,
         token,
         token_expires_at,
         students!anamnese_versions_student_id_fkey (
@@ -76,7 +76,7 @@ export async function POST(
       .from('relacionamento_messages')
       .insert({
         student_id: version.student_id,
-        tenant_id: version.tenant_id,
+        org_id: version.org_id,
         channel: 'whatsapp',
         direction: 'outbound',
         to_text: (Array.isArray((version as any).students) ? (version as any).students[0]?.phone : (version as any).students?.phone) || '',

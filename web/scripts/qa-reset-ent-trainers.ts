@@ -10,7 +10,7 @@ async function main() {
     process.exit(1)
   }
 
-  const endpoint = `${url}/rest/v1/memberships?tenant_id=eq.${TENANT_ENT}&role=eq.trainer`
+  const endpoint = `${url}/rest/v1/memberships?org_id=eq.${TENANT_ENT}&role=eq.trainer`
   const res = await fetch(endpoint, {
     method: "DELETE",
     headers: {

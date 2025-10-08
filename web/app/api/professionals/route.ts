@@ -312,7 +312,7 @@ export async function POST(request: NextRequest) {
         .from('memberships')
         .insert({
           user_id,
-          tenant_id: ctx.tenantId,
+          org_id: ctx.tenantId,
           role: 'trainer',
           status: 'active'
         })
@@ -327,7 +327,7 @@ export async function POST(request: NextRequest) {
     const { data: professional, error } = await supabase
       .from('professionals')
       .insert({
-        tenant_id: ctx.tenantId,
+        org_id: ctx.tenantId,
         profile_id,
         user_id,
         full_name,

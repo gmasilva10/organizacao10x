@@ -51,7 +51,7 @@ export async function POST(
     const { data: versions, error: versionError } = await supabase
       .from('guidelines_versions')
       .select('version')
-      .eq('org_id', currentVersion.tenant_id)
+      .eq('org_id', currentVersion.org_id)
       .order('version', { ascending: false })
       .limit(1)
 
@@ -67,7 +67,7 @@ export async function POST(
     const { data: newVersion, error: createError } = await supabase
       .from('guidelines_versions')
       .insert({
-        tenant_id: currentVersion.tenant_id,
+        org_id: currentVersion.org_id,
         title: currentVersion.title,
         version: nextVersion,
         status: 'DRAFT',
@@ -115,7 +115,7 @@ export async function POST(
     const { error: auditError } = await supabase
       .from('guidelines_audit_log')
       .insert({
-        tenant_id: currentVersion.tenant_id,
+        org_id: currentVersion.org_id,
         version_id: newVersion.id,
         action: 'correct_version',
         details: {

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id')
+      .select('org_id')
       .eq('user_id', user.id)
       .single()
 
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
       .from('service_onboarding_tasks')
       .select('*')
       .eq('stage_code', stageCode)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .neq('order_index', -1)  // Filtrar tarefas soft deleted
       .order('order_index')
 
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Buscando membership para usuário:', user.id)
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id')
+      .select('org_id')
       .eq('user_id', user.id)
       .single()
 
@@ -98,14 +98,14 @@ export async function POST(request: NextRequest) {
       console.error('❌ Erro ao buscar membership:', membershipError)
       return NextResponse.json({ error: 'Usuário não pertence a uma organização' }, { status: 403 })
     }
-    console.log('✅ Membership encontrado:', membership.tenant_id)
+    console.log('✅ Membership encontrado:', membership.org_id)
 
     // Buscar próximo order_index disponível para esta coluna
     console.log('🔍 Buscando próximo order_index para stage_code:', stage_code)
     const { data: existingTasks, error: countError } = await supabase
       .from('service_onboarding_tasks')
       .select('order_index')
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('stage_code', stage_code)
       .order('order_index', { ascending: false })
       .limit(1)
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     const { data: task, error: createError } = await supabase
       .from('service_onboarding_tasks')
       .insert({
-        org_id: membership.tenant_id,
+        org_id: membership.org_id,
         title: title.trim(),
         description: description?.trim() || '',
         is_required: is_required !== undefined ? is_required : true,
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       const { error: logError } = await supabase
         .from('kanban_logs')
         .insert({
-          org_id: membership.tenant_id,
+          org_id: membership.org_id,
           user_id: user.id,
           action: 'task_catalog_created',
           entity_type: 'service_onboarding_task',

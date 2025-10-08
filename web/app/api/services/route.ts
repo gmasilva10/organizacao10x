@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       await fetch(`${url}/rest/v1/events`, {
         method: "POST",
         headers: { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json", Prefer: "return=minimal" },
-        body: JSON.stringify({ tenant_id: ctx.tenantId, user_id: ctx.userId, event_type: "service.created", payload: { name }, route: "/(app)/services", ts: new Date().toISOString() })
+        body: JSON.stringify({ org_id: ctx.tenantId, user_id: ctx.userId, event_type: "service.created", payload: { name }, route: "/(app)/services", ts: new Date().toISOString() })
       })
       await fetch(`${url}/rest/v1/audit_log`, {
         method: "POST",

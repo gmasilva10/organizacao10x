@@ -146,13 +146,13 @@ export async function POST(request: NextRequest) {
     const { data: defaults, error: upsertError } = await supabase
       .from('student_defaults')
       .upsert({
-        tenant_id: ctx.tenantId,
+        org_id: ctx.tenantId,
         principal_professional_id: principalId,
         apoio_professional_ids: apoioIds,
         especificos_professional_ids: especificosIds,
         updated_at: new Date().toISOString()
       }, {
-        onConflict: 'tenant_id'
+        onConflict: 'org_id'
       })
       .select(`
         id,

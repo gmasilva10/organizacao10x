@@ -25,7 +25,7 @@ export async function DELETE(
     // Tenant do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id')
+      .select('org_id')
       .eq('user_id', user.id)
       .single()
     if (membershipError || !membership) {
@@ -37,7 +37,7 @@ export async function DELETE(
       .from('kanban_stages')
       .select('*')
       .eq('id', id)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .maybeSingle()
 
     if (fetchError) {
@@ -60,7 +60,7 @@ export async function DELETE(
     const { data: defaultStage } = await supabase
       .from('kanban_stages')
       .select('id, name, position, is_fixed')
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .or('position.eq.1,name.eq.Novo Aluno')
       .order('position', { ascending: true })
       .limit(1)
@@ -72,7 +72,7 @@ export async function DELETE(
         .from('kanban_items')
         .update({ stage_id: defaultStageId })
         .eq('stage_id', id)
-        .eq('org_id', membership.tenant_id)
+        .eq('org_id', membership.org_id)
       if (moveErr) {
         return NextResponse.json({ error: 'Erro ao mover cards para a coluna padrão' }, { status: 500 })
       }
@@ -81,7 +81,7 @@ export async function DELETE(
         .from('kanban_items')
         .select('id', { count: 'exact', head: true })
         .eq('stage_id', id)
-        .eq('org_id', membership.tenant_id)
+        .eq('org_id', membership.org_id)
       if ((count || 0) > 0) {
         return NextResponse.json({ error: 'not_empty', message: 'Não há coluna padrão para receber os cards' }, { status: 422 })
       }
@@ -91,7 +91,7 @@ export async function DELETE(
       .from('kanban_stages')
       .delete()
       .eq('id', id)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
     if (deleteError) {
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
@@ -100,7 +100,7 @@ export async function DELETE(
       await supabase
         .from('kanban_logs')
         .insert({
-          org_id: membership.tenant_id,
+          org_id: membership.org_id,
           user_id: user.id,
           action: 'column_deleted',
           entity_type: 'kanban_stage',

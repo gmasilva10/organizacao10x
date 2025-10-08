@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     // 2. Buscar membership
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id, role, created_at')
+      .select('org_id, role, created_at')
       .eq('user_id', user.id)
       .single()
 
@@ -55,20 +55,20 @@ export async function GET(request: NextRequest) {
     // 4. Verificar dados necessários
     const { data: occurrenceGroups } = await supabase
       .from('occurrence_groups')
-      .select('id, name, tenant_id')
-      .eq('org_id', membership.tenant_id)
+      .select('id, name, org_id')
+      .eq('org_id', membership.org_id)
       .limit(5)
 
     const { data: occurrenceTypes } = await supabase
       .from('occurrence_types')
-      .select('id, name, group_id, tenant_id')
-      .eq('org_id', membership.tenant_id)
+      .select('id, name, group_id, org_id')
+      .eq('org_id', membership.org_id)
       .limit(5)
 
     const { data: students } = await supabase
       .from('students')
-      .select('id, name, tenant_id')
-      .eq('org_id', membership.tenant_id)
+      .select('id, name, org_id')
+      .eq('org_id', membership.org_id)
       .limit(5)
 
     return NextResponse.json({
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
         email: user.email
       },
       membership: {
-        tenant_id: membership.tenant_id,
+        org_id: membership.org_id,
         role: membership.role,
         created_at: membership.created_at
       },

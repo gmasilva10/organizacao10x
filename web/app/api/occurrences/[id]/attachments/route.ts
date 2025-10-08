@@ -25,7 +25,7 @@ export async function GET(
     // Verificar membership
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -38,7 +38,7 @@ export async function GET(
       .from('student_occurrence_attachments')
       .select('id, filename, file_size, mime_type, created_at')
       .eq('occurrence_id', id)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -71,7 +71,7 @@ export async function POST(
     // Verificar membership
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -82,11 +82,11 @@ export async function POST(
     // Verificar permissões (admin/manager ou owner)
     const { data: occurrence } = await supabase
       .from('student_occurrences')
-      .select('owner_user_id, tenant_id')
+      .select('owner_user_id, org_id')
       .eq('id', id)
       .single()
 
-    if (!occurrence || occurrence.tenant_id !== membership.tenant_id) {
+    if (!occurrence || occurrence.org_id !== membership.org_id) {
       return NextResponse.json({ error: 'Occurrence not found' }, { status: 404 })
     }
 
@@ -143,7 +143,7 @@ export async function POST(
       .from('student_occurrence_attachments')
       .insert({
         occurrence_id: parseInt(id),
-        tenant_id: membership.tenant_id,
+        org_id: membership.org_id,
         filename: file.name,
         file_path: filePath,
         file_size: file.size,
@@ -162,7 +162,7 @@ export async function POST(
     // Log de auditoria
     try {
       await auditLogger.log({
-        organization_id: membership.tenant_id,
+        organization_id: membership.org_id,
         user_id: user.id,
         action: 'create',
         resource_type: 'occurrence_attachment' as any,

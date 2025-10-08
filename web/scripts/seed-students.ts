@@ -4,7 +4,7 @@ const BASIC_TENANT = 'f203156c-ed09-42d1-9593-86f4b2ee0c81'
 const ENT_TENANT = '0f3ec75c-6eb9-4443-8c48-49eca6e6d00f'
 
 type Student = {
-  tenant_id: string
+  org_id: string
   name: string
   email: string
   phone: string | null
@@ -16,7 +16,7 @@ async function getOneTrainerId(tenantId: string): Promise<string | null> {
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) return null
-  const resp = await fetch(`${url}/rest/v1/memberships?tenant_id=eq.${tenantId}&role=eq.trainer&select=user_id&limit=1`, {
+  const resp = await fetch(`${url}/rest/v1/memberships?org_id=eq.${tenantId}&role=eq.trainer&select=user_id&limit=1`, {
     headers: { apikey: key, Authorization: `Bearer ${key}` },
   })
   const rows = await resp.json().catch(() => []) as Array<{ user_id: string }>
@@ -36,7 +36,7 @@ function buildStudents(count: number, tenantId: string, trainerId: string | null
     const status = pickStatus(i)
     const assigned = trainerId && i % 3 === 0 ? trainerId : null // ~33% atribuídos
     arr.push({
-      tenant_id: tenantId,
+      org_id: tenantId,
       name: `${prefix.toUpperCase()} Aluno ${String(i).padStart(4,'0')}`,
       email: `aluno${String(i).padStart(4,'0')}.${prefix}@qa.local`,
       phone: `+55-11-9${String(10000000 + i).slice(-8)}`,
@@ -51,7 +51,7 @@ async function upsertBatch(students: Student[]) {
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) throw new Error('Missing SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY')
-  const resp = await fetch(`${url}/rest/v1/students?on_conflict=tenant_id,email`, {
+  const resp = await fetch(`${url}/rest/v1/students?on_conflict=org_id,email`, {
     method: 'POST',
     headers: {
       apikey: key,

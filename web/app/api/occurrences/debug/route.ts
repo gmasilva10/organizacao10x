@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     const { data: membership } = await supabase
       .from('memberships')
-      .select('tenant_id, role')
+      .select('org_id, role')
       .eq('user_id', user.id)
       .single()
 
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await supabase
       .from('student_occurrences')
       .select('*', { count: 'exact' })
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
       .eq('status', 'OPEN')
       .order('occurred_at', { ascending: false })
       .limit(10)
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       data, 
       count,
       membership,
-      tenant_id: membership.tenant_id 
+      org_id: membership.org_id 
     })
   } catch (e) {
     console.error('Erro na API debug /occurrences:', e)

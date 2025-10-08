@@ -17,19 +17,19 @@ export async function GET(request: Request) {
     // Contadores em paralelo
     const [studentsResp, servicesResp, collaboratorsResp, occurrencesResp, kanbanResp] = await Promise.all([
       // Students count
-      fetch(`${url}/rest/v1/students?tenant_id=eq.${ctx.tenantId}&deleted_at=is.null&select=id`, {
+      fetch(`${url}/rest/v1/students?org_id=eq.${ctx.tenantId}&deleted_at=is.null&select=id`, {
         headers: { ...headers, Prefer: "count=exact" },
         cache: "no-store"
       }),
       // Services count (placeholder - pode ser implementado depois)
       Promise.resolve({ headers: new Headers({ "content-range": "*/0" }) }),
       // Collaborators count
-      fetch(`${url}/rest/v1/collaborators?tenant_id=eq.${ctx.tenantId}&select=id`, {
+      fetch(`${url}/rest/v1/collaborators?org_id=eq.${ctx.tenantId}&select=id`, {
         headers: { ...headers, Prefer: "count=exact" },
         cache: "no-store"
       }),
       // Open occurrences count
-      fetch(`${url}/rest/v1/student_occurrences?tenant_id=eq.${ctx.tenantId}&status=eq.OPEN&select=id`, {
+      fetch(`${url}/rest/v1/student_occurrences?org_id=eq.${ctx.tenantId}&status=eq.OPEN&select=id`, {
         headers: { ...headers, Prefer: "count=exact" },
         cache: "no-store"
       }),
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     // Buscar ocorrências de hoje
     const today = new Date().toISOString().split('T')[0]
     const todayOccurrencesResp = await fetch(
-      `${url}/rest/v1/student_occurrences?tenant_id=eq.${ctx.tenantId}&occurred_at=gte.${today}&select=id`,
+      `${url}/rest/v1/student_occurrences?org_id=eq.${ctx.tenantId}&occurred_at=gte.${today}&select=id`,
       { headers: { ...headers, Prefer: "count=exact" }, cache: "no-store" }
     )
     const occurrencesToday = Number(todayOccurrencesResp.headers.get("content-range")?.split("/")?.[1] || 0)

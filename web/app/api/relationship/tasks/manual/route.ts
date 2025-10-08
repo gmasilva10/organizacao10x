@@ -46,20 +46,15 @@ export async function POST(request: NextRequest) {
   try {
     // API Manual Tasks - Iniciando requisição
     
-    // Para desenvolvimento, usar tenant e usuário fixos
-    const tenantId = 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7'
-    const userId = 'dev-user-id'
-    
-    // TODO: Implementar autenticação real em produção
-    // const ctx = await resolveRequestContext(request)
-    // if (!ctx || !ctx.tenantId || !ctx.userId) {
-    //   const queryTime = Date.now() - startTime
-    //   return NextResponse.json(
-    //     { error: 'unauthorized', message: 'Usuário não autenticado' },
-    //     { status: 401, headers: { 'X-Query-Time': queryTime.toString() } }
-    //   )
-    // }
-    // const { tenantId, userId } = ctx
+    const ctx = await resolveRequestContext(request)
+    if (!ctx || !ctx.tenantId || !ctx.userId) {
+      const queryTime = Date.now() - startTime
+      return NextResponse.json(
+        { error: 'unauthorized', message: 'Usuário não autenticado' },
+        { status: 401, headers: { 'X-Query-Time': queryTime.toString() } }
+      )
+    }
+    const { tenantId, userId } = ctx
     // Usar service role para contornar RLS em desenvolvimento
     const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
@@ -177,7 +172,7 @@ export async function POST(request: NextRequest) {
         { 
           error: 'student_not_found', 
           message: 'Aluno não encontrado',
-          debug: { studentId, tenantId, error: studentError?.message }
+          debug: { studentId, org_id: tenantId, error: studentError?.message }
         },
         { status: 404, headers: { 'X-Query-Time': queryTime.toString() } }
       )
@@ -397,15 +392,13 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Para desenvolvimento, não exigir autenticação
-    // TODO: Implementar autenticação real em produção
-    // const ctx = await resolveRequestContext(request)
-    // if (!ctx || !ctx.tenantId) {
-    //   return NextResponse.json(
-    //     { error: 'unauthorized', message: 'Usuário não autenticado' },
-    //     { status: 401 }
-    //   )
-    // }
+    const ctx = await resolveRequestContext(request)
+    if (!ctx || !ctx.tenantId) {
+      return NextResponse.json(
+        { error: 'unauthorized', message: 'Usuário não autenticado' },
+        { status: 401 }
+      )
+    }
 
     // Opções de classificação predefinidas
     const classificationOptions = [

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         students!inner(name, email),
         professionals!inner(full_name, email, professional_profiles!inner(name))
       `)
-      .eq('students.tenant_id', ctx.tenantId)
+      .eq('students.org_id', ctx.tenantId)
       .order('created_at', { ascending: false })
 
     if (error) {

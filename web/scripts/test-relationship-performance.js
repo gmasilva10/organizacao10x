@@ -126,7 +126,7 @@ async function runPerformanceTests() {
       {
         method: 'POST',
         body: JSON.stringify({
-          tenant_id: 'test-tenant-id',
+          org_id: 'test-tenant-id',
           dry_run: true
         })
       }
@@ -144,7 +144,7 @@ async function runPerformanceTests() {
       {
         method: 'POST',
         body: JSON.stringify({
-          tenant_id: 'test-tenant-id'
+          org_id: 'test-tenant-id'
         })
       }
     )

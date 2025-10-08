@@ -81,15 +81,15 @@ async function createUserTables() {
         CREATE TABLE IF NOT EXISTS memberships (
           id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
           user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          tenant_id uuid NOT NULL,
+          org_id uuid NOT NULL,
           role text NOT NULL CHECK (role IN ('admin', 'manager', 'trainer', 'seller', 'support')),
           created_at timestamptz NOT NULL DEFAULT now(),
           updated_at timestamptz NOT NULL DEFAULT now(),
-          UNIQUE(user_id, tenant_id)
+          UNIQUE(user_id, org_id)
         );
         
         CREATE INDEX IF NOT EXISTS memberships_user_idx ON memberships (user_id);
-        CREATE INDEX IF NOT EXISTS memberships_tenant_idx ON memberships (tenant_id);
+        CREATE INDEX IF NOT EXISTS memberships_org_idx ON memberships (org_id);
         
         ALTER TABLE memberships ENABLE ROW LEVEL SECURITY;
         

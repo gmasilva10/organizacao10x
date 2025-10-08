@@ -23,7 +23,7 @@ export async function DELETE(
     // Descobrir tenant/org do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
-      .select('tenant_id')
+      .select('org_id')
       .eq('user_id', user.id)
       .single()
     if (membershipError || !membership) {
@@ -39,7 +39,7 @@ export async function DELETE(
     if (cardErr || !card) {
       return NextResponse.json({ error: 'Card não encontrado' }, { status: 404 })
     }
-    if (card.org_id !== membership.tenant_id) {
+    if (card.org_id !== membership.org_id) {
       return NextResponse.json({ error: 'Operação não permitida' }, { status: 403 })
     }
 
@@ -48,7 +48,7 @@ export async function DELETE(
       .from('kanban_items')
       .delete()
       .eq('id', cardId)
-      .eq('org_id', membership.tenant_id)
+      .eq('org_id', membership.org_id)
     if (delErr) {
       console.error('Erro ao excluir card:', delErr)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
@@ -59,7 +59,7 @@ export async function DELETE(
       await supabase
         .from('kanban_logs')
         .insert({
-          org_id: membership.tenant_id,
+          org_id: membership.org_id,
           user_id: user.id,
           action: 'card_deleted',
           entity_type: 'kanban_item',
