@@ -170,9 +170,9 @@ export default function OrganizationSettings() {
             {/* Preview da logomarca atual */}
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                {organization?.logo_url ? (
+                {organization && (organization as unknown as Organization).logo_url ? (
                   <Image
-                    src={organization.logo_url}
+                    src={(organization as unknown as Organization).logo_url!}
                     alt="Logomarca atual"
                     width={64}
                     height={64}
@@ -184,7 +184,7 @@ export default function OrganizationSettings() {
               </div>
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">
-                  {organization?.logo_url ? 'Logomarca atual' : 'Nenhuma logomarca definida'}
+                  {organization && (organization as unknown as Organization).logo_url ? 'Logomarca atual' : 'Nenhuma logomarca definida'}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Recomendado: 200x200px, máximo 2MB
@@ -251,7 +251,7 @@ export default function OrganizationSettings() {
             </div>
 
             {/* Remover logomarca */}
-            {organization?.logo_url && !previewUrl && (
+            {organization && (organization as unknown as Organization).logo_url && !previewUrl && (
               <div className="pt-2 border-t">
                 <Button
                   variant="outline"
