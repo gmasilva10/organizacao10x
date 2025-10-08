@@ -253,9 +253,9 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
           >
             {/* Logo da organização ou fallback */}
             <div className="w-7 h-7 rounded-md flex items-center justify-center shadow-sm overflow-hidden">
-              {organization && (organization as Organization).logo_url ? (
+              {organization && (organization as unknown as Organization).logo_url ? (
                 <Image
-                  src={(organization as Organization).logo_url!}
+                  src={(organization as unknown as Organization).logo_url!}
                   alt="Logo da organização"
                   width={28}
                   height={28}
