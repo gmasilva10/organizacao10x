@@ -17,7 +17,7 @@ import Image from 'next/image'
 
 export default function OrganizationSettings() {
   const { organization, isLoading, uploadLogo, removeLogo, isUploading } = useOrganization()
-  const { toast } = useToast()
+  const { success, error } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
@@ -27,13 +27,13 @@ export default function OrganizationSettings() {
       // Validações client-side
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
       if (!allowedTypes.includes(file.type)) {
-        toast.error('Apenas arquivos JPG, PNG e WEBP são permitidos')
+        error('Apenas arquivos JPG, PNG e WEBP são permitidos')
         return
       }
 
       const maxSize = 2 * 1024 * 1024 // 2MB
       if (file.size > maxSize) {
-        toast.error('Arquivo deve ter no máximo 2MB')
+        error('Arquivo deve ter no máximo 2MB')
         return
       }
 
@@ -50,14 +50,14 @@ export default function OrganizationSettings() {
     await uploadLogo({
       file,
       onSuccess: (response) => {
-        toast.success('Logomarca atualizada com sucesso!')
+        success('Logomarca atualizada com sucesso!')
         setPreviewUrl(null)
         if (fileInputRef.current) {
           fileInputRef.current.value = ''
         }
       },
-      onError: (error) => {
-        toast.error(error)
+      onError: (errorMsg) => {
+        error(errorMsg)
       }
     })
   }
@@ -65,9 +65,9 @@ export default function OrganizationSettings() {
   const handleRemove = async () => {
     try {
       await removeLogo()
-      toast.success('Logomarca removida com sucesso!')
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Erro ao remover logomarca')
+      success('Logomarca removida com sucesso!')
+    } catch (err) {
+      error(err instanceof Error ? err.message : 'Erro ao remover logomarca')
     }
   }
 
