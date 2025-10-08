@@ -173,7 +173,7 @@ export async function POST(request: Request) {
     }
 
     // 4. Criar membership (vínculo user <-> org) com role admin
-    // Membership: verifica se já existe para (user_id, tenant_id); se não, insere com pequena retentativa
+    // Membership: verifica se já existe para (user_id, org_id); se não, insere com pequena retentativa
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
     let membershipError: any = null
     {

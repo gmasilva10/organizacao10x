@@ -28,7 +28,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'ID da coluna é obrigatório' }, { status: 400 })
     }
 
-    // Buscar tenant_id do usuário
+    // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
       .select('org_id')
@@ -135,7 +135,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'ID da coluna é obrigatório' }, { status: 400 })
     }
 
-    // Buscar tenant_id do usuário
+    // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
       .select('org_id')

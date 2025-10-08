@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Buscar tenant_id do usuário
+    // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
       .select('org_id')
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Título e posição são obrigatórios' }, { status: 400 })
     }
 
-    // Buscar tenant_id do usuário
+    // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
       .from('memberships')
       .select('org_id')
