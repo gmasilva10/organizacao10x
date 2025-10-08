@@ -153,6 +153,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .upsert({
         user_id: user.id,
+        org_id: org.id,
         full_name: full_name.trim(),
         phone: normalizedPhone || null,
         avatar_url: null,
