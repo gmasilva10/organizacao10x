@@ -455,7 +455,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                 <SelectItem value="postponed">Adiada</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={filters.anchor} onValueChange={(v) => updateFilters({ anchor: v })}>
+            <Select value={filters.anchor} onValueChange={(v: string) => updateFilters({ anchor: v })}>
               <SelectTrigger className="h-10 w-48">
                 <SelectValue placeholder="Âncora" />
               </SelectTrigger>
@@ -466,7 +466,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                 ))}
               </SelectContent>
             </Select>
-            <Select value={filters.channel} onValueChange={(v) => updateFilters({ channel: v })}>
+            <Select value={filters.channel} onValueChange={(v: string) => updateFilters({ channel: v })}>
               <SelectTrigger className="h-10 w-44">
                 <SelectValue placeholder="Canal" />
               </SelectTrigger>
