@@ -70,7 +70,7 @@ export const TEST_DATA = {
     is_required: true,
     order_index: 1,
     column_id: '', // Será preenchido dinamicamente
-    tenant_id: TEST_CONFIG.TENANT_ID,
+    org_id: TEST_CONFIG.TENANT_ID,
   },
 } as const;
 
