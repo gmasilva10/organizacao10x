@@ -7,6 +7,16 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   productionBrowserSourceMaps: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'kkxlztopdmipldncduvj.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
   async redirects() {
     return [
       {

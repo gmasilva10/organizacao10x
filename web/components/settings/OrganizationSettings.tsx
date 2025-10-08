@@ -56,6 +56,10 @@ export default function OrganizationSettings() {
         if (fileInputRef.current) {
           fileInputRef.current.value = ''
         }
+        // Forçar reload para atualizar o header
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
       },
       onError: (errorMsg) => {
         error(errorMsg)
