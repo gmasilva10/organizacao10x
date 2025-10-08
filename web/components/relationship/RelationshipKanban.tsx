@@ -443,7 +443,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
         </div>
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <Select value={filters.status} onValueChange={(v) => updateFilters({ status: v })}>
+            <Select value={filters.status} onValueChange={(v: string) => updateFilters({ status: v })}>
               <SelectTrigger className="h-10 w-44">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
