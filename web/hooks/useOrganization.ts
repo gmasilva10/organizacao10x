@@ -24,7 +24,7 @@ export function useOrganization(options: UseOrganizationOptions = {}) {
     isLoading,
     error,
     refetch
-  } = useQuery({
+  } = useQuery<Organization>({
     queryKey: ['organization'],
     queryFn: async (): Promise<Organization> => {
       const response = await fetch('/api/organization', {
