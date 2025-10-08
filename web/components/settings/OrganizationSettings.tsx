@@ -9,9 +9,86 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Building2, Palette, Globe } from 'lucide-react'
+import { Building2, Palette, Globe, Upload, X, Image as ImageIcon } from 'lucide-react'
+import { useOrganization } from '@/hooks/useOrganization'
+import { useState, useRef } from 'react'
+import { useToast } from '@/components/ui/toast'
+import Image from 'next/image'
 
 export default function OrganizationSettings() {
+  const { organization, isLoading, uploadLogo, removeLogo, isUploading } = useOrganization()
+  const { toast } = useToast()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validações client-side
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Apenas arquivos JPG, PNG e WEBP são permitidos')
+        return
+      }
+
+      const maxSize = 2 * 1024 * 1024 // 2MB
+      if (file.size > maxSize) {
+        toast.error('Arquivo deve ter no máximo 2MB')
+        return
+      }
+
+      // Criar preview
+      const url = URL.createObjectURL(file)
+      setPreviewUrl(url)
+    }
+  }
+
+  const handleUpload = async () => {
+    const file = fileInputRef.current?.files?.[0]
+    if (!file) return
+
+    await uploadLogo({
+      file,
+      onSuccess: (response) => {
+        toast.success('Logomarca atualizada com sucesso!')
+        setPreviewUrl(null)
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
+      },
+      onError: (error) => {
+        toast.error(error)
+      }
+    })
+  }
+
+  const handleRemove = async () => {
+    try {
+      await removeLogo()
+      toast.success('Logomarca removida com sucesso!')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao remover logomarca')
+    }
+  }
+
+  const handleCancel = () => {
+    setPreviewUrl(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -76,6 +153,118 @@ export default function OrganizationSettings() {
 
           <div className="flex justify-end">
             <Button>Salvar Dados</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Logomarca */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ImageIcon className="h-5 w-5" />
+            Logomarca da Organização
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-4">
+            {/* Preview da logomarca atual */}
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                {organization?.logo_url ? (
+                  <Image
+                    src={organization.logo_url}
+                    alt="Logomarca atual"
+                    width={64}
+                    height={64}
+                    className="object-contain rounded"
+                  />
+                ) : (
+                  <ImageIcon className="h-8 w-8 text-gray-400" />
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground">
+                  {organization?.logo_url ? 'Logomarca atual' : 'Nenhuma logomarca definida'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Recomendado: 200x200px, máximo 2MB
+                </p>
+              </div>
+            </div>
+
+            {/* Preview da nova logomarca (se selecionada) */}
+            {previewUrl && (
+              <div className="space-y-2">
+                <Label>Preview da nova logomarca:</Label>
+                <div className="w-20 h-20 border-2 border-primary rounded-lg flex items-center justify-center bg-gray-50">
+                  <Image
+                    src={previewUrl}
+                    alt="Preview da nova logomarca"
+                    width={64}
+                    height={64}
+                    className="object-contain rounded"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Upload de nova logomarca */}
+            <div className="space-y-2">
+              <Label htmlFor="logo-upload">Selecionar nova logomarca</Label>
+              <input
+                ref={fileInputRef}
+                id="logo-upload"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Selecionar Arquivo
+                </Button>
+                
+                {previewUrl && (
+                  <>
+                    <Button
+                      onClick={handleUpload}
+                      disabled={isUploading}
+                    >
+                      {isUploading ? 'Enviando...' : 'Confirmar Upload'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleCancel}
+                      disabled={isUploading}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Cancelar
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Remover logomarca */}
+            {organization?.logo_url && !previewUrl && (
+              <div className="pt-2 border-t">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRemove}
+                  disabled={isUploading}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Remover Logomarca
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

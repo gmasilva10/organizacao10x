@@ -70,11 +70,30 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     console.log('✅ Supabase client criado')
     
-    // Verificar autenticação
+    // Verificar autenticação com mais detalhes
     const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    console.log('🔍 Auth check result:', { 
+      user: user?.id, 
+      error: authError,
+      hasUser: !!user,
+      userEmail: user?.email
+    })
+    
+    if (authError) {
       console.error('❌ Erro de autenticação:', authError)
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ 
+        error: 'Authentication error', 
+        details: authError.message,
+        code: authError.status 
+      }, { status: 401 })
+    }
+    
+    if (!user) {
+      console.error('❌ Usuário não encontrado na sessão')
+      return NextResponse.json({ 
+        error: 'No user session found',
+        details: 'User not authenticated'
+      }, { status: 401 })
     }
     console.log('✅ Usuário autenticado:', user.id)
 
@@ -94,8 +113,23 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    if (membershipError || !membership) {
+    console.log('🔍 Resultado da busca de membership:', { 
+      membership, 
+      membershipError,
+      hasMembership: !!membership,
+      orgId: membership?.org_id
+    })
+
+    if (membershipError) {
       console.error('❌ Erro ao buscar membership:', membershipError)
+      return NextResponse.json({ 
+        error: 'Erro ao buscar membership', 
+        details: membershipError.message 
+      }, { status: 500 })
+    }
+    
+    if (!membership) {
+      console.error('❌ Usuário não tem membership')
       return NextResponse.json({ error: 'Usuário não pertence a uma organização' }, { status: 403 })
     }
     console.log('✅ Membership encontrado:', membership.org_id)

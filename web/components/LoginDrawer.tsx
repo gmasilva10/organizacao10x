@@ -84,7 +84,9 @@ function LoginDrawerContent() {
             }
             toast.success("Login realizado com sucesso.")
             setOpen(false)
-            router.replace("/app")
+            // Aguardar propagação de cookies e forçar reload completo
+            await new Promise(resolve => setTimeout(resolve, 300))
+            window.location.href = "/app"
         } catch {
             toast.error("Erro ao autenticar. Tente novamente.")
         }

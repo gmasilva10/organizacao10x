@@ -23,7 +23,7 @@ import { KanbanCardEditor } from '@/components/KanbanCardEditor'
 import { Clock, X } from 'lucide-react'
 
 type Card = { id: string; title: string; studentId: string; status?: 'onboarding' | 'active' | 'paused' }
-type Column = { id: string; title: string; cards: Card[]; locked?: boolean; blocked?: boolean; stageCode?: string }
+type Column = { id: string; title: string; cards: Card[]; locked?: boolean; blocked?: boolean; stageCode?: string; sort: number }
 
 function createId(prefix: string) {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}`
@@ -87,6 +87,7 @@ export default function OnboardingPage() {
       id: c.id,
       title: c.title,
       cards: [],
+      sort: (c as any).sort || 0,
       // Colunas fixas travadas por título, independente da posição
       locked: (c as any).is_fixed === true || ["Novo Aluno", "Entrega do Treino"].includes(String(c.title)),
       stageCode: (c as any).stage_code
@@ -559,9 +560,9 @@ function ColumnView({
         </h3>
         <span 
           className="text-[10px] text-muted-foreground" 
-          title={`Coluna ${index + 1}`}
+          title={`Coluna #${column.sort}`}
         >
-          #{index + 1}
+          #{column.sort}
         </span>
       </div>
       <div className={`space-y-2 ${isOver ? 'outline-dashed outline-2 outline-primary/40 rounded-md p-1' : ''}`}>

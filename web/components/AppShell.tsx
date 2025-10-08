@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import { 
   LayoutDashboard,
@@ -30,6 +31,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
+import { useOrganization } from "@/hooks/useOrganization"
 // import { useTheme } from "@/lib/use-theme"
 
 interface MenuItem {
@@ -136,6 +138,7 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
+  const { organization } = useOrganization()
   // tema não utilizado diretamente
   
   useEffect(() => {
@@ -247,8 +250,21 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
             aria-label="Página inicial - Organização10x"
             title="Ir para a página inicial"
           >
-            <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600 rounded-md flex items-center justify-center text-white font-bold text-sm shadow-sm">
-              10x
+            {/* Logo da organização ou fallback */}
+            <div className="w-7 h-7 rounded-md flex items-center justify-center shadow-sm overflow-hidden">
+              {organization?.logo_url ? (
+                <Image
+                  src={organization.logo_url}
+                  alt="Logo da organização"
+                  width={28}
+                  height={28}
+                  className="object-contain w-full h-full"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600 rounded-md flex items-center justify-center text-white font-bold text-sm">
+                  10x
+                </div>
+              )}
             </div>
             <span className="font-bold text-lg">Organização10x</span>
           </Link>

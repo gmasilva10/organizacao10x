@@ -24,6 +24,30 @@ export async function GET(request: Request) {
     if (colsResp.ok) {
       const stages: Array<{ id: string; name: string; position: number; is_fixed:boolean; stage_code:string|null }> = await colsResp.json().catch(()=>[])
       columns = stages.map(s => ({ id: s.id, title: s.name, sort: s.position, is_fixed: s.is_fixed, stage_code: s.stage_code || undefined }))
+      
+      // Se não houver colunas, inicializar automaticamente
+      if (columns.length === 0) {
+        try {
+          const initUrl = new URL('/api/kanban/board/init', request.url)
+          await fetch(initUrl.toString(), { 
+            method: 'POST', 
+            headers: { 
+              'Content-Type': 'application/json',
+              'Cookie': request.headers.get('Cookie') || ''
+            }
+          })
+          // Recarregar colunas após inicialização
+          const reloadResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&select=id,name,position,is_fixed,stage_code&order=position.asc`, {
+            headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
+          })
+          if (reloadResp.ok) {
+            const reloadedStages: Array<{ id: string; name: string; position: number; is_fixed:boolean; stage_code:string|null }> = await reloadResp.json().catch(()=>[])
+            columns = reloadedStages.map(s => ({ id: s.id, title: s.name, sort: s.position, is_fixed: s.is_fixed, stage_code: s.stage_code || undefined }))
+          }
+        } catch (initError) {
+          console.error('Erro ao inicializar board automaticamente:', initError)
+        }
+      }
     } else {
       // Fallback para modelo antigo (onboarding_columns)
       const t = await colsResp.text().catch(()=>"")

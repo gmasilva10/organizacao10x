@@ -10,23 +10,67 @@ export async function POST(request: Request) {
   if (!url || !key) return NextResponse.json({ error: "service_unavailable" }, { status: 503 })
 
   const headers = { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json' }
-  // Seed canônico
+  
+  // Seed canônico (se existir a função no banco)
   try {
     await fetch(`${url}/rest/v1/rpc/seed_kanban_stages_canonical`, { method:'POST', headers, body: JSON.stringify({ p_org: ctx.tenantId }) })
   } catch {}
-  // Garante que ao menos uma linha exista
-  const existing = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&select=id&limit=1`, { headers, cache:'no-store' })
+  
+  // Garante que as colunas obrigatórias #1 e #99 sempre existam
+  const existing = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&select=id,position,name&order=position.asc`, { headers, cache:'no-store' })
   const rows = await existing.json().catch(()=>[])
-  if (!Array.isArray(rows) || rows.length === 0) {
-    const defaults = [
-      { name: 'Novo Aluno', position: 0 },
-      { name: 'Avaliação Inicial', position: 1 },
-      { name: 'Montagem do Treino', position: 2 },
-      { name: 'Entrega do Treino', position: 3 },
-    ]
-    const payload = defaults.map(d => ({ org_id: ctx.tenantId, name: d.name, position: d.position }))
-    const ins = await fetch(`${url}/rest/v1/kanban_stages`, { method: 'POST', headers, body: JSON.stringify(payload) })
-    if (!ins.ok) return NextResponse.json({ error: 'init_failed' }, { status: 500 })
+  
+  // Sempre garantir que APENAS as colunas obrigatórias #1 e #99 existam
+  const hasPos1 = Array.isArray(rows) && rows.some((r: any) => Number(r.position) === 1)
+  const hasPos99 = Array.isArray(rows) && rows.some((r: any) => Number(r.position) === 99)
+  
+  const columnsToCreate = []
+  
+  // Coluna #1 obrigatória
+  if (!hasPos1) {
+    columnsToCreate.push({ 
+      org_id: ctx.tenantId, 
+      name: 'Novo Aluno', 
+      position: 1, 
+      is_fixed: true, 
+      stage_code: 'novo_aluno' 
+    })
+  }
+  
+  // Coluna #99 obrigatória
+  if (!hasPos99) {
+    columnsToCreate.push({ 
+      org_id: ctx.tenantId, 
+      name: 'Entrega do Treino', 
+      position: 99, 
+      is_fixed: true, 
+      stage_code: 'entrega_treino' 
+    })
+  }
+  
+  // Não criar colunas intermediárias automaticamente
+  // Usuários devem criar suas próprias colunas conforme necessidade
+  
+  // Criar colunas se houver alguma faltando
+  if (columnsToCreate.length > 0) {
+    // Usar upsert com ON CONFLICT para evitar duplicatas
+    const ins = await fetch(`${url}/rest/v1/kanban_stages`, { 
+      method: 'POST', 
+      headers: { 
+        ...headers, 
+        'Prefer': 'resolution=ignore-duplicates' // Ignora duplicatas silenciosamente
+      }, 
+      body: JSON.stringify(columnsToCreate) 
+    })
+    
+    if (!ins.ok) {
+      const errorText = await ins.text().catch(() => 'unknown error')
+      console.error('Erro ao criar colunas:', errorText)
+      // Não retornar erro 500 se for apenas duplicata
+      if (!errorText.includes('duplicate') && !errorText.includes('unique')) {
+        return NextResponse.json({ error: 'init_failed', details: errorText }, { status: 500 })
+      }
+    }
   }
 
   // Normalização canônica de posições: 1 (entrada), 99 (entrega), intermediárias 2..98
