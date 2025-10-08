@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
 import { useOrganization } from "@/hooks/useOrganization"
+import type { Organization } from "@/types/organization"
 // import { useTheme } from "@/lib/use-theme"
 
 interface MenuItem {
@@ -252,9 +253,9 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
           >
             {/* Logo da organização ou fallback */}
             <div className="w-7 h-7 rounded-md flex items-center justify-center shadow-sm overflow-hidden">
-              {organization?.logo_url ? (
+              {organization && (organization as Organization).logo_url ? (
                 <Image
-                  src={organization.logo_url}
+                  src={(organization as Organization).logo_url!}
                   alt="Logo da organização"
                   width={28}
                   height={28}
