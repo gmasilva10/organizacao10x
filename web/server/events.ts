@@ -43,11 +43,10 @@ export async function logEvent(params: {
 }) {
   const { tenantId, userId, eventType, payload } = params
   await postgrestInsert("events", {
-    tenant_id: tenantId,
+    org_id: tenantId,
     user_id: userId,
     event_type: eventType,
-    // Compat payload: incluir org_id para consumidores que esperam novo campo
-    payload: payload ? { org_id: tenantId, ...payload } : { org_id: tenantId },
+    payload: payload ?? {},
   })
 }
 
