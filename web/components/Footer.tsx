@@ -69,9 +69,9 @@ export function Footer() {
 				<div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 text-center md:flex-row">
 					<p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Personal Global. Todos os direitos reservados. <span className="text-blue-600 font-medium">v0.3.3-dev</span></p>
 					<nav className="flex gap-4 text-sm" aria-label="Políticas">
-						<a href="#" className="transition-colors hover:text-primary">Privacidade</a>
-						<a href="#" className="transition-colors hover:text-primary">Termos</a>
-						<a href="#" className="transition-colors hover:text-primary">Cookies</a>
+						<a href="/privacidade" className="transition-colors hover:text-primary">Privacidade</a>
+						<a href="/termos" className="transition-colors hover:text-primary">Termos</a>
+						<a href="/cookies" className="transition-colors hover:text-primary">Cookies</a>
 					</nav>
 				</div>
 			</div>
