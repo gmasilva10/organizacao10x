@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
           .range(fromIdx, toIdx),
         {
           userId: user.id,
-          tenantId: org_id,
+          org_id: org_id,
           operation: 'list_occurrences'
         }
       )
