@@ -15,7 +15,7 @@ interface TenantDebugInfo {
   } | null
   context: {
     userId: string | null
-    tenantId: string | null
+    org_id: string | null
     role: string | null
   }
   memberships: Array<{
