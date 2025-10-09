@@ -7,7 +7,7 @@ export class QueryMonitor {
     queryFn: () => Promise<T>,
     context?: {
       userId?: string
-      tenantId?: string
+      org_id?: string
       operation?: string
     }
   ): Promise<T> {
@@ -42,7 +42,7 @@ export class QueryMonitor {
         error: error instanceof Error ? error.message : 'Unknown error',
         context: {
           userId: context?.userId,
-          tenantId: context?.tenantId,
+          org_id: context?.org_id,
           operation: context?.operation
         },
         timestamp: new Date().toISOString()
@@ -58,7 +58,7 @@ export class QueryMonitor {
     duration: number,
     context?: {
       userId?: string
-      tenantId?: string
+      org_id?: string
       recordId?: string
     }
   ) {
@@ -81,7 +81,7 @@ export function useQueryMonitor() {
     queryFn: () => Promise<T>,
     context?: {
       userId?: string
-      tenantId?: string
+      org_id?: string
       operation?: string
     }
   ): Promise<T> => {
