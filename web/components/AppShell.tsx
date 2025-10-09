@@ -460,16 +460,16 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
             ))}
           </nav>
 
-          {/* Footer com Logo */}
+          {/* Footer com Logo do Cliente */}
           <div className="border-t bg-background/30 backdrop-blur-sm p-3">
             <div className={`flex justify-center ${sidebarCollapsed ? '' : 'px-2'}`}>
               <OrganizationLogo 
                 organization={organization}
-                showText={!sidebarCollapsed}
-                size="sm"
+                showText={false}
+                size="lg"
                 href="/app"
                 className="transition-all duration-300"
-                ariaLabel="Logo da organização no rodapé"
+                ariaLabel="Logo do cliente no rodapé"
               />
             </div>
           </div>
