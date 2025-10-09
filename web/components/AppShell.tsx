@@ -466,7 +466,7 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
               <OrganizationLogo 
                 organization={organization}
                 showText={false}
-                size="lg"
+                size="xl"
                 href="/app"
                 className="transition-all duration-300"
                 ariaLabel="Logo do cliente no rodapé"
