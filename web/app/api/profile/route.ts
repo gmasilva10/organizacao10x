@@ -176,7 +176,7 @@ export async function PATCH(request: Request) {
     ;(async () => {
       try {
         const { writeAudit, logEvent } = await import("@/server/events")
-        await logEvent({ tenantId: "", userId: user.id, eventType: "feature.used", payload: { type: "profile.edit_success", source: "app.ui" } })
+        await logEvent({ orgId: "", userId: user.id, eventType: "feature.used", payload: { type: "profile.edit_success", source: "app.ui" } })
         await writeAudit({ orgId: "", actorId: user.id, entityType: "profile", entityId: user.id, action: "updated", payload: { full_name: fullName, has_phone: !!phone } })
       } catch {}
     })()
