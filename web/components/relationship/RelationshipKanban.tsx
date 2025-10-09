@@ -113,13 +113,13 @@ const ALL_COLUMNS: KanbanColumn[] = [
   { id: 'postponed_skipped', title: 'Adiadas/Puladas', icon: X, color: 'text-gray-500' },
 ]
 
-// Estilo visual por coluna (aproximação do print 1)
+// Estilo visual por coluna (exatamente como na imagem)
 const columnStyleById: Record<string, { header: string; card: string }> = {
-  overdue: { header: 'bg-red-100 border-red-200', card: 'ring-1 ring-red-200' },
-  due_today: { header: 'bg-blue-100 border-blue-200', card: 'ring-1 ring-blue-200' },
-  pending_future: { header: 'bg-yellow-100 border-yellow-200', card: 'ring-1 ring-yellow-200' },
-  sent: { header: 'bg-green-100 border-green-200', card: 'ring-1 ring-green-200' },
-  postponed_skipped: { header: 'bg-gray-100 border-gray-200', card: 'ring-1 ring-gray-200' },
+  overdue: { header: 'bg-red-50 border-red-200 border-b-0', card: 'border-red-200' },
+  due_today: { header: 'bg-blue-50 border-blue-200 border-b-0', card: 'border-blue-200' },
+  pending_future: { header: 'bg-yellow-50 border-yellow-200 border-b-0', card: 'border-yellow-200' },
+  sent: { header: 'bg-green-50 border-green-200 border-b-0', card: 'border-green-200' },
+  postponed_skipped: { header: 'bg-gray-50 border-gray-200 border-b-0', card: 'border-gray-200' },
 }
 
 const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanProps>(({ onTaskUpdate }, ref) => {
@@ -508,77 +508,65 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           <span className="ml-2 text-lg">Carregando tarefas...</span>
         </div>
       ) : (
-        <div className="flex flex-col flex-1">
-          {/* Cabeçalhos das Colunas - "Soltos" */}
-          <div className="flex space-x-4 mb-4 overflow-x-auto pb-2">
-            {visibleColumns.map(column => (
-              <div key={`header-${column.id}`} className="flex-shrink-0 w-80">
-                <div className="flex items-center justify-between px-4 py-3 bg-transparent">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <column.icon className={`h-5 w-5 ${column.color} flex-shrink-0`} />
-                    <h3 className="text-base font-semibold text-gray-900 truncate">{column.title}</h3>
+        <div className="flex space-x-3 pb-4">
+          {visibleColumns.map(column => (
+            <Card key={column.id} className={`flex-shrink-0 w-72 bg-white ${columnStyleById[column.id]?.card || ''}`}>
+              <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 border rounded-t-md ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
+                <CardTitle className="text-sm font-medium flex items-center">
+                  <column.icon className={`h-4 w-4 mr-2 ${column.color}`} /> {column.title}
+                </CardTitle>
+                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
+                  {getTasksByColumn(column.id).length}
+                </Badge>
+              </CardHeader>
+              <CardContent className="pt-4">
+                {getTasksByColumn(column.id).length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    <Inbox className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+                    <p className="text-sm font-medium">Nenhuma tarefa</p>
+                    <p className="text-xs mt-1">
+                      {column.id === 'overdue' && 'Nenhuma tarefa atrasada'}
+                      {column.id === 'due_today' && 'Sem tarefas para hoje'}
+                      {column.id === 'pending_future' && 'Sem tarefas futuras'}
+                      {column.id === 'sent' && 'Nenhuma enviada'}
+                      {column.id === 'postponed_skipped' && 'Nenhuma adiada/pulada'}
+                    </p>
                   </div>
-                  <Badge variant="secondary" className="bg-gray-100 text-gray-700 flex-shrink-0 ml-2">
-                    {getTasksByColumn(column.id).length}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Conteúdo das Colunas */}
-          <div className="flex flex-1 space-x-4 overflow-x-auto pb-4">
-            {visibleColumns.map(column => (
-              <Card key={column.id} className={`flex-shrink-0 w-80 bg-white ${columnStyleById[column.id]?.card || ''}`}>
-                <CardContent className="pt-4">
-                  {getTasksByColumn(column.id).length === 0 ? (
-                    <div className="text-center text-muted-foreground py-8">
-                      <Inbox className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                      <p className="text-sm font-medium">Nenhuma tarefa</p>
-                      <p className="text-xs mt-1">
-                        {column.id === 'overdue' && 'Nenhuma tarefa atrasada'}
-                        {column.id === 'due_today' && 'Sem tarefas para hoje'}
-                        {column.id === 'pending_future' && 'Sem tarefas futuras'}
-                        {column.id === 'sent' && 'Nenhuma enviada'}
-                        {column.id === 'postponed_skipped' && 'Nenhuma adiada/pulada'}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {(() => {
-                        const items = getTasksByColumn(column.id)
-                        const limit = 200
-                        const isExpanded = !!expandedColumns[column.id]
-                        const visible = isExpanded ? items : items.slice(0, limit)
-                        return (
-                          <>
-                            {visible.map(task => (
-                        <TaskCard
-                          key={task.id}
-                          task={task}
-                          onUpdateStatus={updateTaskStatus}
-                          onCopyMessage={copyMessage}
-                          onOpenWhatsApp={openWhatsApp}
-                          onSnoozeTask={snoozeTask}
-                          onDeleteTask={deleteTask}
-                        />
-                            ))}
-                            {!isExpanded && items.length > limit && (
-                              <div className="text-center">
-                                <Button variant="outline" size="sm" onClick={() => setExpandedColumns(prev => ({ ...prev, [column.id]: true }))}>
-                                  Mostrar mais ({items.length - limit})
-                                </Button>
-                              </div>
-                            )}
-                          </>
-                        )
-                      })()}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                ) : (
+                  <div className="space-y-3">
+                    {(() => {
+                      const items = getTasksByColumn(column.id)
+                      const limit = 200
+                      const isExpanded = !!expandedColumns[column.id]
+                      const visible = isExpanded ? items : items.slice(0, limit)
+                      return (
+                        <>
+                          {visible.map(task => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onUpdateStatus={updateTaskStatus}
+                        onCopyMessage={copyMessage}
+                        onOpenWhatsApp={openWhatsApp}
+                        onSnoozeTask={snoozeTask}
+                        onDeleteTask={deleteTask}
+                      />
+                          ))}
+                          {!isExpanded && items.length > limit && (
+                            <div className="text-center">
+                              <Button variant="outline" size="sm" onClick={() => setExpandedColumns(prev => ({ ...prev, [column.id]: true }))}>
+                                Mostrar mais ({items.length - limit})
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )
+                    })()}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
 
