@@ -21,10 +21,12 @@ import {
   ExternalLink,
   User,
   MoreHorizontal,
-  AlertCircle
+  AlertCircle,
+  Inbox
 } from 'lucide-react'
 import TaskCard from './TaskCard'
 import MessageComposer from './MessageComposer'
+import RelationshipFilterDrawer from './RelationshipFilterDrawer'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -125,6 +127,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
   const [loading, setLoading] = useState(true)
   const [pagination, setPagination] = useState({ page: 1, page_size: 20, total: 0, total_pages: 0 })
   const [showComposer, setShowComposer] = useState(false)
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
   const [expandedColumns, setExpandedColumns] = useState<Record<string, boolean>>({})
   const mountedRef = useRef(true)
 
@@ -455,39 +458,43 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                 <SelectItem value="postponed">Adiada</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={filters.anchor} onValueChange={(v: string) => updateFilters({ anchor: v })}>
-              <SelectTrigger className="h-10 w-48">
-                <SelectValue placeholder="Âncora" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as âncoras</SelectItem>
-                {Object.entries(ANCHOR_LABELS).map(([k, label]) => (
-                  <SelectItem key={k} value={k}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={filters.channel} onValueChange={(v: string) => updateFilters({ channel: v })}>
-              <SelectTrigger className="h-10 w-44">
-                <SelectValue placeholder="Canal" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os canais</SelectItem>
-                <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                <SelectItem value="email">E-mail</SelectItem>
-                <SelectItem value="sms">SMS</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={() => setToday()}>
+            <Button 
+              variant="outline" 
+              onClick={() => setToday()}
+              aria-label="Filtrar tarefas para hoje"
+            >
               <Calendar className="mr-2 h-4 w-4" /> Hoje
             </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setFilterDrawerOpen(true)}
+              aria-label={`Abrir filtros avançados${getActiveFiltersCount() > 0 ? ` - ${getActiveFiltersCount()} filtro${getActiveFiltersCount() !== 1 ? 's' : ''} ativo${getActiveFiltersCount() !== 1 ? 's' : ''}` : ''}`}
+            >
+              <Filter className="mr-2 h-4 w-4" />
+              Filtros
+              {getActiveFiltersCount() > 0 && (
+                <Badge className="ml-2 bg-blue-100 text-blue-700" aria-hidden="true">{getActiveFiltersCount()}</Badge>
+              )}
+            </Button>
             <div className="flex items-center gap-2 justify-end">
-              <Button variant="outline" onClick={resetFilters}>
+              <Button 
+                variant="outline" 
+                onClick={resetFilters}
+                aria-label="Limpar todos os filtros"
+              >
                 <X className="mr-2 h-4 w-4" /> Limpar
               </Button>
-              <Button variant="default" onClick={fetchTasks}>
+              <Button 
+                variant="default" 
+                onClick={fetchTasks}
+                aria-label="Atualizar lista de tarefas"
+              >
                 <RefreshCw className="mr-2 h-4 w-4" /> Atualizar
               </Button>
-              <Button onClick={() => setShowComposer(true)}>
+              <Button 
+                onClick={() => setShowComposer(true)}
+                aria-label="Criar nova mensagem"
+              >
                 <MessageSquare className="mr-2 h-4 w-4" /> Nova Mensagem
               </Button>
             </div>
@@ -501,65 +508,77 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           <span className="ml-2 text-lg">Carregando tarefas...</span>
         </div>
       ) : (
-        <div className="flex flex-1 space-x-4 overflow-x-auto pb-4">
-          {visibleColumns.map(column => (
-            <Card key={column.id} className={`flex-shrink-0 w-80 bg-white ${columnStyleById[column.id]?.card || ''}`}>
-              <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 border rounded-t-md ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <column.icon className={`h-4 w-4 mr-2 ${column.color}`} /> {column.title}
-                </CardTitle>
-                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
-                  {getTasksByColumn(column.id).length}
-                </Badge>
-              </CardHeader>
-              <CardContent className="pt-4">
-                {getTasksByColumn(column.id).length === 0 ? (
-                  <div className="text-center text-muted-foreground py-4">
-                    <img src="/empty-state.svg" alt="Nenhuma tarefa" className="mx-auto h-16 w-16 mb-2 opacity-70" />
-                    <p className="text-sm">Nenhuma tarefa</p>
-                    <p className="text-xs">
-                      {column.id === 'overdue' && 'Nenhuma tarefa atrasada'}
-                      {column.id === 'due_today' && 'Sem tarefas para hoje'}
-                      {column.id === 'pending_future' && 'Sem tarefas futuras'}
-                      {column.id === 'sent' && 'Nenhuma enviada'}
-                      {column.id === 'postponed_skipped' && 'Nenhuma adiada/pulada'}
-                    </p>
+        <div className="flex flex-col flex-1">
+          {/* Cabeçalhos das Colunas - "Soltos" */}
+          <div className="flex space-x-4 mb-4 overflow-x-auto pb-2">
+            {visibleColumns.map(column => (
+              <div key={`header-${column.id}`} className="flex-shrink-0 w-80">
+                <div className="flex items-center justify-between px-4 py-3 bg-transparent">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <column.icon className={`h-5 w-5 ${column.color} flex-shrink-0`} />
+                    <h3 className="text-base font-semibold text-gray-900 truncate">{column.title}</h3>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {(() => {
-                      const items = getTasksByColumn(column.id)
-                      const limit = 200
-                      const isExpanded = !!expandedColumns[column.id]
-                      const visible = isExpanded ? items : items.slice(0, limit)
-                      return (
-                        <>
-                          {visible.map(task => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        onUpdateStatus={updateTaskStatus}
-                        onCopyMessage={copyMessage}
-                        onOpenWhatsApp={openWhatsApp}
-                        onSnoozeTask={snoozeTask}
-                        onDeleteTask={deleteTask}
-                      />
-                          ))}
-                          {!isExpanded && items.length > limit && (
-                            <div className="text-center">
-                              <Button variant="outline" size="sm" onClick={() => setExpandedColumns(prev => ({ ...prev, [column.id]: true }))}>
-                                Mostrar mais ({items.length - limit})
-                              </Button>
-                            </div>
-                          )}
-                        </>
-                      )
-                    })()}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                  <Badge variant="secondary" className="bg-gray-100 text-gray-700 flex-shrink-0 ml-2">
+                    {getTasksByColumn(column.id).length}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Conteúdo das Colunas */}
+          <div className="flex flex-1 space-x-4 overflow-x-auto pb-4">
+            {visibleColumns.map(column => (
+              <Card key={column.id} className={`flex-shrink-0 w-80 bg-white ${columnStyleById[column.id]?.card || ''}`}>
+                <CardContent className="pt-4">
+                  {getTasksByColumn(column.id).length === 0 ? (
+                    <div className="text-center text-muted-foreground py-8">
+                      <Inbox className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+                      <p className="text-sm font-medium">Nenhuma tarefa</p>
+                      <p className="text-xs mt-1">
+                        {column.id === 'overdue' && 'Nenhuma tarefa atrasada'}
+                        {column.id === 'due_today' && 'Sem tarefas para hoje'}
+                        {column.id === 'pending_future' && 'Sem tarefas futuras'}
+                        {column.id === 'sent' && 'Nenhuma enviada'}
+                        {column.id === 'postponed_skipped' && 'Nenhuma adiada/pulada'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {(() => {
+                        const items = getTasksByColumn(column.id)
+                        const limit = 200
+                        const isExpanded = !!expandedColumns[column.id]
+                        const visible = isExpanded ? items : items.slice(0, limit)
+                        return (
+                          <>
+                            {visible.map(task => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          onUpdateStatus={updateTaskStatus}
+                          onCopyMessage={copyMessage}
+                          onOpenWhatsApp={openWhatsApp}
+                          onSnoozeTask={snoozeTask}
+                          onDeleteTask={deleteTask}
+                        />
+                            ))}
+                            {!isExpanded && items.length > limit && (
+                              <div className="text-center">
+                                <Button variant="outline" size="sm" onClick={() => setExpandedColumns(prev => ({ ...prev, [column.id]: true }))}>
+                                  Mostrar mais ({items.length - limit})
+                                </Button>
+                              </div>
+                            )}
+                          </>
+                        )
+                      })()}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
 
@@ -570,6 +589,18 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           fetchTasks()
           if (onTaskUpdate) onTaskUpdate()
         }} 
+      />
+
+      <RelationshipFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        filters={filters}
+        onFiltersChange={updateFilters}
+        onClear={resetFilters}
+        onApply={() => {
+          // O fetchTasks já é chamado automaticamente quando os filtros mudam
+          // através do useEffect que monitora debouncedFilters
+        }}
       />
     </div>
   )

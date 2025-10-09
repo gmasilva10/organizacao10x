@@ -17,7 +17,9 @@ const PlanUpdateSchema = z.object({
   moeda: z.string().optional(),
   ciclo: z.enum(['mensal', 'trimestral', 'semestral', 'anual']).optional(),
   duracao_em_ciclos: z.number().int().positive().optional(),
-  ativo: z.boolean().optional()
+  ativo: z.boolean().optional(),
+  category_id: z.string().uuid('ID da categoria inválido').optional(),
+  tipo: z.enum(['receita', 'despesa']).optional()
 })
 
 export async function GET(

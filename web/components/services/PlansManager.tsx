@@ -28,12 +28,23 @@ interface Plan {
   moeda: string
   ciclo: string
   ativo: boolean
+  category_id?: string
+  tipo: 'receita' | 'despesa'
   created_at: string
   updated_at: string
 }
 
+interface Category {
+  id: string
+  name: string
+  color: string
+  active: boolean
+  is_system: boolean
+}
+
 export default function PlansManager() {
   const [plans, setPlans] = useState<Plan[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -46,19 +57,30 @@ export default function PlansManager() {
     valor: '',
     moeda: 'BRL',
     ciclo: '',
-    ativo: true
+    ativo: true,
+    category_id: '',
+    tipo: 'receita' as 'receita' | 'despesa'
   })
   const [saving, setSaving] = useState(false)
 
   const loadPlans = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/services/plans')
-      if (!response.ok) {
+      const [plansResponse, categoriesResponse] = await Promise.all([
+        fetch('/api/services/plans'),
+        fetch('/api/financial/categories')
+      ])
+      
+      if (!plansResponse.ok) {
         throw new Error('Erro ao carregar planos')
       }
-      const data = await response.json()
-      setPlans(data.plans || [])
+      const plansData = await plansResponse.json()
+      setPlans(plansData.plans || [])
+      
+      if (categoriesResponse.ok) {
+        const categoriesData = await categoriesResponse.json()
+        setCategories(categoriesData.categories || [])
+      }
     } catch (error) {
       console.error('Erro ao carregar planos:', error)
       toast.error('Erro ao carregar planos')
@@ -100,7 +122,9 @@ export default function PlansManager() {
       valor: '',
       moeda: 'BRL',
       ciclo: '',
-      ativo: true
+      ativo: true,
+      category_id: '',
+      tipo: 'receita'
     })
   }
 
@@ -117,7 +141,9 @@ export default function PlansManager() {
       valor: plan.valor.toString(),
       moeda: plan.moeda,
       ciclo: plan.ciclo || '',
-      ativo: plan.ativo
+      ativo: plan.ativo,
+      category_id: plan.category_id || '',
+      tipo: plan.tipo || 'receita'
     })
     setShowEditModal(true)
   }
@@ -279,16 +305,37 @@ export default function PlansManager() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <div className="text-2xl font-bold">
-                    {formatCurrency(plan.valor, plan.moeda)}
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold">
+                      {formatCurrency(plan.valor, plan.moeda)}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className={`text-lg ${plan.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
+                        {plan.tipo === 'receita' ? '↑' : '↓'}
+                      </span>
+                      <span className="text-xs text-muted-foreground capitalize">
+                        {plan.tipo}
+                      </span>
+                    </div>
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {getCycleLabel(plan.ciclo)}
                   </div>
-                  {plan.descricao && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {plan.descricao}
-                    </p>
+                  {plan.category_id && (
+                    <div className="flex items-center gap-2">
+                      {(() => {
+                        const category = categories.find(c => c.id === plan.category_id)
+                        return category ? (
+                          <>
+                            <div 
+                              className="w-2 h-2 rounded-full" 
+                              style={{ backgroundColor: category.color }}
+                            />
+                            <span className="text-xs text-muted-foreground">{category.name}</span>
+                          </>
+                        ) : null
+                      })()}
+                    </div>
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-4">
@@ -343,16 +390,6 @@ export default function PlansManager() {
                     placeholder="Ex: Plano Básico"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="descricao" className="mb-2 block">Descrição</Label>
-                  <Textarea
-                    id="descricao"
-                    value={formData.descricao}
-                    onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
-                    placeholder="Descreva o plano..."
-                    rows={3}
-                  />
-                </div>
               </div>
             </div>
 
@@ -405,7 +442,70 @@ export default function PlansManager() {
               </div>
             </div>
 
-            {/* Seção 3: Configurações */}
+            {/* Seção 3: Categoria e Tipo */}
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+                📂 Categoria e Tipo
+              </h3>
+              <div className="border rounded-lg p-4 space-y-4">
+                <div>
+                  <Label htmlFor="category_id" className="mb-2 block">Categoria *</Label>
+                  <Select value={formData.category_id} onValueChange={(value: string) => setFormData(prev => ({ ...prev, category_id: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.filter(c => c.active).map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-3 h-3 rounded-full" 
+                              style={{ backgroundColor: category.color }}
+                            />
+                            {category.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="mb-2 block">Tipo Financeiro *</Label>
+                  <div className="flex gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="tipo_receita"
+                        name="tipo"
+                        value="receita"
+                        checked={formData.tipo === 'receita'}
+                        onChange={(e) => setFormData(prev => ({ ...prev, tipo: e.target.value as 'receita' | 'despesa' }))}
+                        className="h-4 w-4"
+                      />
+                      <Label htmlFor="tipo_receita" className="flex items-center gap-1">
+                        <span className="text-green-600">↑</span> Receita
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="tipo_despesa"
+                        name="tipo"
+                        value="despesa"
+                        checked={formData.tipo === 'despesa'}
+                        onChange={(e) => setFormData(prev => ({ ...prev, tipo: e.target.value as 'receita' | 'despesa' }))}
+                        className="h-4 w-4"
+                      />
+                      <Label htmlFor="tipo_despesa" className="flex items-center gap-1">
+                        <span className="text-red-600">↓</span> Despesa
+                      </Label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Seção 4: Configurações */}
             <div>
               <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
                 ⚙️ Configurações
@@ -425,18 +525,6 @@ export default function PlansManager() {
               </div>
             </div>
 
-            {/* Seção 4: Informações */}
-            {selectedPlan && (
-              <div>
-                <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
-                  ℹ️ Informações
-                </h3>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  <p><strong>Código:</strong> {selectedPlan.plan_code}</p>
-                  <p className="text-xs">O código é gerado automaticamente pelo sistema</p>
-                </div>
-              </div>
-            )}
           </div>
           
           <DialogFooter>
@@ -452,7 +540,7 @@ export default function PlansManager() {
             >
               Cancelar
             </Button>
-            <Button onClick={handleSavePlan} disabled={saving || !formData.nome || !formData.valor}>
+            <Button onClick={handleSavePlan} disabled={saving || !formData.nome || !formData.valor || !formData.category_id}>
               {saving ? 'Salvando...' : 'Salvar'}
             </Button>
           </DialogFooter>
@@ -482,12 +570,6 @@ export default function PlansManager() {
                 </div>
               </div>
               
-              {selectedPlan.descricao && (
-                <div>
-                  <Label className="text-sm font-medium">Descrição</Label>
-                  <p className="text-sm text-muted-foreground">{selectedPlan.descricao}</p>
-                </div>
-              )}
               
               <div className="grid grid-cols-3 gap-4">
                 <div>

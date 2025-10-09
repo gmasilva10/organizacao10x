@@ -21,6 +21,8 @@ export interface RelationshipFilters {
   channel: string
   date_from: string
   date_to: string
+  created_from: string
+  created_to: string
   q: string
 }
 
@@ -34,6 +36,8 @@ const getDefaultFilters = (): RelationshipFilters => {
     channel: 'all',
     date_from: today.date_from,
     date_to: today.date_to,
+    created_from: '',
+    created_to: '',
     q: ''
   }
 }
@@ -131,7 +135,7 @@ export function useRelationshipFilters() {
   // Verificar se há filtros ativos
   const hasActiveFilters = useCallback(() => {
     return Object.entries(filters).some(([key, value]) => 
-      key !== 'q' && value && value !== 'all'
+      key !== 'q' && value && value !== 'all' && value !== ''
     ) || filters.q.trim() !== ''
   }, [filters])
 
@@ -146,6 +150,10 @@ export function useRelationshipFilters() {
         apiFilters['scheduled_from'] = value as string
       } else if (key === 'date_to') {
         apiFilters['scheduled_to'] = value as string
+      } else if (key === 'created_from') {
+        apiFilters['created_from'] = value as string
+      } else if (key === 'created_to') {
+        apiFilters['created_to'] = value as string
       } else {
         apiFilters[key] = value as string
       }
@@ -157,7 +165,7 @@ export function useRelationshipFilters() {
   // Contar filtros ativos
   const getActiveFiltersCount = useCallback(() => {
     return Object.entries(filters).filter(([key, value]) => 
-      key !== 'q' && value && value !== 'all'
+      key !== 'q' && value && value !== 'all' && value !== ''
     ).length + (filters.q.trim() !== '' ? 1 : 0)
   }, [filters])
 
