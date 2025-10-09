@@ -139,7 +139,7 @@ function renderMessage(template: string, student: StudentData): string {
 /**
  * Verificar rate limiting
  */
-async function checkRateLimit(studentId: string, tenantId: string): Promise<boolean> {
+async function checkRateLimit(studentId: string, orgId: string): Promise<boolean> {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   
@@ -165,13 +165,13 @@ function endOfDayISO(date = new Date()) {
 }
 
 // Buscar alunos elegiveis por ancora sem usar RPCs (sem recursao)
-async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Promise<StudentData[]> {
+async function fetchStudentsForAnchor(anchor: EventCode, orgId: string): Promise<StudentData[]> {
   try {
     if (anchor === 'sale_close') {
       const { data, error } = await supabase
         .from('students')
         .select('id, name, email, phone, created_at, org_id')
-        .eq('org_id', tenantId)
+        .eq('org_id', orgId)
         .eq('status', 'active')
         .gte('created_at', startOfDayISO())
         .lte('created_at', endOfDayISO())
@@ -190,7 +190,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
       const { data, error } = await supabase
         .from('students')
         .select('id, name, email, phone, birth_date, org_id')
-        .eq('org_id', tenantId)
+        .eq('org_id', orgId)
         .not('birth_date', 'is', null)
       if (error) return []
       const today = new Date()
@@ -216,7 +216,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
       const { data: occs, error: occErr } = await supabase
         .from('student_occurrences')
         .select('student_id, reminder_at, org_id')
-        .eq('org_id', tenantId)
+        .eq('org_id', orgId)
         .gte('reminder_at', startOfDayISO())
         .lte('reminder_at', endOfDayISO())
       if (occErr || !occs || occs.length === 0) return []
@@ -255,11 +255,11 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
 }
 
 // Carregar templates ativos da tabela MVP (JSON em content)
-async function fetchActiveTemplates(tenantId: string): Promise<TemplateData[]> {
+async function fetchActiveTemplates(orgId: string): Promise<TemplateData[]> {
   const { data, error } = await supabase
     .from('relationship_templates')
     .select('id, org_id, content')
-    .eq('org_id', tenantId)
+    .eq('org_id', orgId)
   if (error || !data) return []
 
   const templates: TemplateData[] = []
@@ -295,7 +295,7 @@ async function fetchActiveTemplates(tenantId: string): Promise<TemplateData[]> {
 async function processAnchor(
   anchor: EventCode,
   templates: TemplateData[],
-  tenantId: string
+  orgId: string
 ): Promise<{ created: number; updated: number; skipped: number; errors: string[] }> {
   const anchorTemplates = templates.filter(t => t.anchor === anchor)
   if (anchorTemplates.length === 0) {
@@ -309,7 +309,7 @@ async function processAnchor(
 
   try {
     // Buscar alunos para esta ancora
-    const students = await fetchStudentsForAnchor(anchor, tenantId)
+    const students = await fetchStudentsForAnchor(anchor, orgId)
     const studentsError = null as any
 
     if (studentsError) {
@@ -329,7 +329,7 @@ async function processAnchor(
       for (const student of filteredStudents) {
         try {
           // Verificar rate limiting
-          const canCreate = await checkRateLimit(student.id, tenantId)
+          const canCreate = await checkRateLimit(student.id, orgId)
           if (!canCreate) {
             skipped++
             continue

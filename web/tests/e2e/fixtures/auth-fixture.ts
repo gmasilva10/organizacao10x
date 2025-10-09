@@ -38,7 +38,7 @@ export const test = base.extend<AuthFixtures>({
       },
       {
         name: 'pg.active_org',
-        value: TEST_CONFIG.TENANT_ID,
+        value: TEST_CONFIG.ORG_ID,
         domain: 'localhost',
         path: '/',
         httpOnly: true,
@@ -55,7 +55,7 @@ export const test = base.extend<AuthFixtures>({
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ orgId: TEST_CONFIG.TENANT_ID, source: 'cookie' })
+          body: JSON.stringify({ orgId: TEST_CONFIG.ORG_ID, source: 'cookie' })
         });
       } else {
         await route.continue();
@@ -74,7 +74,7 @@ export const test = base.extend<AuthFixtures>({
             user_metadata: { name: 'Test Admin' }
           },
           membership: {
-            org_id: TEST_CONFIG.TENANT_ID,
+            org_id: TEST_CONFIG.ORG_ID,
             role: 'admin'
           },
           profile: {
@@ -107,7 +107,7 @@ export const test = base.extend<AuthFixtures>({
       },
       {
         name: 'pg.active_org',
-        value: TEST_CONFIG.TENANT_ID,
+        value: TEST_CONFIG.ORG_ID,
         domain: 'localhost',
         path: '/',
         httpOnly: true,
@@ -121,7 +121,7 @@ export const test = base.extend<AuthFixtures>({
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ orgId: TEST_CONFIG.TENANT_ID, source: 'cookie' })
+        body: JSON.stringify({ orgId: TEST_CONFIG.ORG_ID, source: 'cookie' })
       });
     });
 
@@ -136,7 +136,7 @@ export const test = base.extend<AuthFixtures>({
             user_metadata: { name: 'Test Admin' }
           },
           membership: {
-            org_id: TEST_CONFIG.TENANT_ID,
+            org_id: TEST_CONFIG.ORG_ID,
             role: 'admin'
           },
           profile: {
@@ -169,7 +169,7 @@ export const test = base.extend<AuthFixtures>({
       },
       {
         name: 'pg.active_org',
-        value: TEST_CONFIG.TENANT_ID,
+        value: TEST_CONFIG.ORG_ID,
         domain: 'localhost',
         path: '/',
         httpOnly: true,
@@ -183,7 +183,7 @@ export const test = base.extend<AuthFixtures>({
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ orgId: TEST_CONFIG.TENANT_ID, source: 'cookie' })
+        body: JSON.stringify({ orgId: TEST_CONFIG.ORG_ID, source: 'cookie' })
       });
     });
 
@@ -198,7 +198,7 @@ export const test = base.extend<AuthFixtures>({
             user_metadata: { name: 'Test Trainer' }
           },
           membership: {
-            org_id: TEST_CONFIG.TENANT_ID,
+            org_id: TEST_CONFIG.ORG_ID,
             role: 'trainer'
           },
           profile: {

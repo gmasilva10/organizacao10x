@@ -135,7 +135,7 @@ export async function PATCH(
               previousValues
             },
             actorId: user.id,
-            tenantId: org_id
+            orgId: org_id
           } as any, supabase)
         }
       } catch (auditError) {
@@ -222,7 +222,7 @@ export async function DELETE(
             description: group.description
           },
           actorId: user.id,
-          tenantId: org_id
+          orgId: org_id
         } as any, supabase)
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)

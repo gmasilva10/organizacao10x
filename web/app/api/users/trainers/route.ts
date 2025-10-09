@@ -7,12 +7,12 @@ type CreateTrainerBody = {
   email: string
 }
 
-async function countTenantTrainers(tenantId: string): Promise<number> {
+async function countTenantTrainers(orgId: string): Promise<number> {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return 0
   const resp = await fetch(
-    `${url}/rest/v1/memberships?org_id=eq.${tenantId}&role=eq.trainer&select=user_id`,
+    `${url}/rest/v1/memberships?org_id=eq.${orgId}&role=eq.trainer&select=user_id`,
     {
       headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact" },
       cache: "no-store",
@@ -36,7 +36,7 @@ async function getUserIdByEmail(email: string): Promise<string | null> {
   return (u?.id as string) || null
 }
 
-async function insertMembership(userId: string, tenantId: string): Promise<boolean> {
+async function insertMembership(userId: string, orgId: string): Promise<boolean> {
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return false
@@ -48,7 +48,7 @@ async function insertMembership(userId: string, tenantId: string): Promise<boole
       "Content-Type": "application/json",
       Prefer: "resolution=merge-duplicates,return=representation",
     },
-    body: JSON.stringify({ user_id: userId, org_id: tenantId, role: "trainer" }),
+    body: JSON.stringify({ user_id: userId, org_id: orgId, role: "trainer" }),
   })
   return resp.ok
 }

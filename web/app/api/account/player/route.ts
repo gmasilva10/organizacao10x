@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     }
 
 
-    const tenantId = org!.id as string
+    const orgId = org!.id as string
 
     // Criar membership admin para o usuário atual
     // membership via service-role para garantir permissão
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates,return=representation",
       },
-      body: JSON.stringify({ org_id: tenantId, user_id: user.id, role: "admin" }),
+      body: JSON.stringify({ org_id: orgId, user_id: user.id, role: "admin" }),
       cache: "no-store",
     })
     if (!memResp.ok) {
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
             method: "POST",
             headers: commonHeaders,
             body: JSON.stringify({
-              org_id: tenantId,
+              org_id: orgId,
               user_id: user.id,
               event_type: "account.created",
               payload: { type: "player", source: "app.ui", ts: new Date().toISOString() },
@@ -133,10 +133,10 @@ export async function POST(request: Request) {
             method: "POST",
             headers: commonHeaders,
             body: JSON.stringify({
-              org_id: tenantId,
+              org_id: orgId,
               user_id: user.id,
               event_type: "membership.created",
-              payload: { org_id: tenantId, role: "admin", source: "app.ui", ts: new Date().toISOString() },
+              payload: { org_id: orgId, role: "admin", source: "app.ui", ts: new Date().toISOString() },
             }),
             cache: "no-store",
           })
@@ -146,13 +146,13 @@ export async function POST(request: Request) {
 
     const res = NextResponse.json({
       ok: true,
-      organization: { id: tenantId, name: org!.name, plan: org?.plan ?? "basic" },
-      membership: { user_id: membership!.user_id as string, organization_id: tenantId, role: membership!.role as string },
-      active_org_id: tenantId,
+      organization: { id: orgId, name: org!.name, plan: org?.plan ?? "basic" },
+      membership: { user_id: membership!.user_id as string, organization_id: orgId, role: membership!.role as string },
+      active_org_id: orgId,
     })
     // Define organização ativa (cookie leve; ACC04 usará)
     try {
-      res.cookies.set("pg.active_org", tenantId, { path: "/", sameSite: "lax", httpOnly: true })
+      res.cookies.set("pg.active_org", orgId, { path: "/", sameSite: "lax", httpOnly: true })
     } catch {}
     return res
   } catch (err) {

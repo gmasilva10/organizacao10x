@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         ok: false,
         inconsistentId: id,
-        tenantId: ctx.org_id,
+        orgId: ctx.org_id,
         details: { listUrl, itemUrl, itemStatus: itemResp.status },
       }, { status: 500 })
     }

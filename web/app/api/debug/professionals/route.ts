@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       professionals: professionals || [],
       userInList: !!userInList,
       userPhone,
-      tenantId: ctx.org_id,
+      orgId: ctx.org_id,
       total: professionals?.length || 0
     })
   } catch (error) {

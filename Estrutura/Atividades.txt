@@ -1,5 +1,15 @@
 # ATIVIDADES COMPLETADAS - ORGANIZAÇÃO 10X
 
+## ✅ MIGRAÇÃO TENANT_ID → ORG_ID DEFINITIVA (2025-10-09)
+- [x] Auditoria completa linha a linha de TODO o projeto (commit 59aff34)
+- [x] Correção de 19 arquivos (12 APIs + 3 testes + 2 scripts + 2 utils)
+- [x] Eliminação de 86 ocorrências de tenantId/tenant_id/TENANT_ID
+- [x] Migration guard criada no banco (event trigger)
+- [x] Documentação antiga arquivada em Estrutura/archive/
+- [x] Verificação final: 0 ocorrências em código funcional
+- [x] Sistema 100% padronizado em org_id
+- [x] Proteções contra regressão implementadas
+
 ## ✅ MIGRAÇÃO ORG_ID COMPLETA (2025-01-02)
 - [x] Migração de 48 tabelas de tenant_id para org_id
 - [x] Atualização de todas as APIs para usar org_id

@@ -52,7 +52,7 @@ interface TaskResponse {
 /**
  * Construir query com filtros
  */
-function buildTaskQuery(supabase: any, filters: TaskFilters, tenantId: string) {
+function buildTaskQuery(supabase: any, filters: TaskFilters, orgId: string) {
   let query = supabase
     .from('relationship_tasks')
     .select(`
@@ -75,7 +75,7 @@ function buildTaskQuery(supabase: any, filters: TaskFilters, tenantId: string) {
         phone
       )
     `, { count: 'exact' })
-    .eq('org_id', tenantId)
+    .eq('org_id', orgId)
 
   // Filtros opcionais
   if (filters.status) {
@@ -132,22 +132,22 @@ function buildTaskQuery(supabase: any, filters: TaskFilters, tenantId: string) {
 /**
  * Buscar estatisticas de tarefas
  */
-async function getTaskStats(supabase: any, tenantId: string) {
+async function getTaskStats(supabase: any, orgId: string) {
   const [totalResult, statusResult, anchorResult] = await Promise.all([
     supabase
       .from('relationship_tasks')
       .select('*', { count: 'exact', head: true })
-      .eq('org_id', tenantId),
+      .eq('org_id', orgId),
     
     supabase
       .from('relationship_tasks')
       .select('status')
-      .eq('org_id', tenantId),
+      .eq('org_id', orgId),
     
     supabase
       .from('relationship_tasks')
       .select('anchor')
-      .eq('org_id', tenantId)
+      .eq('org_id', orgId)
   ])
 
   const total = totalResult.count || 0
