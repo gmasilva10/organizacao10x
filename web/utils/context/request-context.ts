@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server"
 
 export type RequestContext = {
   userId: string | null
-  tenantId: string | null
+  org_id: string | null
   role: string | null
 }
 
@@ -81,9 +81,9 @@ export async function resolveRequestContext(_request?: Request): Promise<Request
       })
     }
 
-    return { userId: user?.id || null, tenantId, role }
+    return { userId: user?.id || null, org_id: tenantId, role }
   } catch (error) {
     console.error('❌ resolveRequestContext - Erro inesperado:', error)
-    return { userId: null, tenantId: null, role: null }
+    return { userId: null, org_id: null, role: null }
   }
 }
