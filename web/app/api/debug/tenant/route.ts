@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const user = userData?.user
 
     // Buscar todas as organizações do usuário
-    let memberships = []
+    let memberships: any[] = []
     if (user) {
       const { data: membershipsData } = await supabase
         .from("memberships")
