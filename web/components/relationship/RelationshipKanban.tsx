@@ -508,7 +508,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           <span className="ml-2 text-lg">Carregando tarefas...</span>
         </div>
       ) : (
-        <div className="flex flex-col space-y-0">
+        <div className="flex flex-col space-y-2">
           {/* Cabeçalhos Ultra Finos (como Paint) */}
           <div className="flex space-x-3">
             {visibleColumns.map(column => (
