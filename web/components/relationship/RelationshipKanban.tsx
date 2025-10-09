@@ -509,17 +509,17 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
         </div>
       ) : (
         <div className="flex flex-col space-y-4">
-          {/* Cabeçalhos como Cartões Separados (Print 2) */}
+          {/* Cabeçalhos Compactos (Print 2) */}
           <div className="flex space-x-3">
             {visibleColumns.map(column => (
               <Card key={`header-${column.id}`} className={`flex-shrink-0 w-72 ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
-                <CardContent className="p-4">
+                <CardContent className="py-2 px-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <column.icon className={`h-5 w-5 ${column.color}`} />
-                      <span className="font-medium text-gray-900">{column.title}</span>
+                      <column.icon className={`h-4 w-4 ${column.color}`} />
+                      <span className="text-sm font-medium text-gray-900">{column.title}</span>
                     </div>
-                    <Badge variant="secondary" className="bg-white text-gray-700 border">
+                    <Badge variant="secondary" className="bg-white text-gray-700 border text-xs px-2 py-0.5">
                       {getTasksByColumn(column.id).length}
                     </Badge>
                   </div>
@@ -534,8 +534,8 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
               <Card key={`content-${column.id}`} className="flex-shrink-0 w-72 bg-white">
                 <CardContent className="p-4">
                   {getTasksByColumn(column.id).length === 0 ? (
-                    <div className="text-center text-muted-foreground py-8">
-                      <Inbox className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+                    <div className="text-center text-muted-foreground py-6">
+                      <Inbox className="mx-auto h-8 w-8 text-gray-300 mb-2" />
                       <p className="text-sm font-medium">Nenhuma tarefa</p>
                       <p className="text-xs mt-1">
                         {column.id === 'overdue' && 'Nenhuma tarefa atrasada'}
