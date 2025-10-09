@@ -7,7 +7,7 @@ import type { Organization } from "@/types/organization"
 interface OrganizationLogoProps {
   organization?: Organization | null
   showText?: boolean
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: "sm" | "md" | "lg" | "xl" | "xxl"
   href?: string
   className?: string
   ariaLabel?: string
@@ -26,7 +26,8 @@ export function OrganizationLogo({
     sm: { container: "w-6 h-6", text: "text-sm", icon: 24 },
     md: { container: "w-7 h-7", text: "text-lg", icon: 28 },
     lg: { container: "w-8 h-8", text: "text-xl", icon: 32 },
-    xl: { container: "w-12 h-12", text: "text-xl", icon: 48 }
+    xl: { container: "w-12 h-12", text: "text-xl", icon: 48 },
+    xxl: { container: "w-20 h-20", text: "text-xl", icon: 80 }
   }
 
   const config = sizeConfig[size]
