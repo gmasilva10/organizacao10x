@@ -508,23 +508,23 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           <span className="ml-2 text-lg">Carregando tarefas...</span>
         </div>
       ) : (
-        <div className="flex flex-col space-y-4">
-          {/* Cabeçalhos Compactos (Print 2) */}
+        <div className="flex flex-col space-y-0">
+          {/* Cabeçalhos Ultra Finos (como Paint) */}
           <div className="flex space-x-3">
             {visibleColumns.map(column => (
-              <Card key={`header-${column.id}`} className={`flex-shrink-0 w-72 ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
-                <CardContent className="py-2 px-3">
+              <div key={`header-${column.id}`} className={`flex-shrink-0 w-72 border rounded-t-md ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
+                <div className="py-1 px-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <column.icon className={`h-4 w-4 ${column.color}`} />
-                      <span className="text-sm font-medium text-gray-900">{column.title}</span>
+                      <column.icon className={`h-3 w-3 ${column.color}`} />
+                      <span className="text-xs font-medium text-gray-900">{column.title}</span>
                     </div>
-                    <Badge variant="secondary" className="bg-white text-gray-700 border text-xs px-2 py-0.5">
+                    <Badge variant="secondary" className="bg-white text-gray-700 border text-xs px-1 py-0 h-5">
                       {getTasksByColumn(column.id).length}
                     </Badge>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
 
