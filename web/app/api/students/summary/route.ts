@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return NextResponse.json({ error: "service_unavailable" }, { status: 503 })
 
-  const baseFilters = [`org_id=eq.${ctx.tenantId}`, `deleted_at=is.null`]
+  const baseFilters = [`org_id=eq.${ctx.org_id}`, `deleted_at=is.null`]
   const trainerFilter = ctx.role === "trainer" ? `&trainer_id=eq.${ctx.userId}` : ""
 
   async function countFor(status: string) {

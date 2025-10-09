@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
   // Count tenant members
   if (limitMembers > 0) {
-    const resp = await fetch(`${url}/rest/v1/tenant_users?org_id=eq.${ctx.tenantId}&select=user_id`, { headers: { apikey: key!, Authorization: `Bearer ${key}`!, Prefer: 'count=exact' } })
+    const resp = await fetch(`${url}/rest/v1/tenant_users?org_id=eq.${ctx.org_id}&select=user_id`, { headers: { apikey: key!, Authorization: `Bearer ${key}`!, Prefer: 'count=exact' } })
     const contentRange = resp.headers.get('content-range') || '*/0'
     const members = Number(contentRange.split('/').pop() || 0)
     if (members >= limitMembers) return NextResponse.json({ error:'limit_reached', details:{ limit:'members_total', value: members, max: limitMembers } }, { status: 422 })
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
   // Count trainers when inviting trainer
   if (role === 'trainer' && limitTrainers > 0) {
-    const resp = await fetch(`${url}/rest/v1/memberships?org_id=eq.${ctx.tenantId}&role=eq.trainer&select=user_id`, { headers: { apikey: key!, Authorization: `Bearer ${key}`!, Prefer: 'count=exact' } })
+    const resp = await fetch(`${url}/rest/v1/memberships?org_id=eq.${ctx.org_id}&role=eq.trainer&select=user_id`, { headers: { apikey: key!, Authorization: `Bearer ${key}`!, Prefer: 'count=exact' } })
     const contentRange = resp.headers.get('content-range') || '*/0'
     const trainers = Number(contentRange.split('/').pop() || 0)
     if (trainers >= limitTrainers) return NextResponse.json({ error:'limit_reached', details:{ limit:'trainers', value: trainers, max: limitTrainers } }, { status: 422 })
@@ -46,15 +46,15 @@ export async function POST(request: Request) {
   const user = usersList.users.find(u => (u.email||'').toLowerCase() === email)
   const userId = user?.id || crypto.randomUUID() // placeholder if not found; in real flow, send invite and get id later
 
-  const ins = await fetch(`${url}/rest/v1/tenant_users`, { method:'POST', headers:{ apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=minimal' }, body: JSON.stringify({ org_id: ctx.tenantId, user_id: userId, status: 'invited', invited_at: new Date().toISOString() }) })
+  const ins = await fetch(`${url}/rest/v1/tenant_users`, { method:'POST', headers:{ apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=minimal' }, body: JSON.stringify({ org_id: ctx.org_id, user_id: userId, status: 'invited', invited_at: new Date().toISOString() }) })
   if (!ins.ok) return NextResponse.json({ error:'insert_failed' }, { status: 500 })
 
   // Upsert membership for requested role
   if (role) {
-    await fetch(`${url}/rest/v1/memberships`, { method:'POST', headers:{ apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates' }, body: JSON.stringify({ org_id: ctx.tenantId, user_id: userId, role }) })
+    await fetch(`${url}/rest/v1/memberships`, { method:'POST', headers:{ apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates' }, body: JSON.stringify({ org_id: ctx.org_id, user_id: userId, role }) })
   }
 
-  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'team.invite', email, role } })
+  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'team.invite', email, role } })
   return NextResponse.json({ ok: true, user_id: userId })
 }
 

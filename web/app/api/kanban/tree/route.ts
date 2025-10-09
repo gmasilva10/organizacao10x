@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   const trainerScope = ctx.role === 'trainer' ? `&trainer_id=eq.${ctx.userId}` : ''
 
   // Lista distinta de trainers com contagem
-  const trainersResp = await fetch(`${url}/rest/v1/onboarding_cards?org_id=eq.${ctx.tenantId}${trainerScope}&completed_at=is.null&select=trainer_id,student_id,column_id`, {
+  const trainersResp = await fetch(`${url}/rest/v1/onboarding_cards?org_id=eq.${ctx.org_id}${trainerScope}&completed_at=is.null&select=trainer_id,student_id,column_id`, {
     headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
   })
   const cards = await trainersResp.json().catch(()=>[] as Array<{trainer_id: string|null; student_id: string; column_id: string}>)
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     items,
   }))
 
-  return NextResponse.json({ root: { id: ctx.tenantId, title: 'Organização', count: cards.length }, nodes })
+  return NextResponse.json({ root: { id: ctx.org_id, title: 'Organização', count: cards.length }, nodes })
 }
 
 

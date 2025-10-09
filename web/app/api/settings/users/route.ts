@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const tu = await fetch(`${url}/rest/v1/tenant_users?org_id=eq.${ctx.tenantId}&select=user_id,status,invited_at,activated_at,paused_at,last_login_at`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+  const tu = await fetch(`${url}/rest/v1/tenant_users?org_id=eq.${ctx.org_id}&select=user_id,status,invited_at,activated_at,paused_at,last_login_at`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
   const list: Array<{ user_id: string; status: string; invited_at: string|null; activated_at: string|null; paused_at: string|null; last_login_at: string|null }>
     = await tu.json().catch(()=>[])
   // opcional: join com auth.users via Admin API (e-mails)

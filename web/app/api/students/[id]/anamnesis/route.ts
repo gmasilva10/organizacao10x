@@ -14,7 +14,7 @@ export async function GET(
 ) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx.userId || !ctx.tenantId) {
+    if (!ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
@@ -26,7 +26,7 @@ export async function GET(
       .from('students')
       .select('id, name, email, status, org_id')
       .eq('id', studentId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (studentError || !student) {

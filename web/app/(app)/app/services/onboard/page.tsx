@@ -29,6 +29,7 @@ type Template = {
   is_required: boolean
   order_index: number
   task_code: string
+  sla_hours: number | null
 }
 
 export default function ServicesOnboardPage() {
@@ -367,12 +368,9 @@ export default function ServicesOnboardPage() {
                 <>
                   <div className="flex items-center justify-between gap-1">
                     <div className="flex items-center gap-1 min-w-0 flex-1">
-                      <CardTitle className="text-xs font-medium truncate max-w-[80px]">
+                      <CardTitle className="text-xs font-medium truncate max-w-[120px]">
                         {column.title}
                       </CardTitle>
-                      <Badge variant="outline" className="text-xs flex-shrink-0 px-1">
-                        #{column.position}
-                      </Badge>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <Button
@@ -400,12 +398,6 @@ export default function ServicesOnboardPage() {
                   <div className="h-px bg-muted/50 my-2" />
                   <div className="flex items-center justify-between gap-1">
                     <div className="flex items-center gap-1 min-w-0">
-                      {column.is_fixed && (
-                        <Badge variant="secondary" className="flex items-center gap-0.5 text-xs px-1 py-0">
-                          <Lock className="h-2 w-2" />
-                          Fixa
-                        </Badge>
-                      )}
                       <div className="flex items-center gap-0.5 text-xs text-muted-foreground">
                         <List className="h-2.5 w-2.5" />
                         {column.templates.length}
@@ -441,15 +433,6 @@ export default function ServicesOnboardPage() {
                       <CardTitle className="text-base font-medium">
                         {column.title}
                       </CardTitle>
-                      <Badge variant="outline" className="text-xs">
-                        #{column.position}
-                      </Badge>
-                      {column.is_fixed && (
-                        <Badge variant="secondary" className="flex items-center gap-1">
-                          <Lock className="h-3 w-3" />
-                          Fixa
-                        </Badge>
-                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -519,17 +502,11 @@ export default function ServicesOnboardPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="font-medium text-xs">{template.title}</div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge 
-                            variant={template.is_required ? "destructive" : "secondary"} 
-                            className="text-xs"
-                          >
-                            {template.is_required ? "Obrigatória" : "Opcional"}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            #{template.order_index}
-                          </span>
-                        </div>
+                        {template.sla_hours && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            SLA: {template.sla_hours}h
+                          </div>
+                        )}
                       </div>
                       <Button
                         variant="ghost"
@@ -560,6 +537,9 @@ export default function ServicesOnboardPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nova Tarefa</DialogTitle>
+            <DialogDescription>
+              Criar uma nova tarefa padrão para a coluna {newTemplateModal.column?.title}
+            </DialogDescription>
           </DialogHeader>
           {newTemplateModal.column && (
             <NewTemplateForm
@@ -599,6 +579,9 @@ export default function ServicesOnboardPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nova Coluna</DialogTitle>
+            <DialogDescription>
+              Adicionar uma nova coluna ao quadro de onboarding
+            </DialogDescription>
           </DialogHeader>
           <NewColumnForm
             onSave={createNewColumn}
@@ -612,6 +595,9 @@ export default function ServicesOnboardPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Coluna</DialogTitle>
+            <DialogDescription>
+              Editar o nome da coluna {editColumnModal.column?.title}
+            </DialogDescription>
           </DialogHeader>
           {editColumnModal.column && (
             <EditColumnForm
@@ -700,7 +686,7 @@ function ManageTemplatesForm({
               <tr>
                 <th className="text-left p-3 font-medium">Ordem</th>
                 <th className="text-left p-3 font-medium">Nome</th>
-                <th className="text-left p-3 font-medium">Tipo</th>
+                <th className="text-left p-3 font-medium">SLA</th>
                 <th className="text-left p-3 font-medium">Ações</th>
               </tr>
             </thead>
@@ -772,13 +758,20 @@ function ManageTemplatesForm({
                     )}
                   </td>
                   <td className="p-3">
-                    <Switch
-                      checked={template.is_required}
-                      onCheckedChange={(_checked: boolean) => handleToggleRequired(template.id, template.is_required)}
-                    />
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      {template.is_required ? 'Obrigatória' : 'Opcional'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        min="1"
+                        value={template.sla_hours || ''}
+                        onChange={(e) => {
+                          const value = e.target.value ? parseInt(e.target.value) : null
+                          onUpdate(template.id, { sla_hours: value })
+                        }}
+                        placeholder="Ex: 48"
+                        className="w-20 h-8"
+                      />
+                      <span className="text-xs text-muted-foreground">h</span>
+                    </div>
                   </td>
                   <td className="p-3">
                     <Button
@@ -827,57 +820,71 @@ function NewColumnForm({ onSave, onCancel }: { onSave: (data: any) => void; onCa
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-6">
+      {/* Seção Principal */}
       <div>
-        <Label htmlFor="name">Nome da Coluna *</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Ex: Avaliação Física"
-          required
-        />
-      </div>
-      
-      <div>
-        <Label htmlFor="position">Posição (opcional)</Label>
-        <Input
-          id="position"
-          type="number"
-          value={position || ''}
-          onChange={(e) => setPosition(e.target.value ? parseInt(e.target.value) : null)}
-          placeholder="Posição da coluna (2-98)"
-          min="2"
-          max="98"
-        />
-        <p className="text-xs text-muted-foreground mt-1">
-          Se não especificado, será alocada automaticamente antes da coluna #99 (Entrega do Treino)
-        </p>
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          📝 Informações da Coluna
+        </h3>
+        <div className="border rounded-lg p-4 space-y-4">
+          <div>
+            <Label htmlFor="name" className="mb-2 block">Nome da Coluna *</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ex: Avaliação Física"
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="position" className="mb-2 block">Posição (opcional)</Label>
+            <Input
+              id="position"
+              type="number"
+              value={position || ''}
+              onChange={(e) => setPosition(e.target.value ? parseInt(e.target.value) : null)}
+              placeholder="Ex: 5"
+              min="2"
+              max="98"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Se não especificado, será alocada automaticamente antes da coluna #99 (Entrega do Treino)
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="text-sm text-muted-foreground space-y-1">
-        <p><strong>Regras:</strong></p>
-        <p>• A coluna será criada como não-fixa e poderá ser editada/reordenada</p>
-        <p>• Colunas #1 (Novo Aluno) e #99 (Entrega do Treino) são fixas e não podem ser alteradas</p>
-        <p>• Posição deve estar entre 2 e 98</p>
+      {/* Informações Contextuais */}
+      <div>
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          ℹ️ Regras
+        </h3>
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>• A coluna será criada como não-fixa e poderá ser editada/reordenada</p>
+          <p>• Colunas #1 (Novo Aluno) e #99 (Entrega do Treino) são fixas e não podem ser alteradas</p>
+          <p>• Posição deve estar entre 2 e 98</p>
+        </div>
       </div>
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={!name.trim()}>
+        <Button type="submit" onClick={handleSubmit} disabled={!name.trim()}>
           Criar Coluna
         </Button>
       </DialogFooter>
-    </form>
+    </div>
   )
 }
 
 function NewTemplateForm({ column, onSave, onCancel }: { column: Column; onSave: (data: any) => void; onCancel: () => void }) {
   const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
   const [isRequired, setIsRequired] = useState(true)
+  const [hasSla, setHasSla] = useState(false)
+  const [slaHours, setSlaHours] = useState<number | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -885,58 +892,91 @@ function NewTemplateForm({ column, onSave, onCancel }: { column: Column; onSave:
     
     onSave({
       title: title.trim(),
-      description: description.trim(),
-      is_required: isRequired
+      description: '', // Removido campo description
+      is_required: isRequired,
+      sla_hours: hasSla ? slaHours : null
     })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-6">
+      {/* Seção Principal */}
       <div>
-        <Label htmlFor="title">Título da Tarefa *</Label>
-        <Input
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Ex: Preencher ficha de anamnese"
-          required
-        />
-      </div>
-      
-      <div>
-        <Label htmlFor="description">Descrição (opcional)</Label>
-        <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Descrição detalhada da tarefa..."
-          rows={3}
-        />
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          📝 Informações Básicas
+        </h3>
+        <div className="border rounded-lg p-4 space-y-4">
+          <div>
+            <Label htmlFor="title" className="mb-2 block">Título da Tarefa *</Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: Preencher ficha de anamnese"
+              required
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isRequired"
+              checked={isRequired}
+              onCheckedChange={(checked: boolean) => setIsRequired(checked)}
+            />
+            <Label htmlFor="isRequired">Tarefa obrigatória</Label>
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="isRequired"
-          checked={isRequired}
-          onCheckedChange={(checked: boolean) => setIsRequired(checked)}
-        />
-        <Label htmlFor="isRequired">Tarefa obrigatória</Label>
+      {/* Seção SLA */}
+      <div>
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          ⏱️ SLA (Service Level Agreement)
+        </h3>
+        <div className="border rounded-lg p-4 space-y-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="hasSla"
+              checked={hasSla}
+              onCheckedChange={(checked: boolean) => setHasSla(checked)}
+            />
+            <Label htmlFor="hasSla">Definir SLA</Label>
+          </div>
+          {hasSla && (
+            <div>
+              <Label htmlFor="slaHours" className="mb-2 block">Prazo (horas) *</Label>
+              <Input
+                id="slaHours"
+                type="number"
+                min="1"
+                value={slaHours || ''}
+                onChange={(e) => setSlaHours(e.target.value ? parseInt(e.target.value) : null)}
+                placeholder="Ex: 48"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="text-sm text-muted-foreground">
-        <p><strong>Coluna:</strong> {column.title} (#{column.position})</p>
-        <p>A tarefa será adicionada automaticamente aos novos alunos nesta coluna.</p>
+      {/* Informações Contextuais */}
+      <div>
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          ℹ️ Informações
+        </h3>
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p><strong>Coluna:</strong> {column.title} (#{column.position})</p>
+          <p>A tarefa será adicionada automaticamente aos novos alunos nesta coluna.</p>
+        </div>
       </div>
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={!title.trim()}>
+        <Button type="submit" onClick={handleSubmit} disabled={!title.trim() || (hasSla && !slaHours)}>
           Criar Tarefa
         </Button>
       </DialogFooter>
-    </form>
+    </div>
   )
 }
 

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const { count, error } = await supabase
       .from('professionals')
       .select('*', { count: 'exact', head: true })
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
 
     if (error) {
       console.error('Erro ao contar profissionais:', error)

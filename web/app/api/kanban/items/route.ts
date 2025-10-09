@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     if (countOnly) {
       // Retornar apenas a contagem de itens
-      const countResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&select=count`, {
+      const countResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=count`, {
         headers: { ...headers, 'Prefer': 'count=exact' },
         cache: 'no-store'
       })
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar itens completos
-    const itemsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&select=id,student_id,stage_id,position,meta,created_at&order=position.asc`, {
+    const itemsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,meta,created_at&order=position.asc`, {
       headers,
       cache: 'no-store'
     })

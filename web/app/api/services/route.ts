@@ -22,14 +22,14 @@ export async function GET(request: Request) {
   const headers: Record<string, string> = { apikey: key!, Authorization: `Bearer ${key}`! }
 
   const listResp = await fetch(
-    `${url}/rest/v1/services?org_id=eq.${ctx.tenantId}${activeFilter}&order=created_at.desc&select=id,org_id,name,description,duration_min,price_cents,plan_visibility,is_active,created_at,updated_at&range=${rangeFrom}-${rangeTo}`,
+    `${url}/rest/v1/services?org_id=eq.${ctx.org_id}${activeFilter}&order=created_at.desc&select=id,org_id,name,description,duration_min,price_cents,plan_visibility,is_active,created_at,updated_at&range=${rangeFrom}-${rangeTo}`,
     { headers, cache: "no-store" }
   )
   const items = await listResp.json().catch(() => [])
 
   // total via head count
   const countResp = await fetch(
-    `${url}/rest/v1/services?org_id=eq.${ctx.tenantId}${activeFilter}&select=id`,
+    `${url}/rest/v1/services?org_id=eq.${ctx.org_id}${activeFilter}&select=id`,
     { headers: { ...headers, Prefer: "count=exact" }, cache: "no-store" }
   )
   const total = Number(countResp.headers.get("content-range")?.split("/")?.[1] || 0)
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 
   const headers: Record<string, string> = { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json", Prefer: "return=representation" }
   const payload = [{
-    org_id: ctx.tenantId,
+    org_id: ctx.org_id,
     name,
     description: b.description ?? null,
     duration_min: duration,
@@ -90,12 +90,12 @@ export async function POST(request: Request) {
       await fetch(`${url}/rest/v1/events`, {
         method: "POST",
         headers: { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json", Prefer: "return=minimal" },
-        body: JSON.stringify({ org_id: ctx.tenantId, user_id: ctx.userId, event_type: "service.created", payload: { name }, route: "/(app)/services", ts: new Date().toISOString() })
+        body: JSON.stringify({ org_id: ctx.org_id, user_id: ctx.userId, event_type: "service.created", payload: { name }, route: "/(app)/services", ts: new Date().toISOString() })
       })
       await fetch(`${url}/rest/v1/audit_log`, {
         method: "POST",
         headers: { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json", Prefer: "return=minimal" },
-        body: JSON.stringify({ org_id: ctx.tenantId, actor_id: ctx.userId, entity_type: "service", entity_id: json?.[0]?.id || "", action: "service.created", payload: { name, price_cents: price }, created_at: new Date().toISOString() })
+        body: JSON.stringify({ org_id: ctx.org_id, actor_id: ctx.userId, entity_type: "service", entity_id: json?.[0]?.id || "", action: "service.created", payload: { name, price_cents: price }, created_at: new Date().toISOString() })
       })
     } catch {}
   })()

@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 
-// PATCH - Atualizar tarefa
-
 // Forçar execução dinâmica para evitar problemas de renderização estática
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+// PATCH - Atualizar tarefa existente
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    console.log('🚀 API PATCH /api/services/onboarding/tasks/[id] iniciada')
+    
     const supabase = await createClient()
     
     // Verificar autenticação
@@ -21,12 +22,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
-    const { title, description, is_required, order_index, apply_to_existing } = await request.json()
-    
-    if (!id) {
-      return NextResponse.json({ error: 'ID da tarefa é obrigatório' }, { status: 400 })
-    }
+    const taskId = params.id
+    const updates = await request.json()
+    console.log('📝 Atualizações recebidas:', updates)
 
     // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
@@ -39,91 +37,94 @@ export async function PATCH(
       return NextResponse.json({ error: 'Usuário não pertence a uma organização' }, { status: 403 })
     }
 
-    // Verificar se a tarefa existe e pertence à organização
-    const { data: existingTask, error: fetchError } = await supabase
+    // Verificar se a tarefa pertence à organização do usuário
+    const { data: existingTask, error: taskError } = await supabase
       .from('service_onboarding_tasks')
-      .select('*')
-      .eq('id', id)
+      .select('id, org_id')
+      .eq('id', taskId)
       .eq('org_id', membership.org_id)
       .single()
 
-    if (fetchError || !existingTask) {
+    if (taskError || !existingTask) {
       return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 })
     }
 
     // Preparar dados para atualização
     const updateData: any = {}
-    if (title !== undefined) updateData.title = title.trim()
-    if (description !== undefined) updateData.description = description?.trim() || ''
-    if (is_required !== undefined) updateData.is_required = is_required
-    if (order_index !== undefined) updateData.order_index = order_index
+    
+    if (updates.title !== undefined) {
+      updateData.title = updates.title.trim()
+    }
+    
+    if (updates.description !== undefined) {
+      updateData.description = updates.description.trim()
+    }
+    
+    if (updates.is_required !== undefined) {
+      updateData.is_required = updates.is_required
+    }
+    
+    if (updates.order_index !== undefined) {
+      updateData.order_index = updates.order_index
+    }
+    
+    if (updates.sla_hours !== undefined) {
+      updateData.sla_hours = updates.sla_hours || null
+    }
 
     // Atualizar tarefa
+    console.log('🔄 Atualizando tarefa:', updateData)
     const { data: updatedTask, error: updateError } = await supabase
       .from('service_onboarding_tasks')
       .update(updateData)
-      .eq('id', id)
+      .eq('id', taskId)
+      .eq('org_id', membership.org_id)
       .select()
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar tarefa:', updateError)
+      console.error('❌ Erro ao atualizar tarefa:', updateError)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
-    // Se solicitado, aplicar aos cards existentes
-    if (apply_to_existing) {
-      try {
-        // Chamar função PostgreSQL para aplicar aos cards existentes
-        const { data: applyResult, error: applyError } = await supabase.rpc(
-          'apply_catalog_to_existing_cards',
-          {
-            p_stage_code: existingTask.stage_code,
-            p_org_id: membership.org_id,
-            p_apply_to_existing: true
-          }
-        )
-
-        if (applyError) {
-          console.error('Erro ao aplicar aos cards existentes:', applyError)
-        }
-      } catch (applyError) {
-        console.error('Erro ao aplicar aos cards existentes:', applyError)
-      }
-    }
+    console.log('✅ Tarefa atualizada com sucesso:', updatedTask.id)
 
     // Log da atualização
     try {
-      await supabase
+      const { error: logError } = await supabase
         .from('kanban_logs')
         .insert({
           org_id: membership.org_id,
           user_id: user.id,
           action: 'task_catalog_updated',
           entity_type: 'service_onboarding_task',
-          entity_id: id,
+          entity_id: taskId,
           payload: {
-            task_id: id,
-            old_values: existingTask,
-            new_values: updatedTask,
-            apply_to_existing: apply_to_existing || false
+            task_id: taskId,
+            updates: updateData,
+            updated_at: new Date().toISOString()
           }
         })
+      
+      if (logError) {
+        console.error('❌ Erro ao criar log:', logError)
+      } else {
+        console.log('✅ Log criado com sucesso')
+      }
     } catch (logError) {
-      console.error('Erro ao criar log:', logError)
-      // Não falha a operação se o log falhar
+      console.error('❌ Erro ao criar log:', logError)
     }
 
+    console.log('🎉 Retornando sucesso para cliente')
     return NextResponse.json({ 
       success: true, 
       message: 'Tarefa atualizada com sucesso',
       task: updatedTask,
-      applied_to_existing: apply_to_existing || false,
-      invalidateCache: true  // Flag para o frontend invalidar cache
+      invalidateCache: true
     })
 
   } catch (error) {
-    console.error('Erro inesperado:', error)
+    console.error('❌ Erro inesperado na API:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
@@ -134,6 +135,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    console.log('🚀 API DELETE /api/services/onboarding/tasks/[id] iniciada')
+    
     const supabase = await createClient()
     
     // Verificar autenticação
@@ -142,11 +145,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
-    
-    if (!id) {
-      return NextResponse.json({ error: 'ID da tarefa é obrigatório' }, { status: 400 })
-    }
+    const taskId = params.id
 
     // Buscar org_id do usuário
     const { data: membership, error: membershipError } = await supabase
@@ -159,48 +158,69 @@ export async function DELETE(
       return NextResponse.json({ error: 'Usuário não pertence a uma organização' }, { status: 403 })
     }
 
-    // Verificar se a tarefa existe e pertence à organização
-    const { data: existingTask, error: fetchError } = await supabase
+    // Verificar se a tarefa pertence à organização do usuário
+    const { data: existingTask, error: taskError } = await supabase
       .from('service_onboarding_tasks')
-      .select('*')
-      .eq('id', id)
+      .select('id, org_id, title, stage_code')
+      .eq('id', taskId)
       .eq('org_id', membership.org_id)
       .single()
 
-    if (fetchError || !existingTask) {
+    if (taskError || !existingTask) {
       return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 })
     }
 
-    // Implementar soft delete - marcar como excluída em vez de apagar fisicamente
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    const { data: updatedTask, error: deleteError } = await supabase
+    // Excluir tarefa (soft delete - marcar order_index como -1)
+    console.log('🔄 Excluindo tarefa (soft delete):', taskId)
+    const { error: deleteError } = await supabase
       .from('service_onboarding_tasks')
-      .update({
-        title: `[EXCLUÍDO-${timestamp}] ${existingTask.title}`,
-        description: `Tarefa excluída em ${new Date().toISOString()}. Descrição original: ${existingTask.description || 'Sem descrição'}`,
-        is_required: false,
-        order_index: -1
-      })
-      .eq('id', id)
-      .select()
-      .single()
+      .update({ order_index: -1 })
+      .eq('id', taskId)
+      .eq('org_id', membership.org_id)
 
     if (deleteError) {
-      console.error('Erro ao excluir tarefa (soft delete):', deleteError)
-      return NextResponse.json({ error: 'Erro ao excluir tarefa' }, { status: 500 })
+      console.error('❌ Erro ao excluir tarefa:', deleteError)
+      return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
-    // Log da exclusão (simplificado - não usar kanban_logs que é específico para cards)
-    console.log(`Template excluído: ${existingTask.title} (${existingTask.stage_code}) por usuário ${user.id} na org ${membership.org_id}`)
+    console.log('✅ Tarefa excluída com sucesso:', taskId)
 
+    // Log da exclusão
+    try {
+      const { error: logError } = await supabase
+        .from('kanban_logs')
+        .insert({
+          org_id: membership.org_id,
+          user_id: user.id,
+          action: 'task_catalog_deleted',
+          entity_type: 'service_onboarding_task',
+          entity_id: taskId,
+          payload: {
+            task_id: taskId,
+            task_title: existingTask.title,
+            stage_code: existingTask.stage_code,
+            deleted_at: new Date().toISOString()
+          }
+        })
+      
+      if (logError) {
+        console.error('❌ Erro ao criar log:', logError)
+      } else {
+        console.log('✅ Log criado com sucesso')
+      }
+    } catch (logError) {
+      console.error('❌ Erro ao criar log:', logError)
+    }
+
+    console.log('🎉 Retornando sucesso para cliente')
     return NextResponse.json({ 
       success: true, 
       message: 'Tarefa excluída com sucesso',
-      invalidateCache: true  // Flag para o frontend invalidar cache
+      invalidateCache: true
     })
 
   } catch (error) {
-    console.error('Erro inesperado:', error)
+    console.error('❌ Erro inesperado na API:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

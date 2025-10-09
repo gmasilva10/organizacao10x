@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const orgResp = await fetch(`${url}/rest/v1/tenants?id=eq.${ctx.tenantId}&select=display_name,legal_name,cnpj,address,timezone,currency,plan_code`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+  const orgResp = await fetch(`${url}/rest/v1/tenants?id=eq.${ctx.org_id}&select=display_name,legal_name,cnpj,address,timezone,currency,plan_code`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
   const org = (await orgResp.json().catch(()=>[]))?.[0] || null
   const reqCookie = (request.headers as Headers).get('cookie') || ''
   const caps = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/capabilities`, { headers: { cookie: reqCookie } }).then(r=>r.json()).catch(()=>null)
@@ -40,7 +40,7 @@ export async function PATCH(request: Request) {
   if (body.currency != null) patchRow.currency = String(body.currency).toUpperCase().slice(0,3)
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const resp = await fetch(`${url}/rest/v1/tenants?id=eq.${ctx.tenantId}`, { method: 'PATCH', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=minimal' }, body: JSON.stringify(patchRow) })
+  const resp = await fetch(`${url}/rest/v1/tenants?id=eq.${ctx.org_id}`, { method: 'PATCH', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=minimal' }, body: JSON.stringify(patchRow) })
   if (!resp.ok) return NextResponse.json({ error: 'update_failed' }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

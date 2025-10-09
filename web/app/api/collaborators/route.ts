@@ -55,7 +55,7 @@ export async function GET(request: Request) {
     let queryBuilder = supabase
       .from("collaborators")
       .select("*", { count: "exact" })
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .order("created_at", { ascending: false })
 
     // Filtros
@@ -97,7 +97,7 @@ export async function GET(request: Request) {
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              org_id: ctx.tenantId, 
+              org_id: ctx.org_id, 
               user_id: user.id, 
               event_type: "collaborators.list", 
               payload: { 
@@ -216,7 +216,7 @@ export async function POST(request: Request) {
     const { count: currentCount } = await supabase
       .from("collaborators")
       .select("id", { count: "exact", head: true })
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .eq("status", "active")
 
     const activeCount = currentCount || 0
@@ -225,7 +225,7 @@ export async function POST(request: Request) {
     const { data: tenant } = await supabase
       .from("tenants")
       .select("plan_code")
-      .eq("id", ctx.tenantId)
+      .eq("id", ctx.org_id)
       .single()
 
     const plan = (tenant as any)?.plan_code || "basic"
@@ -253,7 +253,7 @@ export async function POST(request: Request) {
     const { data: collaborator, error } = await supabase
       .from("collaborators")
       .insert({
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         full_name: fullName,
         email,
         phone,
@@ -283,7 +283,7 @@ export async function POST(request: Request) {
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              org_id: ctx.tenantId, 
+              org_id: ctx.org_id, 
               user_id: user.id, 
               event_type: "collaborator.created", 
               payload: { 

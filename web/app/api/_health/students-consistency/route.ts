@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const softDelete = (process.env.STUDENTS_USE_SOFT_DELETE ?? 'true') !== 'false'
 
   // pegar 3 primeiros alunos
-  const baseFilters = [`org_id=eq.${ctx.tenantId}`]
+  const baseFilters = [`org_id=eq.${ctx.org_id}`]
   if (softDelete) baseFilters.push('deleted_at=is.null')
   const listUrl = `${url}/rest/v1/students?${baseFilters.join('&')}&select=id&limit=3`
   const listResp = await fetch(listUrl, { headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store' })
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   const ids = (await listResp.json()).map((r: any) => r.id) as string[]
 
   for (const id of ids) {
-    const itemFilters = [`id=eq.${id}`, `org_id=eq.${ctx.tenantId}`]
+    const itemFilters = [`id=eq.${id}`, `org_id=eq.${ctx.org_id}`]
     if (softDelete) itemFilters.push('deleted_at=is.null')
     const itemUrl = `${url}/rest/v1/students?${itemFilters.join('&')}&select=id`
     const itemResp = await fetch(itemUrl, { headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store' })
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         ok: false,
         inconsistentId: id,
-        tenantId: ctx.tenantId,
+        tenantId: ctx.org_id,
         details: { listUrl, itemUrl, itemStatus: itemResp.status },
       }, { status: 500 })
     }

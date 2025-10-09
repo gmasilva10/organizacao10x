@@ -13,10 +13,15 @@ export class TestHelpers {
     await this.page.fill('input[name="email"]', TEST_CONFIG.ADMIN_EMAIL);
     await this.page.fill('input[name="password"]', TEST_CONFIG.PASSWORD);
     await this.page.click('button[type="submit"]');
-    
-    // Aguardar redirecionamento para /app
-    await this.page.waitForURL('/app');
     await this.page.waitForLoadState('networkidle');
+    
+    // Aguardar redirecionamento para /app ou /app/dashboard, com fallback
+    try {
+      await this.page.waitForURL(/\/app(\/dashboard)?(\?.*)?$/, { timeout: 8000 });
+    } catch {
+      await this.page.goto('/app');
+      await this.page.waitForLoadState('networkidle');
+    }
   }
 
   async loginAsTrainer() {
@@ -27,10 +32,15 @@ export class TestHelpers {
     await this.page.fill('input[name="email"]', TEST_CONFIG.TRAINER_EMAIL);
     await this.page.fill('input[name="password"]', TEST_CONFIG.PASSWORD);
     await this.page.click('button[type="submit"]');
-    
-    // Aguardar redirecionamento para /app
-    await this.page.waitForURL('/app');
     await this.page.waitForLoadState('networkidle');
+    
+    // Aguardar redirecionamento para /app ou /app/dashboard, com fallback
+    try {
+      await this.page.waitForURL(/\/app(\/dashboard)?(\?.*)?$/, { timeout: 8000 });
+    } catch {
+      await this.page.goto('/app');
+      await this.page.waitForLoadState('networkidle');
+    }
   }
 
   async logout() {

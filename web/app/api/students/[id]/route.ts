@@ -15,10 +15,21 @@ export async function GET(
     const commit = (process.env.VERCEL_GIT_COMMIT_SHA || process.env.COMMIT_SHA || 'dev').slice(0, 7)
     const { id: studentId } = await params
 
+    // Debug de contexto de tenant
+    console.log('🔍 API Student Detail - Contexto de tenant:', {
+      userId: ctx?.userId,
+      tenantId: ctx?.tenantId,
+      role: ctx?.role,
+      studentId,
+      env,
+      requestId
+    })
+
     // Em produção exigimos tenant; em dev permitimos fallback sem multi-tenant
     const isDev = process.env.NODE_ENV !== 'production'
-    if ((!ctx || !ctx.tenantId) && !isDev) {
+    if ((!ctx || !ctx.org_id) && !isDev) {
       const queryTime = Date.now() - startTime
+      console.error('❌ API Student Detail - Tenant não resolvido:', { ctx, isDev, studentId })
       return NextResponse.json(
         { error: 'unauthorized', message: 'Tenant não resolvido no contexto da requisição.' },
         { status: 401, headers: { 'X-Query-Time': queryTime.toString() } }
@@ -38,7 +49,7 @@ export async function GET(
     // Buscar aluno específico com feature-flag de soft-delete
     const filters: string[] = []
     filters.push(`id=eq.${studentId}`)
-    if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.tenantId}`)
+    if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.org_id}`)
     if (softDelete) filters.push(`deleted_at=is.null`)
     const select = `select=id,name,email,phone,status,created_at,trainer_id,photo_url,birth_date,gender,marital_status,nationality,birth_place,address`
     const studentUrl = `${url}/rest/v1/students?${filters.join('&')}&${select}`
@@ -90,7 +101,7 @@ export async function GET(
     // Buscar dados do treinador se existir
     let trainer = null
     if (student.trainer_id) {
-      const trainerTenant = ctx?.tenantId ? `&org_id=eq.${ctx.tenantId}` : ''
+      const trainerTenant = ctx?.tenantId ? `&org_id=eq.${ctx.org_id}` : ''
       const trainerUrl = `${url}/rest/v1/profiles?id=eq.${student.trainer_id}${trainerTenant}&select=id,full_name`
       
       try {
@@ -145,7 +156,7 @@ export async function GET(
         'Pragma': 'no-cache',
         'X-Debug-Env': env,
         'X-Debug-Commit': commit,
-        'X-Debug-Tenant': String(ctx.tenantId || ''),
+        'X-Debug-Tenant': String(ctx.org_id || ''),
         'X-Debug-User': String(ctx.userId || ''),
         'X-Debug-Flags': `STUDENTS_USE_SOFT_DELETE=${softDelete}`,
       }
@@ -166,7 +177,7 @@ export async function PUT(
   try {
     const ctx = await resolveRequestContext(request)
     
-    if (!ctx || !ctx.tenantId) {
+    if (!ctx || !ctx.org_id) {
       const queryTime = Date.now() - startTime
       return NextResponse.json(
         { error: "unauthorized", message: "Tenant não resolvido no contexto da requisição." },
@@ -222,7 +233,7 @@ export async function PUT(
     // Log para debug
     console.log('Dados sendo enviados para atualização:', JSON.stringify(updateData, null, 2))
 
-    const updateUrl = `${url}/rest/v1/students?id=eq.${studentId}&org_id=eq.${ctx.tenantId}`
+    const updateUrl = `${url}/rest/v1/students?id=eq.${studentId}&org_id=eq.${ctx.org_id}`
     
     const updateResponse = await fetch(updateUrl, {
       method: 'PATCH',

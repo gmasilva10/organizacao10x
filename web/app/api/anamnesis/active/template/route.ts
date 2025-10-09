@@ -17,7 +17,7 @@ const setDefaultTemplateSchema = z.object({
 // POST /api/anamnesis/active/template - Definir template padrão da organização
 export async function POST(request: Request) {
   const ctx = await resolveRequestContext(request)
-  if (!ctx || !ctx.userId || !ctx.tenantId) {
+  if (!ctx || !ctx.userId || !ctx.org_id) {
     return NextResponse.json({ error: "Usuário não autenticado" }, { status: 401 })
   }
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const templateOrgId = Array.isArray((templateVersion as any).template)
       ? (templateVersion as any).template[0]?.organization_id
       : (templateVersion as any).template?.organization_id
-    if (templateOrgId !== ctx.tenantId) {
+    if (templateOrgId !== ctx.org_id) {
       return NextResponse.json({ error: "Template não pertence à organização" }, { status: 403 })
     }
 
@@ -62,20 +62,20 @@ export async function POST(request: Request) {
     const { data: previousDefault } = await supabase
       .from('organization_default_templates')
       .select('template_version_id')
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     // Remover default anterior se existir
     await supabase
       .from('organization_default_templates')
       .delete()
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
 
     // Definir novo default
     const { data: defaultTemplate, error: createError } = await supabase
       .from('organization_default_templates')
       .insert({
-        organization_id: ctx.tenantId,
+        organization_id: ctx.org_id,
         template_version_id: validatedData.template_version_id,
         created_by: ctx.userId
       })
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
     // Registrar auditoria
     const auditLogger = AuditLogger.getInstance(supabase)
     await auditLogger.logSetDefault(
-      ctx.tenantId,
+      ctx.org_id,
       ctx.userId,
       'template',
       validatedData.template_version_id,

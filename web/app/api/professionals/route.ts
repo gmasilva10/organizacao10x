@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
         is_active,
         professional_profiles!inner(name)
       `)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
 
     // Filtro por status (active/inactive)
     if (status === 'active') {
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
       .from('professional_profiles')
       .select('id')
       .eq('id', profile_id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (profileError || !profile) {
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
     const { data: existingCPF, error: cpfError } = await supabase
       .from('professionals')
       .select('id')
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .eq('cpf', cpf)
       .single()
 
@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
     const { data: existingEmail, error: emailError } = await supabase
       .from('professionals')
       .select('id')
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .eq('email', email)
       .single()
 
@@ -312,7 +312,7 @@ export async function POST(request: NextRequest) {
         .from('memberships')
         .insert({
           user_id,
-          org_id: ctx.tenantId,
+          org_id: ctx.org_id,
           role: 'trainer',
           status: 'active'
         })
@@ -327,7 +327,7 @@ export async function POST(request: NextRequest) {
     const { data: professional, error } = await supabase
       .from('professionals')
       .insert({
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         profile_id,
         user_id,
         full_name,

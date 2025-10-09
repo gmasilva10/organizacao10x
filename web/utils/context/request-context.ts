@@ -8,29 +8,82 @@ export type RequestContext = {
 }
 
 export async function resolveRequestContext(_request?: Request): Promise<RequestContext> {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getUser()
-  const user = data?.user || null
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getUser()
+    const user = data?.user || null
 
-  // Tenta obter org ativa do cookie (quando AppShell define)
-  const cookieStore = await cookies()
-  const activeOrg = cookieStore.get("pg.active_org")?.value || null
+    // Tenta obter org ativa do cookie (quando AppShell define)
+    const cookieStore = await cookies()
+    const activeOrg = cookieStore.get("pg.active_org")?.value || null
 
-  // Busca membership do usuário (primeira org)
-  let tenantId: string | null = activeOrg
-  let role: string | null = null
+    // Debug de contexto
+    console.log('🔍 resolveRequestContext - Debug:', {
+      userId: user?.id,
+      userEmail: user?.email,
+      activeOrgFromCookie: activeOrg,
+      hasUser: !!user
+    })
 
-  if (user) {
-    const { data: membership } = await (await createClient())
-      .from("memberships")
-      .select("org_id, role")
-      .eq("user_id", user.id)
-      .limit(1)
-      .maybeSingle()
+    // Busca membership do usuário (primeira org)
+    let tenantId: string | null = activeOrg
+    let role: string | null = null
 
-    tenantId = tenantId || membership?.org_id || null
-    role = membership?.role || null
+    if (user) {
+      // Primeiro verifica se o activeOrg é válido (usuário tem acesso)
+      let membership = null
+      
+      if (activeOrg) {
+        const { data: activeOrgMembership, error: activeOrgError } = await (await createClient())
+          .from("memberships")
+          .select("org_id, role")
+          .eq("user_id", user.id)
+          .eq("org_id", activeOrg)
+          .limit(1)
+          .maybeSingle()
+        
+        if (activeOrgError) {
+          console.error('❌ resolveRequestContext - Erro ao verificar acesso à org ativa:', activeOrgError)
+        }
+        
+        membership = activeOrgMembership
+      }
+      
+      // Se não tem acesso à org ativa ou não há org ativa, busca a primeira disponível
+      if (!membership) {
+        const { data: firstMembership, error: firstMembershipError } = await (await createClient())
+          .from("memberships")
+          .select("org_id, role")
+          .eq("user_id", user.id)
+          .limit(1)
+          .maybeSingle()
+        
+        if (firstMembershipError) {
+          console.error('❌ resolveRequestContext - Erro ao buscar primeira membership:', firstMembershipError)
+        }
+        
+        membership = firstMembership
+      }
+
+      tenantId = membership?.org_id || null
+      role = membership?.role || null
+      
+      // Log de debug para identificar problemas
+      if (activeOrg && activeOrg !== tenantId) {
+        console.warn(`⚠️ Tenant mismatch: activeOrg=${activeOrg}, resolved=${tenantId}`)
+      }
+
+      console.log('🔍 resolveRequestContext - Membership:', {
+        membership,
+        finalTenantId: tenantId,
+        finalRole: role,
+        hadAccessToActiveOrg: !!membership
+      })
+    }
+
+    return { userId: user?.id || null, tenantId, role }
+  } catch (error) {
+    console.error('❌ resolveRequestContext - Erro inesperado:', error)
+    return { userId: null, tenantId: null, role: null }
   }
-
-  return { userId: user?.id || null, tenantId, role }
 }

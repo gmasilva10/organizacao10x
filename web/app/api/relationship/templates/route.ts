@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   if (!canRead(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  const tenantId = ctx.tenantId
+  const tenantId = ctx.org_id
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   const readV2 = process.env.REL_TEMPLATES_V2_READ === '1'
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  const tenantId = ctx.tenantId
+  const tenantId = ctx.org_id
   const userId = ctx.userId
   type Body = { 
     code?: string; 

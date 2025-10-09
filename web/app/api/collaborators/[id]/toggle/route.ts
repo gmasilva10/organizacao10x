@@ -43,7 +43,7 @@ export async function PATCH(
       .from("collaborators")
       .select("*")
       .eq("id", collaboratorId)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .single()
 
     if (fetchError || !existingCollaborator) {
@@ -58,7 +58,7 @@ export async function PATCH(
       const { count: currentCount } = await supabase
         .from("collaborators")
         .select("id", { count: "exact", head: true })
-        .eq("org_id", ctx.tenantId)
+        .eq("org_id", ctx.org_id)
         .eq("status", "active")
 
       const activeCount = currentCount || 0
@@ -67,7 +67,7 @@ export async function PATCH(
       const { data: tenant } = await supabase
         .from("tenants")
         .select("plan")
-        .eq("id", ctx.tenantId)
+        .eq("id", ctx.org_id)
         .single()
 
       const plan = tenant?.plan || "basic"
@@ -101,7 +101,7 @@ export async function PATCH(
         updated_at: new Date().toISOString()
       })
       .eq("id", collaboratorId)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .select()
       .single()
 
@@ -125,7 +125,7 @@ export async function PATCH(
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              org_id: ctx.tenantId, 
+              org_id: ctx.org_id, 
               user_id: user.id, 
               event_type: "collaborator.status_changed", 
               payload: { 

@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const ctx = await resolveRequestContext(request)
     
-    if (!ctx || !ctx.tenantId) {
+    if (!ctx || !ctx.org_id) {
       return NextResponse.json(
         { error: "unauthorized", message: "Tenant não resolvido no contexto da requisição." },
         { status: 401 }

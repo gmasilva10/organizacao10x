@@ -28,7 +28,7 @@ export default function CategoryManager() {
             Organize seus serviços em categorias para melhor gestão.
           </p>
         </div>
-        <Button>
+        <Button aria-label="Criar nova categoria">
           <Plus className="h-4 w-4 mr-2" />
           Nova Categoria
         </Button>
@@ -50,13 +50,11 @@ export default function CategoryManager() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  <Edit className="h-3 w-3 mr-1" />
-                  Editar
+                <Button variant="ghost" size="sm" aria-label="Editar categoria">
+                  <Edit className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Trash2 className="h-3 w-3 mr-1" />
-                  Excluir
+                <Button variant="destructive" size="sm" aria-label="Excluir categoria">
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -75,7 +73,7 @@ export default function CategoryManager() {
                 Comece criando sua primeira categoria financeira.
               </p>
             </div>
-            <Button>
+            <Button aria-label="Criar primeira categoria">
               <Plus className="h-4 w-4 mr-2" />
               Criar Primeira Categoria
             </Button>

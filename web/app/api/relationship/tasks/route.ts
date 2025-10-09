@@ -182,7 +182,7 @@ export async function GET(request: NextRequest) {
     // Resolver contexto de autenticacao
     const ctx = await resolveRequestContext(request)
     
-    if (!ctx || !ctx.tenantId) {
+    if (!ctx || !ctx.org_id) {
       return NextResponse.json(
         { error: "unauthorized", message: "Tenant nao resolvido no contexto da requisicao." },
         { status: 401 }
@@ -231,7 +231,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClientAdmin()
 
     // Construir query
-    const { query, page, limit } = buildTaskQuery(supabase, filters, ctx.tenantId)
+    const { query, page, limit } = buildTaskQuery(supabase, filters, ctx.org_id)
 
     // Executar query
     const queryStartTime = Date.now()
@@ -247,7 +247,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar estatisticas
-    const stats = await getTaskStats(supabase, ctx.tenantId)
+    const stats = await getTaskStats(supabase, ctx.org_id)
 
     // Calcular paginacao
     const total = count || 0
@@ -296,7 +296,7 @@ export async function POST(request: NextRequest) {
     // Resolver contexto de autenticacao
     const ctx = await resolveRequestContext(request)
     
-    if (!ctx || !ctx.tenantId) {
+    if (!ctx || !ctx.org_id) {
       return NextResponse.json(
         { error: "unauthorized", message: "Tenant nao resolvido no contexto da requisicao." },
         { status: 401 }
@@ -332,7 +332,7 @@ export async function POST(request: NextRequest) {
       .from('students')
       .select('id, name, email, phone')
       .eq('id', student_id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (studentError || !student) {
@@ -346,7 +346,7 @@ export async function POST(request: NextRequest) {
     const { data: task, error: createError } = await supabase
       .from('relationship_tasks')
       .insert({
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         student_id,
         template_code,
         anchor,

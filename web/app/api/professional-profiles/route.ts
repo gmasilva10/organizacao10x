@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const { data: profiles, error } = await supabase
       .from('professional_profiles')
       .select('*')
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('name', { ascending: true })
 
     if (error) {
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const { data: existingProfile, error: checkError } = await supabase
       .from('professional_profiles')
       .select('id')
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .eq('name', name)
       .single()
 
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name,
         description: b.description || null,
-        org_id: ctx.tenantId
+        org_id: ctx.org_id
       })
       .select()
       .single()

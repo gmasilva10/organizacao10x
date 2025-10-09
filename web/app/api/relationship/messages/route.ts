@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   }
   const body: Body = await request.json().catch(()=>({}))
   const row = {
-    org_id: ctx.tenantId,
+    org_id: ctx.org_id,
     student_id: String((body as Body).student_id||''),
     type: String((body as Body).type||'nota'),
     channel: (body as Body).channel != null ? String((body as Body).channel) : null,
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const resp = await fetch(`${url}/rest/v1/relationship_messages`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=representation' }, body: JSON.stringify(row) })
   if (!resp.ok) return NextResponse.json({ error: 'insert_failed' }, { status: 500 })
   const data = await resp.json()
-  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'relationship.message.logged', id: data?.[0]?.id } })
+  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'relationship.message.logged', id: data?.[0]?.id } })
 
   // Best-effort: dual-write em relationship_tasks como 'sent' para refletir no Kanban
   try {
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
   const rangeEnd = rangeStart + pageSize - 1
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const base = `${url}/rest/v1/relationship_messages?org_id=eq.${ctx.tenantId}${studentId?`&student_id=eq.${studentId}`:''}`
+  const base = `${url}/rest/v1/relationship_messages?org_id=eq.${ctx.org_id}${studentId?`&student_id=eq.${studentId}`:''}`
   const resp = await fetch(`${base}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`!, Range: `${rangeStart}-${rangeEnd}`, Prefer: 'count=exact' } })
   const items = await resp.json().catch(()=>[])
   const contentRange = resp.headers.get('content-range') || '0-0/0'

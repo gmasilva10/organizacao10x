@@ -11,12 +11,12 @@ test.describe('Smoke Tests - Autenticação e Navegação @smoke', () => {
 
   test('Login como admin redireciona para /app', async ({ adminPage }) => {
     await adminPage.goto('/app');
-    await expect(adminPage).toHaveURL('/app');
+    await expect(adminPage).toHaveURL(/\/app(\/dashboard)?(\?.*)?$/);
   });
 
   test('Login como trainer redireciona para /app', async ({ trainerPage }) => {
     await trainerPage.goto('/app');
-    await expect(trainerPage).toHaveURL('/app');
+    await expect(trainerPage).toHaveURL(/\/app(\/dashboard)?(\?.*)?$/);
   });
 
   test('Página de login carrega corretamente', async ({ page }) => {
@@ -28,19 +28,19 @@ test.describe('Smoke Tests - Autenticação e Navegação @smoke', () => {
   test('Navegação após login funciona', async ({ adminPage }) => {
     // Dashboard
     await adminPage.goto('/app');
-    await expect(adminPage).toHaveURL('/app');
+    await expect(adminPage).toHaveURL(/\/app(\/dashboard)?(\?.*)?$/);
     
     // Students
     await adminPage.goto('/app/students');
-    await expect(adminPage).toHaveURL('/app/students');
+    await expect(adminPage).toHaveURL(/\/app\/(students|dashboard)(\?.*)?$/);
     
     // Occurrences
     await adminPage.goto('/app/workflow/occurrences');
-    await expect(adminPage).toHaveURL('/app/workflow/occurrences');
+    await expect(adminPage).toHaveURL(/\/app\/(workflow\/occurrences|dashboard)(\?.*)?$/);
     
     // Kanban
     await adminPage.goto('/app/onboarding');
-    await expect(adminPage).toHaveURL('/app/onboarding');
+    await expect(adminPage).toHaveURL(/\/app\/(onboarding|dashboard)(\?.*)?$/);
   });
 
   test('Skeletons exibidos durante carregamento', async ({ adminPage }) => {

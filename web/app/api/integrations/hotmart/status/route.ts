@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
     
     // Obter org_id do contexto de autenticação
-    const org_id = ctx.tenantId
+    const org_id = ctx.org_id
     
     // Buscar integração
     const { data: integration, error } = await supabase

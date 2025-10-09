@@ -17,7 +17,7 @@ const createVersionSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
           created_at
         )
       `)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('version', { ascending: false })
 
     if (error) {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     const { data: lastVersion } = await supabase
       .from('guidelines_versions')
       .select('version')
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('version', { ascending: false })
       .limit(1)
       .single()
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     const { data: version, error } = await supabase
       .from('guidelines_versions')
       .insert({
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         version: nextVersion,
         status: 'DRAFT',
         is_default: false,

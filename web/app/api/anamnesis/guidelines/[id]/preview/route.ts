@@ -30,7 +30,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       .from('training_guidelines')
       .select('id, organization_id')
       .eq('id', params.id)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     if (guidelineError || !guideline) {

@@ -27,7 +27,6 @@ interface Plan {
   valor: number
   moeda: string
   ciclo: string
-  duracao_em_ciclos?: number
   ativo: boolean
   created_at: string
   updated_at: string
@@ -42,13 +41,11 @@ export default function PlansManager() {
   const [showViewModal, setShowViewModal] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
   const [formData, setFormData] = useState({
-    plan_code: '',
     nome: '',
     descricao: '',
     valor: '',
     moeda: 'BRL',
     ciclo: '',
-    duracao_em_ciclos: '',
     ativo: true
   })
   const [saving, setSaving] = useState(false)
@@ -98,13 +95,11 @@ export default function PlansManager() {
 
   const resetForm = () => {
     setFormData({
-      plan_code: '',
       nome: '',
       descricao: '',
       valor: '',
       moeda: 'BRL',
       ciclo: '',
-      duracao_em_ciclos: '',
       ativo: true
     })
   }
@@ -117,13 +112,11 @@ export default function PlansManager() {
   const handleEditPlan = (plan: Plan) => {
     setSelectedPlan(plan)
     setFormData({
-      plan_code: plan.plan_code,
       nome: plan.nome,
       descricao: plan.descricao || '',
       valor: plan.valor.toString(),
       moeda: plan.moeda,
       ciclo: plan.ciclo || '',
-      duracao_em_ciclos: plan.duracao_em_ciclos?.toString() || '',
       ativo: plan.ativo
     })
     setShowEditModal(true)
@@ -145,8 +138,7 @@ export default function PlansManager() {
       
       const payload = {
         ...formData,
-        valor: parseFloat(formData.valor),
-        duracao_em_ciclos: formData.duracao_em_ciclos ? parseInt(formData.duracao_em_ciclos) : undefined
+        valor: parseFloat(formData.valor)
       }
 
       const url = selectedPlan ? `/api/services/plans/${selectedPlan.id}` : '/api/services/plans'
@@ -247,7 +239,7 @@ export default function PlansManager() {
             Gerencie seus planos de venda e assinatura
           </p>
         </div>
-        <Button onClick={handleCreatePlan}>
+        <Button onClick={handleCreatePlan} aria-label="Criar novo plano">
           <Plus className="h-4 w-4 mr-2" />
           Novo Plano
         </Button>
@@ -261,7 +253,7 @@ export default function PlansManager() {
               <p className="text-muted-foreground mb-4">
                 Crie seu primeiro plano para começar a vender
               </p>
-              <Button onClick={handleCreatePlan}>
+              <Button onClick={handleCreatePlan} aria-label="Criar primeiro plano">
                 <Plus className="h-4 w-4 mr-2" />
                 Criar Primeiro Plano
               </Button>
@@ -292,7 +284,6 @@ export default function PlansManager() {
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {getCycleLabel(plan.ciclo)}
-                    {plan.duracao_em_ciclos && ` • ${plan.duracao_em_ciclos} ciclos`}
                   </div>
                   {plan.descricao && (
                     <p className="text-sm text-muted-foreground line-clamp-2">
@@ -301,17 +292,14 @@ export default function PlansManager() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-4">
-                  <Button variant="outline" size="sm" onClick={() => handleViewPlan(plan)}>
-                    <Eye className="h-4 w-4 mr-1" />
-                    Ver
+                  <Button variant="ghost" size="sm" onClick={() => handleViewPlan(plan)} aria-label="Ver detalhes do plano">
+                    <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
-                    <Edit className="h-4 w-4 mr-1" />
-                    Editar
+                  <Button variant="ghost" size="sm" onClick={() => handleEditPlan(plan)} aria-label="Editar plano">
+                    <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleDeletePlan(plan)}>
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Excluir
+                  <Button variant="destructive" size="sm" onClick={() => handleDeletePlan(plan)} aria-label="Excluir plano">
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -332,106 +320,123 @@ export default function PlansManager() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {selectedPlan ? 'Editar Plano' : 'Novo Plano'}
+              {selectedPlan ? '✏️ Editar Plano' : '➕ Novo Plano'}
             </DialogTitle>
             <DialogDescription>
               {selectedPlan ? 'Atualize as informações do plano' : 'Preencha os dados para criar um novo plano'}
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="plan_code">Código do Plano *</Label>
-                <Input
-                  id="plan_code"
-                  value={formData.plan_code}
-                  onChange={(e) => setFormData(prev => ({ ...prev, plan_code: e.target.value }))}
-                  placeholder="Ex: PLANO_BASICO"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="nome">Nome *</Label>
-                <Input
-                  id="nome"
-                  value={formData.nome}
-                  onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
-                  placeholder="Ex: Plano Básico"
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="descricao">Descrição</Label>
-              <Textarea
-                id="descricao"
-                value={formData.descricao}
-                onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
-                placeholder="Descreva o plano..."
-                rows={3}
-              />
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="valor">Valor *</Label>
-                <Input
-                  id="valor"
-                  type="number"
-                  step="0.01"
-                  value={formData.valor}
-                  onChange={(e) => setFormData(prev => ({ ...prev, valor: e.target.value }))}
-                  placeholder="0.00"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="moeda">Moeda</Label>
-                <Select value={formData.moeda} onValueChange={(value: string) => setFormData(prev => ({ ...prev, moeda: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="BRL">BRL</SelectItem>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="ciclo">Ciclo</Label>
-                <Select value={formData.ciclo} onValueChange={(value: string) => setFormData(prev => ({ ...prev, ciclo: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mensal">Mensal</SelectItem>
-                    <SelectItem value="trimestral">Trimestral</SelectItem>
-                    <SelectItem value="semestral">Semestral</SelectItem>
-                    <SelectItem value="anual">Anual</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="space-y-6">
+            {/* Seção 1: Informações Básicas */}
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+                📝 Informações Básicas
+              </h3>
+              <div className="border rounded-lg p-4 space-y-4">
+                <div>
+                  <Label htmlFor="nome" className="mb-2 block">Nome do Plano *</Label>
+                  <Input
+                    id="nome"
+                    value={formData.nome}
+                    onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+                    placeholder="Ex: Plano Básico"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="descricao" className="mb-2 block">Descrição</Label>
+                  <Textarea
+                    id="descricao"
+                    value={formData.descricao}
+                    onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+                    placeholder="Descreva o plano..."
+                    rows={3}
+                  />
+                </div>
               </div>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="duracao_em_ciclos">Duração em Ciclos</Label>
-              <Input
-                id="duracao_em_ciclos"
-                type="number"
-                value={formData.duracao_em_ciclos}
-                onChange={(e) => setFormData(prev => ({ ...prev, duracao_em_ciclos: e.target.value }))}
-                placeholder="Ex: 12"
-              />
+
+            {/* Seção 2: Valores e Periodicidade */}
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+                💰 Valores e Periodicidade
+              </h3>
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="valor" className="mb-2 block">Valor *</Label>
+                    <Input
+                      id="valor"
+                      type="number"
+                      step="0.01"
+                      value={formData.valor}
+                      onChange={(e) => setFormData(prev => ({ ...prev, valor: e.target.value }))}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="moeda" className="mb-2 block">Moeda</Label>
+                    <Select value={formData.moeda} onValueChange={(value: string) => setFormData(prev => ({ ...prev, moeda: value }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="BRL">BRL - Real Brasileiro</SelectItem>
+                        <SelectItem value="USD">USD - Dólar Americano</SelectItem>
+                        <SelectItem value="EUR">EUR - Euro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="ciclo" className="mb-2 block">Ciclo de Cobrança</Label>
+                  <Select value={formData.ciclo} onValueChange={(value: string) => setFormData(prev => ({ ...prev, ciclo: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o ciclo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mensal">Mensal</SelectItem>
+                      <SelectItem value="trimestral">Trimestral</SelectItem>
+                      <SelectItem value="semestral">Semestral</SelectItem>
+                      <SelectItem value="anual">Anual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
-            
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="ativo"
-                checked={formData.ativo}
-                onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, ativo: checked }))}
-              />
-              <Label htmlFor="ativo">Plano ativo</Label>
+
+            {/* Seção 3: Configurações */}
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+                ⚙️ Configurações
+              </h3>
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="ativo"
+                    checked={formData.ativo}
+                    onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, ativo: checked }))}
+                  />
+                  <Label htmlFor="ativo">Plano ativo</Label>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Planos inativos não aparecem na seleção de vendas
+                </p>
+              </div>
             </div>
+
+            {/* Seção 4: Informações */}
+            {selectedPlan && (
+              <div>
+                <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+                  ℹ️ Informações
+                </h3>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p><strong>Código:</strong> {selectedPlan.plan_code}</p>
+                  <p className="text-xs">O código é gerado automaticamente pelo sistema</p>
+                </div>
+              </div>
+            )}
           </div>
           
           <DialogFooter>
@@ -445,11 +450,9 @@ export default function PlansManager() {
               }}
               disabled={saving}
             >
-              <X className="h-4 w-4 mr-2" />
               Cancelar
             </Button>
-            <Button onClick={handleSavePlan} disabled={saving}>
-              <Save className="h-4 w-4 mr-2" />
+            <Button onClick={handleSavePlan} disabled={saving || !formData.nome || !formData.valor}>
               {saving ? 'Salvando...' : 'Salvar'}
             </Button>
           </DialogFooter>
@@ -507,20 +510,11 @@ export default function PlansManager() {
                 </div>
               </div>
               
-              {selectedPlan.duracao_em_ciclos && (
-                <div>
-                  <Label className="text-sm font-medium">Duração</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedPlan.duracao_em_ciclos} ciclos
-                  </p>
-                </div>
-              )}
             </div>
           )}
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowViewModal(false)}>
-              <X className="h-4 w-4 mr-2" />
               Fechar
             </Button>
           </DialogFooter>

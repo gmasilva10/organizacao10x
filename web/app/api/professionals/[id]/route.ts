@@ -96,7 +96,7 @@ export async function PATCH(
         .from('professionals')
         .select('id, org_id, full_name')
         .eq('id', professionalId)
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .single()
 
       if (fetchError || !existingProfessional) {
@@ -111,7 +111,7 @@ export async function PATCH(
           updated_at: new Date().toISOString()
         })
         .eq('id', professionalId)
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .select(`
           id,
           full_name,
@@ -156,7 +156,7 @@ export async function PATCH(
       .from('professionals')
       .select('id, org_id, email, cpf')
       .eq('id', professionalId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (fetchError || !existingProfessional) {
@@ -168,7 +168,7 @@ export async function PATCH(
       const { data: emailExists } = await supabase
         .from('professionals')
         .select('id')
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .eq('email', validatedData.email)
         .neq('id', professionalId)
         .single()
@@ -183,7 +183,7 @@ export async function PATCH(
       const { data: cpfExists } = await supabase
         .from('professionals')
         .select('id')
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .eq('cpf', validatedData.cpf)
         .neq('id', professionalId)
         .single()
@@ -209,7 +209,7 @@ export async function PATCH(
         updated_at: new Date().toISOString()
       })
       .eq('id', professionalId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .select(`
         *,
         professional_profiles!inner(name)
@@ -268,7 +268,7 @@ export async function DELETE(
       .from('professionals')
       .select('id, org_id, full_name')
       .eq('id', professionalId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (fetchError || !existingProfessional) {
@@ -280,7 +280,7 @@ export async function DELETE(
       .from('professionals')
       .delete()
       .eq('id', professionalId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
 
     if (deleteError) {
       console.error('Erro ao deletar profissional:', deleteError)
@@ -324,7 +324,7 @@ export async function GET(
         professional_profiles!inner(name)
       `)
       .eq('id', professionalId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (error || !professional) {

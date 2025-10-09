@@ -16,7 +16,7 @@ export async function PATCH(
   
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx.userId || !ctx.tenantId) {
+    if (!ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
@@ -31,7 +31,7 @@ export async function PATCH(
       .from('students')
       .select('id, org_id')
       .eq('id', studentId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (studentError || !student) {
@@ -43,7 +43,7 @@ export async function PATCH(
       .from('student_anamnesis_versions')
       .select('version_n')
       .eq('student_id', studentId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('version_n', { ascending: false })
       .limit(1)
       .single()
@@ -54,7 +54,7 @@ export async function PATCH(
     const { data: template, error: templateError } = await supabase
       .from('anamnesis_templates')
       .select('id')
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .eq('is_default', true)
       .eq('status', 'PUBLISHED')
       .single()
@@ -71,7 +71,7 @@ export async function PATCH(
         version_n: nextVersion,
         answers_json: answers,
         template_version_id: template.id,
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         created_by: ctx.userId
       })
       .select()
@@ -90,7 +90,7 @@ export async function PATCH(
         version_id: newVersion.id,
         answers_json: answers,
         active_tags: active_tags || [],
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         updated_at: new Date().toISOString()
       })
 

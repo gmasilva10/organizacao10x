@@ -34,7 +34,7 @@ export async function GET(request: Request) {
           raw_user_meta_data
         )
       `)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .order('created_at', { ascending: false })
       .range((page - 1) * limit, page * limit - 1)
 
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
     let countQuery = supabase
       .from('anamnesis_audit_logs')
       .select('id', { count: 'exact', head: true })
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
 
     if (action) countQuery = countQuery.eq('action', action)
     if (resourceType) countQuery = countQuery.eq('resource_type', resourceType)

@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   // RBAC: precisa gerenciar usuários e criar trainer
   const allowed = can(ctx.role, "manage_users") && can(ctx.role, "create_trainer")
   if (!allowed) {
-    await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: "rbac.denied", payload: { action: "users.create_trainer" } })
+    await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: "rbac.denied", payload: { action: "users.create_trainer" } })
     return NextResponse.json({ error: "forbidden" }, { status: 403 })
   }
 
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
 
   // Limite por plano
   // Obter a policy para saber o limite
-  const policyResp = await fetch(`${process.env.SUPABASE_URL}/rest/v1/plan_policies?org_id=eq.${ctx.tenantId}&select=limits`, {
+  const policyResp = await fetch(`${process.env.SUPABASE_URL}/rest/v1/plan_policies?org_id=eq.${ctx.org_id}&select=limits`, {
     headers: {
       apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "",
       Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY}`,
@@ -83,10 +83,10 @@ export async function POST(request: Request) {
     maxTrainers = Number(rows?.[0]?.limits?.trainers ?? 0)
   }
 
-  const current = await countTenantTrainers(ctx.tenantId)
+  const current = await countTenantTrainers(ctx.org_id)
   if (current >= maxTrainers) {
     await logEvent({
-      tenantId: ctx.tenantId,
+      tenantId: ctx.org_id,
       userId: ctx.userId,
       eventType: "limit.hit",
       payload: { limit: "trainers", value: current, max: maxTrainers },
@@ -98,10 +98,10 @@ export async function POST(request: Request) {
   const userId = await getUserIdByEmail(email)
   if (!userId) return NextResponse.json({ error: "user_not_found" }, { status: 404 })
 
-  const ok = await insertMembership(userId, ctx.tenantId)
+  const ok = await insertMembership(userId, ctx.org_id)
   if (!ok) return NextResponse.json({ error: "insert_failed" }, { status: 500 })
 
-  await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: "feature.used", payload: { feature: "users.create_trainer", email } })
+  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: "feature.used", payload: { feature: "users.create_trainer", email } })
   return NextResponse.json({ ok: true })
 }
 
@@ -115,7 +115,7 @@ export async function GET(request: Request) {
   if (!url || !service) return NextResponse.json({ error: "service_unavailable" }, { status: 503 })
 
   // 1) pegar user_ids de trainers no tenant
-  const idsResp = await fetch(`${url}/rest/v1/memberships?org_id=eq.${ctx.tenantId}&role=eq.trainer&select=user_id`, {
+  const idsResp = await fetch(`${url}/rest/v1/memberships?org_id=eq.${ctx.org_id}&role=eq.trainer&select=user_id`, {
     headers: { apikey: service, Authorization: `Bearer ${service}` },
     cache: "no-store",
   })

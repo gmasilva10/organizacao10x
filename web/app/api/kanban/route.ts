@@ -16,15 +16,15 @@ export async function GET(request: Request) {
     await fetch(`${url}/rest/v1/rpc/seed_kanban_stages`, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
-      body: JSON.stringify({ p_org: ctx.tenantId }),
+      body: JSON.stringify({ p_org: ctx.org_id }),
       cache: "no-store",
     })
   } catch {}
 
-  const stagesResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&select=id,name,position&order=position.asc`, { headers, cache: "no-store" })
+  const stagesResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&select=id,name,position&order=position.asc`, { headers, cache: "no-store" })
   const stages = await stagesResp.json().catch(() => [])
 
-  const itemsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&select=id,student_id,stage_id,position,meta&order=position.asc`, { headers, cache: "no-store" })
+  const itemsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,meta&order=position.asc`, { headers, cache: "no-store" })
   const items = await itemsResp.json().catch(() => [])
 
   return NextResponse.json({ stages, items })

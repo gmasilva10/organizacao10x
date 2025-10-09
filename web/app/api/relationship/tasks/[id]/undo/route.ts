@@ -25,7 +25,7 @@ export async function POST(
     // Resolver contexto de autenticação
     const ctx = await resolveRequestContext(request)
     
-    if (!ctx || !ctx.tenantId) {
+    if (!ctx || !ctx.org_id) {
       return NextResponse.json(
         { error: "unauthorized", message: "Tenant não resolvido no contexto da requisição." },
         { status: 401 }
@@ -51,7 +51,7 @@ export async function POST(
         student:students(name, org_id)
       `)
       .eq('id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
     
     if (fetchError || !task) {
@@ -121,7 +121,7 @@ export async function POST(
     await supabase
       .from('relationship_logs')
       .insert({
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         student_id: task.student_id,
         task_id: params.id,
         action: 'undo',

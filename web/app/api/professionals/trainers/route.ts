@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const { data: professionals, error } = await supabase
       .from('professionals')
       .select('id, user_id, full_name, email')
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .not('user_id', 'is', null)
       .order('full_name')
 

@@ -23,7 +23,7 @@ export async function DELETE(
     
     // Resolver contexto da requisiÃ§Ã£o
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json(
         { error: "UsuÃ¡rio nÃ£o autenticado" },
         { status: 401 }
@@ -34,14 +34,14 @@ export async function DELETE(
     const supabase = await createClient()
 
     console.log('Tentando excluir template:', id)
-    console.log('Tenant ID:', ctx.tenantId)
+    console.log('Tenant ID:', ctx.org_id)
 
     // Primeiro, verificar se o template existe (mesmo se jÃ¡ foi excluÃ­do)
     const { data: allTemplates, error: allError } = await supabase
       .from('anamnesis_templates')
       .select('id, name, organization_id, deleted_at')
       .eq('id', id)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     console.log('Template (incluindo excluÃ­dos):', allTemplates)
@@ -52,7 +52,7 @@ export async function DELETE(
       .from('anamnesis_templates')
       .select('id, name, organization_id')
       .eq('id', id)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .is('deleted_at', null)
       .single()
 
@@ -70,7 +70,7 @@ export async function DELETE(
     const { data: defaultTemplate } = await supabase
       .from('organization_default_templates')
       .select('template_version_id')
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     if (defaultTemplate) {
@@ -99,7 +99,7 @@ export async function DELETE(
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
 
     if (deleteError) {
       console.error('Erro ao excluir template:', deleteError)

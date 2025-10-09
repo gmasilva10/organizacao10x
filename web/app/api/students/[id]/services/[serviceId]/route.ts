@@ -33,7 +33,7 @@ export async function GET(
       `)
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (error) {
@@ -97,7 +97,7 @@ export async function PATCH(
       .select('id')
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (serviceError || !existingService) {
@@ -129,7 +129,7 @@ export async function PATCH(
       .update(updateData)
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .select()
       .single()
 
@@ -170,7 +170,7 @@ export async function DELETE(
       .select('id')
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (serviceError || !existingService) {
@@ -183,7 +183,7 @@ export async function DELETE(
       .delete()
       .eq('id', params.serviceId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
 
     if (deleteError) {
       console.error('Erro ao deletar serviço:', deleteError)

@@ -22,7 +22,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       .from('anamnesis_templates')
       .select('id, organization_id, name')
       .eq('id', params.id)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     if (templateError || !template) {
@@ -92,7 +92,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     // Registrar auditoria
     const auditLogger = AuditLogger.getInstance(supabase)
     await auditLogger.logTemplatePublish(
-      ctx.tenantId,
+      ctx.org_id,
       ctx.userId,
       template.id,
       publishedVersion.id,
@@ -143,7 +143,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .from('anamnesis_templates')
       .select('id, organization_id, name')
       .eq('id', params.id)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     if (templateError || !template) {

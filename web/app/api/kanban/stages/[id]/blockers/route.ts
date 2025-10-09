@@ -13,7 +13,7 @@ export async function GET(request: Request, ctxParam: { params: Promise<{ id: st
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return NextResponse.json({ hasPendingServices: false })
   try {
-    const resp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&stage_id=eq.${id}&select=id,meta`, { headers: { apikey: key, Authorization: `Bearer ${key}` }, cache: 'no-store' })
+    const resp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&stage_id=eq.${id}&select=id,meta`, { headers: { apikey: key, Authorization: `Bearer ${key}` }, cache: 'no-store' })
     const rows: Array<{ id: string; meta: any }> = await resp.json().catch(()=>[])
     const pending = rows.filter(r => {
       const p = (r?.meta?.pending_services ?? 0) as number

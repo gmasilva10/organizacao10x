@@ -1,0 +1,55 @@
+name: CI - Tenant ID Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install root deps (if any)
+        run: npm -v
+
+      - name: Audit codebase for tenant_id
+        run: node scripts/audit-tenant-id.js
+
+      - name: Install web workspace
+        working-directory: ./web
+        run: npm ci
+
+      - name: Build (typecheck)
+        working-directory: ./web
+        run: npm run build --if-present
+
+      - name: Optional DB Audit - check tenant_id references (policies/functions/columns)
+        if: ${{ secrets.DATABASE_URL != '' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          set -e
+          echo "Running DB audit against DATABASE_URL"
+          # count columns
+          COLS=$(psql "$DATABASE_URL" -t -c "SELECT count(*) FROM information_schema.columns WHERE column_name='tenant_id';" | tr -d '[:space:]')
+          # count policies
+          POLS=$(psql "$DATABASE_URL" -t -c "SELECT count(*) FROM pg_policies WHERE qual ILIKE '%tenant_id%' OR with_check ILIKE '%tenant_id%';" | tr -d '[:space:]')
+          # count functions
+          FUNS=$(psql "$DATABASE_URL" -t -c "SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND pg_get_functiondef(p.oid) ILIKE '%tenant_id%';" | tr -d '[:space:]')
+          echo "Columns:$COLS Policies:$POLS Functions:$FUNS"
+          if [ "$COLS" != "0" ] || [ "$POLS" != "0" ] || [ "$FUNS" != "0" ]; then
+            echo "❌ DB audit failed: tenant_id remnants found"; exit 1;
+          fi
+          echo "✅ DB audit passed"
+
+

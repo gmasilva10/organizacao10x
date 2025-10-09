@@ -13,10 +13,20 @@ export async function GET(request: NextRequest) {
     const softDelete = (process.env.STUDENTS_USE_SOFT_DELETE ?? 'true') !== 'false'
     const commit = (process.env.VERCEL_GIT_COMMIT_SHA || process.env.COMMIT_SHA || 'dev').slice(0, 7)
 
+    // Debug de contexto de tenant
+    console.log('🔍 API Students - Contexto de tenant:', {
+      userId: ctx?.userId,
+      tenantId: ctx?.tenantId,
+      role: ctx?.role,
+      env,
+      requestId
+    })
+
     // Em produção exigimos tenant; em dev permitimos fallback sem multi-tenant
     const isDev = process.env.NODE_ENV !== 'production'
-    if ((!ctx || !ctx.tenantId) && !isDev) {
+    if ((!ctx || !ctx.org_id) && !isDev) {
       const queryTime = Date.now() - startTime
+      console.error('❌ API Students - Tenant não resolvido:', { ctx, isDev })
       return NextResponse.json(
         { error: 'unauthorized', message: 'Tenant não resolvido no contexto da requisição.' },
         { status: 401, headers: { 'X-Query-Time': queryTime.toString() } }
@@ -42,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     // Construir filtros (org_id apenas)
     const filters: string[] = []
-    if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.tenantId}`)
+    if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.org_id}`)
     if (softDelete) filters.push(`deleted_at=is.null`)
     if (status) filters.push(`status=eq.${status}`)
     
@@ -99,7 +109,7 @@ export async function GET(request: NextRequest) {
     
     if (studentIds.length > 0) {
       const studentFilters = [`student_id=in.(${studentIds.join(',')})`, `role=eq.principal`]
-      if (ctx?.tenantId) studentFilters.push(`org_id=eq.${ctx.tenantId}`)
+      if (ctx?.tenantId) studentFilters.push(`org_id=eq.${ctx.org_id}`)
       
       const responsibleUrl = `${url}/rest/v1/student_responsibles?${studentFilters.join('&')}&select=student_id,professional_id,professionals(id,full_name)`
       
@@ -179,7 +189,7 @@ export async function POST(request: NextRequest) {
   try {
     const ctx = await resolveRequestContext(request)
     const isDev = process.env.NODE_ENV !== 'production'
-    if ((!ctx || !ctx.tenantId) && !isDev) {
+    if ((!ctx || !ctx.org_id) && !isDev) {
       const t = Date.now() - startTime
       return NextResponse.json({ error: 'unauthorized' }, { status: 401, headers: { 'X-Query-Time': String(t) } })
     }

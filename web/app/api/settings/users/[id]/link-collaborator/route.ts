@@ -62,7 +62,7 @@ export async function POST(
       .from("memberships")
       .select("user_id, org_id")
       .eq("user_id", userId)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .single()
 
     if (!existingMembership) {
@@ -78,7 +78,7 @@ export async function POST(
       .from("collaborators")
       .select("*")
       .eq("id", collaboratorId)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .single()
 
     if (collaboratorError || !existingCollaborator) {
@@ -106,7 +106,7 @@ export async function POST(
       .from("collaborators")
       .select("id, full_name")
       .eq("user_id", userId)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .single()
 
     if (existingUserLink && existingUserLink.id !== collaboratorId) {
@@ -137,7 +137,7 @@ export async function POST(
         updated_at: new Date().toISOString()
       })
       .eq("id", collaboratorId)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .select()
       .single()
 
@@ -161,7 +161,7 @@ export async function POST(
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              org_id: ctx.tenantId, 
+              org_id: ctx.org_id, 
               user_id: user.id, 
               event_type: "settings.users.linked_to_collaborator", 
               payload: { 
@@ -225,7 +225,7 @@ export async function DELETE(
       .from("memberships")
       .select("user_id, org_id")
       .eq("user_id", userId)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .single()
 
     if (!existingMembership) {
@@ -241,7 +241,7 @@ export async function DELETE(
       .from("collaborators")
       .select("*")
       .eq("user_id", userId)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
       .single()
 
     if (!linkedCollaborator) {
@@ -259,7 +259,7 @@ export async function DELETE(
         updated_at: new Date().toISOString()
       })
       .eq("id", linkedCollaborator.id)
-      .eq("org_id", ctx.tenantId)
+      .eq("org_id", ctx.org_id)
 
     if (unlinkError) {
       console.error("Unlink user-collaborator error:", unlinkError)
@@ -281,7 +281,7 @@ export async function DELETE(
               Prefer: "return=minimal" 
             },
             body: JSON.stringify({ 
-              org_id: ctx.tenantId, 
+              org_id: ctx.org_id, 
               user_id: user.id, 
               event_type: "settings.users.unlinked_from_collaborator", 
               payload: { 

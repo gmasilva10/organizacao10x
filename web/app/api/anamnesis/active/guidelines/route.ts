@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const guidelineOrgId = Array.isArray((guidelineVersion as any).guideline)
       ? (guidelineVersion as any).guideline[0]?.organization_id
       : (guidelineVersion as any).guideline?.organization_id
-    if (guidelineOrgId !== ctx.tenantId) {
+    if (guidelineOrgId !== ctx.org_id) {
       return NextResponse.json({ error: "Diretrizes não pertencem à organização" }, { status: 403 })
     }
 
@@ -59,13 +59,13 @@ export async function POST(request: Request) {
     await supabase
       .from('organization_default_guidelines')
       .delete()
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
 
     // Definir novo default
     const { data: defaultGuidelines, error: createError } = await supabase
       .from('organization_default_guidelines')
       .insert({
-        organization_id: ctx.tenantId,
+        organization_id: ctx.org_id,
         guideline_version_id: validatedData.guideline_version_id,
         created_by: ctx.userId
       })

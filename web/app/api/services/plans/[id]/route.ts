@@ -38,7 +38,7 @@ export async function GET(
       .from('plans')
       .select('*')
       .eq('id', id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
     
     if (error) {
@@ -86,7 +86,7 @@ export async function PUT(
       .from('plans')
       .select('id, plan_code')
       .eq('id', id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
     
     if (!existingPlan) {
@@ -98,7 +98,7 @@ export async function PUT(
       const { data: conflictingPlan } = await supabase
         .from('plans')
         .select('id')
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .eq('plan_code', validatedData.plan_code)
         .neq('id', id)
         .single()
@@ -118,7 +118,7 @@ export async function PUT(
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .select()
       .single()
     
@@ -170,7 +170,7 @@ export async function DELETE(
       .from('plans')
       .select('id')
       .eq('id', id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
     
     if (!existingPlan) {
@@ -196,7 +196,7 @@ export async function DELETE(
       .from('plans')
       .delete()
       .eq('id', id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
     
     if (error) throw error
     

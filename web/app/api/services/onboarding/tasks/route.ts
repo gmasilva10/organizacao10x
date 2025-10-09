@@ -97,8 +97,8 @@ export async function POST(request: NextRequest) {
     }
     console.log('✅ Usuário autenticado:', user.id)
 
-    const { title, description, is_required, stage_code, order_index } = await request.json()
-    console.log('📝 Dados recebidos:', { title, description, is_required, stage_code, order_index })
+    const { title, description, is_required, stage_code, order_index, sla_hours } = await request.json()
+    console.log('📝 Dados recebidos:', { title, description, is_required, stage_code, order_index, sla_hours })
     
     if (!title || !stage_code) {
       console.error('❌ Dados obrigatórios faltando')
@@ -153,8 +153,8 @@ export async function POST(request: NextRequest) {
       ? (existingTasks[0].order_index || 0) + 1 
       : 1
 
-    // Gerar task_code único
-    const taskCode = `${stage_code}_${String(nextOrderIndex).padStart(3, '0')}`
+    // Gerar task_code único usando timestamp para evitar duplicatas
+    const taskCode = `${stage_code}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
     console.log('🔑 Task code gerado:', taskCode, 'para order_index:', nextOrderIndex)
 
     // Criar nova tarefa
@@ -168,7 +168,8 @@ export async function POST(request: NextRequest) {
         is_required: is_required !== undefined ? is_required : true,
         stage_code,
         order_index: nextOrderIndex,
-        task_code: taskCode
+        task_code: taskCode,
+        sla_hours: sla_hours || null
       })
       .select()
       .single()

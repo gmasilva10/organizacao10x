@@ -121,7 +121,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       .from('training_guidelines')
       .select('id, organization_id')
       .eq('id', params.id)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     if (guidelineError || !guideline) {
@@ -214,7 +214,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const guideline = Array.isArray((rule as any).guideline_version?.guideline)
       ? (rule as any).guideline_version?.guideline?.[0]
       : (rule as any).guideline_version?.guideline
-    if (!guideline || guideline.organization_id !== ctx.tenantId) {
+    if (!guideline || guideline.organization_id !== ctx.org_id) {
       return NextResponse.json({ error: "Regra nÃ£o encontrada" }, { status: 404 })
     }
 
@@ -292,7 +292,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     const guideline = Array.isArray((rule as any).guideline_version?.guideline)
       ? (rule as any).guideline_version?.guideline?.[0]
       : (rule as any).guideline_version?.guideline
-    if (!guideline || guideline.organization_id !== ctx.tenantId) {
+    if (!guideline || guideline.organization_id !== ctx.org_id) {
       return NextResponse.json({ error: "Regra nÃ£o encontrada" }, { status: 404 })
     }
 

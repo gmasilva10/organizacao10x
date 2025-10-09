@@ -31,7 +31,7 @@ export async function GET(
         )
       `)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('competencia', { ascending: false })
 
     if (error) {

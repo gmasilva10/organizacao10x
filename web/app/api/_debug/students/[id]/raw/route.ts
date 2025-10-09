@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const softDelete = (process.env.STUDENTS_USE_SOFT_DELETE ?? 'true') !== 'false'
   const filters: string[] = []
   filters.push(`id=eq.${id}`)
-  if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.tenantId}`)
+  if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.org_id}`)
   if (softDelete) filters.push('deleted_at=is.null')
   const resp = await fetch(`${url}/rest/v1/students?${filters.join('&')}&select=*`, {
     headers: { apikey: key!, Authorization: `Bearer ${key}`! },

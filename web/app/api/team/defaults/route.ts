@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         apoio_professional_ids,
         especificos_professional_ids
       `)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (defaultsError && defaultsError.code !== 'PGRST116') {
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         .from('professionals')
         .select('id, full_name, email, whatsapp_work, is_active')
         .in('id', allProfessionalIds)
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .eq('is_active', true)
 
       if (!professionalsError && professionals) {
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
         .from('professionals')
         .select('id, full_name, is_active')
         .in('id', allIds)
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
 
       if (professionalsError) {
         console.error('Erro ao verificar profissionais:', professionalsError)
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     const { data: defaults, error: upsertError } = await supabase
       .from('student_defaults')
       .upsert({
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         principal_professional_id: principalId,
         apoio_professional_ids: apoioIds,
         especificos_professional_ids: especificosIds,
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
         .from('professionals')
         .select('id, full_name, email, whatsapp_work, is_active')
         .in('id', allProfessionalIds)
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .eq('is_active', true)
 
       if (!professionalsError && professionals) {

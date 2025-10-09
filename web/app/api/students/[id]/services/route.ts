@@ -41,7 +41,7 @@ export async function GET(
 
   console.log(`[${correlationId}] GET /api/students/${params.id}/services - Start`, {
     studentId: params.id,
-    orgId: ctx.tenantId,
+    orgId: ctx.org_id,
     role: ctx.role
   })
 
@@ -69,7 +69,7 @@ export async function GET(
         )
       `)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -129,7 +129,7 @@ export async function POST(
 
   console.log(`[${correlationId}] POST /api/students/${params.id}/services - Start`, {
     studentId: params.id,
-    orgId: ctx.tenantId,
+    orgId: ctx.org_id,
     role: ctx.role
   })
 
@@ -172,7 +172,7 @@ export async function POST(
       .from('students')
       .select('id, name')
       .eq('id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (studentError || !student) {
@@ -189,7 +189,7 @@ export async function POST(
       const { data: existingService } = await supabase
         .from('student_services')
         .select('id, name, created_at')
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .eq('student_id', params.id)
         .eq('idempotency_key', validatedData.idempotency_key)
         .single()
@@ -211,7 +211,7 @@ export async function POST(
 
     // Criar serviço
     const serviceData = {
-      org_id: ctx.tenantId,
+      org_id: ctx.org_id,
       student_id: params.id,
       name: validatedData.name,
       type: validatedData.type,

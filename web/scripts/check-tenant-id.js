@@ -70,6 +70,10 @@ function main() {
         file.includes(path.join('server', 'events.ts'))) {
       continue;
     }
+    // Ignorar o próprio script de verificação
+    if (path.basename(file) === 'check-tenant-id.js') {
+      continue;
+    }
     const issues = checkTenantIdUsage(file);
     if (issues.length > 0) {
       filesWithIssues.push({ file, issues });

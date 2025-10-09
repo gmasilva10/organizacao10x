@@ -34,7 +34,7 @@ export async function PUT(
     
     // Resolver contexto da requisiÃ§Ã£o
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json(
         { error: "UsuÃ¡rio nÃ£o autenticado" },
         { status: 401 }
@@ -49,7 +49,7 @@ export async function PUT(
       .from('anamnesis_templates')
       .select('id, name, organization_id')
       .eq('id', id)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .is('deleted_at', null)
       .single()
 

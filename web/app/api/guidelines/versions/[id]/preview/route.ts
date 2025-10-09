@@ -203,7 +203,7 @@ export async function POST(
     const ctx = await resolveRequestContext(request)
     console.log('Context:', { userId: ctx?.userId, tenantId: ctx?.tenantId })
     
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       console.log('Erro: Contexto invÃ¡lido')
       return NextResponse.json({ error: "NÃ£o autorizado" }, { status: 401 })
     }
@@ -225,7 +225,7 @@ export async function POST(
       const { data: defaultVersion } = await supabase
         .from('guidelines_versions')
         .select('id, status, version')
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .eq('is_default', true)
         .single()
       version = defaultVersion
@@ -234,7 +234,7 @@ export async function POST(
         .from('guidelines_versions')
         .select('id, status, version')
         .eq('id', versionId)
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .single()
       
       if (versionError || !versionData) {
@@ -252,7 +252,7 @@ export async function POST(
       .from('guideline_rules')
       .select('*')
       .eq('guidelines_version_id', version.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('priority_clinical', { ascending: false })
       .order('created_at', { ascending: true })
 

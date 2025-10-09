@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Obter org_id do contexto de autenticação
-    const org_id = ctx.tenantId
+    const org_id = ctx.org_id
     
     // Testar conexão OAuth2 com Hotmart
     const authString = Buffer.from(`${client_id}:${client_secret}`).toString('base64')

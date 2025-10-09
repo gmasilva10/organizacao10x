@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   // Columns (kanban_stages)
   let columns: Array<{ id: string; title: string; sort: number; is_fixed?: boolean; stage_code?: string; blocked?: boolean }> = []
   {
-    const colsResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&select=id,name,position,is_fixed,stage_code&order=position.asc`, {
+    const colsResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&select=id,name,position,is_fixed,stage_code&order=position.asc`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (colsResp.ok) {
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
             }
           })
           // Recarregar colunas após inicialização
-          const reloadResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&select=id,name,position,is_fixed,stage_code&order=position.asc`, {
+          const reloadResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&select=id,name,position,is_fixed,stage_code&order=position.asc`, {
             headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
           })
           if (reloadResp.ok) {
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
       // Fallback para modelo antigo (onboarding_columns)
       const t = await colsResp.text().catch(()=>"")
       try {
-        const legacy = await fetch(`${url}/rest/v1/onboarding_columns?org_id=eq.${ctx.tenantId}&select=id,title,sort&order=sort.asc`, {
+        const legacy = await fetch(`${url}/rest/v1/onboarding_columns?org_id=eq.${ctx.org_id}&select=id,title,sort&order=sort.asc`, {
           headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
         })
         if (legacy.ok) {
@@ -74,12 +74,12 @@ export async function GET(request: Request) {
   = []
   {
     // Busca robusta incluindo org_id; tenta incluir meta quando existir
-    let cardsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&select=id,student_id,stage_id,position,created_at,meta&order=position.asc`, {
+    let cardsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,created_at,meta&order=position.asc`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (!cardsResp.ok) {
       // Fallback sem meta
-      cardsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&select=id,student_id,stage_id,position,created_at&order=position.asc`, {
+      cardsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,created_at&order=position.asc`, {
         headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
       })
     }
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
       const t = await cardsResp.text().catch(()=>"")
       // Fallback para modelo antigo
       try {
-        const legacy = await fetch(`${url}/rest/v1/onboarding_cards?org_id=eq.${ctx.tenantId}&select=id,student_id,column_id,sort,created_at,completed_at&order=sort.asc`, {
+        const legacy = await fetch(`${url}/rest/v1/onboarding_cards?org_id=eq.${ctx.org_id}&select=id,student_id,column_id,sort,created_at,completed_at&order=sort.asc`, {
           headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
         })
         if (legacy.ok) {
@@ -109,7 +109,7 @@ export async function GET(request: Request) {
 
   // Salvaguarda: se não retornou nenhum card mas existem itens na tabela para a org, tenta uma segunda leitura simples
   if (cards.length === 0) {
-    const probe = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&select=id,student_id,stage_id,position&order=position.asc`, {
+    const probe = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position&order=position.asc`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (probe.ok) {
@@ -123,7 +123,7 @@ export async function GET(request: Request) {
     try {
       await fetch(new URL('/api/kanban/resync', request.url).toString(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store' })
     } catch {}
-    const retry = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&select=id,student_id,stage_id,position&order=position.asc`, {
+    const retry = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position&order=position.asc`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (retry.ok) {
@@ -149,7 +149,7 @@ export async function GET(request: Request) {
   const studentsMap: Record<string, { status?: string; name?: string; phone?: string }> = {}
   if (studentIds.length > 0) {
     const inList = studentIds.map(encodeURIComponent).join(',')
-    const stuResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.tenantId}&id=in.(${inList})&select=id,name,status,phone`, {
+    const stuResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.org_id}&id=in.(${inList})&select=id,name,status,phone`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (!stuResp.ok) {

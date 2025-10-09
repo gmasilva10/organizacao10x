@@ -52,7 +52,7 @@ export async function GET(
 ) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
@@ -64,7 +64,7 @@ export async function GET(
       .from('guidelines_versions')
       .select('id, status')
       .eq('id', versionId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (versionError || !version) {
@@ -76,7 +76,7 @@ export async function GET(
       .from('guideline_rules')
       .select('*')
       .eq('guidelines_version_id', versionId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('priority_clinical', { ascending: false })
       .order('created_at', { ascending: true })
 
@@ -102,7 +102,7 @@ export async function POST(
 ) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
@@ -117,7 +117,7 @@ export async function POST(
       .from('guidelines_versions')
       .select('id, status')
       .eq('id', versionId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (versionError || !version) {
@@ -132,7 +132,7 @@ export async function POST(
     const { data: rule, error } = await supabase
       .from('guideline_rules')
       .insert({
-        org_id: ctx.tenantId,
+        org_id: ctx.org_id,
         guidelines_version_id: versionId,
         priority_clinical: validatedData.priority_clinical,
         condition: validatedData.condition,

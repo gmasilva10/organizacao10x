@@ -24,7 +24,7 @@ export async function DELETE(
       .select('id, student_id, role, professionals!inner(full_name)')
       .eq('id', responsibleId)
       .eq('student_id', studentId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (responsibleError || !responsible) {
@@ -36,7 +36,7 @@ export async function DELETE(
       .from('student_responsibles')
       .delete()
       .eq('id', responsibleId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
 
     if (deleteError) {
       console.error('Erro ao deletar responsável:', deleteError)
@@ -86,7 +86,7 @@ export async function PATCH(
       .select('id, student_id, role, professional_id')
       .eq('id', responsibleId)
       .eq('student_id', studentId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (existingError || !existing) {
@@ -99,7 +99,7 @@ export async function PATCH(
         .from('student_responsibles')
         .delete()
         .eq('student_id', studentId)
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .eq('role', 'principal')
         .neq('id', responsibleId)
     }
@@ -113,7 +113,7 @@ export async function PATCH(
       .from('student_responsibles')
       .update(updateData)
       .eq('id', responsibleId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .select(`
         id,
         role,

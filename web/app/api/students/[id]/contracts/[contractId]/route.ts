@@ -72,7 +72,7 @@ export async function PATCH(
       .select('*')
       .eq('id', params.contractId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (checkError || !contract) {
@@ -96,7 +96,7 @@ export async function PATCH(
       .update(updateData)
       .eq('id', params.contractId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .select()
       .single()
 
@@ -137,7 +137,7 @@ export async function DELETE(
       .select('*')
       .eq('id', params.contractId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (checkError || !contract) {
@@ -169,7 +169,7 @@ export async function DELETE(
       .delete()
       .eq('id', params.contractId)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
 
     if (error) {
       console.error('Erro ao deletar contrato:', error)

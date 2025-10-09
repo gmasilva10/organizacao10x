@@ -72,26 +72,26 @@ CREATE INDEX IF NOT EXISTS plans_org_active_idx ON plans (org_id, ativo);
         
         DROP POLICY IF EXISTS "Users can view plans from their organization" ON plans;
         CREATE POLICY "Users can view plans from their organization" ON plans
-          FOR SELECT USING (tenant_id = (SELECT org_id FROM users WHERE id = auth.uid()));
+          FOR SELECT USING (is_member_of_org(org_id));
         
         DROP POLICY IF EXISTS "Admin/Manager can insert plans" ON plans;
         CREATE POLICY "Admin/Manager can insert plans" ON plans
           FOR INSERT WITH CHECK (
-            tenant_id = (SELECT org_id FROM users WHERE id = auth.uid()) AND
+            is_member_of_org(org_id) AND
             (SELECT role FROM users WHERE id = auth.uid()) IN ('admin', 'manager')
           );
         
         DROP POLICY IF EXISTS "Admin/Manager can update plans" ON plans;
         CREATE POLICY "Admin/Manager can update plans" ON plans
           FOR UPDATE USING (
-            tenant_id = (SELECT org_id FROM users WHERE id = auth.uid()) AND
+            is_member_of_org(org_id) AND
             (SELECT role FROM users WHERE id = auth.uid()) IN ('admin', 'manager')
           );
         
         DROP POLICY IF EXISTS "Admin/Manager can delete plans" ON plans;
         CREATE POLICY "Admin/Manager can delete plans" ON plans
           FOR DELETE USING (
-            tenant_id = (SELECT org_id FROM users WHERE id = auth.uid()) AND
+            is_member_of_org(org_id) AND
             (SELECT role FROM users WHERE id = auth.uid()) IN ('admin', 'manager')
           );
       `

@@ -2,7 +2,7 @@ export type RoleName = "admin" | "manager" | "trainer" | "seller" | "support"
 
 export type RequestContext = {
   userId: string
-  tenantId: string
+  org_id: string
   role: RoleName
 }
 
@@ -27,10 +27,10 @@ export async function resolveRequestContext(_request: Request): Promise<RequestC
     .limit(1)
     .maybeSingle()
 
-  const tenantId = (membership?.org_id as string) || ""
+  const org_id = (membership?.org_id as string) || ""
   const role = (membership?.role as RoleName) || ""
-  if (!tenantId || !role) return null
-  return { userId, tenantId, role }
+  if (!org_id || !role) return null
+  return { userId, org_id, role }
 }
 
 

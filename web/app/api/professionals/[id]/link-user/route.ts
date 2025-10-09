@@ -40,7 +40,7 @@ export async function POST(
       .from('professionals')
       .select('id, org_id, email, user_id')
       .eq('id', professionalId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (fetchError || !professional) {
@@ -108,7 +108,7 @@ export async function POST(
         .from('memberships')
         .insert({
           user_id,
-          org_id: ctx.tenantId,
+          org_id: ctx.org_id,
           role: 'trainer',
           status: 'active'
         })
@@ -127,7 +127,7 @@ export async function POST(
         updated_at: new Date().toISOString()
       })
       .eq('id', professionalId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .select(`
         *,
         professional_profiles!inner(name)

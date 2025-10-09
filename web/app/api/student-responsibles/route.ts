@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         students!inner(name, email),
         professionals!inner(full_name, email, professional_profiles!inner(name))
       `)
-      .eq('students.org_id', ctx.tenantId)
+      .eq('students.org_id', ctx.org_id)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       .from('students')
       .select('id')
       .eq('id', student_id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (studentError || !student) {
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       .from('professionals')
       .select('id')
       .eq('id', professional_id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (professionalError || !professional) {

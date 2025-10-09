@@ -7,7 +7,7 @@ Objetivo: validar rapidamente o caminho crítico (templates v2 + dual‑write + 
 - Variável de ambiente ativada em staging: `REL_TEMPLATES_V2_READ=1`.
 - Valores à mão:
   - `BASE_URL` (ex.: https://staging.seudominio.com)
-  - `TENANT_ID` (UUID do tenant de teste)
+  - `ORG_ID` (UUID da organização de teste)
   - `CRON_SECRET` (segredo usado pelo job)
   - `STUDENT_ID` (UUID de um aluno de teste, opcional para occurrence‑trigger e timeline)
   - `OCCURRENCE_ID` (ID inteiro de uma ocorrência de teste, opcional)
@@ -56,7 +56,7 @@ Esperado: criação OK no MVP e tentativa de gravação no v2 (best‑effort). R
 curl -sS -i -X POST "$BASE_URL/api/relationship/job" \
   -H "Authorization: Bearer $CRON_SECRET" \
   -H 'Content-Type: application/json' \
-  --data "{\"tenant_id\":\"$TENANT_ID\"}"
+  --data "{\"org_id\":\"$ORG_ID\"}"
 ```
 
 Checar `stats.duration_ms` e mensagens de erro (se houver). O job respeita dedup por dia.
@@ -96,7 +96,7 @@ Requer `STUDENT_ID` e `OCCURRENCE_ID` (inteiro). Ajuste `reminder_at` para um in
 WHEN=$(date -u +"%Y-%m-%dT03:00:00Z")
 curl -sS -i -X POST "$BASE_URL/api/relationship/occurrence-trigger" \
   -H 'Content-Type: application/json' \
-  --data "{\"student_id\":\"$STUDENT_ID\",\"occurrence_id\":$OCCURRENCE_ID,\"reminder_at\":\"$WHEN\",\"occurrence_type\":\"SMOKE\",\"occurrence_notes\":\"Smoke test\",\"tenant_id\":\"$TENANT_ID\"}"
+  --data "{\"student_id\":\"$STUDENT_ID\",\"occurrence_id\":$OCCURRENCE_ID,\"reminder_at\":\"$WHEN\",\"occurrence_type\":\"SMOKE\",\"occurrence_notes\":\"Smoke test\",\"org_id\":\"$ORG_ID\"}"
 ```
 
 Verificar criação/atualização de tarefa `occurrence_followup` e log de `created` / `scheduled`.

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { 
@@ -12,6 +13,8 @@ import {
 } from "lucide-react"
 
 export default function ServicesPage() {
+  const [activeService, setActiveService] = useState<string | null>(null)
+  
   const services = [
     {
       title: "Financeiro",
@@ -55,6 +58,18 @@ export default function ServicesPage() {
     }
   ]
 
+  // Detectar qual serviço está ativo baseado na URL atual
+  useEffect(() => {
+    const currentPath = window.location.pathname
+    const activeService = services.find(service => currentPath === service.href)
+    if (activeService) {
+      setActiveService(activeService.title)
+    } else {
+      // Se estamos na página principal de serviços, nenhum está ativo
+      setActiveService(null)
+    }
+  }, [])
+
   return (
     <div className="container py-6">
       {/* Header */}
@@ -65,11 +80,15 @@ export default function ServicesPage() {
         </p>
       </div>
 
-      {/* Services Grid - Cards Compactos (5 por linha) */}
+      {/* Services Grid - Cards Coloridos com Padrão de Seleção */}
       <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {services.map((service) => (
           <Link key={service.title} href={service.href}>
-            <Card className="group relative cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 border-l-4 border-l-transparent hover:border-l-primary">
+            <Card className={`group relative cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 ${
+              activeService === service.title
+                ? 'border-l-4 border-l-primary shadow-md -translate-y-0.5'
+                : 'border-l-4 border-l-transparent hover:border-l-primary'
+            }`}>
               <CardContent className="p-4">
                 <div className={`${service.bgColor} ${service.color} w-10 h-10 rounded-lg flex items-center justify-center mb-3`}>
                   <service.icon className="h-5 w-5" />

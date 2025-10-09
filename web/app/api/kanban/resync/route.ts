@@ -15,10 +15,10 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}))
     const { student_id, force_create } = body
 
-    let firstStageResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&position=eq.1&select=id,position&limit=1`, { headers, cache: 'no-store' })
+    let firstStageResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&position=eq.1&select=id,position&limit=1`, { headers, cache: 'no-store' })
     let firstStage = (await firstStageResp.json().catch(()=>[]))?.[0]
     if (!firstStage?.id) {
-      firstStageResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.tenantId}&select=id,position&order=position.asc&limit=1`, { headers, cache:'no-store' })
+      firstStageResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&select=id,position&order=position.asc&limit=1`, { headers, cache:'no-store' })
       firstStage = (await firstStageResp.json().catch(()=>[]))?.[0]
     }
     if (!firstStage?.id) return NextResponse.json({ ok: false, code:'no_stage' }, { status: 200 })
@@ -26,12 +26,12 @@ export async function POST(request: Request) {
     // Se é criação forçada para um aluno específico
     if (force_create && student_id) {
       // Verificar se já existe card para este aluno
-      const ex = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&student_id=eq.${student_id}&select=id&limit=1`, { headers, cache:'no-store' })
+      const ex = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&student_id=eq.${student_id}&select=id&limit=1`, { headers, cache:'no-store' })
       const has = (await ex.json().catch(()=>[]))?.[0]
       
       if (!has) {
         // Buscar próxima posição
-        const posResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&stage_id=eq.${firstStage.id}&select=position&order=position.desc&limit=1`, { headers, cache:'no-store' })
+        const posResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&stage_id=eq.${firstStage.id}&select=position&order=position.desc&limit=1`, { headers, cache:'no-store' })
         const top = (await posResp.json().catch(()=>[]))?.[0]
         const nextPos = Number.isFinite(Number(top?.position)) ? Number(top.position) + 1 : 0
         
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
           method:'POST', 
           headers, 
           body: JSON.stringify({ 
-            org_id: ctx.tenantId, 
+            org_id: ctx.org_id, 
             student_id: student_id, 
             stage_id: firstStage.id, 
             position: nextPos 
@@ -59,17 +59,17 @@ export async function POST(request: Request) {
     }
 
     // Lógica original para resync geral
-    const toCreateResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.tenantId}&or=(onboard_opt.eq.enviar,onboard_opt.eq.enviado)&select=id`, { headers, cache:'no-store' })
+    const toCreateResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.org_id}&or=(onboard_opt.eq.enviar,onboard_opt.eq.enviado)&select=id`, { headers, cache:'no-store' })
     const rows: Array<{ id:string }> = await toCreateResp.json().catch(()=>[])
     let created = 0
     for (const r of rows) {
-      const ex = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&student_id=eq.${r.id}&select=id&limit=1`, { headers, cache:'no-store' })
+      const ex = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&student_id=eq.${r.id}&select=id&limit=1`, { headers, cache:'no-store' })
       const has = (await ex.json().catch(()=>[]))?.[0]
       if (!has) {
-        const posResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.tenantId}&stage_id=eq.${firstStage.id}&select=position&order=position.desc&limit=1`, { headers, cache:'no-store' })
+        const posResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&stage_id=eq.${firstStage.id}&select=position&order=position.desc&limit=1`, { headers, cache:'no-store' })
         const top = (await posResp.json().catch(()=>[]))?.[0]
         const nextPos = Number.isFinite(Number(top?.position)) ? Number(top.position) + 1 : 0
-        const ins = await fetch(`${url}/rest/v1/kanban_items`, { method:'POST', headers, body: JSON.stringify({ org_id: ctx.tenantId, student_id: r.id, stage_id: firstStage.id, position: nextPos }) })
+        const ins = await fetch(`${url}/rest/v1/kanban_items`, { method:'POST', headers, body: JSON.stringify({ org_id: ctx.org_id, student_id: r.id, stage_id: firstStage.id, position: nextPos }) })
         if (ins.ok) created++
       }
     }

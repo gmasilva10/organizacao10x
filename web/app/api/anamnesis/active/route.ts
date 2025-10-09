@@ -32,7 +32,7 @@ export async function GET(request: Request) {
           )
         )
       `)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     // Buscar diretrizes padrão da organização
@@ -51,14 +51,14 @@ export async function GET(request: Request) {
           )
         )
       `)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
 
     return NextResponse.json({
       data: {
         template_version: defaultTemplate?.template_version || null,
         guidelines_version: defaultGuidelines?.guideline_version || null,
-        organization_id: ctx.tenantId,
+        organization_id: ctx.org_id,
         updated_at: new Date().toISOString()
       }
     }, {

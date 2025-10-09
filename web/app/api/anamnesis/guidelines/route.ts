@@ -61,7 +61,7 @@ export async function GET(request: Request) {
     const { data: guidelines, error } = await supabase
       .from('training_guidelines')
       .select(selectQuery)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
 
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
     const { data: guideline, error } = await supabase
       .from('training_guidelines')
       .insert({
-        organization_id: ctx.tenantId,
+        organization_id: ctx.org_id,
         name: validatedData.name,
         description: validatedData.description,
         created_by: ctx.userId
@@ -177,7 +177,7 @@ export async function PUT(request: Request) {
         updated_at: new Date().toISOString()
       })
       .eq('id', guidelineId)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .select()
       .single()
 
@@ -223,7 +223,7 @@ export async function DELETE(request: Request) {
         is_active: false
       })
       .eq('id', guidelineId)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
 
     if (error) {
       console.error('Erro ao deletar diretrizes:', error)

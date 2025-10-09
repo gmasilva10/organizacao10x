@@ -68,7 +68,7 @@ export async function GET(request: Request) {
     const { data: templates, error } = await supabase
       .from('anamnesis_templates')
       .select(selectQuery)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
 
@@ -82,7 +82,7 @@ export async function GET(request: Request) {
     const { data: defaultTemplate, error: defaultError } = await supabase
       .from('organization_default_templates')
       .select('template_version_id')
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .single()
     
     console.log('Default template encontrado:', defaultTemplate)
@@ -142,13 +142,13 @@ export async function POST(request: Request) {
       await supabase
         .from('anamnesis_templates')
         .update({ is_default: false })
-        .eq('organization_id', ctx.tenantId)
+        .eq('organization_id', ctx.org_id)
     }
 
     const { data: template, error } = await supabase
       .from('anamnesis_templates')
       .insert({
-        organization_id: ctx.tenantId,
+        organization_id: ctx.org_id,
         name: validatedData.name,
         description: validatedData.description,
         is_default: validatedData.is_default,
@@ -210,7 +210,7 @@ export async function PUT(request: Request) {
       await supabase
         .from('anamnesis_templates')
         .update({ is_default: false })
-        .eq('organization_id', ctx.tenantId)
+        .eq('organization_id', ctx.org_id)
         .neq('id', templateId)
     }
 
@@ -221,7 +221,7 @@ export async function PUT(request: Request) {
         updated_at: new Date().toISOString()
       })
       .eq('id', templateId)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
       .select()
       .single()
 
@@ -267,7 +267,7 @@ export async function DELETE(request: Request) {
         is_active: false
       })
       .eq('id', templateId)
-      .eq('organization_id', ctx.tenantId)
+      .eq('organization_id', ctx.org_id)
 
     if (error) {
       console.error('Erro ao deletar template:', error)

@@ -10,13 +10,11 @@ import { z } from 'zod'
 
 // Schema de validação para criação/atualização de planos
 const PlanSchema = z.object({
-  plan_code: z.string().min(1, 'Código do plano é obrigatório'),
   nome: z.string().min(1, 'Nome do plano é obrigatório'),
   descricao: z.string().optional(),
   valor: z.number().positive('Valor deve ser positivo'),
   moeda: z.string().default('BRL'),
   ciclo: z.enum(['mensal', 'trimestral', 'semestral', 'anual']).optional(),
-  duracao_em_ciclos: z.number().int().positive().optional(),
   ativo: z.boolean().default(true)
 })
 
@@ -33,7 +31,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from('plans')
       .select('*')
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('nome')
     
     if (error) throw error
@@ -69,26 +67,31 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = PlanSchema.parse(body)
     
-    // Verificar se o código do plano já existe
-    const { data: existingPlan } = await supabase
+    // Gerar código do plano automaticamente (sequencial de 3 dígitos)
+    // Buscar todos os códigos existentes para esta organização
+    const { data: existingPlans } = await supabase
       .from('plans')
-      .select('id')
-      .eq('org_id', ctx.tenantId)
-      .eq('plan_code', validatedData.plan_code)
-      .single()
+      .select('plan_code')
+      .eq('org_id', ctx.org_id)
     
-    if (existingPlan) {
-      return NextResponse.json({
-        error: 'Código do plano já existe',
-        details: 'Já existe um plano com este código'
-      }, { status: 409 })
+    console.log('🔍 [DEBUG] Planos existentes:', existingPlans)
+    
+    // Encontrar o próximo código disponível
+    let nextCode = '001'
+    if (existingPlans && existingPlans.length > 0) {
+      const existingCodes = existingPlans.map(p => parseInt(p.plan_code)).sort((a, b) => b - a)
+      const lastCode = existingCodes[0]
+      nextCode = String(lastCode + 1).padStart(3, '0')
     }
+    
+    console.log('🔍 [DEBUG] Próximo código gerado:', nextCode)
     
     const { data, error } = await supabase
       .from('plans')
       .insert({
         ...validatedData,
-        org_id: ctx.tenantId,
+        plan_code: nextCode,
+        org_id: ctx.org_id,
         created_by: ctx.userId
       })
       .select()

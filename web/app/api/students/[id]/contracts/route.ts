@@ -32,7 +32,7 @@ export async function GET(
         )
       `)
       .eq('student_id', params.id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -97,7 +97,7 @@ export async function POST(
       .from('plans')
       .select('*')
       .eq('plan_code', plan_code)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .eq('ativo', true)
       .single()
 
@@ -160,7 +160,7 @@ export async function POST(
         end_date,
         status: 'ativo',
         notes: b.notes || null,
-        org_id: ctx.tenantId
+        org_id: ctx.org_id
       })
       .select()
       .single()
@@ -185,7 +185,7 @@ export async function POST(
           moeda: currency,
           status: 'pendente',
           created_by: ctx.userId,
-          org_id: ctx.tenantId
+          org_id: ctx.org_id
         })
 
       if (billingError) {

@@ -20,14 +20,14 @@ export async function POST(request: Request) {
 
   // Aplica sequencialmente (última gravação vence)
   for (const u of norm) {
-    const resp = await fetch(`${url}/rest/v1/kanban_stages?id=eq.${u.id}&org_id=eq.${ctx.tenantId}&is_fixed=eq.false`, {
+    const resp = await fetch(`${url}/rest/v1/kanban_stages?id=eq.${u.id}&org_id=eq.${ctx.org_id}&is_fixed=eq.false`, {
       method: 'PATCH',
       headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type': 'application/json' },
       body: JSON.stringify({ position: u.position })
     })
     if (!resp.ok) return NextResponse.json({ error: 'update_failed' }, { status: 500 })
   }
-  try { await logEvent({ tenantId: ctx.tenantId, userId: ctx.userId, eventType: 'kanban.stage.reordered', payload: { updates: norm.length } }) } catch {}
+  try { await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'kanban.stage.reordered', payload: { updates: norm.length } }) } catch {}
   return new NextResponse(null, { status: 204 })
 }
 

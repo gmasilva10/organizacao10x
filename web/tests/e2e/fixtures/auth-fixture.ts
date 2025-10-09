@@ -12,6 +12,10 @@ type AuthFixtures = {
 export const test = base.extend<AuthFixtures>({
   // Página autenticada genérica
   authenticatedPage: async ({ page }, use) => {
+    // Sinalizar modo E2E para o servidor
+    await page.context().addCookies([
+      { name: 'e2e', value: '1', domain: 'localhost', path: '/', httpOnly: false, secure: false, sameSite: 'Lax' }
+    ]);
     // Configurar storage state para evitar redirect loop
     await page.context().addCookies([
       {
@@ -86,6 +90,10 @@ export const test = base.extend<AuthFixtures>({
 
   // Página com usuário admin
   adminPage: async ({ page }, use) => {
+    // Sinalizar modo E2E para o servidor
+    await page.context().addCookies([
+      { name: 'e2e', value: '1', domain: 'localhost', path: '/', httpOnly: false, secure: false, sameSite: 'Lax' }
+    ]);
     // Configurar storage state para admin
     await page.context().addCookies([
       {
@@ -144,6 +152,10 @@ export const test = base.extend<AuthFixtures>({
 
   // Página com usuário trainer
   trainerPage: async ({ page }, use) => {
+    // Sinalizar modo E2E para o servidor
+    await page.context().addCookies([
+      { name: 'e2e', value: '1', domain: 'localhost', path: '/', httpOnly: false, secure: false, sameSite: 'Lax' }
+    ]);
     // Configurar storage state para trainer
     await page.context().addCookies([
       {

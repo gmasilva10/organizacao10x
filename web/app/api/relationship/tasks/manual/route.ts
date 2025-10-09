@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     // API Manual Tasks - Iniciando requisição
     
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.tenantId || !ctx.userId) {
+    if (!ctx || !ctx.org_id || !ctx.userId) {
       const queryTime = Date.now() - startTime
       return NextResponse.json(
         { error: 'unauthorized', message: 'Usuário não autenticado' },
@@ -393,7 +393,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.tenantId) {
+    if (!ctx || !ctx.org_id) {
       return NextResponse.json(
         { error: 'unauthorized', message: 'Usuário não autenticado' },
         { status: 401 }

@@ -15,7 +15,7 @@ export async function POST(
 ) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
@@ -27,7 +27,7 @@ export async function POST(
       .from('guidelines_versions')
       .select('*')
       .eq('id', versionId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (versionError || !version) {
@@ -59,7 +59,7 @@ export async function POST(
     // Log de auditoria
     const auditLogger = new AuditLogger(supabase)
     await auditLogger.log({
-      organization_id: ctx.tenantId,
+      organization_id: ctx.org_id,
       user_id: ctx.userId,
       action: 'update',
       resource_type: 'guideline_version',

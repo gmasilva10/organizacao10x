@@ -23,7 +23,7 @@ export async function GET(
       .from('students')
       .select('id, name')
       .eq('id', studentId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (studentError || !student) {
@@ -49,7 +49,7 @@ export async function GET(
         )
       `)
       .eq('student_id', studentId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('created_at', { ascending: true })
 
     if (responsiblesError) {
@@ -120,7 +120,7 @@ export async function POST(
       .from('students')
       .select('id, name')
       .eq('id', studentId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (studentError || !student) {
@@ -132,7 +132,7 @@ export async function POST(
       .from('professionals')
       .select('id, full_name, is_active')
       .eq('id', professional_id)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (professionalError || !professional) {
@@ -149,7 +149,7 @@ export async function POST(
         .from('student_responsibles')
         .select('id, professional_id')
         .eq('student_id', studentId)
-        .eq('org_id', ctx.tenantId)
+        .eq('org_id', ctx.org_id)
         .contains('roles', ['principal'])
         .neq('professional_id', professional_id)
         .single()
@@ -174,7 +174,7 @@ export async function POST(
         professional_id: professional_id,
         roles,
         note: note || null,
-        org_id: ctx.tenantId
+        org_id: ctx.org_id
       }, {
         onConflict: 'org_id,student_id,professional_id'
       })

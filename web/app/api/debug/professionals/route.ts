@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         is_active,
         professional_profiles!inner(name)
       `)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .eq('is_active', true)
       .order('full_name', { ascending: true })
 
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       professionals: professionals || [],
       userInList: !!userInList,
       userPhone,
-      tenantId: ctx.tenantId,
+      tenantId: ctx.org_id,
       total: professionals?.length || 0
     })
   } catch (error) {

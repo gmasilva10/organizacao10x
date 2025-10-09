@@ -45,15 +45,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
   // garantir pertencimento à org
   const headers = { apikey: key!, Authorization: `Bearer ${key}`!, "Content-Type": "application/json" }
-  const check = await fetch(`${url}/rest/v1/services?id=eq.${id}&org_id=eq.${ctx.tenantId}&select=id&limit=1`, { headers, cache: "no-store" })
+  const check = await fetch(`${url}/rest/v1/services?id=eq.${id}&org_id=eq.${ctx.org_id}&select=id&limit=1`, { headers, cache: "no-store" })
   const found = (await check.json().catch(() => []))?.[0]
   if (!found) return NextResponse.json({ error: "not_found" }, { status: 404 })
 
-  const upd = await fetch(`${url}/rest/v1/services?id=eq.${id}&org_id=eq.${ctx.tenantId}`, { method: "PATCH", headers, body: JSON.stringify(patch) })
+  const upd = await fetch(`${url}/rest/v1/services?id=eq.${id}&org_id=eq.${ctx.org_id}`, { method: "PATCH", headers, body: JSON.stringify(patch) })
   if (!upd.ok) return NextResponse.json({ error: "unexpected_error" }, { status: 500 })
 
   ;(async () => {
-    try { await writeAudit({ orgId: ctx.tenantId, actorId: ctx.userId, entityType: "service", entityId: id, action: "updated", payload: patch }) } catch {}
+    try { await writeAudit({ orgId: ctx.org_id, actorId: ctx.userId, entityType: "service", entityId: id, action: "updated", payload: patch }) } catch {}
   })()
 
   return NextResponse.json({ ok: true })

@@ -99,7 +99,7 @@ async function createUserTables() {
         
         DROP POLICY IF EXISTS "Users can view memberships from their organization" ON memberships;
         CREATE POLICY "Users can view memberships from their organization" ON memberships
-          FOR SELECT USING (tenant_id = (SELECT org_id FROM users WHERE id = auth.uid()));
+          FOR SELECT USING (is_member_of_org(org_id));
       `
     })
     

@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         email,
         professional_profiles!inner(name)
       `)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .order('full_name', { ascending: true })
 
     if (error) {

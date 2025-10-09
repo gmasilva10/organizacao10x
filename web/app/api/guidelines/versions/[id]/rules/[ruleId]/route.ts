@@ -52,7 +52,7 @@ export async function PUT(
 ) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "NÃ£o autorizado" }, { status: 401 })
     }
 
@@ -67,7 +67,7 @@ export async function PUT(
       .from('guidelines_versions')
       .select('id, status')
       .eq('id', versionId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (versionError || !version) {
@@ -83,7 +83,7 @@ export async function PUT(
       .from('guideline_rules')
       .select('id')
       .eq('id', ruleId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .eq('guidelines_version_id', versionId)
       .single()
 
@@ -101,7 +101,7 @@ export async function PUT(
         updated_at: new Date().toISOString()
       })
       .eq('id', ruleId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .select()
       .single()
 
@@ -130,7 +130,7 @@ export async function DELETE(
 ) {
   try {
     const ctx = await resolveRequestContext(request)
-    if (!ctx || !ctx.userId || !ctx.tenantId) {
+    if (!ctx || !ctx.userId || !ctx.org_id) {
       return NextResponse.json({ error: "NÃ£o autorizado" }, { status: 401 })
     }
 
@@ -142,7 +142,7 @@ export async function DELETE(
       .from('guidelines_versions')
       .select('id, status')
       .eq('id', versionId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .single()
 
     if (versionError || !version) {
@@ -158,7 +158,7 @@ export async function DELETE(
       .from('guideline_rules')
       .select('id')
       .eq('id', ruleId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
       .eq('guidelines_version_id', versionId)
       .single()
 
@@ -171,7 +171,7 @@ export async function DELETE(
       .from('guideline_rules')
       .delete()
       .eq('id', ruleId)
-      .eq('org_id', ctx.tenantId)
+      .eq('org_id', ctx.org_id)
 
     if (error) {
       console.error('Erro ao deletar regra:', error)
