@@ -10,7 +10,7 @@ export async function GET() {
   return NextResponse.json({
     env: process.env.NEXT_PUBLIC_ENV || process.env.NODE_ENV,
     userId: ctx.userId,
-    tenantId: ctx.org_id,
+    org_id: ctx.org_id,
     role: ctx.role,
   })
 }

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     // Debug de contexto de tenant
     console.log('🔍 API Students - Contexto de tenant:', {
       userId: ctx?.userId,
-      tenantId: ctx?.tenantId,
+      org_id: ctx?.org_id,
       role: ctx?.role,
       env,
       requestId

@@ -201,7 +201,7 @@ export async function POST(
     console.log('=== D3 PREVIEW ENGINE START ===')
     
     const ctx = await resolveRequestContext(request)
-    console.log('Context:', { userId: ctx?.userId, tenantId: ctx?.tenantId })
+    console.log('Context:', { userId: ctx?.userId, org_id: ctx?.org_id })
     
     if (!ctx || !ctx.userId || !ctx.org_id) {
       console.log('Erro: Contexto invÃ¡lido')
