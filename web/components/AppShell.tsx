@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useOrganization } from "@/hooks/useOrganization"
 import type { Organization } from "@/types/organization"
+import { OrganizationLogo } from "@/components/OrganizationLogo"
 // import { useTheme } from "@/lib/use-theme"
 
 interface MenuItem {
@@ -245,30 +246,13 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
           </Button>
 
           {/* Logo/Branding */}
-          <Link 
-            href="/app" 
-            className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md px-1 py-1" 
-            aria-label="Página inicial - Organização10x"
-            title="Ir para a página inicial"
-          >
-            {/* Logo da organização ou fallback */}
-            <div className="w-7 h-7 rounded-md flex items-center justify-center shadow-sm overflow-hidden">
-              {organization && (organization as unknown as Organization).logo_url ? (
-                <Image
-                  src={(organization as unknown as Organization).logo_url!}
-                  alt="Logo da organização"
-                  width={28}
-                  height={28}
-                  className="object-contain w-full h-full"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600 rounded-md flex items-center justify-center text-white font-bold text-sm">
-                  10x
-                </div>
-              )}
-            </div>
-            <span className="font-bold text-lg">Organização10x</span>
-          </Link>
+          <OrganizationLogo 
+            organization={organization}
+            showText={true}
+            size="md"
+            href="/app"
+            ariaLabel="Página inicial - Organização10x"
+          />
 
           {/* Spacer */}
           <div className="flex-1" />
@@ -364,7 +348,7 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
         {/* Sidebar */}
         <aside 
           id="sidebar-navigation"
-          className={`sticky top-16 h-[calc(100vh-4rem)] border-r bg-background/50 backdrop-blur-sm transition-all duration-300 ease-in-out overflow-hidden ${
+          className={`sticky top-16 h-[calc(100vh-4rem)] border-r bg-background/50 backdrop-blur-sm transition-all duration-300 ease-in-out overflow-hidden flex flex-col ${
             sidebarCollapsed ? 'w-16' : 'w-64'
           }`}
           aria-label="Menu de navegação principal"
@@ -375,7 +359,8 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
             transform: 'translateZ(0)' // Force GPU acceleration
           }}
         >
-          <nav className="flex flex-col gap-4 p-3" aria-label="Menu de navegação">
+          {/* Navigation Menu */}
+          <nav className="flex-1 overflow-y-auto p-3" aria-label="Menu de navegação">
             {menuGroups.map((group) => (
               <div key={group.id} className="flex flex-col gap-1">
                 {/* Group Title */}
@@ -474,6 +459,20 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
               </div>
             ))}
           </nav>
+
+          {/* Footer com Logo */}
+          <div className="border-t bg-background/30 backdrop-blur-sm p-3">
+            <div className={`flex justify-center ${sidebarCollapsed ? '' : 'px-2'}`}>
+              <OrganizationLogo 
+                organization={organization}
+                showText={!sidebarCollapsed}
+                size="sm"
+                href="/app"
+                className="transition-all duration-300"
+                ariaLabel="Logo da organização no rodapé"
+              />
+            </div>
+          </div>
         </aside>
 
         {/* Main Content */}
