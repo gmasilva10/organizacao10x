@@ -25,7 +25,7 @@ export class QueryMonitor {
           threshold: `${this.SLOW_QUERY_THRESHOLD}ms`,
           context: {
             userId: context?.userId,
-            tenantId: context?.tenantId,
+            org_id: context?.org_id,
             operation: context?.operation
           },
           timestamp: new Date().toISOString()

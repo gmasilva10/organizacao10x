@@ -7,7 +7,7 @@ export async function withRBAC(requiredPerms: Array<Parameters<typeof can>[1]>, 
   if (!ctx) return { allowed: false, reason: 'unauthenticated' as const }
   const role = ctx.role
   const hasAll = requiredPerms.every((p) => can(role, p))
-  return { allowed: hasAll, reason: hasAll ? 'ok' as const : 'forbidden' as const, role, tenantId: ctx.tenantId }
+  return { allowed: hasAll, reason: hasAll ? 'ok' as const : 'forbidden' as const, role, org_id: ctx.org_id }
 }
 
 

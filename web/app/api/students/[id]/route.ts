@@ -49,7 +49,7 @@ export async function GET(
     // Buscar aluno específico com feature-flag de soft-delete
     const filters: string[] = []
     filters.push(`id=eq.${studentId}`)
-    if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.org_id}`)
+    if (ctx?.org_id) filters.push(`org_id=eq.${ctx.org_id}`)
     if (softDelete) filters.push(`deleted_at=is.null`)
     const select = `select=id,name,email,phone,status,created_at,trainer_id,photo_url,birth_date,gender,marital_status,nationality,birth_place,address`
     const studentUrl = `${url}/rest/v1/students?${filters.join('&')}&${select}`
@@ -101,7 +101,7 @@ export async function GET(
     // Buscar dados do treinador se existir
     let trainer = null
     if (student.trainer_id) {
-      const trainerTenant = ctx?.tenantId ? `&org_id=eq.${ctx.org_id}` : ''
+      const trainerTenant = ctx?.org_id ? `&org_id=eq.${ctx.org_id}` : ''
       const trainerUrl = `${url}/rest/v1/profiles?id=eq.${student.trainer_id}${trainerTenant}&select=id,full_name`
       
       try {

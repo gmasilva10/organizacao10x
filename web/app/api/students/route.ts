@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     // Construir filtros (org_id apenas)
     const filters: string[] = []
-    if (ctx?.tenantId) filters.push(`org_id=eq.${ctx.org_id}`)
+    if (ctx?.org_id) filters.push(`org_id=eq.${ctx.org_id}`)
     if (softDelete) filters.push(`deleted_at=is.null`)
     if (status) filters.push(`status=eq.${status}`)
     
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
     
     if (studentIds.length > 0) {
       const studentFilters = [`student_id=in.(${studentIds.join(',')})`, `role=eq.principal`]
-      if (ctx?.tenantId) studentFilters.push(`org_id=eq.${ctx.org_id}`)
+      if (ctx?.org_id) studentFilters.push(`org_id=eq.${ctx.org_id}`)
       
       const responsibleUrl = `${url}/rest/v1/student_responsibles?${studentFilters.join('&')}&select=student_id,professional_id,professionals(id,full_name)`
       
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
       email,
       phone: phoneDigits,
       status,
-      org_id: ctx?.tenantId || null,
+      org_id: ctx?.org_id || null,
     }
 
     const resp = await fetch(`${url}/rest/v1/students`, {

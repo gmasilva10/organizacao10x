@@ -79,7 +79,7 @@ export async function GET(request: Request) {
 
     // Extrair org/role principal (primeira membership)
     const ctx = await resolveRequestContext(request).catch(() => null)
-    const primaryOrgId = memberships[0]?.organization_id || ctx?.tenantId || null
+    const primaryOrgId = memberships[0]?.organization_id || ctx?.org_id || null
     const primaryRole = memberships[0]?.role || ctx?.role || null
 
     return NextResponse.json({

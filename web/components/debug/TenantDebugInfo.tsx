@@ -117,7 +117,7 @@ export function TenantDebugInfo() {
             <div>
               <strong>Contexto Atual:</strong>
               <div className="ml-4 mt-1 space-y-1">
-                <div><strong>Tenant ID:</strong> <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">{debugInfo.context.tenantId}</code></div>
+                <div><strong>Org ID:</strong> <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">{debugInfo.context.org_id}</code></div>
                 <div><strong>Role:</strong> <Badge variant="secondary">{debugInfo.context.role}</Badge></div>
               </div>
             </div>
@@ -133,7 +133,7 @@ export function TenantDebugInfo() {
                     <div><strong>Role:</strong> <Badge variant="outline">{org.role}</Badge></div>
                     <div><strong>Plan:</strong> <Badge variant="secondary">{org.plan}</Badge></div>
                     <div><strong>Alunos:</strong> {org.student_count}</div>
-                    {debugInfo.context.tenantId === org.org_id && (
+                    {debugInfo.context.org_id === org.org_id && (
                       <Badge className="bg-green-100 text-green-800">ATIVA</Badge>
                     )}
                   </div>

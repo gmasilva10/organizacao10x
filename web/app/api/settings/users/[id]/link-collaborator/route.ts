@@ -23,7 +23,7 @@ export async function POST(
 
     // Resolver contexto da requisição
     const ctx = await resolveRequestContext(request)
-    if (!ctx?.tenantId) {
+    if (!ctx?.org_id) {
       return NextResponse.json({ ok: false, code: "no_organization" }, { status: 400 })
     }
 
@@ -205,7 +205,7 @@ export async function DELETE(
 
     // Resolver contexto da requisição
     const ctx = await resolveRequestContext(request)
-    if (!ctx?.tenantId) {
+    if (!ctx?.org_id) {
       return NextResponse.json({ ok: false, code: "no_organization" }, { status: 400 })
     }
 
