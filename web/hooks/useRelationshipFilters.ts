@@ -24,6 +24,7 @@ export interface RelationshipFilters {
   created_from: string
   created_to: string
   q: string
+  visible_columns: string[] // Novo campo para filtro de colunas
 }
 
 // Função para obter filtros padrão (hoje)
@@ -38,7 +39,8 @@ const getDefaultFilters = (): RelationshipFilters => {
     date_to: today.date_to,
     created_from: '',
     created_to: '',
-    q: ''
+    q: '',
+    visible_columns: ['overdue', 'due_today', 'pending_future', 'sent', 'postponed_skipped'] // Todas as colunas visíveis por padrão
   }
 }
 
@@ -162,11 +164,26 @@ export function useRelationshipFilters() {
     return apiFilters
   }, [debouncedFilters])
 
-  // Contar filtros ativos
+  // Contar filtros ativos (não conta filtros padrão)
   const getActiveFiltersCount = useCallback(() => {
-    return Object.entries(filters).filter(([key, value]) => 
-      key !== 'q' && value && value !== 'all' && value !== ''
-    ).length + (filters.q.trim() !== '' ? 1 : 0)
+    const defaultFilters = getDefaultFilters()
+    let count = 0
+    
+    // Contar filtros não-padrão
+    if (filters.q.trim() !== '') count++
+    if (filters.anchor !== defaultFilters.anchor) count++
+    if (filters.template_code !== defaultFilters.template_code) count++
+    if (filters.channel !== defaultFilters.channel) count++
+    if (filters.created_from !== defaultFilters.created_from) count++
+    if (filters.created_to !== defaultFilters.created_to) count++
+    if (filters.date_from !== defaultFilters.date_from) count++
+    if (filters.date_to !== defaultFilters.date_to) count++
+    
+    // Contar colunas ocultas (se não são todas visíveis)
+    const allColumns = ['overdue', 'due_today', 'pending_future', 'sent', 'postponed_skipped']
+    if (JSON.stringify(filters.visible_columns.sort()) !== JSON.stringify(allColumns.sort())) count++
+    
+    return count
   }, [filters])
 
   return {

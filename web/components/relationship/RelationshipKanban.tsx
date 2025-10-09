@@ -209,12 +209,13 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
   // Determinar colunas visíveis com try/catch
   const visibleColumns = useMemo(() => {
     try {
-      return ALL_COLUMNS
+      const selectedColumns = filters.visible_columns || ['overdue', 'due_today', 'pending_future', 'sent', 'postponed_skipped']
+      return ALL_COLUMNS.filter(column => selectedColumns.includes(column.id))
     } catch (error) {
       console.error('Erro ao determinar colunas visíveis:', error)
       return ALL_COLUMNS
     }
-  }, [])
+  }, [filters.visible_columns])
 
   // Agrupar tarefas por coluna com proteção robusta
   const getTasksByColumn = useCallback((columnId: string) => {

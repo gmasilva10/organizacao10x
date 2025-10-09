@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
-import { Filter, X, RefreshCw, Search, Calendar as CalendarIcon } from 'lucide-react'
+import { Filter, X, RefreshCw, Search, Calendar as CalendarIcon, Eye, EyeOff } from 'lucide-react'
 import { RelationshipFilters } from '@/hooks/useRelationshipFilters'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface RelationshipFilterDrawerProps {
   open: boolean
@@ -56,6 +57,14 @@ const TEMPLATE_OPTIONS = [
   { value: 'MSG10', label: 'MSG10 - Oferecimento de Novos Serviços' }
 ]
 
+const COLUMN_OPTIONS = [
+  { value: 'overdue', label: 'Atrasadas', icon: '🔴' },
+  { value: 'due_today', label: 'Para Hoje', icon: '🔵' },
+  { value: 'pending_future', label: 'Pendentes de Envio', icon: '🟡' },
+  { value: 'sent', label: 'Enviadas', icon: '🟢' },
+  { value: 'postponed_skipped', label: 'Adiadas/Puladas', icon: '⚪' }
+]
+
 export default function RelationshipFilterDrawer({
   open,
   onOpenChange,
@@ -67,8 +76,19 @@ export default function RelationshipFilterDrawer({
 
   const getActiveFiltersCount = () => {
     return Object.entries(filters).filter(([key, value]) => 
-      key !== 'q' && value && value !== 'all' && value !== ''
-    ).length + (filters.q.trim() !== '' ? 1 : 0)
+      key !== 'q' && key !== 'visible_columns' && value && value !== 'all' && value !== ''
+    ).length + (filters.q.trim() !== '' ? 1 : 0) + (
+      JSON.stringify(filters.visible_columns.sort()) !== JSON.stringify(['overdue', 'due_today', 'pending_future', 'sent', 'postponed_skipped'].sort()) ? 1 : 0
+    )
+  }
+
+  const handleColumnToggle = (columnValue: string) => {
+    const currentColumns = filters.visible_columns || []
+    const newColumns = currentColumns.includes(columnValue)
+      ? currentColumns.filter(col => col !== columnValue)
+      : [...currentColumns, columnValue]
+    
+    onFiltersChange({ visible_columns: newColumns })
   }
 
   return (
@@ -92,6 +112,29 @@ export default function RelationshipFilterDrawer({
         </DrawerHeader>
 
         <div className="px-4 pb-4 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {/* Seção: Colunas Visíveis */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Colunas Visíveis</Label>
+            <div className="space-y-2">
+              {COLUMN_OPTIONS.map(option => (
+                <div key={option.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`column-${option.value}`}
+                    checked={filters.visible_columns?.includes(option.value) || false}
+                    onCheckedChange={() => handleColumnToggle(option.value)}
+                  />
+                  <Label
+                    htmlFor={`column-${option.value}`}
+                    className="text-sm font-normal cursor-pointer flex items-center gap-2"
+                  >
+                    <span>{option.icon}</span>
+                    {option.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Seção: Âncora */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Âncora</Label>
