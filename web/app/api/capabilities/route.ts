@@ -4,7 +4,7 @@ export type PlanName = "basic" | "enterprise"
 export type RoleName = "admin" | "manager" | "trainer" | "seller" | "support"
 
 export type Capabilities = {
-  tenantId: string
+  orgId: string
   plan: PlanName
   role: RoleName
   limits: { students: number; trainers: number }
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   
   // DEBUG: Sempre retornar capabilities hardcoded
   const caps: Capabilities = {
-    tenantId: "test-tenant-id",
+    orgId: "test-tenant-id",
     plan: "enterprise",
     role: "admin",
     limits: {

@@ -1,11 +1,11 @@
-﻿// ConfiguraÃ§Ã£o de ambiente para testes E2E
+// ConfiguraÃ§Ã£o de ambiente para testes E2E
 export const TEST_CONFIG = {
   // URLs
   BASE_URL: process.env.BASE_URL || 'http://localhost:3000',
   SUPABASE_URL: process.env.SUPABASE_URL || 'http://localhost:54321',
   
-  // Test Tenant ID (fixo para testes)
-  TENANT_ID: 'test-tenant-123',
+  // Test Org ID (fixo para testes)
+  ORG_ID: 'test-tenant-123',
   
   // Test Users (via environment variables)
   ADMIN_EMAIL: process.env.TEST_ADMIN_EMAIL || 'test-admin@example.com',

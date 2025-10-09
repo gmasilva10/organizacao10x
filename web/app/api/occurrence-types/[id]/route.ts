@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
 import { z } from 'zod'
@@ -162,7 +162,7 @@ export async function PATCH(
               previousValues
             },
             actorId: user.id,
-            tenantId: org_id
+            orgId: org_id
           } as any, supabase)
         }
       } catch (auditError) {
@@ -250,7 +250,7 @@ export async function DELETE(
             group_id: type.group_id
           },
           actorId: user.id,
-          tenantId: org_id
+          orgId: org_id
         } as any, supabase)
       } catch (auditError) {
         console.error('Erro ao registrar log de auditoria:', auditError)

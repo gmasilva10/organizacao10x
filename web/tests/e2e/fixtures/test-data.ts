@@ -11,13 +11,13 @@ export const TEST_DATA = {
       email: TEST_CONFIG.ADMIN_EMAIL,
       password: TEST_CONFIG.PASSWORD,
       role: 'admin',
-      org_id: TEST_CONFIG.TENANT_ID,
+      org_id: TEST_CONFIG.ORG_ID,
     },
     trainer: {
       email: TEST_CONFIG.TRAINER_EMAIL,
       password: TEST_CONFIG.PASSWORD,
       role: 'trainer',
-      org_id: TEST_CONFIG.TENANT_ID,
+      org_id: TEST_CONFIG.ORG_ID,
     },
   },
 
@@ -27,7 +27,7 @@ export const TEST_DATA = {
     email: 'joao.silva@test.com',
     phone: '11999999999',
     status: 'active',
-    org_id: TEST_CONFIG.TENANT_ID,
+    org_id: TEST_CONFIG.ORG_ID,
   },
 
   // Ocorrência base para testes
@@ -38,14 +38,14 @@ export const TEST_DATA = {
     priority: 'medium',
     is_sensitive: false,
     reminder_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // +1 dia
-    org_id: TEST_CONFIG.TENANT_ID,
+    org_id: TEST_CONFIG.ORG_ID,
   },
 
   // Grupo de ocorrência para testes
   occurrenceGroup: {
     name: 'Teste E2E',
     description: 'Grupo para testes E2E',
-    org_id: TEST_CONFIG.TENANT_ID,
+    org_id: TEST_CONFIG.ORG_ID,
   },
 
   // Tipo de ocorrência para testes
@@ -53,14 +53,14 @@ export const TEST_DATA = {
     name: 'Teste E2E',
     description: 'Tipo para testes E2E',
     group_id: '', // Será preenchido dinamicamente
-    org_id: TEST_CONFIG.TENANT_ID,
+    org_id: TEST_CONFIG.ORG_ID,
   },
 
   // Coluna do Kanban para testes
   kanbanColumn: {
     title: TEST_CONFIG.KANBAN_COLUMN_TITLE,
     order_index: 1,
-    org_id: TEST_CONFIG.TENANT_ID,
+    org_id: TEST_CONFIG.ORG_ID,
   },
 
   // Tarefa do Kanban para testes

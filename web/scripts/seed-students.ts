@@ -12,11 +12,11 @@ type Student = {
   trainer_id: string | null
 }
 
-async function getOneTrainerId(tenantId: string): Promise<string | null> {
+async function getOneTrainerId(orgId: string): Promise<string | null> {
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) return null
-  const resp = await fetch(`${url}/rest/v1/memberships?org_id=eq.${tenantId}&role=eq.trainer&select=user_id&limit=1`, {
+  const resp = await fetch(`${url}/rest/v1/memberships?org_id=eq.${orgId}&role=eq.trainer&select=user_id&limit=1`, {
     headers: { apikey: key, Authorization: `Bearer ${key}` },
   })
   const rows = await resp.json().catch(() => []) as Array<{ user_id: string }>
@@ -30,13 +30,13 @@ function pickStatus(i: number): 'onboarding' | 'active' | 'paused' {
   return 'paused'                     // ~5%
 }
 
-function buildStudents(count: number, tenantId: string, trainerId: string | null, prefix: string): Student[] {
+function buildStudents(count: number, orgId: string, trainerId: string | null, prefix: string): Student[] {
   const arr: Student[] = []
   for (let i = 1; i <= count; i++) {
     const status = pickStatus(i)
     const assigned = trainerId && i % 3 === 0 ? trainerId : null // ~33% atribuídos
     arr.push({
-      org_id: tenantId,
+      org_id: orgId,
       name: `${prefix.toUpperCase()} Aluno ${String(i).padStart(4,'0')}`,
       email: `aluno${String(i).padStart(4,'0')}.${prefix}@qa.local`,
       phone: `+55-11-9${String(10000000 + i).slice(-8)}`,

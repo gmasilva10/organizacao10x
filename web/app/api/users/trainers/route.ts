@@ -7,12 +7,12 @@ type CreateTrainerBody = {
   email: string
 }
 
-async function countTenantTrainers(tenantId: string): Promise<number> {
+async function countOrgTrainers(orgId: string): Promise<number> {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return 0
   const resp = await fetch(
-    `${url}/rest/v1/memberships?org_id=eq.${tenantId}&role=eq.trainer&select=user_id`,
+    `${url}/rest/v1/memberships?org_id=eq.${orgId}&role=eq.trainer&select=user_id`,
     {
       headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact" },
       cache: "no-store",
@@ -36,7 +36,7 @@ async function getUserIdByEmail(email: string): Promise<string | null> {
   return (u?.id as string) || null
 }
 
-async function insertMembership(userId: string, tenantId: string): Promise<boolean> {
+async function insertMembership(userId: string, orgId: string): Promise<boolean> {
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return false
@@ -48,7 +48,7 @@ async function insertMembership(userId: string, tenantId: string): Promise<boole
       "Content-Type": "application/json",
       Prefer: "resolution=merge-duplicates,return=representation",
     },
-    body: JSON.stringify({ user_id: userId, org_id: tenantId, role: "trainer" }),
+    body: JSON.stringify({ user_id: userId, org_id: orgId, role: "trainer" }),
   })
   return resp.ok
 }
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   // RBAC: precisa gerenciar usuários e criar trainer
   const allowed = can(ctx.role, "manage_users") && can(ctx.role, "create_trainer")
   if (!allowed) {
-    await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: "rbac.denied", payload: { action: "users.create_trainer" } })
+    await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: "rbac.denied", payload: { action: "users.create_trainer" } })
     return NextResponse.json({ error: "forbidden" }, { status: 403 })
   }
 
@@ -83,10 +83,10 @@ export async function POST(request: Request) {
     maxTrainers = Number(rows?.[0]?.limits?.trainers ?? 0)
   }
 
-  const current = await countTenantTrainers(ctx.org_id)
+  const current = await countOrgTrainers(ctx.org_id)
   if (current >= maxTrainers) {
     await logEvent({
-      tenantId: ctx.org_id,
+      orgId: ctx.org_id,
       userId: ctx.userId,
       eventType: "limit.hit",
       payload: { limit: "trainers", value: current, max: maxTrainers },
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   const ok = await insertMembership(userId, ctx.org_id)
   if (!ok) return NextResponse.json({ error: "insert_failed" }, { status: 500 })
 
-  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: "feature.used", payload: { feature: "users.create_trainer", email } })
+  await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: "feature.used", payload: { feature: "users.create_trainer", email } })
   return NextResponse.json({ ok: true })
 }
 

@@ -9,16 +9,16 @@ export async function GET(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   if (!canRead(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  const tenantId = ctx.org_id
+  const orgId = ctx.org_id
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   const readV2 = process.env.REL_TEMPLATES_V2_READ === '1'
   if (readV2) {
-    const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${tenantId}&order=priority.asc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+    const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${orgId}&order=priority.asc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
     const itemsV2 = await respV2.json().catch(()=>[])
     return NextResponse.json({ items: itemsV2 })
   }
-  const resp = await fetch(`${url}/rest/v1/relationship_templates?org_id=eq.${tenantId}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+  const resp = await fetch(`${url}/rest/v1/relationship_templates?org_id=eq.${orgId}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
   const items = await resp.json().catch(()=>[])
   
   // Processar items para extrair dados do content JSON
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  const tenantId = ctx.org_id
+  const orgId = ctx.org_id
   const userId = ctx.userId
   type Body = { 
     code?: string; 
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
   }
   
   const rowMVP = { 
-    org_id: tenantId, 
+    org_id: orgId, 
     title: String(body.title||''), 
     type: 'whatsapp',
     content: JSON.stringify(templateData)
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   
   // Dual-write v2 (best-effort)
   const rowV2 = {
-    org_id: tenantId,
+    org_id: orgId,
     code: templateData.code,
     anchor: templateData.anchor,
     touchpoint: templateData.touchpoint,
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     await fetch(`${url}/rest/v1/relationship_templates_v2`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates,return=representation' }, body: JSON.stringify(rowV2) })
   } catch {}
 
-  await logEvent({ tenantId: tenantId, userId: userId, eventType: 'feature.used', payload: { feature: 'relationship.template.created', id: dataMVP?.[0]?.id } })
+  await logEvent({ orgId: orgId, userId: userId, eventType: 'feature.used', payload: { feature: 'relationship.template.created', id: dataMVP?.[0]?.id } })
   return NextResponse.json({ ok: true, id: dataMVP?.[0]?.id || null })
 }
 

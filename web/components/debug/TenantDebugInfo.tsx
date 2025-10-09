@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { RefreshCw, Bug, Trash2 } from 'lucide-react'
 
-interface TenantDebugInfo {
+interface OrgDebugInfo {
   timestamp: string
   user: {
     id: string
@@ -35,8 +35,8 @@ interface TenantDebugInfo {
   }
 }
 
-export function TenantDebugInfo() {
-  const [debugInfo, setDebugInfo] = useState<TenantDebugInfo | null>(null)
+export function OrgDebugInfo() {
+  const [debugInfo, setDebugInfo] = useState<OrgDebugInfo | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -91,7 +91,7 @@ export function TenantDebugInfo() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-orange-800 dark:text-orange-200">
           <Bug className="h-5 w-5" />
-          Debug - Informações de Tenant
+          Debug - Informações de Organização
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

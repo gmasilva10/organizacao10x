@@ -108,11 +108,11 @@ async function removeLock(): Promise<void> {
 /**
  * Buscar templates ativos
  */
-async function fetchActiveTemplates(tenantId: string): Promise<any[]> {
+async function fetchActiveTemplates(orgId: string): Promise<any[]> {
   const { data, error } = await supabase
     .from('relationship_templates')
     .select('id, org_id, content')
-    .eq('org_id', tenantId)
+    .eq('org_id', orgId)
 
   if (error || !data) return []
 
@@ -136,13 +136,13 @@ async function fetchActiveTemplates(tenantId: string): Promise<any[]> {
 /**
  * Buscar alunos para uma ancora especifica
  */
-async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Promise<any[]> {
+async function fetchStudentsForAnchor(anchor: EventCode, orgId: string): Promise<any[]> {
   try {
     if (anchor === 'sale_close') {
       const { data, error } = await supabase
         .from('students')
         .select('id, name, email, phone, created_at, org_id')
-        .eq('org_id', tenantId)
+        .eq('org_id', orgId)
         .eq('status', 'active')
       if (error) return []
       return data || []
@@ -152,7 +152,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
       const { data, error } = await supabase
         .from('students')
         .select('id, name, email, phone, birth_date, org_id')
-        .eq('org_id', tenantId)
+        .eq('org_id', orgId)
         .not('birth_date', 'is', null)
       if (error) return []
       return data || []
@@ -168,7 +168,7 @@ async function fetchStudentsForAnchor(anchor: EventCode, tenantId: string): Prom
 /**
  * Deletar tarefas existentes para uma ancora
  */
-async function deleteExistingTasks(anchor: EventCode, tenantId: string, dryRun: boolean): Promise<number> {
+async function deleteExistingTasks(anchor: EventCode, orgId: string, dryRun: boolean): Promise<number> {
   if (dryRun) {
     const { count } = await supabase
       .from('relationship_tasks')
@@ -198,7 +198,7 @@ async function deleteExistingTasks(anchor: EventCode, tenantId: string, dryRun: 
 async function processRecalculate(
   anchor: EventCode,
   templates: any[],
-  tenantId: string,
+  orgId: string,
   dryRun: boolean
 ): Promise<{ created: number; updated: number; deleted: number; skipped: number; errors: string[] }> {
   const anchorTemplates = templates.filter(t => t.anchor === anchor)
@@ -214,17 +214,17 @@ async function processRecalculate(
 
   try {
     // Deletar tarefas existentes
-    deleted = await deleteExistingTasks(anchor, tenantId, dryRun)
+    deleted = await deleteExistingTasks(anchor, orgId, dryRun)
 
     if (dryRun) {
       // Em dry-run, apenas simular criacao
-      const students = await fetchStudentsForAnchor(anchor, tenantId)
+      const students = await fetchStudentsForAnchor(anchor, orgId)
       created = students.length * anchorTemplates.length
       return { created, updated, deleted, skipped, errors }
     }
 
     // Buscar alunos para esta ancora
-    const students = await fetchStudentsForAnchor(anchor, tenantId)
+    const students = await fetchStudentsForAnchor(anchor, orgId)
     if (!students || students.length === 0) {
       return { created, updated, deleted, skipped, errors }
     }

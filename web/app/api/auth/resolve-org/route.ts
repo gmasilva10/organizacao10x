@@ -47,7 +47,7 @@ export async function GET(request: Request) {
       // Telemetria best-effort
       try {
         const { logEvent } = await import("@/server/events")
-        await logEvent({ tenantId: membership.org_id as string, userId: user.id, eventType: "auth.org_resolved", payload: { source: "membership" } })
+        await logEvent({ orgId: membership.org_id as string, userId: user.id, eventType: "auth.org_resolved", payload: { source: "membership" } })
       } catch {}
       return NextResponse.json({ orgId: membership.org_id as string, source: "membership" })
     }
@@ -55,7 +55,7 @@ export async function GET(request: Request) {
     // Nenhuma org
     try {
       const { logEvent } = await import("@/server/events")
-      await logEvent({ tenantId: "", userId: user.id, eventType: "auth.redirect_onboarding", payload: { reason: "no_membership" } })
+      await logEvent({ orgId: "", userId: user.id, eventType: "auth.redirect_onboarding", payload: { reason: "no_membership" } })
     } catch {}
     return NextResponse.json({ orgId: null, source: "none" })
   } catch (err) {

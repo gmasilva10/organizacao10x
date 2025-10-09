@@ -140,7 +140,7 @@ export async function POST(request: Request) {
   // Telemetria leve
   try {
     const { logEvent } = await import('@/server/events')
-    await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'onboarding.seed_applied', payload: { created: 0 } })
+    await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: 'onboarding.seed_applied', payload: { created: 0 } })
   } catch {}
   return new NextResponse(null, { status: 204 })
 }

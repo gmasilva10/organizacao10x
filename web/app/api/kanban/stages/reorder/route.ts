@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     })
     if (!resp.ok) return NextResponse.json({ error: 'update_failed' }, { status: 500 })
   }
-  try { await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'kanban.stage.reordered', payload: { updates: norm.length } }) } catch {}
+  try { await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: 'kanban.stage.reordered', payload: { updates: norm.length } }) } catch {}
   return new NextResponse(null, { status: 204 })
 }
 

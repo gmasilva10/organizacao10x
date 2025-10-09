@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     await fetch(`${url}/rest/v1/memberships`, { method:'POST', headers:{ apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates' }, body: JSON.stringify({ org_id: ctx.org_id, user_id: userId, role }) })
   }
 
-  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'team.invite', email, role } })
+  await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'team.invite', email, role } })
   return NextResponse.json({ ok: true, user_id: userId })
 }
 

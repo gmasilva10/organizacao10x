@@ -7,7 +7,6 @@ interface VersionInfo {
   commit: string
   buildTime: string
   env: string
-  tenantId: string
   lastMigration: string
 }
 
@@ -21,7 +20,6 @@ export function VersionBanner() {
       commit: "a8b5c2d",
       buildTime: "2025-01-28T16:30:00Z",
       env: "production",
-      tenantId: "tenant-123",
       lastMigration: "20250128_equipe_p1_final_v2"
     })
   }, [])

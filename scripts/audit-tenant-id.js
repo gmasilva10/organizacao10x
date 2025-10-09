@@ -33,6 +33,7 @@ const codeExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.
 // Patterns considered critical (functional usage)
 const patterns = [
   /\btenant_id\b/,        // direct DB column only (functional risk)
+  /\btenantId\b(?!\s*[:=]\s*['"]?allowed)/, // accidental variable usage in code
 ];
 
 // Simple allowlist of lines to ignore (comments only or documented references)
@@ -42,6 +43,8 @@ function isAllowedLine(line) {
   if (trimmed.startsWith('#')) return true;
   // ignore URL query examples or doc strings
   if (/^".*tenant_id.*"$/.test(trimmed)) return true;
+  // allow occurrences inside structured docs in Estrutura/evidencias
+  if (rel.includes('Estrutura/') || rel.includes('evidencias/')) return true;
   return false;
 }
 

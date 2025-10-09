@@ -36,14 +36,14 @@ async function postgrestInsert(table: string, row: Record<string, unknown>) {
 }
 
 export async function logEvent(params: {
-  tenantId: string
+  orgId: string
   userId: string
   eventType: EventType
   payload?: Record<string, unknown>
 }) {
-  const { tenantId, userId, eventType, payload } = params
+  const { orgId, userId, eventType, payload } = params
   await postgrestInsert("events", {
-    org_id: tenantId,
+    org_id: orgId,
     user_id: userId,
     event_type: eventType,
     payload: payload ?? {},

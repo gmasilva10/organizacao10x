@@ -5,7 +5,7 @@ Habilita  o: defina `NEXT_PUBLIC_DEBUG=true` em `.env.development.local`.
 ## Endpoints
 
 - `GET /api/_debug/session`
-  - Retorna `{ env, userId, tenantId, role }` resolvidos no servidor.
+  - Retorna `{ env, userId, orgId, role }` resolvidos no servidor.
 
 - `GET /api/_debug/students/:id/raw`
   - Retorna o registro  cru” de `students` (respeita RLS). Inclui `id, tenant_id, deleted_at, status, ...`.

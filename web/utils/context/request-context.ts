@@ -26,7 +26,7 @@ export async function resolveRequestContext(_request?: Request): Promise<Request
     })
 
     // Busca membership do usuário (primeira org)
-    let tenantId: string | null = activeOrg
+    let resolvedOrgId: string | null = activeOrg
     let role: string | null = null
 
     if (user) {
@@ -65,23 +65,23 @@ export async function resolveRequestContext(_request?: Request): Promise<Request
         membership = firstMembership
       }
 
-      tenantId = membership?.org_id || null
+      resolvedOrgId = membership?.org_id || null
       role = membership?.role || null
       
       // Log de debug para identificar problemas
-      if (activeOrg && activeOrg !== tenantId) {
-        console.warn(`⚠️ Tenant mismatch: activeOrg=${activeOrg}, resolved=${tenantId}`)
+      if (activeOrg && activeOrg !== resolvedOrgId) {
+        console.warn(`⚠️ Org mismatch: activeOrg=${activeOrg}, resolved=${resolvedOrgId}`)
       }
 
       console.log('🔍 resolveRequestContext - Membership:', {
         membership,
-        finalTenantId: tenantId,
+        finalOrgId: resolvedOrgId,
         finalRole: role,
         hadAccessToActiveOrg: !!membership
       })
     }
 
-    return { userId: user?.id || null, org_id: tenantId, role }
+    return { userId: user?.id || null, org_id: resolvedOrgId, role }
   } catch (error) {
     console.error('❌ resolveRequestContext - Erro inesperado:', error)
     return { userId: null, org_id: null, role: null }
