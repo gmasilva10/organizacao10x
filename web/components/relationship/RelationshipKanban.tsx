@@ -115,11 +115,11 @@ const ALL_COLUMNS: KanbanColumn[] = [
 
 // Estilo visual por coluna (exatamente como na imagem)
 const columnStyleById: Record<string, { header: string; card: string }> = {
-  overdue: { header: 'bg-red-50 border-red-200 border-b-0', card: 'border-red-200' },
-  due_today: { header: 'bg-blue-50 border-blue-200 border-b-0', card: 'border-blue-200' },
-  pending_future: { header: 'bg-yellow-50 border-yellow-200 border-b-0', card: 'border-yellow-200' },
-  sent: { header: 'bg-green-50 border-green-200 border-b-0', card: 'border-green-200' },
-  postponed_skipped: { header: 'bg-gray-50 border-gray-200 border-b-0', card: 'border-gray-200' },
+  overdue: { header: 'bg-red-50 border-red-200', card: 'border-red-200' },
+  due_today: { header: 'bg-blue-50 border-blue-200', card: 'border-blue-200' },
+  pending_future: { header: 'bg-yellow-50 border-yellow-200', card: 'border-yellow-200' },
+  sent: { header: 'bg-green-50 border-green-200', card: 'border-green-200' },
+  postponed_skipped: { header: 'bg-gray-50 border-gray-200', card: 'border-gray-200' },
 }
 
 const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanProps>(({ onTaskUpdate }, ref) => {
