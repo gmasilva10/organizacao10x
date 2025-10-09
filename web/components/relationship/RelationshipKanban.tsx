@@ -508,65 +508,79 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           <span className="ml-2 text-lg">Carregando tarefas...</span>
         </div>
       ) : (
-        <div className="flex space-x-3 pb-4">
-          {visibleColumns.map(column => (
-            <Card key={column.id} className={`flex-shrink-0 w-72 bg-white ${columnStyleById[column.id]?.card || ''}`}>
-              <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 border rounded-t-md ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <column.icon className={`h-4 w-4 mr-2 ${column.color}`} /> {column.title}
-                </CardTitle>
-                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
-                  {getTasksByColumn(column.id).length}
-                </Badge>
-              </CardHeader>
-              <CardContent className="pt-4">
-                {getTasksByColumn(column.id).length === 0 ? (
-                  <div className="text-center text-muted-foreground py-8">
-                    <Inbox className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                    <p className="text-sm font-medium">Nenhuma tarefa</p>
-                    <p className="text-xs mt-1">
-                      {column.id === 'overdue' && 'Nenhuma tarefa atrasada'}
-                      {column.id === 'due_today' && 'Sem tarefas para hoje'}
-                      {column.id === 'pending_future' && 'Sem tarefas futuras'}
-                      {column.id === 'sent' && 'Nenhuma enviada'}
-                      {column.id === 'postponed_skipped' && 'Nenhuma adiada/pulada'}
-                    </p>
+        <div className="flex flex-col space-y-4">
+          {/* Cabeçalhos como Cartões Separados (Print 2) */}
+          <div className="flex space-x-3">
+            {visibleColumns.map(column => (
+              <Card key={`header-${column.id}`} className={`flex-shrink-0 w-72 ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <column.icon className={`h-5 w-5 ${column.color}`} />
+                      <span className="font-medium text-gray-900">{column.title}</span>
+                    </div>
+                    <Badge variant="secondary" className="bg-white text-gray-700 border">
+                      {getTasksByColumn(column.id).length}
+                    </Badge>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {(() => {
-                      const items = getTasksByColumn(column.id)
-                      const limit = 200
-                      const isExpanded = !!expandedColumns[column.id]
-                      const visible = isExpanded ? items : items.slice(0, limit)
-                      return (
-                        <>
-                          {visible.map(task => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        onUpdateStatus={updateTaskStatus}
-                        onCopyMessage={copyMessage}
-                        onOpenWhatsApp={openWhatsApp}
-                        onSnoozeTask={snoozeTask}
-                        onDeleteTask={deleteTask}
-                      />
-                          ))}
-                          {!isExpanded && items.length > limit && (
-                            <div className="text-center">
-                              <Button variant="outline" size="sm" onClick={() => setExpandedColumns(prev => ({ ...prev, [column.id]: true }))}>
-                                Mostrar mais ({items.length - limit})
-                              </Button>
-                            </div>
-                          )}
-                        </>
-                      )
-                    })()}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Colunas de Conteúdo */}
+          <div className="flex space-x-3">
+            {visibleColumns.map(column => (
+              <Card key={`content-${column.id}`} className="flex-shrink-0 w-72 bg-white">
+                <CardContent className="p-4">
+                  {getTasksByColumn(column.id).length === 0 ? (
+                    <div className="text-center text-muted-foreground py-8">
+                      <Inbox className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+                      <p className="text-sm font-medium">Nenhuma tarefa</p>
+                      <p className="text-xs mt-1">
+                        {column.id === 'overdue' && 'Nenhuma tarefa atrasada'}
+                        {column.id === 'due_today' && 'Sem tarefas para hoje'}
+                        {column.id === 'pending_future' && 'Sem tarefas futuras'}
+                        {column.id === 'sent' && 'Nenhuma enviada'}
+                        {column.id === 'postponed_skipped' && 'Nenhuma adiada/pulada'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {(() => {
+                        const items = getTasksByColumn(column.id)
+                        const limit = 200
+                        const isExpanded = !!expandedColumns[column.id]
+                        const visible = isExpanded ? items : items.slice(0, limit)
+                        return (
+                          <>
+                            {visible.map(task => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          onUpdateStatus={updateTaskStatus}
+                          onCopyMessage={copyMessage}
+                          onOpenWhatsApp={openWhatsApp}
+                          onSnoozeTask={snoozeTask}
+                          onDeleteTask={deleteTask}
+                        />
+                            ))}
+                            {!isExpanded && items.length > limit && (
+                              <div className="text-center">
+                                <Button variant="outline" size="sm" onClick={() => setExpandedColumns(prev => ({ ...prev, [column.id]: true }))}>
+                                  Mostrar mais ({items.length - limit})
+                                </Button>
+                              </div>
+                            )}
+                          </>
+                        )
+                      })()}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
 
