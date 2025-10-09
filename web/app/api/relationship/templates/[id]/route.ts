@@ -64,7 +64,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   } catch {}
   
   await logEvent({ 
-    tenantId: ctx.org_id, 
+    orgId: ctx.org_id, 
     userId: ctx.userId, 
     eventType: 'feature.used', 
     payload: { feature: 'relationship.template.updated', id } 
@@ -105,7 +105,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   } catch {}
 
   await logEvent({ 
-    tenantId: ctx.org_id, 
+    orgId: ctx.org_id, 
     userId: ctx.userId, 
     eventType: 'feature.used', 
     payload: { feature: 'relationship.template.deleted', id } 

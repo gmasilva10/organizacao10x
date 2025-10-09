@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     await fetch(`${url}/rest/v1/relationship_templates_v2`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates,return=representation' }, body: JSON.stringify(rowV2) })
   } catch {}
 
-  await logEvent({ tenantId: tenantId, userId: userId, eventType: 'feature.used', payload: { feature: 'relationship.template.created', id: dataMVP?.[0]?.id } })
+  await logEvent({ orgId: tenantId, userId: userId, eventType: 'feature.used', payload: { feature: 'relationship.template.created', id: dataMVP?.[0]?.id } })
   return NextResponse.json({ ok: true, id: dataMVP?.[0]?.id || null })
 }
 

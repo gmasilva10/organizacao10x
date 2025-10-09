@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   // RBAC: precisa gerenciar usuários e criar trainer
   const allowed = can(ctx.role, "manage_users") && can(ctx.role, "create_trainer")
   if (!allowed) {
-    await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: "rbac.denied", payload: { action: "users.create_trainer" } })
+    await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: "rbac.denied", payload: { action: "users.create_trainer" } })
     return NextResponse.json({ error: "forbidden" }, { status: 403 })
   }
 
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
   const current = await countTenantTrainers(ctx.org_id)
   if (current >= maxTrainers) {
     await logEvent({
-      tenantId: ctx.org_id,
+      orgId: ctx.org_id,
       userId: ctx.userId,
       eventType: "limit.hit",
       payload: { limit: "trainers", value: current, max: maxTrainers },
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   const ok = await insertMembership(userId, ctx.org_id)
   if (!ok) return NextResponse.json({ error: "insert_failed" }, { status: 500 })
 
-  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: "feature.used", payload: { feature: "users.create_trainer", email } })
+  await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: "feature.used", payload: { feature: "users.create_trainer", email } })
   return NextResponse.json({ ok: true })
 }
 

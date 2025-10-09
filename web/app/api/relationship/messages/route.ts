@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const resp = await fetch(`${url}/rest/v1/relationship_messages`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=representation' }, body: JSON.stringify(row) })
   if (!resp.ok) return NextResponse.json({ error: 'insert_failed' }, { status: 500 })
   const data = await resp.json()
-  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'relationship.message.logged', id: data?.[0]?.id } })
+  await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { feature: 'relationship.message.logged', id: data?.[0]?.id } })
 
   // Best-effort: dual-write em relationship_tasks como 'sent' para refletir no Kanban
   try {

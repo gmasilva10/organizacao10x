@@ -27,7 +27,7 @@ export async function PATCH(request: Request, ctxParam: { params: Promise<{ id: 
   })
   if (!upd.ok) return NextResponse.json({ error:'update_failed' }, { status:500 })
   const now = new Date().toISOString()
-  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { type: 'kanban.column', action: 'rename', details: { columnId: id, columns_version: 1, ts: now }, route: '/(app)/onboarding' } })
+  await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { type: 'kanban.column', action: 'rename', details: { columnId: id, columns_version: 1, ts: now }, route: '/(app)/onboarding' } })
   return NextResponse.json({ ok:true })
 }
 
@@ -59,7 +59,7 @@ export async function DELETE(request: Request, ctxParam: { params: Promise<{ id:
   })
   if (!del.ok) return NextResponse.json({ error:'delete_failed' }, { status:500 })
   const now2 = new Date().toISOString()
-  await logEvent({ tenantId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { type: 'kanban.column', action: 'delete', details: { columnId: id, columns_version: 1, ts: now2 }, route: '/(app)/onboarding' } })
+  await logEvent({ orgId: ctx.org_id, userId: ctx.userId, eventType: 'feature.used', payload: { type: 'kanban.column', action: 'delete', details: { columnId: id, columns_version: 1, ts: now2 }, route: '/(app)/onboarding' } })
   return NextResponse.json({ ok:true })
 }
 
