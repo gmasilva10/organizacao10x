@@ -512,7 +512,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           {/* Cabeçalhos Ultra Finos (como Paint) */}
           <div className="flex space-x-3">
             {visibleColumns.map(column => (
-              <div key={`header-${column.id}`} className={`flex-shrink-0 w-72 border rounded-t-md ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
+              <div key={`header-${column.id}`} className={`flex-shrink-0 w-72 border rounded-md ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
                 <div className="py-1 px-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
