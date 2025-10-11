@@ -19,12 +19,17 @@ Estrutura principal
 - `web/` Next.js (App Router) + TypeScript + Tailwind + shadcn/ui
 - `web/app/(app)/onboarding` Kanban oficial (board + sidebar árvore + histórico)
 - `web/app/api/*` Rotas server-first (RBAC/limits/telemetria)
-- `web/Estrutura/` Governança (Atividades, Pendências, Erros, Checklist, Planos)
+- `web/Estrutura/` Governança e documentação técnica (organizada por categoria)
+  - `Padrao/` Padrões de desenvolvimento e UI/UX
+  - `Pendencias/` Tarefas e atividades
+  - `Relatorios/` Auditorias, migrações e validações
+  - `Checklists/` Checklists de validação
+  - Ver `web/Estrutura/README.md` para estrutura completa
 
 Qualidade (gate)
 - Build e Lint verdes antes de qualquer entrega
 - Evidências em JSON/prints em `web/Estrutura/`
-- Checklist obrigatório: `web/Estrutura/Checklist_Release_Validation.txt`
+- Checklist obrigatório: `web/Estrutura/Checklists/Checklist_Release_Validation.txt`
 
 CI (GitHub Actions)
 - Workflow em `.github/workflows/ci.yml` roda install + build + lint no push/PR para `main`.

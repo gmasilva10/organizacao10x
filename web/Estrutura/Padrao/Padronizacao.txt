@@ -373,3 +373,25 @@ Sincronização Kanban
 - Relatórios avançados
 - Notificações push
 - API GraphQL
+
+[TESTES AUTOMATIZADOS]
+- Vitest + Testing Library para testes unitários
+- jest-axe para validação de acessibilidade
+- Estrutura em web/__tests__/unit/
+- Cobertura mínima: 80%
+- CI/CD: rodar testes antes de merge
+- Arquivos de teste: *.test.tsx ou *.test.ts
+- Testes de componentes: renderização, interação, acessibilidade
+- Testes de hooks: comportamento, edge cases
+- Testes de utils: funções puras, validações
+
+[PERFORMANCE]
+- Lazy loading: modais pesados e features raramente usadas
+- Memoization: cards e filtros com React.memo
+- Debounce: 300ms em campos de busca
+- Bundle size: < 250KB First Load JS (meta)
+- Code splitting por rota
+- Dynamic imports para componentes pesados
+- useMemo para cálculos complexos
+- useCallback para callbacks passados como props
+- React Query para cache de dados

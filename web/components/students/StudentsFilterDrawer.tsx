@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { memo, useMemo } from 'react'
 import { FilterDrawer } from '@/components/ui/filter-drawer'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -22,7 +22,7 @@ interface StudentsFilterDrawerProps {
   onApply: () => void
 }
 
-export default function StudentsFilterDrawer({
+const StudentsFilterDrawer = memo(function StudentsFilterDrawer({
   open,
   onOpenChange,
   filters,
@@ -32,6 +32,14 @@ export default function StudentsFilterDrawer({
   onApply
 }: StudentsFilterDrawerProps) {
   
+  // Memoizar options pesadas
+  const trainerOptions = useMemo(() => {
+    return trainers.map(t => ({
+      value: t.id,
+      label: t.name
+    }))
+  }, [trainers])
+
   const handleFiltersChange = (field: keyof typeof filters, value: string) => {
     onFiltersChange({
       ...filters,
@@ -99,9 +107,9 @@ export default function StudentsFilterDrawer({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">Todos os Treinadores</SelectItem>
-              {trainers.map((trainer) => (
-                <SelectItem key={trainer.id} value={trainer.id}>
-                  {trainer.name}
+              {trainerOptions.map((trainer) => (
+                <SelectItem key={trainer.value} value={trainer.value}>
+                  {trainer.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -110,4 +118,6 @@ export default function StudentsFilterDrawer({
       </div>
     </FilterDrawer>
   )
-}
+})
+
+export default StudentsFilterDrawer

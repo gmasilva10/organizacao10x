@@ -8,12 +8,18 @@
         "lint": "next lint --no-inline-config --file app/api/relationship/_health/route.ts --file app/api/wa/create-group/route.ts --file app/api/wa/test-zapi/route.ts --file app/students/[id]/relacionamento/page.tsx --file components/students/modals/AnamneseInviteModal.tsx --file tests/e2e/specs/relationship-rewrite.spec.ts && eslint \"app/api/relationship/_health/route.ts\" \"app/api/wa/create-group/route.ts\" \"app/api/wa/test-zapi/route.ts\" \"app/students/[id]/relacionamento/page.tsx\" \"components/students/modals/AnamneseInviteModal.tsx\" \"tests/e2e/specs/relationship-rewrite.spec.ts\" --max-warnings=0",
         "lint:fix": "eslint \"app/api/relationship/_health/route.ts\" \"app/api/wa/create-group/route.ts\" \"app/api/wa/test-zapi/route.ts\" \"app/students/[id]/relacionamento/page.tsx\" \"components/students/modals/AnamneseInviteModal.tsx\" \"tests/e2e/specs/relationship-rewrite.spec.ts\" --fix",
         "start": "next start",
+        "test": "vitest",
+        "test:ui": "vitest --ui",
+        "test:coverage": "vitest --coverage",
         "test:e2e": "playwright test",
         "test:e2e:debug": "playwright test --debug",
         "test:e2e:regression": "playwright test --grep=\"@regression\"",
         "test:e2e:report": "playwright show-report",
         "test:e2e:smoke": "playwright test --grep=\"@smoke\"",
         "test:e2e:ui": "playwright test --ui",
+        "analyze": "ANALYZE=true next build",
+        "analyze:server": "BUNDLE_ANALYZE=server next build",
+        "analyze:browser": "BUNDLE_ANALYZE=browser next build",
         "ci:lint": "node scripts/check-tenant-id.js",
         "audit:tenant": "node ../scripts/audit-tenant-id.js"
     },
@@ -66,21 +72,28 @@
         "zod": "^4.1.12"
     },
     "devDependencies": {
+        "@next/bundle-analyzer": "^15.5.4",
         "@playwright/test": "^1.40.0",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.0",
         "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "@typescript-eslint/eslint-plugin": "^6.18.0",
         "@typescript-eslint/parser": "^6.18.0",
+        "@vitejs/plugin-react": "^5.0.4",
         "autoprefixer": "^10.4.20",
         "eslint": "^8.57.0",
         "eslint-config-next": "14.2.5",
         "eslint-plugin-unused-imports": "^3.1.0",
         "framer-motion": "^11.0.0",
+        "jest-axe": "^10.0.0",
+        "jsdom": "^27.0.0",
         "postcss": "^8",
         "puppeteer": "^24.22.0",
         "source-map-explorer": "^2.5.3",
         "tailwindcss": "^3.4.17",
-        "typescript": "^5"
+        "typescript": "^5",
+        "vitest": "^3.2.4"
     }
 }

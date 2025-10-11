@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import { Button } from "@/components/ui/button"
 import { 
   Tooltip,
@@ -17,7 +18,7 @@ type StudentCardActionsProps = {
   onActionComplete?: () => void
 }
 
-export default function StudentCardActions({ studentId, studentName, onHover, onActionComplete }: StudentCardActionsProps) {
+const StudentCardActions = memo(function StudentCardActions({ studentId, studentName, onHover, onActionComplete }: StudentCardActionsProps) {
   return (
     <div className="flex items-center gap-1 pt-1.5 border-t">
         {/* Editar */}
@@ -47,4 +48,10 @@ export default function StudentCardActions({ studentId, studentName, onHover, on
         />
       </div>
   )
-}
+}, (prevProps, nextProps) => {
+  // Re-render apenas se studentId ou studentName mudarem
+  return prevProps.studentId === nextProps.studentId &&
+         prevProps.studentName === nextProps.studentName
+})
+
+export default StudentCardActions
