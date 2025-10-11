@@ -17,13 +17,18 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { KanbanLogDrawer } from '@/components/KanbanLogDrawer'
 import { KanbanChecklist } from '@/components/KanbanChecklist'
 import { KanbanCardEditor } from '@/components/KanbanCardEditor'
-import { Clock, X } from 'lucide-react'
+import { Clock, X, Search, Filter, RefreshCw, Inbox } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useOnboardingFilters } from "@/hooks/useOnboardingFilters"
+import OnboardingFilterDrawer from "@/components/onboarding/OnboardingFilterDrawer"
 
-type Card = { id: string; title: string; studentId: string; status?: 'onboarding' | 'active' | 'paused' }
-type Column = { id: string; title: string; cards: Card[]; locked?: boolean; blocked?: boolean; stageCode?: string; sort: number }
+type Card = { id: string; title: string; studentId: string; status?: 'onboarding' | 'active' | 'paused'; color?: string }
+type Column = { id: string; title: string; cards: Card[]; locked?: boolean; blocked?: boolean; stageCode?: string; sort: number; color?: string }
 
 function createId(prefix: string) {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}`
@@ -44,6 +49,18 @@ export default function OnboardingPage() {
   const lastMovedIdRef = useRef<string | null>(null)
   const [trainerScope, setTrainerScope] = useState<string | undefined>(undefined)
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({})
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
+
+  // Hook de filtros do Onboarding
+  const {
+    filters,
+    debouncedFilters,
+    updateFilters,
+    resetFilters,
+    hasActiveFilters,
+    getApiFilters,
+    getActiveFiltersCount
+  } = useOnboardingFilters()
   // estados de arraste não usados removidos para atender regras de lint
   const { success: toastSuccess, error: toastError } = useToast()
   const [confirm, setConfirm] = useState<{ open: boolean; title: string; description?: string; onConfirm?: () => void }>({ open: false, title: '' })
@@ -90,7 +107,8 @@ export default function OnboardingPage() {
       sort: (c as any).sort || 0,
       // Colunas fixas travadas por título, independente da posição
       locked: (c as any).is_fixed === true || ["Novo Aluno", "Entrega do Treino"].includes(String(c.title)),
-      stageCode: (c as any).stage_code
+      stageCode: (c as any).stage_code,
+      color: (c as any).color || null
     }))
     // Identifica a coluna de conclusão por título, não pela última posição
     const doneColId = cols.find(c => String(c.title).toLowerCase().includes('entrega do treino'))?.id
@@ -326,6 +344,62 @@ export default function OnboardingPage() {
 
   return (
     <div className="container py-8" data-alias="onboarding-kanban">
+      {/* Cabeçalho do Módulo */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Onboarding</h1>
+            <p className="text-muted-foreground mt-2">
+              Gerencie o fluxo de onboarding dos seus alunos
+            </p>
+          </div>
+        </div>
+
+        {/* Barra de Ferramentas */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          {/* Busca e Status */}
+          <div className="flex gap-2 flex-1">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar alunos..."
+                value={filters.q}
+                onChange={(e) => updateFilters({ q: e.target.value })}
+                className="pl-10"
+              />
+            </div>
+            <Select value={filters.status} onValueChange={(v) => updateFilters({ status: v })}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Todos os status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os status</SelectItem>
+                <SelectItem value="onboarding">Onboarding</SelectItem>
+                <SelectItem value="active">Ativo</SelectItem>
+                <SelectItem value="paused">Pausado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Botões de Ação */}
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setFilterDrawerOpen(true)}>
+              <Filter className="mr-2 h-4 w-4" />
+              Filtros
+              {getActiveFiltersCount() > 0 && (
+                <Badge className="ml-2">{getActiveFiltersCount()}</Badge>
+              )}
+            </Button>
+            <Button variant="outline" onClick={resetFilters}>
+              <X className="mr-2 h-4 w-4" /> Limpar
+            </Button>
+            <Button variant="default" onClick={() => loadBoard(trainerScope)}>
+              <RefreshCw className="mr-2 h-4 w-4" /> Atualizar
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {loadingBoard ? (
         <>
           <div className="space-y-3">
@@ -338,7 +412,6 @@ export default function OnboardingPage() {
         <div className="mb-3" />
       ) : (
         <>
-      <div className="mb-3" />
 
           <DndContext sensors={sensors} onDragStart={(e: DragStartEvent) => {
             const isDraggingCol = e.active.id.toString().startsWith('col:')
@@ -424,7 +497,15 @@ export default function OnboardingPage() {
             }
           }}>
             <div className={`${boardCollapsed ? "opacity-60" : ""} flex gap-4 overflow-x-auto pb-2`} style={{ scrollSnapType: 'x proximity' }}>
-              {columns.map((column, index) => (
+              {columns
+                .filter(column => {
+                  // Aplicar filtro de colunas visíveis
+                  if (filters.visible_columns.length > 0) {
+                    return filters.visible_columns.includes(column.title)
+                  }
+                  return true
+                })
+                .map((column, index) => (
                 <ColumnView
                   key={column.id}
                   column={column}
@@ -436,6 +517,7 @@ export default function OnboardingPage() {
                   setOpenEditorId={setOpenEditorId}
                   cardProgress={cardProgress}
                   updateCardProgress={updateCardProgress}
+                  filters={filters}
                 />
               ))}
             </div>
@@ -508,6 +590,20 @@ export default function OnboardingPage() {
           onClose={() => setLogsDrawer({...logsDrawer, open: false})}
         />
       )}
+
+      {/* Onboarding Filter Drawer */}
+      <OnboardingFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        filters={filters}
+        onFiltersChange={updateFilters}
+        onClear={resetFilters}
+        onApply={() => {
+          setFilterDrawerOpen(false)
+          loadBoard(trainerScope)
+        }}
+        availableColumns={columns.map(col => col.title)}
+      />
     </div>
   )
 }
@@ -521,7 +617,8 @@ function ColumnView({
   openEditorId,
   setOpenEditorId,
   cardProgress,
-  updateCardProgress
+  updateCardProgress,
+  filters
 }: {
   column: Column
   index: number
@@ -532,6 +629,7 @@ function ColumnView({
   setOpenEditorId: (id: string | null) => void
   cardProgress: Record<string, { completed: number; total: number }>
   updateCardProgress: (cardId: string, taskId: string, newStatus: string) => void
+  filters: any
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id })
 
@@ -549,35 +647,77 @@ function ColumnView({
     return true
   }
 
+  // Função para converter cor hex em fundo claro e borda escura (como Relacionamento)
+  const getColumnStyle = (hexColor: string | null | undefined) => {
+    if (!hexColor) return { background: '', border: '' }
+    
+    // Adiciona opacidade de 10% para o fundo (claro)
+    const bgColor = `${hexColor}1A` // 1A = 10% de opacidade
+    // Adiciona opacidade de 40% para a borda (mais escura)
+    const borderColor = `${hexColor}66` // 66 = 40% de opacidade
+    
+    return {
+      background: bgColor,
+      border: borderColor
+    }
+  }
+
+  const style = getColumnStyle(column.color)
+
   return (
-    <div ref={setNodeRef} className="w-[300px] shrink-0 bg-card rounded-md border p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="font-medium select-none cursor-default">
-          {column.title}
-          <span className="ml-1 rounded bg-muted px-1.5 text-[10px] text-muted-foreground">
-            {column.cards.length}
-          </span>
-        </h3>
-        <span 
-          className="text-[10px] text-muted-foreground" 
-          title={`Coluna #${column.sort}`}
-        >
-          #{column.sort}
-        </span>
+    <div className="w-[300px] shrink-0">
+      {/* Cabeçalho da coluna separado (como no Relacionamento) */}
+      <div 
+        className={`border rounded-md mb-2 ${column.color ? '' : 'bg-muted/40'}`}
+        style={{ 
+          backgroundColor: style.background || undefined,
+          borderColor: style.border || undefined
+        }}
+      >
+        <div className="py-1 px-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span 
+                className="text-xs font-medium text-gray-900"
+              >
+                {column.title}
+              </span>
+            </div>
+            <Badge 
+              variant="secondary" 
+              className="bg-white text-gray-700 border text-xs px-1 py-0 h-5"
+            >
+              {column.cards.length}
+            </Badge>
+          </div>
+        </div>
       </div>
+      
+      {/* Conteúdo da coluna */}
+      <div ref={setNodeRef}>
+        <Card className="bg-white">
+          <CardContent className="p-4">
       <div className={`space-y-2 ${isOver ? 'outline-dashed outline-2 outline-primary/40 rounded-md p-1' : ''}`}>
         {matchesFilters(column.title) && column.cards.length === 0 ? (
-          <div className="min-h-[80px] border-dashed border rounded-md p-3 text-muted-foreground text-center">
-            <p className="text-sm">Nenhum card aqui ainda</p>
-            <p className="text-xs">Arraste cards de outras colunas ou crie um novo</p>
+          <div className="text-center text-muted-foreground py-6">
+            <Inbox className="mx-auto h-8 w-8 text-gray-300 mb-2" />
+            <p className="text-sm font-medium">Nenhum card</p>
           </div>
         ) : (
           matchesFilters(column.title) ? (
             column.cards
               .filter(card => {
-                const textOk = card.title.toLowerCase().includes((debouncedQuery ?? query).toLowerCase())
-                const statusOk = !activeFilters?.status || activeFilters.status.length === 0 || activeFilters.status.includes(String(card.status || 'onboarding'))
-                return textOk && statusOk
+                // Filtro de busca textual
+                const searchText = (filters.q || debouncedQuery || query).toLowerCase()
+                const textOk = !searchText || card.title.toLowerCase().includes(searchText)
+                
+                // Filtro de status
+                const statusOk = filters.status === 'all' || card.status === filters.status || (!card.status && filters.status === 'onboarding')
+                
+                // Filtros antigos (manter compatibilidade)
+                const legacyStatusOk = !activeFilters?.status || activeFilters.status.length === 0 || activeFilters.status.includes(String(card.status || 'onboarding'))
+                
+                return textOk && statusOk && legacyStatusOk
               })
               .map((card) => (
                 <DraggableCard
@@ -593,6 +733,9 @@ function ColumnView({
               ))
           ) : null
         )}
+        </div>
+        </CardContent>
+        </Card>
       </div>
     </div>
   )

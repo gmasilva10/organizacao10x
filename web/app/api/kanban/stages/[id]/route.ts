@@ -22,7 +22,7 @@ export async function PATCH(
     }
 
     const { id } = params
-    const { title, position } = await request.json()
+    const { title, position, color } = await request.json()
     
     if (!id) {
       return NextResponse.json({ error: 'ID da coluna é obrigatório' }, { status: 400 })
@@ -51,31 +51,68 @@ export async function PATCH(
       return NextResponse.json({ error: 'Coluna não encontrada' }, { status: 404 })
     }
 
+    // Validar formato de cor se fornecida
+    if (color !== undefined && color !== null && !/^#[0-9A-Fa-f]{6}$/.test(color)) {
+      return NextResponse.json({ error: 'Formato de cor inválido. Use formato hex (#RRGGBB)' }, { status: 400 })
+    }
+
     // Preparar dados para atualização
     const updateData: any = {}
     if (title !== undefined) updateData.name = title.trim()
+    if (color !== undefined) updateData.color = color
     
-    // Para colunas fixas, permitir apenas renomeação (não mudança de posição)
-    if (existingColumn.is_fixed) {
+    // Para colunas fixas, permitir renomeação e cor (mas não mudança de posição)
+    if (existingColumn.is_fixed || existingColumn.position === 1 || existingColumn.position === 99) {
       if (position !== undefined) {
         return NextResponse.json({ error: 'Não é possível alterar a posição de colunas fixas' }, { status: 403 })
       }
-      // Permitir apenas renomeação para colunas fixas
-      if (title === undefined) {
-        return NextResponse.json({ error: 'Apenas o nome pode ser alterado em colunas fixas' }, { status: 400 })
+      // Permitir renomeação e alteração de cor para colunas fixas
+      if (title === undefined && color === undefined) {
+        return NextResponse.json({ error: 'Forneça o nome ou cor para atualizar a coluna fixa' }, { status: 400 })
       }
     } else {
       // Para colunas não-fixas, permitir alteração de posição
       if (position !== undefined) updateData.position = position
     }
 
-    // Atualizar coluna
-    const { data: updatedColumn, error: updateError } = await supabase
-      .from('kanban_stages')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single()
+    // Atualizar coluna com fallback para campo color
+    let updatedColumn, updateError
+    
+    try {
+      // Tentar atualizar com todos os campos
+      const result = await supabase
+        .from('kanban_stages')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single()
+      
+      updatedColumn = result.data
+      updateError = result.error
+    } catch (err) {
+      // Se falhar, pode ser porque o campo color não existe
+      if (updateData.color) {
+        console.log('Campo color não existe, tentando sem ele...')
+        const fallbackData: any = { name: updateData.name }
+        if (updateData.position !== undefined) fallbackData.position = updateData.position
+        
+        const result = await supabase
+          .from('kanban_stages')
+          .update(fallbackData)
+          .eq('id', id)
+          .select()
+          .single()
+        
+        updatedColumn = result.data
+        updateError = result.error
+        
+        // Log informativo
+        console.log('Campo color ignorado - migration não aplicada')
+      } else {
+        console.error('Erro inesperado:', err)
+        throw err
+      }
+    }
 
     if (updateError) {
       console.error('Erro ao atualizar coluna:', updateError)

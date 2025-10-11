@@ -16,14 +16,14 @@ export async function GET(request: Request) {
 
   const t0 = Date.now()
   // Columns (kanban_stages)
-  let columns: Array<{ id: string; title: string; sort: number; is_fixed?: boolean; stage_code?: string; blocked?: boolean }> = []
+  let columns: Array<{ id: string; title: string; sort: number; is_fixed?: boolean; stage_code?: string; blocked?: boolean; color?: string }> = []
   {
-    const colsResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&select=id,name,position,is_fixed,stage_code&order=position.asc`, {
+    const colsResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&select=id,name,position,is_fixed,stage_code,color&order=position.asc`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (colsResp.ok) {
-      const stages: Array<{ id: string; name: string; position: number; is_fixed:boolean; stage_code:string|null }> = await colsResp.json().catch(()=>[])
-      columns = stages.map(s => ({ id: s.id, title: s.name, sort: s.position, is_fixed: s.is_fixed, stage_code: s.stage_code || undefined }))
+      const stages: Array<{ id: string; name: string; position: number; is_fixed:boolean; stage_code:string|null; color?:string|null }> = await colsResp.json().catch(()=>[])
+      columns = stages.map(s => ({ id: s.id, title: s.name, sort: s.position, is_fixed: s.is_fixed, stage_code: s.stage_code || undefined, color: s.color || undefined }))
       
       // Se não houver colunas, inicializar automaticamente
       if (columns.length === 0) {
@@ -37,12 +37,12 @@ export async function GET(request: Request) {
             }
           })
           // Recarregar colunas após inicialização
-          const reloadResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&select=id,name,position,is_fixed,stage_code&order=position.asc`, {
+          const reloadResp = await fetch(`${url}/rest/v1/kanban_stages?org_id=eq.${ctx.org_id}&select=id,name,position,is_fixed,stage_code,color&order=position.asc`, {
             headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
           })
           if (reloadResp.ok) {
-            const reloadedStages: Array<{ id: string; name: string; position: number; is_fixed:boolean; stage_code:string|null }> = await reloadResp.json().catch(()=>[])
-            columns = reloadedStages.map(s => ({ id: s.id, title: s.name, sort: s.position, is_fixed: s.is_fixed, stage_code: s.stage_code || undefined }))
+            const reloadedStages: Array<{ id: string; name: string; position: number; is_fixed:boolean; stage_code:string|null; color?:string|null }> = await reloadResp.json().catch(()=>[])
+            columns = reloadedStages.map(s => ({ id: s.id, title: s.name, sort: s.position, is_fixed: s.is_fixed, stage_code: s.stage_code || undefined, color: s.color || undefined }))
           }
         } catch (initError) {
           console.error('Erro ao inicializar board automaticamente:', initError)
@@ -149,7 +149,7 @@ export async function GET(request: Request) {
   const studentsMap: Record<string, { status?: string; name?: string; phone?: string }> = {}
   if (studentIds.length > 0) {
     const inList = studentIds.map(encodeURIComponent).join(',')
-    const stuResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.org_id}&id=in.(${inList})&select=id,name,status,phone`, {
+    const stuResp = await fetch(`${url}/rest/v1/students?org_id=eq.${ctx.org_id}&id=in.(${inList})&deleted_at=is.null&select=id,name,status,phone`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (!stuResp.ok) {
@@ -160,7 +160,10 @@ export async function GET(request: Request) {
     for (const r of rows) studentsMap[r.id] = { status: r.status, name: r.name || undefined, phone: r.phone || undefined }
   }
 
-  const enriched = cards.map(c => ({ 
+  // Filtrar apenas cards de alunos que ainda existem (não foram excluídos)
+  const validCards = cards.filter(c => studentsMap[c.student_id])
+  
+  const enriched = validCards.map(c => ({ 
     ...c, 
     student_status: studentsMap[c.student_id]?.status || 'onboarding', 
     student_name: studentsMap[c.student_id]?.name,
@@ -170,7 +173,7 @@ export async function GET(request: Request) {
   return NextResponse.json({ columns, cards: enriched }, { 
     headers: { 
       'X-Query-Time': String(ms), 
-      'X-Row-Count': String(cards.length),
+      'X-Row-Count': String(enriched.length),
       'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' 
     } 
   })

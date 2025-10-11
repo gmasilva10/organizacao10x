@@ -81,7 +81,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       {
         id: "onboarding",
-        title: "Onboarding/Kanban",
+        title: "Onboarding",
         href: "/app/onboarding",
         icon: KanbanSquare
       },

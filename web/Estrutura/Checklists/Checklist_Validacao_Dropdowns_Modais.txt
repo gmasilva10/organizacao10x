@@ -1,0 +1,248 @@
+═══════════════════════════════════════════════════════════════════════════════
+  CHECKLIST DE VALIDAÇÃO - DROPDOWNS EM MODAIS
+  GATE 10.7.1 - Correção Global de Z-Index
+═══════════════════════════════════════════════════════════════════════════════
+
+Data: 30/09/2025
+Testador: _______________________
+Status: ⏳ AGUARDANDO VALIDAÇÃO
+
+───────────────────────────────────────────────────────────────────────────────
+  OBJETIVO
+───────────────────────────────────────────────────────────────────────────────
+
+Validar que TODOS os dropdowns (Select, Dropdown, Autocomplete) dentro de 
+modais aparecem TOTALMENTE VISÍVEIS, sem transparência ou escurecimento.
+
+───────────────────────────────────────────────────────────────────────────────
+  TESTE 1: MODAL "FILTROS" (Relacionamento)
+───────────────────────────────────────────────────────────────────────────────
+
+Navegação:
+1. Abrir /app/relationship
+2. Clicar no botão de Filtros (ícone de funil)
+3. Modal "Filtros" abre
+
+Validações:
+
+[ ] 1.1 - Select "Status"
+    - Clicar no select "Status"
+    - Dropdown abre TOTALMENTE VISÍVEL (sem transparência)
+    - Todas as opções são clicáveis
+    - Ao selecionar, dropdown fecha corretamente
+
+[ ] 1.2 - Select "Âncora"
+    - Clicar no select "Âncora"
+    - Dropdown abre visível
+    - Rolagem funciona (se necessário)
+    - Opções clicáveis
+
+[ ] 1.3 - Select "Canal"
+    - Clicar no select "Canal"
+    - Dropdown abre SEM escurecimento
+    - Todas as opções visíveis
+    - Seleção funciona
+
+[ ] 1.4 - Select "Template"
+    - Clicar no select "Template"
+    - Dropdown com ~10 opções abre completamente visível
+    - Rolagem interna funciona
+    - Sem corte visual
+
+[ ] 1.5 - Input "Data Inicial" / "Data Final"
+    - Clicar nos inputs de data
+    - Calendar picker abre visível (se houver)
+    - Navegação funciona
+
+[ ] 1.6 - Navegação por teclado
+    - Usar TAB para navegar entre selects
+    - Pressionar ENTER para abrir dropdown
+    - Usar setas para navegar opções
+    - ENTER para selecionar
+
+───────────────────────────────────────────────────────────────────────────────
+  TESTE 2: MODAL "ENVIAR MENSAGEM" (Relacionamento)
+───────────────────────────────────────────────────────────────────────────────
+
+Navegação:
+1. Abrir /app/relationship
+2. Clicar em "+ Nova Mensagem" (ou botão similar)
+3. Modal "Enviar Mensagem" abre
+
+Validações:
+
+[ ] 2.1 - Select "Aluno" (Autocomplete)
+    - Clicar no campo "Aluno"
+    - Dropdown com lista de alunos abre TOTALMENTE VISÍVEL
+    - Busca/filtro funciona
+    - Ao digitar, lista filtra
+    - Seleção funciona
+
+[ ] 2.2 - Modo (Texto Livre / Template)
+    - Radio buttons ou tabs funcionam
+    - Sem problemas de visualização
+
+[ ] 2.3 - Select "Canal" (WhatsApp, E-mail, Manual)
+    - Dropdown abre visível
+    - Sem transparência
+    - Clicável
+
+[ ] 2.4 - Select "Classificação"
+    - Dropdown abre visível
+    - Opções clicáveis
+    - Seleção funciona
+
+[ ] 2.5 - Botão "Inserir Variáveis" (se houver dropdown)
+    - Dropdown de variáveis abre visível
+    - Lista completa
+    - Inserção funciona
+
+───────────────────────────────────────────────────────────────────────────────
+  TESTE 3: MODAL "ANAMNESE" (Estudantes)
+───────────────────────────────────────────────────────────────────────────────
+
+Navegação:
+1. Abrir um aluno
+2. Menu "Processos" > "Gerar Anamnese"
+3. Modal abre
+
+Validações:
+
+[ ] 3.1 - Select "Destino" (Individual / Grupo)
+    - Dropdown visível
+    - Opções clicáveis
+
+[ ] 3.2 - Select "Grupo do WhatsApp"
+    - Dropdown com lista de grupos visível
+    - Sem escurecimento
+    - Rolagem funciona (se lista grande)
+
+───────────────────────────────────────────────────────────────────────────────
+  TESTE 4: OUTROS MODAIS
+───────────────────────────────────────────────────────────────────────────────
+
+[ ] 4.1 - Modal "Criar Aluno"
+    - Todos os Selects (status, gênero, etc.) visíveis
+
+[ ] 4.2 - Modal "Editar Aluno"
+    - Selects de endereço (estado, etc.) visíveis
+
+[ ] 4.3 - Modal "Criar Ocorrência"
+    - Select de tipo, grupo, etc. visíveis
+
+[ ] 4.4 - Modal "Adicionar Responsável"
+    - Autocomplete de busca funciona
+
+───────────────────────────────────────────────────────────────────────────────
+  TESTE 5: NAVEGADORES (Cross-Browser)
+───────────────────────────────────────────────────────────────────────────────
+
+Executar TESTE 1 e 2 em cada navegador:
+
+[ ] 5.1 - Chrome (Desktop)
+    - Versão: __________
+    - Todos os dropdowns funcionam: [ ] Sim [ ] Não
+    - Observações: _________________________________
+
+[ ] 5.2 - Firefox (Desktop)
+    - Versão: __________
+    - Todos os dropdowns funcionam: [ ] Sim [ ] Não
+    - Observações: _________________________________
+
+[ ] 5.3 - Edge (Desktop)
+    - Versão: __________
+    - Todos os dropdowns funcionam: [ ] Sim [ ] Não
+    - Observações: _________________________________
+
+───────────────────────────────────────────────────────────────────────────────
+  TESTE 6: RESOLUÇÕES (Responsividade)
+───────────────────────────────────────────────────────────────────────────────
+
+Executar TESTE 1 em diferentes resoluções:
+
+[ ] 6.1 - 1920x1080 (Desktop)
+    - Dropdowns visíveis: [ ] Sim [ ] Não
+
+[ ] 6.2 - 1366x768 (Notebook)
+    - Dropdowns visíveis: [ ] Sim [ ] Não
+    - Modal cabe na tela: [ ] Sim [ ] Não
+
+[ ] 6.3 - 1280x720 (Notebook pequeno)
+    - Dropdowns visíveis: [ ] Sim [ ] Não
+    - Scroll funciona: [ ] Sim [ ] Não
+
+───────────────────────────────────────────────────────────────────────────────
+  TESTE 7: CASOS ESPECIAIS
+───────────────────────────────────────────────────────────────────────────────
+
+[ ] 7.1 - Dropdown com muitas opções (>20)
+    - Scroll interno do dropdown funciona
+    - Sem corte visual
+
+[ ] 7.2 - Modal em tela cheia ou maximizado
+    - Dropdowns ainda funcionam
+    - Posicionamento correto
+
+[ ] 7.3 - Múltiplos dropdowns abertos sequencialmente
+    - Primeiro dropdown fecha ao abrir segundo
+    - Sem "fantasmas" de dropdowns antigos
+
+[ ] 7.4 - Dropdown próximo às bordas da tela
+    - Radix ajusta posicionamento automaticamente
+    - Sempre visível (não corta)
+
+───────────────────────────────────────────────────────────────────────────────
+  CRITÉRIOS DE ACEITE (OBRIGATÓRIOS)
+───────────────────────────────────────────────────────────────────────────────
+
+[ ] CA-01: TODOS os dropdowns em modais aparecem acima do backdrop
+[ ] CA-02: SEM transparência ou escurecimento em nenhum dropdown
+[ ] CA-03: SEM recorte por overflow dos contêineres
+[ ] CA-04: Navegação por teclado funciona em todos os dropdowns
+[ ] CA-05: Funciona em Chrome, Firefox e Edge
+[ ] CA-06: Funciona em resoluções desktop (1366x768+)
+[ ] CA-07: Testado nos modais: Filtros, Enviar Mensagem, Anamnese
+[ ] CA-08: Padrão visual mantido (cores, espaçamento, animações)
+
+───────────────────────────────────────────────────────────────────────────────
+  BUGS ENCONTRADOS
+───────────────────────────────────────────────────────────────────────────────
+
+Nº | Descrição | Severidade | Modal/Campo | Print
+───┼───────────┼────────────┼─────────────┼──────
+01 |           |            |             |
+02 |           |            |             |
+03 |           |            |             |
+
+───────────────────────────────────────────────────────────────────────────────
+  OBSERVAÇÕES ADICIONAIS
+───────────────────────────────────────────────────────────────────────────────
+
+Observações gerais sobre a correção, performance, UX, etc:
+
+
+
+
+
+
+
+
+───────────────────────────────────────────────────────────────────────────────
+  ASSINATURAS
+───────────────────────────────────────────────────────────────────────────────
+
+Testador QA: _____________________ Data: ___/___/_____
+
+Aprovado por: ____________________ Data: ___/___/_____
+
+───────────────────────────────────────────────────────────────────────────────
+  STATUS FINAL
+───────────────────────────────────────────────────────────────────────────────
+
+[ ] ✅ APROVADO - Pronto para produção
+[ ] ⚠️ APROVADO COM RESSALVAS - Bugs menores anotados
+[ ] ❌ REPROVADO - Correção adicional necessária
+
+═══════════════════════════════════════════════════════════════════════════════
+                              FIM DO CHECKLIST
+═══════════════════════════════════════════════════════════════════════════════

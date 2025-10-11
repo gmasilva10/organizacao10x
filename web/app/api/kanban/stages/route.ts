@@ -63,10 +63,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { title, position, stage_code, is_fixed } = await request.json()
+    const { title, position, stage_code, is_fixed, color } = await request.json()
     
     if (!title || position === undefined) {
       return NextResponse.json({ error: 'Título e posição são obrigatórios' }, { status: 400 })
+    }
+
+    // Validar formato de cor se fornecida
+    if (color && !/^#[0-9A-Fa-f]{6}$/.test(color)) {
+      return NextResponse.json({ error: 'Formato de cor inválido. Use formato hex (#RRGGBB)' }, { status: 400 })
     }
 
     // Buscar org_id do usuário
@@ -100,7 +105,8 @@ export async function POST(request: NextRequest) {
         name: title.trim(),
         position: position,
         stage_code: stage_code || `stage_${position}`,
-        is_fixed: is_fixed || false
+        is_fixed: is_fixed || false,
+        color: color || null
       })
       .select()
       .single()
@@ -125,7 +131,8 @@ export async function POST(request: NextRequest) {
             title: column.name,
             position: column.position,
             stage_code: column.stage_code,
-            is_fixed: column.is_fixed
+            is_fixed: column.is_fixed,
+            color: column.color
           }
         })
     } catch (logError) {

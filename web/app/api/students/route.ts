@@ -108,7 +108,8 @@ export async function GET(request: NextRequest) {
     const trainerMap: Record<string, any> = {}
     
     if (studentIds.length > 0) {
-      const studentFilters = [`student_id=in.(${studentIds.join(',')})`, `role=eq.principal`]
+      // roles é um array JSON, usar operador @> para verificar se contém 'principal'
+      const studentFilters = [`student_id=in.(${studentIds.join(',')})`, `roles=cs.{principal}`]
       if (ctx?.org_id) studentFilters.push(`org_id=eq.${ctx.org_id}`)
       
       const responsibleUrl = `${url}/rest/v1/student_responsibles?${studentFilters.join('&')}&select=student_id,professional_id,professionals(id,full_name)`
@@ -186,6 +187,7 @@ export async function GET(request: NextRequest) {
 // Criação de aluno (mínima e compatível com o modal atual)
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
+  console.log('🔥 [API STUDENTS] POST request iniciada')
   try {
     const ctx = await resolveRequestContext(request)
     const isDev = process.env.NODE_ENV !== 'production'
@@ -206,6 +208,17 @@ export async function POST(request: NextRequest) {
     const phoneDigits = String(payload?.phone || '').replace(/\D/g, '') || null
     const status = (payload?.status as string) || 'onboarding'
 
+    // Garantir consistência: status 'onboarding' deve ter onboard_opt 'enviar'
+    let finalOnboardOpt = payload.onboard_opt
+    console.log('[API STUDENTS] Valores iniciais:', { status, onboard_opt: payload.onboard_opt, finalOnboardOpt })
+    
+    if (status === 'onboarding' && (!finalOnboardOpt || finalOnboardOpt === 'nao_enviar')) {
+      finalOnboardOpt = 'enviar'
+      console.log('[API STUDENTS] Auto-corrigindo onboard_opt para "enviar" devido ao status onboarding')
+    }
+    
+    console.log('[API STUDENTS] Valores finais:', { status, finalOnboardOpt })
+
     const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     if (!url || !key) {
@@ -213,13 +226,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'service_unavailable', message: 'Variáveis de ambiente do Supabase ausentes.' }, { status: 503, headers: { 'X-Query-Time': String(t) } })
     }
 
-    // Montar corpo conforme schema (org_id apenas)
-    const body = {
+    // Montar corpo com todos os campos disponíveis
+    const body: any = {
       name,
       email,
       phone: phoneDigits,
       status,
       org_id: ctx?.org_id || null,
+    }
+
+    // Campos opcionais - Informações Pessoais
+    if (payload.birth_date) body.birth_date = payload.birth_date
+    if (payload.gender) body.gender = payload.gender
+    if (payload.marital_status) body.marital_status = payload.marital_status
+    if (payload.nationality) body.nationality = payload.nationality
+    if (payload.birth_place) body.birth_place = payload.birth_place
+    if (payload.photo_url) body.photo_url = payload.photo_url
+
+    // Campos opcionais - Configurações
+    if (payload.trainer_id) body.trainer_id = payload.trainer_id
+    if (finalOnboardOpt) body.onboard_opt = finalOnboardOpt
+
+    // Endereço (salvar como JSONB)
+    if (payload.address) {
+      const addr = payload.address
+      if (addr.zip_code || addr.street || addr.city) {
+        body.address = addr
+      }
     }
 
     const resp = await fetch(`${url}/rest/v1/students`, {
@@ -240,7 +273,90 @@ export async function POST(request: NextRequest) {
     }
     const arr = await resp.json().catch(() => [])
     const student = Array.isArray(arr) ? arr[0] : arr
-    return NextResponse.json({ success: true, student }, { status: 201, headers: { 'X-Query-Time': String(t) } })
+
+    // Se aluno foi criado com onboard_opt = 'enviar', sincronizar com kanban
+    console.log('[API STUDENTS] Verificando condição de resync:', { finalOnboardOpt, studentId: student?.id, condition: finalOnboardOpt === 'enviar' && student?.id })
+    
+    let resyncAttempted = false
+    let resyncSuccess = false
+    let resyncError = null
+    
+    if (finalOnboardOpt === 'enviar' && student?.id) {
+      resyncAttempted = true
+      try {
+        // Construir URL correta para a API interna
+        const baseUrl = request.url.split('/api/')[0] // http://localhost:3000
+        const resyncUrl = `${baseUrl}/api/kanban/resync`
+        
+        console.log('[API STUDENTS] Tentando sincronizar aluno com kanban:', { studentId: student.id, resyncUrl })
+        
+        const resyncResponse = await fetch(resyncUrl, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'apikey': key,
+            'Authorization': `Bearer ${key}`
+          },
+          body: JSON.stringify({ 
+            student_id: student.id, 
+            force_create: true,
+            org_id: ctx?.org_id // Passar org_id no body para evitar dependência de cookies
+          })
+        })
+        
+        if (resyncResponse.ok) {
+          resyncSuccess = true
+          console.log('[API STUDENTS] ✅ Aluno sincronizado com kanban:', student.id)
+        } else {
+          const errorText = await resyncResponse.text()
+          resyncError = { status: resyncResponse.status, error: errorText }
+          console.warn('[API STUDENTS] ❌ Falha ao sincronizar com kanban:', resyncError)
+        }
+      } catch (e: any) {
+        resyncError = { message: e?.message || 'Erro desconhecido' }
+        console.warn('[API STUDENTS] ❌ Erro ao sincronizar com kanban:', e)
+        // Não falhar a criação do aluno se o kanban falhar
+      }
+    }
+
+    // Criar responsáveis se fornecidos
+    if (payload.responsibles && Array.isArray(payload.responsibles) && payload.responsibles.length > 0) {
+      const responsaveisData = payload.responsibles.map((resp: any) => ({
+        student_id: student.id,
+        professional_id: resp.professional_id,
+        roles: resp.roles,
+        org_id: ctx?.org_id || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }))
+
+      const responsaveisResp = await fetch(`${url}/rest/v1/student_responsibles`, {
+        method: 'POST',
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify(responsaveisData)
+      })
+
+      if (!responsaveisResp.ok) {
+        console.error('Erro ao criar responsáveis:', await responsaveisResp.text())
+        // Não falhar a criação do aluno se houver erro nos responsáveis
+      }
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      student,
+      debug: {
+        resyncAttempted,
+        resyncSuccess,
+        resyncError,
+        finalOnboardOpt
+      }
+    }, { status: 201, headers: { 'X-Query-Time': String(t) } })
   } catch (e: any) {
     const t = Date.now() - startTime
     return NextResponse.json({ error: 'internal_error', message: e?.message || 'Erro interno' }, { status: 500, headers: { 'X-Query-Time': String(t) } })

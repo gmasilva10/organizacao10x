@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useStudents, usePrefetchStudent } from "@/hooks/useStudents"
 import { useStudentSearch } from "@/hooks/useDebounce"
+import { useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,7 +16,10 @@ import {
   User,
   Mail,
   Phone,
-  Calendar
+  Calendar,
+  Filter,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react"
 import { 
   DropdownMenu, 
@@ -28,6 +32,7 @@ import StudentTableActions from "@/components/students/StudentTableActions"
 import Link from "next/link"
 import { toast } from "sonner"
 import { StudentCreateModal } from "@/components/students/StudentCreateModal"
+import StudentsFilterDrawer from "@/components/students/StudentsFilterDrawer"
 import EmptyState from "@/components/ui/EmptyState"
 import { showNoStudentsFound, showStudentError, showStudentUpdated } from "@/lib/toast-utils"
 
@@ -47,9 +52,16 @@ type Student = {
 type ViewMode = 'cards' | 'table'
 
 export default function StudentsPage() {
+  const queryClient = useQueryClient()
   const [viewMode, setViewMode] = useState<ViewMode>('cards')
   const [createOpen, setCreateOpen] = useState(false)
-  const [statusFilter, setStatusFilter] = useState<string>('')
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [filters, setFilters] = useState({
+    q: '',
+    status: '',
+    trainerId: ''
+  })
   
   // Busca com debounce
   const { searchTerm, setSearchTerm, debouncedSearchTerm } = useStudentSearch('')
@@ -59,17 +71,68 @@ export default function StudentsPage() {
     data: studentsData, 
     isLoading: loading, 
     error,
-    isFetching 
+    isFetching,
+    refetch
   } = useStudents({
-    page: 1,
-    q: debouncedSearchTerm,
-    status: statusFilter
+    page: currentPage,
+    q: debouncedSearchTerm || filters.q,
+    status: filters.status,
+    trainer_id: filters.trainerId
   })
   
   // Prefetch para detalhe do aluno
   const prefetchStudent = usePrefetchStudent()
   
   const students = (studentsData as any)?.students || []
+  const total = (studentsData as any)?.total || students.length
+  const pageSize = (studentsData as any)?.pageSize || 50
+  const totalPages = Math.ceil(total / pageSize)
+
+  // Função para atualizar a listagem após ações
+  const handleStudentActionComplete = () => {
+    refetch()
+  }
+
+  // Funções de paginação
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  // Funções para filtros
+  const handleFiltersChange = (newFilters: { q: string; status: string; trainerId: string }) => {
+    setFilters(newFilters)
+    setCurrentPage(1) // Resetar para primeira página ao filtrar
+  }
+
+  const handleClearFilters = () => {
+    setFilters({ q: '', status: '', trainerId: '' })
+    setSearchTerm('')
+    setCurrentPage(1) // Resetar para primeira página ao limpar filtros
+  }
+
+  const handleApplyFilters = () => {
+    // Os filtros já são aplicados automaticamente via useStudents
+  }
+
+  const getActiveFiltersCount = () => {
+    let count = 0
+    if (filters.q) count++
+    if (filters.status) count++
+    if (filters.trainerId) count++
+    return count
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -109,6 +172,21 @@ export default function StudentsPage() {
     status?: 'onboarding' | 'active' | 'paused'
     trainer_id?: string | null
     onboard_opt?: 'nao_enviar' | 'enviar' | 'enviado'
+    birth_date?: string
+    gender?: 'masculino' | 'feminino' | 'outro'
+    marital_status?: 'solteiro' | 'casado' | 'divorciado' | 'viuvo'
+    nationality?: string
+    birth_place?: string
+    photo_url?: string
+    address?: {
+      street: string
+      number: string
+      complement: string
+      neighborhood: string
+      city: string
+      state: string
+      zip_code: string
+    }
   }) {
     try {
       const res = await fetch('/api/students', {
@@ -121,8 +199,23 @@ export default function StudentsPage() {
         throw new Error(err?.error || 'Falha ao criar aluno')
       }
       const data = await res.json()
+      console.log('[DEBUG RESYNC] Resposta da API:', data)
       const created = data?.student || data
-      // A listagem será atualizada automaticamente pelo React Query
+      
+      // ✅ INVALIDAÇÃO MANUAL DO CACHE - CORREÇÃO DO BUG
+      // Invalidar todas as queries de lista de alunos para forçar refresh
+      queryClient.invalidateQueries({ 
+        queryKey: ['students', 'list'],
+        exact: false // Invalida todas as variações da query (com filtros diferentes)
+      })
+      
+      // Também invalidar queries específicas se existirem
+      queryClient.invalidateQueries({ 
+        queryKey: ['students'],
+        exact: false 
+      })
+      
+      console.log('[DEBUG CACHE] Cache invalidado após criar aluno')
       showStudentUpdated()
     } catch (e: any) {
       showStudentError("criar")
@@ -132,7 +225,7 @@ export default function StudentsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" role="status" aria-live="polite" aria-label="Carregando lista de alunos">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Alunos</h1>
@@ -141,7 +234,7 @@ export default function StudentsPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} className="animate-pulse" aria-hidden="true">
               <CardHeader>
                 <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                 <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -156,6 +249,7 @@ export default function StudentsPage() {
             </Card>
           ))}
         </div>
+        <span className="sr-only">Carregando lista de alunos, por favor aguarde...</span>
       </div>
     )
   }
@@ -166,11 +260,15 @@ export default function StudentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Alunos</h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground" role="status" aria-live="polite">
             {filteredStudents.length} aluno{filteredStudents.length !== 1 ? 's' : ''} cadastrado{filteredStudents.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button className="gap-2" onClick={() => setCreateOpen(true)}>
+        <Button 
+          className="gap-2" 
+          onClick={() => setCreateOpen(true)}
+          aria-label="Abrir modal para criar novo aluno"
+        >
           <Plus className="h-4 w-4" />
           Novo Aluno
         </Button>
@@ -193,13 +291,34 @@ export default function StudentsPage() {
               </div>
             </div>
 
+            {/* Botão de Filtros */}
+            <Button
+              variant="outline"
+              onClick={() => setFilterDrawerOpen(true)}
+              className="relative"
+              aria-label="Abrir filtros avançados"
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filtros
+              {getActiveFiltersCount() > 0 && (
+                <Badge 
+                  variant="secondary" 
+                  className="ml-2 bg-primary text-primary-foreground"
+                >
+                  {getActiveFiltersCount()}
+                </Badge>
+              )}
+            </Button>
+
             {/* Toggle de Visualização */}
-            <div className="flex border rounded-lg">
+            <div className="flex border rounded-lg" role="group" aria-label="Modo de visualização">
               <Button
                 variant={viewMode === 'cards' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('cards')}
                 className="rounded-r-none"
+                aria-label="Visualizar em cards"
+                aria-pressed={viewMode === 'cards'}
               >
                 <Grid3X3 className="h-4 w-4" />
               </Button>
@@ -208,6 +327,8 @@ export default function StudentsPage() {
                 size="sm"
                 onClick={() => setViewMode('table')}
                 className="rounded-l-none"
+                aria-label="Visualizar em tabela"
+                aria-pressed={viewMode === 'table'}
               >
                 <List className="h-4 w-4" />
               </Button>
@@ -303,6 +424,7 @@ export default function StudentsPage() {
                   studentId={student.id} 
                   studentName={student.name}
                   onHover={() => prefetchStudent(student.id)}
+                  onActionComplete={handleStudentActionComplete}
                 />
               </CardContent>
             </Card>
@@ -313,16 +435,16 @@ export default function StudentsPage() {
         <Card>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full" role="table" aria-label="Tabela de alunos cadastrados">
                 <thead className="border-b">
                   <tr>
-                    <th className="text-left p-3 font-medium text-sm">Nome</th>
-                    <th className="text-left p-3 font-medium text-sm">Email</th>
-                    <th className="text-left p-3 font-medium text-sm">Telefone</th>
-                    <th className="text-left p-3 font-medium text-sm">Status</th>
-                    <th className="text-left p-3 font-medium text-sm">Treinador</th>
-                    <th className="text-left p-3 font-medium text-sm">Criado em</th>
-                    <th className="text-right p-3 font-medium text-sm">Ações</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Nome</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Email</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Telefone</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Status</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Treinador</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Criado em</th>
+                    <th className="text-right p-3 font-medium text-sm" scope="col">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -355,6 +477,7 @@ export default function StudentsPage() {
                           studentId={student.id} 
                           studentName={student.name}
                           onHover={() => prefetchStudent(student.id)}
+                          onActionComplete={handleStudentActionComplete}
                         />
                       </td>
                     </tr>
@@ -365,11 +488,89 @@ export default function StudentsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Controles de Paginação */}
+      {totalPages > 1 && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Página {currentPage} de {totalPages} ({total} {total === 1 ? 'aluno' : 'alunos'})
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1 || isFetching}
+                  aria-label="Página anterior"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Anterior
+                </Button>
+                
+                {/* Números de página */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    let pageNum: number
+                    if (totalPages <= 5) {
+                      pageNum = i + 1
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i
+                    } else {
+                      pageNum = currentPage - 2 + i
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handlePageChange(pageNum)}
+                        disabled={isFetching}
+                        className="w-8 h-8 p-0"
+                        aria-label={`Ir para página ${pageNum}`}
+                        aria-current={currentPage === pageNum ? 'page' : undefined}
+                      >
+                        {pageNum}
+                      </Button>
+                    )
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages || isFetching}
+                  aria-label="Próxima página"
+                >
+                  Próxima
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <StudentCreateModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreate={handleCreate}
         trainers={[]}
+      />
+
+      <StudentsFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        filters={filters}
+        trainers={[]} // TODO: Implementar carregamento de treinadores
+        onFiltersChange={handleFiltersChange}
+        onClear={handleClearFilters}
+        onApply={handleApplyFilters}
       />
     </div>
   )

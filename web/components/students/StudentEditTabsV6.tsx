@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useSearchParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -30,6 +30,9 @@ import {
   Loader2
 } from "lucide-react"
 import { showStudentUpdated, showStudentError, showSuccessToast, showErrorToast, showStudentInactivated } from "@/lib/toast-utils"
+import { processImageForUpload, validateImageRequirements, formatFileSize } from "@/utils/image-processing"
+import { studentIdentificationSchema, studentAddressSchema, formatZodErrors } from "@/lib/validators/student-schema"
+// import { ImageCropModal } from "@/components/ui/ImageCropModal" // Removido - processamento direto
 
 // Importar componentes compartilhados
 import StudentActions from "./shared/StudentActions"
@@ -122,7 +125,10 @@ export default function StudentEditTabsV6({
   const [photoData, setPhotoData] = useState({
     file: null as File | null,
     preview: student?.photo_url || '',
-    uploading: false
+    uploading: false,
+    originalSize: 0,
+    processedSize: 0,
+    dimensions: { width: 0, height: 0 }
   })
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
@@ -130,6 +136,11 @@ export default function StudentEditTabsV6({
   // Estados para modais de busca
   const [searchModalOpen, setSearchModalOpen] = useState(false)
   const [searchModalType, setSearchModalType] = useState<'principal' | 'apoio' | 'especifico'>('principal')
+  
+  // Estados para modal de crop de imagem
+  // Estados do modal de crop removidos - processamento direto
+  
+  // Função setModalState removida - processamento direto
   
   // Detectar parâmetro action da URL
   const actionParam = searchParams.get('action')
@@ -264,31 +275,32 @@ export default function StudentEditTabsV6({
   }
 
   const validateForm = () => {
-    const errors: Record<string, string> = {}
-    
-    // Validações obrigatórias (apenas Nome, Email e Telefone)
-    if (!formData.name.trim()) {
-      errors.name = 'Nome é obrigatório'
+    try {
+      // Validar dados de identificação com Zod
+      studentIdentificationSchema.parse(formData)
+      
+      // Limpar erros se validação passar
+      setValidationErrors({})
+      return true
+    } catch (error: any) {
+      // Formatar erros do Zod
+      const errors = formatZodErrors(error)
+      setValidationErrors(errors)
+      return false
     }
-    
-    if (!formData.email.trim()) {
-      errors.email = 'Email é obrigatório'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email inválido'
+  }
+
+  const validateAddress = () => {
+    try {
+      // Validar endereço com Zod (opcional)
+      studentAddressSchema.parse(addressData)
+      setValidationErrors({})
+      return true
+    } catch (error: any) {
+      const errors = formatZodErrors(error)
+      setValidationErrors(errors)
+      return false
     }
-    
-    if (!formData.phone.trim()) {
-      errors.phone = 'Telefone é obrigatório'
-    }
-    
-    if (!formData.status) {
-      errors.status = 'Status é obrigatório'
-    }
-    
-    // Endereço e Responsável são opcionais - sem validações obrigatórias
-    
-    setValidationErrors(errors)
-    return Object.keys(errors).length === 0
   }
 
   const handleSave = async () => {
@@ -299,17 +311,44 @@ export default function StudentEditTabsV6({
     
     setSaving(true)
     try {
+      let photoUrl = photoData.preview
+      
+      // Se há uma foto nova (blob), fazer upload primeiro
+      if (photoData.file && photoData.preview.startsWith('blob:')) {
+        const uploadFormData = new FormData()
+        uploadFormData.append('file', photoData.file)
+        uploadFormData.append('studentId', student.id)
+        
+        const uploadResponse = await fetch('/api/upload/photo', {
+          method: 'POST',
+          body: uploadFormData
+        })
+        
+        if (!uploadResponse.ok) {
+          const error = await uploadResponse.json()
+          throw new Error(error.error || 'Erro ao fazer upload da foto')
+        }
+        
+        const uploadData = await uploadResponse.json()
+        photoUrl = uploadData.photo_url
+      }
+      
       // Preparar dados completos para salvamento
       const saveData = {
         ...formData,
         address: addressData,
         trainer_id: (responsaveisData as any).trainer_principal_id,
-        // Não enviar photo_url se for uma URL local (blob)
-        ...(photoData.preview && !photoData.preview.startsWith('blob:') && { photo_url: photoData.preview })
+        // Incluir photo_url se disponível
+        ...(photoUrl && { photo_url: photoUrl })
       }
       
       await onSave(saveData as any)
       setValidationErrors({})
+      
+      // Atualizar estado local com a URL final
+      if (photoUrl) {
+        setPhotoData(prev => ({ ...prev, preview: photoUrl }))
+      }
       
       // Toast específico para inativação
       if (saveData.status === 'inactive') {
@@ -328,62 +367,55 @@ export default function StudentEditTabsV6({
   }
 
   const handlePhotoUpload = async (file: File) => {
-    // Validar tipo e tamanho
-    if (!file.type.startsWith('image/')) {
-      showErrorToast('Por favor, selecione apenas arquivos de imagem (JPG, PNG)')
-      return
-    }
-
-    if (file.size > 10 * 1024 * 1024) { // 10MB
-      showErrorToast('O arquivo deve ter no máximo 10MB')
-      return
-    }
-
-    setPhotoData(prev => ({ ...prev, uploading: true, file }))
-    
     try {
-      // Criar preview local imediato
-      const preview = URL.createObjectURL(file)
-      setPhotoData(prev => ({ ...prev, preview }))
+      console.log('📸 Iniciando upload de foto:', file.name)
       
-      // Upload real para Supabase Storage
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('studentId', studentId)
-      
-      const response = await fetch('/api/upload/photo', {
-        method: 'POST',
-        body: formData
-      })
-      
-      if (!response.ok) {
-        throw new Error('Erro no upload')
-      }
-      
-      const result = await response.json()
-      
-      if (result.success && result.photo_url) {
-        // Atualizar com URL real do Supabase
-        setPhotoData(prev => ({ ...prev, preview: result.photo_url }))
-        showSuccessToast('Foto enviada com sucesso!')
-      } else {
-        throw new Error('URL da foto não retornada')
+      // Validar requisitos da imagem
+      const validation = validateImageRequirements(file)
+      if (!validation.isValid) {
+        showErrorToast(validation.errors.join(', '))
+        return
       }
 
+      console.log('✅ Validação passou, processando diretamente')
+      
+      // Processar imagem diretamente sem modal de crop
+      const processedImage = await processImageForUpload(file, true) // true = forçar quadrado
+      
+      // Atualizar estado com imagem processada
+      setPhotoData(prev => ({
+        ...prev,
+        file: processedImage.file,
+        preview: processedImage.previewUrl,
+        originalSize: processedImage.originalSize,
+        processedSize: processedImage.processedSize,
+        dimensions: processedImage.dimensions
+      }))
+      
+      // Feedback de sucesso com informações do processamento
+      const compressionRatio = Math.round((1 - processedImage.processedSize / processedImage.originalSize) * 100)
+      showSuccessToast(
+        `Foto carregada! ${processedImage.dimensions.width}x${processedImage.dimensions.height}px, ${formatFileSize(processedImage.processedSize)}${compressionRatio > 0 ? ` (${compressionRatio}% menor)` : ''}`
+      )
+      
     } catch (error) {
-      console.error('Erro ao enviar foto:', error)
-      showErrorToast('Erro ao enviar foto')
-      // Reverter preview em caso de erro
-      setPhotoData(prev => ({ ...prev, preview: student?.photo_url || '' }))
-    } finally {
-      setPhotoData(prev => ({ ...prev, uploading: false }))
+      console.error('Erro ao processar imagem:', error)
+      showErrorToast('Erro ao processar a imagem. Tente novamente.')
     }
   }
 
+  // Função chamada quando o crop é finalizado
+  // Função handleCropComplete removida - processamento direto
+
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('🔄 handleFileInputChange chamado')
     const file = e.target.files?.[0]
     if (file) {
+      console.log('📁 Arquivo selecionado:', file.name)
+      console.log('🎯 Chamando handlePhotoUpload...')
       handlePhotoUpload(file)
+    } else {
+      console.log('❌ Nenhum arquivo selecionado')
     }
   }
 
@@ -443,8 +475,11 @@ export default function StudentEditTabsV6({
     setSearchModalOpen(false)
   }
 
+  // useEffect do modal removido - processamento direto
+
   // Carregar responsáveis quando o componente montar
   useEffect(() => {
+    console.log('🔄 useEffect loadResponsaveis chamado, studentId:', studentId)
     loadResponsaveis()
   }, [studentId])
 
@@ -476,10 +511,15 @@ export default function StudentEditTabsV6({
               studentPhone={student.phone}
               variant="edit"
               openModal={openModal}
-              onActionComplete={() => {
+              onActionComplete={(actionType?: string) => {
                 // Callback para atualizar dados após ações
                 console.log('Ação completada, dados podem ser atualizados')
                 setOpenModal(null) // Limpar modal após ação
+                
+                // Se a ação foi de exclusão, redirecionar para a listagem
+                if (actionType === 'delete') {
+                  window.location.href = '/app/students'
+                }
               }}
             />
           </div>
@@ -491,6 +531,8 @@ export default function StudentEditTabsV6({
               size="sm"
               className="border-destructive text-destructive hover:bg-destructive/10"
               onClick={onCancel}
+              disabled={saving}
+              aria-label="Cancelar edição"
             >
               Cancelar
             </Button>
@@ -499,6 +541,7 @@ export default function StudentEditTabsV6({
               size="sm"
               disabled={saving}
               onClick={handleSave}
+              aria-label="Aplicar alterações sem sair da tela"
             >
               {saving ? (
                 <>
@@ -508,14 +551,18 @@ export default function StudentEditTabsV6({
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-1" />
-                  Salvar
+                  Aplicar
                 </>
               )}
             </Button>
             <Button 
               size="sm"
               disabled={saving}
-              onClick={onSaveAndRedirect}
+              onClick={async () => {
+                await handleSave()
+                onSaveAndRedirect?.()
+              }}
+              aria-label="Salvar e voltar para a lista de alunos"
             >
               {saving ? (
                 <>
@@ -525,7 +572,7 @@ export default function StudentEditTabsV6({
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-1" />
-                  OK
+                  Salvar e Voltar
                 </>
               )}
             </Button>
@@ -591,9 +638,14 @@ export default function StudentEditTabsV6({
                           id="phone"
                           value={formData.phone}
                           onChange={(e) => setFormData({...formData, phone: formatPhone(e.target.value)})}
-                          className="h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          className={`h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors ${
+                            validationErrors.phone ? 'border-red-500 focus:border-red-500' : ''
+                          }`}
                           placeholder="(11) 99999-9999"
                         />
+                        {validationErrors.phone && (
+                          <p className="text-sm text-red-600">{validationErrors.phone}</p>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="status" className="text-sm font-medium">Status *</Label>
@@ -739,6 +791,14 @@ export default function StudentEditTabsV6({
                           Câmera
                         </Button>
                       </div>
+                      <div className="text-xs text-muted-foreground text-center space-y-1">
+                        <p>Formatos: JPG, PNG, WEBP (máx. 2MB)</p>
+                        {photoData.dimensions.width > 0 && photoData.dimensions.height > 0 && (
+                          <p className="text-primary font-medium">
+                            {photoData.dimensions.width}×{photoData.dimensions.height}px • {formatFileSize(photoData.processedSize)}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -754,7 +814,7 @@ export default function StudentEditTabsV6({
                   <CardContent className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
-                      <span>Criado em {new Date(student.created_at).toLocaleDateString('pt-BR')}</span>
+                      <span>Criado em {student.created_at ? new Date(student.created_at).toLocaleDateString('pt-BR') : 'Data não disponível'}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <User className="h-4 w-4" />
@@ -1123,6 +1183,8 @@ export default function StudentEditTabsV6({
           }
           placeholder="Buscar profissional ativo..."
         />
+
+        {/* Modal de Crop removido - processamento direto */}
       </div>
     </div>
   )

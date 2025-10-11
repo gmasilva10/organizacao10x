@@ -9,7 +9,8 @@
  */
 
 import { useState } from "react"
-import { Building2, Plug } from "lucide-react"
+import { Building2, Plug, ArrowRight } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 import OrganizationSettings from "@/components/settings/OrganizationSettings"
 import IntegrationsSettings from "@/components/settings/IntegrationsSettings"
 
@@ -28,36 +29,52 @@ export default function SettingsPage() {
       </div>
 
       {/* Submódulos - Grid 2 colunas */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-        <button
-          onClick={() => setActiveTab('organization')}
-          className={`block rounded-lg border p-6 text-left transition-colors ${
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <Card 
+          className={`group relative cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 ${
             activeTab === 'organization'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-card hover:bg-accent'
+              ? 'border-l-4 border-l-primary shadow-md -translate-y-0.5'
+              : 'border-l-4 border-l-transparent hover:border-l-primary'
           }`}
+          onClick={() => setActiveTab('organization')}
+          aria-pressed={activeTab === 'organization'}
+          aria-label="Acessar Organização"
         >
-          <div className="flex items-center gap-2 mb-1">
-            <Building2 className="h-4 w-4" />
-            <h3 className="font-semibold">Organização</h3>
-          </div>
-          <p className="text-sm opacity-80">Dados da empresa, tema e preferências gerais.</p>
-        </button>
+          <CardContent className="p-3">
+            <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
+              <Building2 className="h-4 w-4" />
+            </div>
+            <h3 className="text-sm font-semibold mb-1">Organização</h3>
+            <p className="text-muted-foreground text-xs mb-2 line-clamp-2">Dados da empresa, tema e preferências gerais.</p>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">Acessar</span>
+              <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </CardContent>
+        </Card>
 
-        <button
-          onClick={() => setActiveTab('integrations')}
-          className={`block rounded-lg border p-6 text-left transition-colors ${
+        <Card 
+          className={`group relative cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 ${
             activeTab === 'integrations'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-card hover:bg-accent'
+              ? 'border-l-4 border-l-primary shadow-md -translate-y-0.5'
+              : 'border-l-4 border-l-transparent hover:border-l-primary'
           }`}
+          onClick={() => setActiveTab('integrations')}
+          aria-pressed={activeTab === 'integrations'}
+          aria-label="Acessar Integrações"
         >
-          <div className="flex items-center gap-2 mb-1">
-            <Plug className="h-4 w-4" />
-            <h3 className="font-semibold">Integrações</h3>
-          </div>
-          <p className="text-sm opacity-80">Conecte WhatsApp, Supabase e outras APIs.</p>
-        </button>
+          <CardContent className="p-3">
+            <div className="bg-purple-50 dark:bg-purple-900/20 text-purple-600 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
+              <Plug className="h-4 w-4" />
+            </div>
+            <h3 className="text-sm font-semibold mb-1">Integrações</h3>
+            <p className="text-muted-foreground text-xs mb-2 line-clamp-2">Conecte WhatsApp, Supabase e outras APIs.</p>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">Acessar</span>
+              <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Tab Content */}

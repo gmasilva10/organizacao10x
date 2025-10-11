@@ -33,13 +33,14 @@ import OnboardingModal from "../modals/OnboardingModal"
 import MessageComposer from "../../relationship/MessageComposer"
 import WhatsAppContactModal from "../modals/WhatsAppContactModal"
 import WhatsAppCreateGroupModal from "../modals/WhatsAppCreateGroupModal"
+import { DeleteStudentModal } from "../modals/DeleteStudentModal"
 
 interface StudentActionsProps {
   studentId: string
   studentName: string
   studentPhone?: string // Telefone do aluno
   variant?: 'card' | 'edit' // Variante para card ou página de edição
-  onActionComplete?: () => void // Callback para atualizar dados após ação
+  onActionComplete?: (actionType?: string) => void // Callback para atualizar dados após ação
   openModal?: 'gerar-anamnese' | null // Modal específico para abrir
 }
 
@@ -251,12 +252,12 @@ export default function StudentActions({
           icon={<Mail className="h-5 w-5 text-blue-600" />}
         />
 
-        <PlaceholderModal
+        <DeleteStudentModal
           open={deleteModalOpen}
           onClose={() => setDeleteModalOpen(false)}
-          title="Excluir Aluno"
-          description="Funcionalidade de exclusão em desenvolvimento."
-          icon={<Trash2 className="h-5 w-5 text-red-600" />}
+          studentId={studentId}
+          studentName={studentName}
+          onSuccess={() => onActionComplete?.('delete')}
         />
       </>
     )
@@ -450,12 +451,12 @@ export default function StudentActions({
         icon={<Mail className="h-5 w-5 text-blue-600" />}
       />
 
-      <PlaceholderModal
+      <DeleteStudentModal
         open={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
-        title="Excluir Aluno"
-        description="Funcionalidade de exclusão em desenvolvimento."
-        icon={<Trash2 className="h-5 w-5 text-red-600" />}
+        studentId={studentId}
+        studentName={studentName}
+        onSuccess={() => onActionComplete?.('delete')}
       />
 
       {/* Relacionamento Modal */}
@@ -492,7 +493,7 @@ export default function StudentActions({
       />
 
       {/* WhatsApp Create Group Modal */}
-      { (process.env.NEXT_PUBLIC_WA_CREATE_GROUP_ENABLED === 'true') && (
+      { (process.env.NEXT_PUBLIC_WA_CREATE_GROUP_ENABLED === 'true') && whatsappCreateGroupOpen && (
         <WhatsAppCreateGroupModal
           open={whatsappCreateGroupOpen}
           onOpenChange={setWhatsappCreateGroupOpen}

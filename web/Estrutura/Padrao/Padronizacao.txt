@@ -1,0 +1,302 @@
+## Forms ACC (Cadastro de Conta)
+- Bot o prim rio à direita
+- Erro inline abaixo do campo
+- M nimo 2 caracteres para campos obrigat rios
+- aria-invalid e aria-describedby nos inputs inv lidos
+- Enter = submit; Esc = cancelar em dialogs
+# Padroniza  o   Kanban (D&D)
+
+Biblioteca
+- @dnd-kit/core (sensores PointerSensor; estrat gia de colis o padr o)
+
+Acessibilidade
+- Card com tabIndex=0 e aria-label:  Mover aluno: <Nome>”
+- Foco devolvido ao card ap s drop
+- Áreas droppable identific veis visualmente (borda/grada  o)   aplicado no Terceiro Corte
+
+Telemetria
+- Evento: student.stage.moved (append-only)
+- Schema (detalhes em events payload):
+  {
+    type: "student.stage.moved",
+    details: {
+      studentId: string,
+      from: string,
+      to: string,
+      columns_version: 1,
+      source: "kanban.ui",
+      ts: ISO8601
+    },
+    route: "/(app)/kanban"
+  }
+
+RBAC
+- admin|manager|trainer: permitido
+- seller|support: 403 + rbac.denied
+
+ROTAS
+- Rota oficial: /(app)/onboarding (renderiza o Kanban)
+- Alias de desenvolvimento: /(app)/kanban (n o expor no app; pode redirecionar para /(app)/onboarding)
+
+[Persist ncia   Kanban]
+- Tabelas: onboarding_columns (id, tenant_id, title, sort, created_at); onboarding_cards (id, tenant_id, student_id, column_id, trainer_id, sort, created_at)
+- Endpoint board: GET /api/kanban/board → { columns, cards }
+- Filtro trainerId: GET /api/kanban/board?trainerId=... (server-first)
+[UX de rollback (DnD)]
+- Em falha (401/403/5xx), reverter posi  o do card localmente, logar {studentId, from, to, status} no console e exibir toast orientando o usu rio.
+- Telemetria student.stage.moved somente quando 2xx/204.
+- Endpoint move: POST /api/kanban/move (persiste movimenta  o + telemetria student.stage.moved)
+- Endpoint tree: GET /api/kanban/tree (raiz organiza  o; n s filhos por trainer com contagem)
+- Endpoints colunas: POST /api/kanban/columns | PATCH/DELETE /api/kanban/columns/:id (restri  es: n o renomear/remover colunas fixas  Novo Aluno” e  Entrega do Treino”)
+
+[Menu recolh vel]
+- Chave localStorage: pg.nav.collapsed (boolean)
+- Acessibilidade: bot o com aria-pressed e r tulo claro; foco preservado ao alternar
+- Persist ncia: estado preservado ap s reload
+
+[Árvore lateral (Enterprise)]
+- RBAC: admin|manager veem todos; trainer v  apenas seus cards
+- Cada n  de trainer exibe contador de cards e permite filtrar o board
+- Atualiza  o: contadores atualizam ap s DnD (persist ncia conclu da)
+- A11y: n  ativo com aria-current="page"; navega  o por teclado (↑/↓ para navegar, Enter para selecionar); nomes longos com truncate + title (tooltip nativo)
+- Persist ncia: colapso em localStorage (pg.nav.collapsed), restauro no reload; evento `pg:kanban:refetchTree` ap s DnD/CRUD/reorder mant m contadores vivos
+
+Confirma  es (2025-08-19 10:20)
+- Uso de @dnd-kit/core confirmado no primeiro corte do Kanban.
+- Schema do evento student.stage.moved aplicado no endpoint /api/kanban/move (payload dentro de feature.used).
+- Regras de RBAC aplicadas no endpoint: admin|manager|trainer liberados; seller|support recebem 403 e evento rbac.denied.
+# PADRONIZA  O (C digo, UI/UX, Conte do)
+#  ltima atualiza  o: 2025-08-26
+
+C DIGO
+- Stack: Next.js + TS + App Router + Tailwind v4 + shadcn/ui + framer-motion + lucide-react.
+- Padr o de imports: absolutos com alias quando aplic vel; remover n o usados.
+- Componentiza  o: se  es da landing em components/ (Header, Hero, Features, Stats, About, Footer, LoginDrawer, GlobeBackground).
+- Anima  es: framer-motion (stagger on-scroll; transitions suaves); evitar excesso no LCP.
+
+Commits (Conventional Commits)
+- feat(landing): ...
+- fix(contrast): ...
+- chore(build): ...
+PRs: t tulo = escopo claro + label (landing, a11y, perf); descri  o com  antes/depois” (prints). Commits devem vincular evid ncias sob `web/evidencias`.
+
+UI/UX
+- Paleta (light): primary #5B7CFA, accent #22D3EE, background #F8FAFC, foreground #0F172A.
+- Dark mode: alternar logo (preta/branca) automaticamente.
+- Hero: globo dotted 3D à esquerda; logo grande à direita; CTA prim rio com gradiente.
+- Login: drawer lateral direito, overlay com blur; inputs com  cones; acessibilidade (aria-labels).
+- Toggle de tema: sempre vis vel no topo à direita.
+- Tamanhos: Header logo 32px; Drawer logo 56px; Hero logo ~42 48vw em desktop.
+
+ACESSIBILIDADE
+- Contraste m nimo AA: 4.5:1 texto normal, 3:1 texto grande.
+- Foco vis vel em bot es/links; labels em inputs; aria-atributos em controles.
+
+PERFORMANCE
+- next/image com sizes/priority no LCP.
+- Evitar anima  es custosas no caminho inicial; lazy onde n o for LCP.
+
+[RBAC & Flags]
+- Perfis fixos: admin | manager | trainer | seller | support (MVP)
+- Flags congeladas (v1.0): features.onboarding.kanban, features.payments.manual, features.reports.advanced, limits.students, limits.trainers
+- Server-first: autoriza  o e limites no backend; front apenas UX/indicativos
+
+Mapa de a  es (RBAC → roles permitidos)
+- manage_users: admin, manager
+- create_trainer: admin, manager
+- read_users: admin, manager, support
+- move_onboarding: admin, manager, trainer, seller
+- read_payments: admin, manager, seller
+- update_payment: admin, manager
+
+[RBAC   Students]
+- students.read: admin, manager, seller, support; trainer (somente alunos com seu trainer_id)
+- students.create: admin, manager, seller
+- students.update: admin, manager (full)
+- students.update_status (trainer): permitido apenas onboarding→active e somente nos seus alunos
+- students.assign_trainer: admin, manager
+- students.delete (soft): admin, manager
+
+[Telemetria   Upsell e Students]
+- upgrade_modal.shown | upgrade_modal.clicked   quando modal   exibido/clicado (Header/TeamAdmin/Students)
+- students.create | students.update | students.assign_trainer   sucesso (200)
+- limit.hit   quando limits.students   atingido (422)
+- rbac.denied   opera  es bloqueadas (403)
+
+Exemplo payload `/api/capabilities`:
+{
+  "plan": "basic",
+  "role": "manager",
+  "limits": { "students": 300, "trainers": 1 },
+  "features": {
+    "onboarding": { "kanban": true },
+    "payments": { "manual": true },
+    "reports": { "advanced": false }
+  }
+}
+
+AUTH / SESS O (App Router)
+- Server-first: o client do Supabase no server deve usar interface de cookies { get, set, remove } via `next/headers`.
+- Sync p s-login: chamar `POST /api/auth/sync` com `credentials: 'include'` e `cache: 'no-store'` e, ap s 204, `router.replace('/app')` + `router.refresh()`.
+- Middleware: manter somente refresh de sess o; n o criar cookies se envs ausentes.
+
+[APP SHELL]
+- Sidebar: traço accent de 3px à esquerda no item ativo; estados hover/active consistentes.
+- Tooltips: exibir somente quando a sidebar estiver colapsada.
+- Breadcrumb: padrão único em todas as rotas privadas.
+
+[MÓDULO ALUNOS - Padrões e Estrutura]
+Última atualização: 2025-01-28
+
+## Estrutura de Arquivos
+
+### Páginas
+- page.tsx: Listagem e controle (busca, filtros, toggle view)
+- [id]/edit/page.tsx: Wrapper da tela de edição
+
+### Componentes Principais
+- StudentEditTabsV6.tsx: Formulário de edição (3 abas: Identificação, Endereço, Responsáveis)
+- StudentCreateModal.tsx: Modal de criação rápida
+- StudentCardActions.tsx: Ações no card (variante compacta)
+- StudentTableActions.tsx: Ações na tabela (variante compacta)
+- shared/StudentActions.tsx: Menu de ações compartilhado (Anexos + Processos)
+
+### Componentes de Modal
+- DeleteStudentModal.tsx: Confirmação de exclusão premium
+- ProfessionalSearchModal.tsx: Busca de profissionais para responsáveis
+- modals/AnamneseInviteModal.tsx: Envio de anamnese
+- modals/MatricularModal.tsx: Matrícula em plano
+- modals/OnboardingModal.tsx: Envio de onboarding
+- modals/PlaceholderModal.tsx: Para features em desenvolvimento
+
+### Hooks
+- useStudents: Listagem com filtros, paginação e React Query
+- usePrefetchStudent: Prefetch de detalhes ao hover
+- useStudentSearch: Busca com debounce (300ms)
+
+### Validações
+- lib/validators/student-schema.ts: Schemas Zod
+  - studentIdentificationSchema: Dados básicos (nome, email, telefone*, status*)
+  - studentAddressSchema: Endereço completo (todos opcionais)
+  - Helpers: formatZodErrors, validateField
+
+### API Routes
+- GET /api/students: Lista com filtros (q, status, trainer_id, page)
+- POST /api/students: Criação com validação server-side
+- GET /api/students/[id]: Detalhes de um aluno
+- PATCH /api/students/[id]: Atualização parcial
+- DELETE /api/students/[id]: Soft delete (marca deleted_at + status=inactive)
+
+## Validações e Regras
+
+### Campos Obrigatórios
+- Nome: min 3, max 100 caracteres, não pode ser só espaços
+- Email: formato RFC 5322, lowercase automático, max 100 chars
+- Telefone: 10-11 dígitos (máscara automática), valida formato brasileiro
+- Status: enum ['onboarding', 'active', 'paused', 'inactive']
+
+### Campos Opcionais
+- Data de nascimento: formato YYYY-MM-DD
+- Gênero: enum ['masculino', 'feminino', 'outro']
+- Estado civil: enum ['solteiro', 'casado', 'divorciado', 'viuvo']
+- Nacionalidade: max 50 chars
+- Local de nascimento: max 100 chars
+- Endereço: todos os campos opcionais (CEP 8 dígitos, UF 2 chars)
+
+### Feedback Visual
+- Erro inline: Texto vermelho abaixo do campo (`text-sm text-red-600`)
+- Campo com erro: Borda vermelha (`border-red-500 focus:border-red-500`)
+- Toast de sucesso: Verde com ícone de check
+- Toast de erro: Vermelho com mensagem específica
+
+## UX e Navegação
+
+### Botões de Ação (StudentEditTabsV6)
+1. **Cancelar** (outline, vermelho): Volta sem salvar
+   - `variant="outline" className="border-destructive text-destructive"`
+   - Disabled durante salvamento
+   - aria-label="Cancelar edição"
+
+2. **Aplicar** (outline, padrão): Salva e permanece
+   - `variant="outline"` + ícone Save
+   - Spinner durante salvamento: "Salvando..."
+   - aria-label="Aplicar alterações sem sair da tela"
+
+3. **Salvar e Voltar** (primary): Salva e redireciona
+   - `variant default` (primary) + ícone Save
+   - Executa handleSave() + onSaveAndRedirect()
+   - aria-label="Salvar e voltar para a lista de alunos"
+
+### Loading States
+- Skeleton loader: 6 cards pulsantes (180px altura)
+- Spinner nos botões: Loader2 com animate-spin
+- Disabled states: Todos os botões durante operações async
+- React Query: isFetching para indicadores secundários
+
+### Exclusão de Aluno
+- Menu: "Processos" → "Excluir Aluno" (texto vermelho)
+- Modal: DeleteStudentModal
+  - Ícone de alerta vermelho (AlertTriangle)
+  - Nome do aluno destacado
+  - Lista de consequências
+  - Botões: "Cancelar" (outline) + "Sim, Excluir Aluno" (destructive)
+- Backend: Soft delete (marca deleted_at + status=inactive)
+- RBAC: Apenas admin e manager (403 para outros roles)
+- Feedback: Toast de sucesso + atualização automática da listagem
+
+### Prefetch e Performance
+- Hover nos cards: Dispara prefetch via usePrefetchStudent
+- Debounce de busca: 300ms (hook useStudentSearch)
+- React Query: staleTime 5min, cache automático
+- Paginação: 50 alunos por página (futuro)
+
+## Toast Notifications (lib/toast-utils.ts)
+- showStudentUpdated(): "Aluno atualizado com sucesso"
+- showStudentError(action): "Erro ao {action} aluno"
+- showSuccessToast(msg): Toast verde customizado
+- showErrorToast(msg): Toast vermelho customizado
+
+## Integrações
+
+### Módulo de Relacionamento
+- StudentRelationshipModal: Timeline de mensagens
+- MessageComposer: Criar nova mensagem
+- Hook compartilhado para callbacks
+
+### Módulo de Ocorrências
+- StudentOccurrenceModal: Criar/visualizar ocorrências
+- Callback onSaved para atualizar dados
+
+### Módulo de Onboarding
+- OnboardingModal: Envio de formulário
+- Integração com WhatsApp/Email
+- Status: 'nao_enviar' | 'enviar' | 'enviado'
+
+## Multi-tenancy e RBAC
+
+### Tenant Filtering
+- Todos os endpoints filtram por org_id automaticamente
+- resolveRequestContext() valida tenant em cada request
+- Fallback para dev: Permite sem tenant (isDev = true)
+
+### Permissões (RBAC)
+- students.read: admin, manager, seller, support, trainer (seus alunos)
+- students.create: admin, manager, seller
+- students.update: admin, manager (full); trainer (apenas seus alunos)
+- students.delete: admin, manager (soft delete)
+- Validação: Client-side (UI) + Server-side (obrigatório)
+
+## Documentação
+
+### Arquivos de Referência
+- PRD_Modulo_Alunos_v1.0.md: Documento completo de requisitos
+- Checklist_Modulo_Alunos.md: 256 casos de teste manuais
+- Padrão_Botões.md: Guidelines de botões e cards
+- Padrão_Filtros.md: Guidelines de filtros e drawer
+
+### Próximas Implementações
+- Paginação real (50 alunos/página)
+- Virtual scrolling para listas grandes
+- Busca por CEP com preenchimento automático
+- Testes E2E automatizados (Playwright)
+- Aria-labels completos e navegação por teclado otimizada

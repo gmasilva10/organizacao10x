@@ -32,13 +32,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validar tamanho (10MB)
-    if (file.size > 10 * 1024 * 1024) {
+    // Validar tamanho (2MB)
+    if (file.size > 2 * 1024 * 1024) {
       return NextResponse.json(
-        { error: "file_too_large", message: "Arquivo deve ter no máximo 10MB." },
+        { error: "file_too_large", message: "Arquivo deve ter no máximo 2MB." },
         { status: 400 }
       )
     }
+
+    // Validar dimensões mínimas (200x200px)
+    // Como não podemos validar dimensões facilmente no servidor sem processar a imagem,
+    // essa validação é feita no cliente. Aqui apenas validamos o tamanho do arquivo.
 
     const url = process.env.SUPABASE_URL
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY

@@ -9,50 +9,74 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Building2, Palette, Globe, Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Building2, Palette, Globe, Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { useOrganization } from '@/hooks/useOrganization'
 import type { Organization } from '@/types/organization'
 import { useState, useRef } from 'react'
 import { useToast } from '@/components/ui/toast'
 import Image from 'next/image'
+import { processImageForUpload, validateImageRequirements, formatFileSize } from '@/utils/image-processing'
 
 export default function OrganizationSettings() {
   const { organization, isLoading, uploadLogo, removeLogo, isUploading } = useOrganization()
   const { success, error } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [processingImage, setProcessingImage] = useState(false)
+  const [processedFile, setProcessedFile] = useState<File | null>(null)
+  const [imageInfo, setImageInfo] = useState<{
+    dimensions: { width: number; height: number }
+    processedSize: number
+  } | null>(null)
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      // Validações client-side
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-      if (!allowedTypes.includes(file.type)) {
-        error('Apenas arquivos JPG, PNG e WEBP são permitidos')
+    if (!file) return
+
+    setProcessingImage(true)
+    
+    try {
+      // Validar requisitos da imagem
+      const validation = validateImageRequirements(file)
+      if (!validation.isValid) {
+        error(validation.errors.join(', '))
         return
       }
 
-      const maxSize = 2 * 1024 * 1024 // 2MB
-      if (file.size > maxSize) {
-        error('Arquivo deve ter no máximo 2MB')
-        return
-      }
-
-      // Criar preview
-      const url = URL.createObjectURL(file)
-      setPreviewUrl(url)
+      // Processar imagem (redimensionar, comprimir)
+      const processedImage = await processImageForUpload(file)
+      
+      // Atualizar estado com imagem processada
+      setPreviewUrl(processedImage.previewUrl)
+      setProcessedFile(processedImage.file)
+      setImageInfo({
+        dimensions: processedImage.dimensions,
+        processedSize: processedImage.processedSize
+      })
+      
+      // Feedback de sucesso com informações do processamento
+      const compressionRatio = Math.round((1 - processedImage.processedSize / processedImage.originalSize) * 100)
+      success(
+        `Logo processado! ${processedImage.dimensions.width}x${processedImage.dimensions.height}px, ${formatFileSize(processedImage.processedSize)}${compressionRatio > 0 ? ` (${compressionRatio}% menor)` : ''}`
+      )
+    } catch (error) {
+      console.error('Erro ao processar logo:', error)
+      error(error instanceof Error ? error.message : 'Erro ao processar logo')
+    } finally {
+      setProcessingImage(false)
     }
   }
 
   const handleUpload = async () => {
-    const file = fileInputRef.current?.files?.[0]
-    if (!file) return
+    if (!processedFile) return
 
     await uploadLogo({
-      file,
+      file: processedFile,
       onSuccess: (response) => {
         success('Logomarca atualizada com sucesso!')
         setPreviewUrl(null)
+        setProcessedFile(null)
+        setImageInfo(null)
         if (fileInputRef.current) {
           fileInputRef.current.value = ''
         }
@@ -78,6 +102,8 @@ export default function OrganizationSettings() {
 
   const handleCancel = () => {
     setPreviewUrl(null)
+    setProcessedFile(null)
+    setImageInfo(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -210,6 +236,11 @@ export default function OrganizationSettings() {
                     className="object-contain rounded"
                   />
                 </div>
+                {imageInfo && (
+                  <div className="text-xs text-primary font-medium">
+                    {imageInfo.dimensions.width}×{imageInfo.dimensions.height}px • {formatFileSize(imageInfo.processedSize)}
+                  </div>
+                )}
               </div>
             )}
 
@@ -228,10 +259,14 @@ export default function OrganizationSettings() {
                 <Button
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
+                  disabled={isUploading || processingImage}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Selecionar Arquivo
+                  {processingImage ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4 mr-2" />
+                  )}
+                  {processingImage ? 'Processando...' : 'Selecionar Arquivo'}
                 </Button>
                 
                 {previewUrl && (

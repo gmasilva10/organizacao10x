@@ -14,9 +14,10 @@ type StudentCardActionsProps = {
   studentId: string
   studentName: string
   onHover?: () => void
+  onActionComplete?: () => void
 }
 
-export default function StudentCardActions({ studentId, studentName, onHover }: StudentCardActionsProps) {
+export default function StudentCardActions({ studentId, studentName, onHover, onActionComplete }: StudentCardActionsProps) {
   return (
     <div className="flex items-center gap-1 pt-1.5 border-t">
         {/* Editar */}
@@ -42,10 +43,7 @@ export default function StudentCardActions({ studentId, studentName, onHover }: 
           studentId={studentId} 
           studentName={studentName} 
           variant="card"
-          onActionComplete={() => {
-            // Callback para atualizar dados após ações
-            console.log('Ação completada no card, dados podem ser atualizados')
-          }}
+          onActionComplete={onActionComplete}
         />
       </div>
   )

@@ -15,21 +15,22 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
-import { Plus, Edit, Trash2, Eye, Save, X } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Save, X, Grid3X3, List } from 'lucide-react'
 import { toast } from 'sonner'
+import { DeletePlanModal } from './modals/DeletePlanModal'
 
 interface Plan {
   id: string
   plan_code: string
   nome: string
   descricao?: string
-  valor: number
+  valor: number | null  // MODIFICAR: permitir null
   moeda: string
-  ciclo: string
+  ciclo: string | null  // MODIFICAR: permitir null
   ativo: boolean
   category_id?: string
   tipo: 'receita' | 'despesa'
+  custom_value: boolean  // ADICIONAR: novo campo
   created_at: string
   updated_at: string
 }
@@ -42,10 +43,13 @@ interface Category {
   is_system: boolean
 }
 
+type ViewMode = 'cards' | 'table'
+
 export default function PlansManager() {
   const [plans, setPlans] = useState<Plan[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [viewMode, setViewMode] = useState<ViewMode>('cards')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -59,7 +63,8 @@ export default function PlansManager() {
     ciclo: '',
     ativo: true,
     category_id: '',
-    tipo: 'receita' as 'receita' | 'despesa'
+    tipo: 'receita' as 'receita' | 'despesa',
+    custom_value: false  // ADICIONAR: novo campo
   })
   const [saving, setSaving] = useState(false)
 
@@ -100,6 +105,17 @@ export default function PlansManager() {
     }).format(value)
   }
 
+  const formatPlanValue = (plan: Plan) => {
+    if (plan.custom_value) {
+      return (
+        <span className="text-amber-600 dark:text-amber-400 text-sm font-medium">
+          Valor Customizado
+        </span>
+      )
+    }
+    return formatCurrency(plan.valor || 0, plan.moeda)
+  }
+
   const getCycleLabel = (ciclo: string) => {
     const cycles = {
       'diario': 'Diário',
@@ -124,7 +140,8 @@ export default function PlansManager() {
       ciclo: '',
       ativo: true,
       category_id: '',
-      tipo: 'receita'
+      tipo: 'receita',
+      custom_value: false
     })
   }
 
@@ -138,12 +155,13 @@ export default function PlansManager() {
     setFormData({
       nome: plan.nome,
       descricao: plan.descricao || '',
-      valor: plan.valor.toString(),
+      valor: plan.valor?.toString() || '',
       moeda: plan.moeda,
       ciclo: plan.ciclo || '',
       ativo: plan.ativo,
       category_id: plan.category_id || '',
-      tipo: plan.tipo || 'receita'
+      tipo: plan.tipo || 'receita',
+      custom_value: plan.custom_value || false
     })
     setShowEditModal(true)
   }
@@ -151,6 +169,10 @@ export default function PlansManager() {
   const handleDeletePlan = (plan: Plan) => {
     setSelectedPlan(plan)
     setShowDeleteModal(true)
+  }
+
+  const handleDeleteSuccess = () => {
+    loadPlans() // Recarregar a lista de planos
   }
 
   const handleViewPlan = (plan: Plan) => {
@@ -162,10 +184,18 @@ export default function PlansManager() {
     try {
       setSaving(true)
       
-      const payload = {
-        ...formData,
-        valor: parseFloat(formData.valor)
-      }
+      // MODIFICAR: Validação condicional baseada em custom_value
+      const payload = formData.custom_value 
+        ? {
+            ...formData,
+            valor: null,  // Garantir NULL
+            ciclo: null,  // Garantir NULL
+            moeda: 'BRL'  // Valor padrão
+          }
+        : {
+            ...formData,
+            valor: parseFloat(formData.valor)
+          }
 
       const url = selectedPlan ? `/api/services/plans/${selectedPlan.id}` : '/api/services/plans'
       const method = selectedPlan ? 'PUT' : 'POST'
@@ -201,36 +231,6 @@ export default function PlansManager() {
     }
   }
 
-  const handleConfirmDelete = async () => {
-    if (!selectedPlan) return
-
-    try {
-      setSaving(true)
-      
-      const response = await fetch(`/api/services/plans/${selectedPlan.id}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.details || errorData.error || 'Erro ao excluir plano')
-      }
-
-      const data = await response.json()
-      toast.success(data.message || 'Plano excluído com sucesso')
-      
-      await loadPlans()
-      
-      setShowDeleteModal(false)
-      setSelectedPlan(null)
-      
-    } catch (error: any) {
-      console.error('Erro ao excluir plano:', error)
-      toast.error(error.message || 'Erro ao excluir plano')
-    } finally {
-      setSaving(false)
-    }
-  }
 
   if (loading) {
     return (
@@ -265,10 +265,35 @@ export default function PlansManager() {
             Gerencie seus planos de venda e assinatura
           </p>
         </div>
-        <Button onClick={handleCreatePlan} aria-label="Criar novo plano">
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Plano
-        </Button>
+        <div className="flex items-center gap-3">
+          {/* Toggle de Visualização */}
+          <div className="flex border rounded-lg" role="group" aria-label="Modo de visualização">
+            <Button
+              variant={viewMode === 'cards' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('cards')}
+              className="rounded-r-none"
+              aria-label="Visualizar em cards"
+              aria-pressed={viewMode === 'cards'}
+            >
+              <Grid3X3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'table' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('table')}
+              className="rounded-l-none"
+              aria-label="Visualizar em tabela"
+              aria-pressed={viewMode === 'table'}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
+          <Button onClick={handleCreatePlan} aria-label="Criar novo plano">
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Plano
+          </Button>
+        </div>
       </div>
 
       {plans.length === 0 ? (
@@ -286,31 +311,30 @@ export default function PlansManager() {
             </div>
           </CardContent>
         </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      ) : viewMode === 'cards' ? (
+        <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {plans.map((plan) => (
-            <Card key={plan.id} className="relative">
-              <CardHeader>
+            <Card key={plan.id} className="relative hover:shadow-md transition-shadow">
+              <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">{plan.nome}</CardTitle>
-                    <CardDescription className="text-sm">
-                      {plan.plan_code}
-                    </CardDescription>
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-sm font-medium truncate" title={plan.nome}>
+                      {plan.nome}
+                    </CardTitle>
                   </div>
-                  <Badge variant={plan.ativo ? "default" : "secondary"}>
+                  <Badge variant={plan.ativo ? "default" : "secondary"} className="text-xs">
                     {plan.ativo ? "Ativo" : "Inativo"}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold">
-                      {formatCurrency(plan.valor, plan.moeda)}
+                    <div className="text-lg font-bold">
+                      {formatPlanValue(plan)}
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className={`text-lg ${plan.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className={`text-sm ${plan.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
                         {plan.tipo === 'receita' ? '↑' : '↓'}
                       </span>
                       <span className="text-xs text-muted-foreground capitalize">
@@ -318,20 +342,32 @@ export default function PlansManager() {
                       </span>
                     </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {getCycleLabel(plan.ciclo)}
-                  </div>
+                  
+                  {/* ADICIONAR: Badge para planos com valor customizado */}
+                  {plan.custom_value && (
+                    <Badge variant="secondary" className="text-xs">
+                      <span className="mr-1">⚙️</span>
+                      Valor Manual
+                    </Badge>
+                  )}
+                  
+                  {/* MODIFICAR: Mostrar ciclo apenas se não for custom_value */}
+                  {!plan.custom_value && plan.ciclo && (
+                    <div className="text-xs text-muted-foreground">
+                      {getCycleLabel(plan.ciclo)}
+                    </div>
+                  )}
                   {plan.category_id && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       {(() => {
                         const category = categories.find(c => c.id === plan.category_id)
                         return category ? (
                           <>
                             <div 
-                              className="w-2 h-2 rounded-full" 
+                              className="w-1.5 h-1.5 rounded-full" 
                               style={{ backgroundColor: category.color }}
                             />
-                            <span className="text-xs text-muted-foreground">{category.name}</span>
+                            <span className="text-xs text-muted-foreground truncate">{category.name}</span>
                           </>
                         ) : null
                       })()}
@@ -353,6 +389,94 @@ export default function PlansManager() {
             </Card>
           ))}
         </div>
+      ) : (
+        /* Visualização em Tabela */
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full" role="table" aria-label="Tabela de planos financeiros">
+                <thead className="border-b">
+                  <tr>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Nome</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Código</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Valor</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Tipo</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Status</th>
+                    <th className="text-left p-3 font-medium text-sm" scope="col">Categoria</th>
+                    <th className="text-right p-3 font-medium text-sm" scope="col">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {plans.map((plan) => (
+                    <tr key={plan.id} className="border-b hover:bg-muted/50">
+                      <td className="p-3">
+                        <div className="font-medium text-sm">{plan.nome}</div>
+                      </td>
+                      <td className="p-3 text-muted-foreground text-xs">{plan.plan_code}</td>
+                      <td className="p-3">
+                        <div className="font-medium text-sm">
+                          {formatPlanValue(plan)}
+                        </div>
+                        {plan.custom_value && (
+                          <Badge variant="secondary" className="text-xs mt-1">
+                            <span className="mr-1">⚙️</span>
+                            Valor Manual
+                          </Badge>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-1">
+                          <span className={`text-sm ${plan.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
+                            {plan.tipo === 'receita' ? '↑' : '↓'}
+                          </span>
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {plan.tipo}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <Badge variant={plan.ativo ? "default" : "secondary"} className="text-xs">
+                          {plan.ativo ? "Ativo" : "Inativo"}
+                        </Badge>
+                      </td>
+                      <td className="p-3">
+                        {plan.category_id && (
+                          <div className="flex items-center gap-1">
+                            {(() => {
+                              const category = categories.find(c => c.id === plan.category_id)
+                              return category ? (
+                                <>
+                                  <div 
+                                    className="w-1.5 h-1.5 rounded-full" 
+                                    style={{ backgroundColor: category.color }}
+                                  />
+                                  <span className="text-xs text-muted-foreground">{category.name}</span>
+                                </>
+                              ) : null
+                            })()}
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleViewPlan(plan)} aria-label="Ver detalhes do plano">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleEditPlan(plan)} aria-label="Editar plano">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="destructive" size="sm" onClick={() => handleDeletePlan(plan)} aria-label="Excluir plano">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Modal de Criação/Edição */}
@@ -366,12 +490,26 @@ export default function PlansManager() {
       }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>
-              {selectedPlan ? '✏️ Editar Plano' : '➕ Novo Plano'}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedPlan ? 'Atualize as informações do plano' : 'Preencha os dados para criar um novo plano'}
-            </DialogDescription>
+            <div className="space-y-4">
+              <div>
+                <DialogTitle>
+                  {selectedPlan ? '✏️ Editar Plano' : '➕ Novo Plano'}
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedPlan ? 'Atualize as informações do plano' : 'Preencha os dados para criar um novo plano'}
+                </DialogDescription>
+              </div>
+              <div className="flex justify-end">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="ativo"
+                    checked={formData.ativo}
+                    onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, ativo: checked }))}
+                  />
+                  <Label htmlFor="ativo" className="text-sm font-medium">Ativo</Label>
+                </div>
+              </div>
+            </div>
           </DialogHeader>
           
           <div className="space-y-6">
@@ -398,10 +536,34 @@ export default function PlansManager() {
               <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
                 💰 Valores e Periodicidade
               </h3>
-              <div className="border rounded-lg p-4 space-y-4">
+              <div className="border rounded-lg p-4 space-y-4 min-h-[200px]">
+             {/* ADICIONAR: Toggle Switch para Valor Customizado */}
+             <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+               <div className="flex-1">
+                 <Label htmlFor="custom_value" className="font-semibold cursor-pointer">
+                   Valor Customizado
+                 </Label>
+               </div>
+               <Switch
+                 id="custom_value"
+                 checked={formData.custom_value}
+                 onCheckedChange={(checked) => {
+                   setFormData(prev => ({ 
+                     ...prev, 
+                     custom_value: checked,
+                     // Limpar campos quando ativar
+                     ...(checked ? { valor: '', ciclo: '', moeda: 'BRL' } : {})
+                   }))
+                 }}
+               />
+             </div>
+
+                {/* MODIFICAR: Campos existentes com disabled quando custom_value = true */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="valor" className="mb-2 block">Valor *</Label>
+                    <Label htmlFor="valor" className="mb-2 block">
+                      Valor {!formData.custom_value && '*'}
+                    </Label>
                     <Input
                       id="valor"
                       type="number"
@@ -409,12 +571,18 @@ export default function PlansManager() {
                       value={formData.valor}
                       onChange={(e) => setFormData(prev => ({ ...prev, valor: e.target.value }))}
                       placeholder="0.00"
+                      disabled={formData.custom_value}  // ADICIONAR
+                      className={formData.custom_value ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''}  // ADICIONAR
                     />
                   </div>
                   <div>
                     <Label htmlFor="moeda" className="mb-2 block">Moeda</Label>
-                    <Select value={formData.moeda} onValueChange={(value: string) => setFormData(prev => ({ ...prev, moeda: value }))}>
-                      <SelectTrigger>
+                    <Select 
+                      value={formData.moeda} 
+                      onValueChange={(value: string) => setFormData(prev => ({ ...prev, moeda: value }))}
+                      disabled={formData.custom_value}  // ADICIONAR
+                    >
+                      <SelectTrigger className={formData.custom_value ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -427,8 +595,12 @@ export default function PlansManager() {
                 </div>
                 <div>
                   <Label htmlFor="ciclo" className="mb-2 block">Ciclo de Cobrança</Label>
-                  <Select value={formData.ciclo} onValueChange={(value: string) => setFormData(prev => ({ ...prev, ciclo: value }))}>
-                    <SelectTrigger>
+                  <Select 
+                    value={formData.ciclo} 
+                    onValueChange={(value: string) => setFormData(prev => ({ ...prev, ciclo: value }))}
+                    disabled={formData.custom_value}  // ADICIONAR
+                  >
+                    <SelectTrigger className={formData.custom_value ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''}>
                       <SelectValue placeholder="Selecione o ciclo" />
                     </SelectTrigger>
                     <SelectContent>
@@ -505,44 +677,42 @@ export default function PlansManager() {
               </div>
             </div>
 
-            {/* Seção 4: Configurações */}
-            <div>
-              <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
-                ⚙️ Configurações
-              </h3>
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="ativo"
-                    checked={formData.ativo}
-                    onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, ativo: checked }))}
-                  />
-                  <Label htmlFor="ativo">Plano ativo</Label>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Planos inativos não aparecem na seleção de vendas
-                </p>
-              </div>
-            </div>
 
           </div>
           
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowCreateModal(false)
-                setShowEditModal(false)
-                setSelectedPlan(null)
-                resetForm()
-              }}
-              disabled={saving}
-            >
-              Cancelar
-            </Button>
-            <Button onClick={handleSavePlan} disabled={saving || !formData.nome || !formData.valor || !formData.category_id}>
-              {saving ? 'Salvando...' : 'Salvar'}
-            </Button>
+          <DialogFooter className="flex justify-between">
+            <div>
+              {selectedPlan && (
+                <Button 
+                  variant="destructive" 
+                  onClick={() => {
+                    setShowEditModal(false)
+                    setShowDeleteModal(true)
+                  }}
+                  className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Excluir Plano
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowCreateModal(false)
+                  setShowEditModal(false)
+                  setSelectedPlan(null)
+                  resetForm()
+                }}
+                disabled={saving}
+              >
+                Cancelar
+              </Button>
+              <Button onClick={handleSavePlan} disabled={saving || !formData.nome || !formData.category_id || (!formData.custom_value && !formData.valor)}>
+                {saving ? 'Salvando...' : 'Salvar'}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -571,23 +741,51 @@ export default function PlansManager() {
               </div>
               
               
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label className="text-sm font-medium">Valor</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {formatCurrency(selectedPlan.valor, selectedPlan.moeda)}
-                  </p>
+              {/* MODIFICAR: Seção de Valores */}
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold mb-3">💰 Valores e Periodicidade</h4>
+                <div className="space-y-3">
+                  {/* ADICIONAR: Indicador de valor customizado */}
+                  {selectedPlan.custom_value && (
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">Valor Customizado</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          O valor será definido manualmente no lançamento financeiro
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* MODIFICAR: Exibir valor apenas se não for customizado */}
+                  {!selectedPlan.custom_value && (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Valor:</span>
+                        <span className="font-semibold">
+                          {formatCurrency(selectedPlan.valor || 0, selectedPlan.moeda)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Ciclo:</span>
+                        <span className="font-medium">{getCycleLabel(selectedPlan.ciclo)}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div>
-                  <Label className="text-sm font-medium">Ciclo</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {getCycleLabel(selectedPlan.ciclo)}
-                  </p>
-                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-sm font-medium">Status</Label>
                   <Badge variant={selectedPlan.ativo ? "default" : "secondary"}>
                     {selectedPlan.ativo ? "Ativo" : "Inativo"}
+                  </Badge>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Tipo</Label>
+                  <Badge variant={selectedPlan.tipo === 'receita' ? "default" : "destructive"}>
+                    {selectedPlan.tipo === 'receita' ? 'Receita' : 'Despesa'}
                   </Badge>
                 </div>
               </div>
@@ -604,15 +802,12 @@ export default function PlansManager() {
       </Dialog>
 
       {/* Modal de Confirmação de Exclusão */}
-      <ConfirmDeleteDialog
+      <DeletePlanModal
         open={showDeleteModal}
-        onOpenChange={setShowDeleteModal}
-        onConfirm={handleConfirmDelete}
-        title="Excluir Plano"
-        description="Tem certeza que deseja excluir este plano?"
-        itemName={selectedPlan?.nome}
-        itemType="plano"
-        loading={saving}
+        onClose={() => setShowDeleteModal(false)}
+        planId={selectedPlan?.id || ''}
+        planName={selectedPlan?.nome || ''}
+        onSuccess={handleDeleteSuccess}
       />
     </div>
   )

@@ -74,6 +74,25 @@ function logAction(action: string, data: MaskableData, status?: number) {
   })
 }
 
+// Função de auditoria
+async function auditLog(action: string, data: {
+  userId?: string
+  orgId?: string
+  studentId?: string
+  groupName?: string
+  participants?: string[]
+  success: boolean
+  error?: string
+}) {
+  // TODO: Integrar com sistema de auditoria do Supabase
+  // Por enquanto, apenas log estruturado
+  console.log('[AUDIT]', {
+    timestamp: new Date().toISOString(),
+    action: 'WHATSAPP_CREATE_GROUP',
+    ...data
+  })
+}
+
 export async function POST(request: NextRequest) {
   const correlationId = `${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}-wa-group`
   
@@ -149,6 +168,13 @@ export async function POST(request: NextRequest) {
       normalizedParticipants
     })
 
+    // Auditoria: Tentativa de criação
+    await auditLog('CREATE_GROUP_ATTEMPT', {
+      groupName: name,
+      participants: normalizedParticipants,
+      success: false // ainda não executado
+    })
+
     const response = await fetch(zapiUrl, {
       method: 'POST',
       headers: {
@@ -174,6 +200,14 @@ export async function POST(request: NextRequest) {
       response: responseData,
       url: zapiUrl
     }, response.status)
+
+    // Auditoria: Resultado da criação
+    await auditLog('CREATE_GROUP_RESULT', {
+      groupName: name,
+      participants: normalizedParticipants,
+      success: response.ok,
+      error: response.ok ? undefined : String((responseData as any)?.message || response.statusText)
+    })
 
     if (!response.ok) {
       const message = String(((responseData as any)?.message) || response.statusText || '')

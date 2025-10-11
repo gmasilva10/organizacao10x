@@ -440,13 +440,8 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-start justify-between mb-6 gap-4">
-        <div className="flex flex-col">
-          <h2 className="text-2xl font-bold">Relacionamento</h2>
-          <p className="text-muted-foreground">Gerencie mensagens e lembretes com seus alunos</p>
-        </div>
-        <div className="flex-1">
-          <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-2 mb-6">
+        <div className="flex flex-wrap items-center gap-2">
             <Select value={filters.status} onValueChange={(v: string) => updateFilters({ status: v })}>
               <SelectTrigger className="h-10 w-44">
                 <SelectValue placeholder="Status" />
@@ -477,29 +472,26 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                 <Badge className="ml-2 bg-blue-100 text-blue-700" aria-hidden="true">{getActiveFiltersCount()}</Badge>
               )}
             </Button>
-            <div className="flex items-center gap-2 justify-end">
-              <Button 
-                variant="outline" 
-                onClick={resetFilters}
-                aria-label="Limpar todos os filtros"
-              >
-                <X className="mr-2 h-4 w-4" /> Limpar
-              </Button>
-              <Button 
-                variant="default" 
-                onClick={fetchTasks}
-                aria-label="Atualizar lista de tarefas"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" /> Atualizar
-              </Button>
-              <Button 
-                onClick={() => setShowComposer(true)}
-                aria-label="Criar nova mensagem"
-              >
-                <MessageSquare className="mr-2 h-4 w-4" /> Nova Mensagem
-              </Button>
-            </div>
-          </div>
+          <Button 
+            variant="outline" 
+            onClick={resetFilters}
+            aria-label="Limpar todos os filtros"
+          >
+            <X className="mr-2 h-4 w-4" /> Limpar
+          </Button>
+          <Button 
+            variant="default" 
+            onClick={fetchTasks}
+            aria-label="Atualizar lista de tarefas"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" /> Atualizar
+          </Button>
+          <Button 
+            onClick={() => setShowComposer(true)}
+            aria-label="Criar nova mensagem"
+          >
+            <MessageSquare className="mr-2 h-4 w-4" /> Nova Mensagem
+          </Button>
         </div>
       </div>
 

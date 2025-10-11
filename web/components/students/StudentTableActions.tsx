@@ -14,9 +14,10 @@ type StudentTableActionsProps = {
   studentId: string
   studentName: string
   onHover?: () => void
+  onActionComplete?: () => void
 }
 
-export default function StudentTableActions({ studentId, studentName, onHover }: StudentTableActionsProps) {
+export default function StudentTableActions({ studentId, studentName, onHover, onActionComplete }: StudentTableActionsProps) {
   return (
     <div className="flex items-center justify-end gap-0.5">
         {/* Editar */}
@@ -42,10 +43,7 @@ export default function StudentTableActions({ studentId, studentName, onHover }:
           studentId={studentId} 
           studentName={studentName} 
           variant="card"
-          onActionComplete={() => {
-            // Callback para atualizar dados após ações
-            console.log('Ação completada na tabela, dados podem ser atualizados')
-          }}
+          onActionComplete={onActionComplete}
         />
       </div>
   )

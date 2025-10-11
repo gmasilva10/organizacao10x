@@ -61,9 +61,12 @@ import {
   User,
   Key,
   Phone,
-  Settings
+  Settings,
+  Filter
 } from "lucide-react"
 import { TeamUpgradeModal } from "./TeamUpgradeModal"
+import { useProfessionalsFilters } from "@/hooks/useProfessionalsFilters"
+import ProfessionalsFilterDrawer from "./team/ProfessionalsFilterDrawer"
 
 interface ProfessionalProfile {
   id: number
@@ -109,11 +112,21 @@ export function ProfessionalsManager() {
   const [activeTab, setActiveTab] = useState<'professional' | 'user'>('professional')
   const [searchTerm, setSearchTerm] = useState('')
   const [profileFilter, setProfileFilter] = useState('')
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
   const [userFormData, setUserFormData] = useState({
     password: '',
     userProfile: 'admin',
     isActive: false
   })
+  
+  // Hook de filtros
+  const {
+    filters,
+    updateFilters,
+    resetFilters,
+    getActiveFiltersCount,
+    applyFilters
+  } = useProfessionalsFilters()
 
   // Filtrar profissionais
   const filteredProfessionals = professionals.filter(professional => {
@@ -516,25 +529,30 @@ export function ProfessionalsManager() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Buscar por nome ou email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={filters.search}
+              onChange={(e) => updateFilters({ search: e.target.value })}
               className="pl-10"
             />
           </div>
         </div>
-        <Select value={profileFilter} onValueChange={setProfileFilter}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filtrar por perfil" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os perfis</SelectItem>
-            {profiles.map((profile) => (
-              <SelectItem key={profile.id} value={profile.id.toString()}>
-                {profile.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Button
+          variant="outline"
+          size="default"
+          onClick={() => setFilterDrawerOpen(true)}
+          className="relative"
+          aria-label="Abrir filtros avançados"
+        >
+          <Filter className="h-4 w-4 mr-2" />
+          Filtros
+          {getActiveFiltersCount() > 0 && (
+            <Badge 
+              variant="secondary" 
+              className="ml-2 bg-primary text-primary-foreground"
+            >
+              {getActiveFiltersCount()}
+            </Badge>
+          )}
+        </Button>
       </div>
 
       {/* Tabela */}
@@ -1037,6 +1055,17 @@ export function ProfessionalsManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Drawer de Filtros */}
+      <ProfessionalsFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        filters={filters}
+        onFiltersChange={updateFilters}
+        onClear={resetFilters}
+        onApply={applyFilters}
+        profiles={profiles.map(p => ({ id: p.id.toString(), name: p.name }))}
+      />
 
     </div>
   )

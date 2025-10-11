@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle, User, Users } from "lucide-react"
+import { AlertCircle, CheckCircle, User, Users, AlertTriangle } from "lucide-react"
 import { normalizeToE164DigitsBR } from "@/lib/phone-normalize"
 
 interface Trainer {
@@ -36,9 +36,16 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<any>(null)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [lastCreationTime, setLastCreationTime] = useState<number>(0)
+  const RATE_LIMIT_MS = 60000 // 1 minuto entre criações
 
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      // Resetar estado quando modal fecha
+      setShowConfirmation(false)
+      return
+    }
     const load = async () => {
       try {
         const res = await fetch('/api/professionals?status=active', { cache: 'no-store' })
@@ -59,6 +66,9 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
   }, [open])
 
   const selectedPhones = useMemo(() => {
+    // Guard: não processar se modal fechado
+    if (!open) return []
+    
     // Sempre incluir o aluno como participante
     const participants = []
     
@@ -80,21 +90,17 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
     
     participants.push(...selectedTrainers)
     
-    console.log('📱 Participantes do grupo:', {
-      aluno: studentPhone,
-      treinadores: selectedTrainers,
-      total: participants.length
-    })
-    
     return participants
-  }, [selected, trainers, studentPhone])
+  }, [selected, trainers, studentPhone, open])
 
   const adminPhones = useMemo(() => {
+    if (!open) return []
+    
     return trainers
       .filter(t => admins[t.id])
       .map(t => (t.phone || (t as any).whatsapp_work || ''))
       .filter(Boolean)
-  }, [admins, trainers])
+  }, [admins, trainers, open])
 
   const handleCreate = async () => {
     setError(null)
@@ -107,20 +113,23 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
       return 
     }
 
+    // NOVA VALIDAÇÃO: Rate limiting
+    const now = Date.now()
+    if (now - lastCreationTime < RATE_LIMIT_MS) {
+      const remainingSeconds = Math.ceil((RATE_LIMIT_MS - (now - lastCreationTime)) / 1000)
+      setError(`Aguarde ${remainingSeconds} segundos antes de criar outro grupo.`)
+      return
+    }
+
+    // NOVA VALIDAÇÃO: Confirmação dupla
+    if (!showConfirmation) {
+      setShowConfirmation(true)
+      return
+    }
+
     try {
       setLoading(true)
       
-      // Debug: verificar variáveis de ambiente
-      console.log('🔍 [WHATSAPP GROUP] Variáveis de ambiente:', {
-        instance: process.env.NEXT_PUBLIC_ZAPI_INSTANCE,
-        token: process.env.NEXT_PUBLIC_ZAPI_TOKEN ? '✅ Presente' : '❌ Ausente'
-      })
-      
-      console.log('🔍 [WHATSAPP GROUP] Dados do grupo:', {
-        name: groupName,
-        participants: normalized,
-        selectedPhones
-      })
       
       // Usar a nova API interna /api/wa/ que resolve CORS e garante Node runtime
       const res = await fetch('/api/wa/create-group', {
@@ -134,23 +143,13 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
         })
       })
       
-      console.log('🔍 [WHATSAPP GROUP] Resposta da API:', {
-        status: res.status,
-        ok: res.ok,
-        statusText: res.statusText
-      })
-      
-      // Capturar resposta como texto primeiro para debug
+      // Capturar resposta como texto primeiro
       const responseText = await res.text()
-      console.log('🔍 [WHATSAPP GROUP] Resposta bruta:', responseText)
       
       let data = {}
       try {
         data = JSON.parse(responseText)
-        console.log('🔍 [WHATSAPP GROUP] Dados da resposta (JSON):', data)
       } catch (parseError) {
-        console.error('❌ [WHATSAPP GROUP] Erro ao fazer parse do JSON:', parseError)
-        console.log('🔍 [WHATSAPP GROUP] Resposta não é JSON válido:', responseText)
         data = { error: 'Resposta inválida do servidor', raw: responseText }
       }
       
@@ -158,6 +157,8 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
         setError((data as any)?.error || 'Falha na criação do grupo')
       } else {
         setResult(data)
+        // Após sucesso, atualizar timestamp para rate limiting
+        setLastCreationTime(Date.now())
       }
     } catch (error) {
       console.error('❌ [WHATSAPP GROUP] Erro:', error)
@@ -247,6 +248,24 @@ export default function WhatsAppCreateGroupModal({ open, onOpenChange, studentId
                 O aluno será incluído automaticamente. Treinadores são opcionais. Recomenda-se marcar ao menos um admin.
               </div>
             </div>
+
+            {showConfirmation && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-yellow-900 mb-1">Confirmar Criação de Grupo</h4>
+                    <p className="text-sm text-yellow-800 mb-2">
+                      Você está prestes a criar um grupo no WhatsApp com {selectedPhones.length} participante(s).
+                      Esta ação não pode ser desfeita automaticamente.
+                    </p>
+                    <p className="text-xs text-yellow-700">
+                      Grupo: <strong>{groupName}</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-end gap-2">
               <Button onClick={handleCreate} disabled={loading}>{loading ? 'Criando…' : 'Criar grupo (API)'}</Button>

@@ -182,7 +182,8 @@ export default function ServicesOnboardPage() {
           title: finalData.name,
           position: finalData.position,
           stage_code: `stage_${finalData.position}`,
-          is_fixed: false
+          is_fixed: false,
+          color: finalData.color
         })
       })
 
@@ -256,16 +257,23 @@ export default function ServicesOnboardPage() {
     }
   }
 
-  async function updateColumn(columnId: string, newTitle: string) {
+  async function updateColumn(columnId: string, data: { title: string; color?: string }) {
     try {
+      // Enviar título e cor (a API validará se a posição pode ser alterada)
+      const requestBody = { 
+        title: data.title, 
+        color: data.color 
+      }
+      
       const response = await fetch(`/api/kanban/stages/${columnId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle })
+        body: JSON.stringify(requestBody)
       })
 
       if (!response.ok) {
-        throw new Error('Erro ao atualizar coluna')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erro ao atualizar coluna')
       }
 
       success('Coluna atualizada com sucesso!')
@@ -273,7 +281,7 @@ export default function ServicesOnboardPage() {
       loadBoard()
     } catch (err) {
       console.error('Erro ao atualizar coluna:', err)
-      error('Erro ao atualizar coluna')
+      error(err instanceof Error ? err.message : 'Erro ao atualizar coluna')
     }
   }
 
@@ -558,7 +566,7 @@ export default function ServicesOnboardPage() {
             <DialogTitle>Gerenciar Tarefas da Coluna</DialogTitle>
             {manageTemplatesModal.column && (
               <DialogDescription>
-                {manageTemplatesModal.column.title} (#{manageTemplatesModal.column.position})
+                {manageTemplatesModal.column.title}
               </DialogDescription>
             )}
           </DialogHeader>
@@ -602,7 +610,7 @@ export default function ServicesOnboardPage() {
           {editColumnModal.column && (
             <EditColumnForm
               column={editColumnModal.column}
-              onSave={(newTitle) => updateColumn(editColumnModal.column!.id, newTitle)}
+              onSave={(data) => updateColumn(editColumnModal.column!.id, data)}
               onCancel={() => setEditColumnModal({ open: false, column: null })}
             />
           )}
@@ -805,9 +813,21 @@ function ManageTemplatesForm({
   )
 }
 
+const COLOR_OPTIONS = [
+  { value: '#ef4444', label: 'Vermelho' },
+  { value: '#f97316', label: 'Laranja' },
+  { value: '#eab308', label: 'Amarelo' },
+  { value: '#22c55e', label: 'Verde' },
+  { value: '#3b82f6', label: 'Azul' },
+  { value: '#8b5cf6', label: 'Roxo' },
+  { value: '#ec4899', label: 'Rosa' },
+  { value: '#6b7280', label: 'Cinza' }
+]
+
 function NewColumnForm({ onSave, onCancel }: { onSave: (data: any) => void; onCancel: () => void }) {
   const [name, setName] = useState('')
   const [position, setPosition] = useState<number | null>(null)
+  const [color, setColor] = useState<string>('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -815,7 +835,8 @@ function NewColumnForm({ onSave, onCancel }: { onSave: (data: any) => void; onCa
     
     onSave({
       name: name.trim(),
-      position: position || null
+      position: position || null,
+      color: color || null
     })
   }
 
@@ -851,6 +872,35 @@ function NewColumnForm({ onSave, onCancel }: { onSave: (data: any) => void; onCa
             />
             <p className="text-xs text-muted-foreground mt-1">
               Se não especificado, será alocada automaticamente antes da coluna #99 (Entrega do Treino)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Seção de Cor */}
+      <div>
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          🎨 Aparência
+        </h3>
+        <div className="border rounded-lg p-4 space-y-4">
+          <div>
+            <Label htmlFor="color" className="mb-2 block">Cor do Cabeçalho (opcional)</Label>
+            <div className="flex gap-2 flex-wrap">
+              {COLOR_OPTIONS.map(option => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setColor(option.value)}
+                  className={`w-10 h-10 rounded-md border-2 ${
+                    color === option.value ? 'border-primary ring-2 ring-primary' : 'border-gray-300'
+                  }`}
+                  style={{ backgroundColor: option.value }}
+                  title={option.label}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Escolha uma cor para o cabeçalho da coluna no Kanban
             </p>
           </div>
         </div>
@@ -963,7 +1013,7 @@ function NewTemplateForm({ column, onSave, onCancel }: { column: Column; onSave:
           ℹ️ Informações
         </h3>
         <div className="text-sm text-muted-foreground space-y-1">
-          <p><strong>Coluna:</strong> {column.title} (#{column.position})</p>
+          <p><strong>Coluna:</strong> {column.title}</p>
           <p>A tarefa será adicionada automaticamente aos novos alunos nesta coluna.</p>
         </div>
       </div>
@@ -980,41 +1030,85 @@ function NewTemplateForm({ column, onSave, onCancel }: { column: Column; onSave:
   )
 }
 
-function EditColumnForm({ column, onSave, onCancel }: { column: Column; onSave: (title: string) => void; onCancel: () => void }) {
+function EditColumnForm({ column, onSave, onCancel }: { column: Column; onSave: (data: { title: string; color?: string }) => void; onCancel: () => void }) {
   const [title, setTitle] = useState(column.title)
+  const [color, setColor] = useState<string>(column.color || '')
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Seção Principal */}
       <div>
-        <Label htmlFor="title">Nome da Coluna *</Label>
-        <Input
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Ex: Avaliação Física"
-          required
-        />
-      </div>
-
-      <div className="text-sm text-muted-foreground">
-        {column.is_fixed ? (
-          <div className="space-y-1">
-            <p><strong>Coluna fixa:</strong> Apenas o nome pode ser alterado.</p>
-            <p>A posição (#{column.position}) não pode ser modificada.</p>
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          📝 Informações da Coluna
+        </h3>
+        <div className="border rounded-lg p-4 space-y-4">
+          <div>
+            <Label htmlFor="title" className="mb-2 block">Nome da Coluna *</Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: Avaliação Física"
+              required
+            />
           </div>
-        ) : (
-          <p>Alterar o nome da coluna não afeta as tarefas existentes.</p>
-        )}
+        </div>
       </div>
 
-      <div className="flex justify-end gap-2">
+      {/* Seção de Cor */}
+      <div>
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          🎨 Aparência
+        </h3>
+        <div className="border rounded-lg p-4 space-y-4">
+          <div>
+            <Label htmlFor="color" className="mb-2 block">Cor do Cabeçalho (opcional)</Label>
+            <div className="flex gap-2 flex-wrap">
+              {COLOR_OPTIONS.map(option => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setColor(option.value)}
+                  className={`w-10 h-10 rounded-md border-2 ${
+                    color === option.value ? 'border-primary ring-2 ring-primary' : 'border-gray-300'
+                  }`}
+                  style={{ backgroundColor: option.value }}
+                  title={option.label}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Escolha uma cor para o cabeçalho da coluna no Kanban
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Informações Contextuais */}
+      <div>
+        <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
+          ℹ️ Informações
+        </h3>
+        <div className="text-sm text-muted-foreground space-y-1">
+          {column.is_fixed ? (
+            <>
+              <p><strong>Coluna fixa:</strong> O nome e a cor podem ser alterados.</p>
+              <p>A posição não pode ser modificada.</p>
+            </>
+          ) : (
+            <p>Alterar o nome e cor da coluna não afeta as tarefas existentes.</p>
+          )}
+        </div>
+      </div>
+
+      <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button onClick={() => onSave(title)} disabled={!title.trim()}>
-          {column.is_fixed ? 'Renomear' : 'Salvar'}
+        <Button onClick={() => onSave({ title, color: color || undefined })} disabled={!title.trim()}>
+          Atualizar
         </Button>
-      </div>
+      </DialogFooter>
     </div>
   )
 }

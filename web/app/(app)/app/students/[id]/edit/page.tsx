@@ -97,7 +97,8 @@ export default function EditStudentPage() {
         return
       }
       
-      const studentData = await response.json()
+      const responseData = await response.json()
+      const studentData = responseData.student || responseData // Fallback para compatibilidade
       setStudent(studentData)
       
       // Performance mark: Interactive

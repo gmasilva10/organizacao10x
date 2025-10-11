@@ -105,6 +105,17 @@ export async function POST(
       return NextResponse.json({ error: "plan_not_found_or_inactive" }, { status: 404 })
     }
 
+    // ADICIONAR: Validação para planos com valor customizado
+    if (plan.custom_value) {
+      // Para planos customizados, unit_price é obrigatório no payload
+      if (!b.unit_price || b.unit_price <= 0) {
+        return NextResponse.json({ 
+          error: "custom_value_required", 
+          message: "Este plano possui valor customizado. Você deve fornecer um valor válido." 
+        }, { status: 400 })
+      }
+    }
+
     // Verificar se já existe contrato ativo do mesmo plan_code
     const { data: existingContract, error: contractError } = await supabase
       .from('student_plan_contracts')
@@ -124,8 +135,12 @@ export async function POST(
     }
 
     // Preparar dados do contrato
-    const unit_price = b.unit_price || plan.valor
-    const currency = b.currency || plan.moeda
+    // MODIFICAR: Usar unit_price obrigatório se custom_value, senão usar valor do plano
+    const unit_price = plan.custom_value 
+      ? b.unit_price  // Obrigatório para custom_value
+      : (b.unit_price || plan.valor)  // Opcional se plano tem valor fixo
+
+    const currency = b.currency || plan.moeda || 'BRL'
     const cycle = b.cycle || plan.ciclo
     const duration_cycles = b.duration_cycles || plan.duracao_em_ciclos
 

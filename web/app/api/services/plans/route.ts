@@ -12,12 +12,27 @@ import { z } from 'zod'
 const PlanSchema = z.object({
   nome: z.string().min(1, 'Nome do plano é obrigatório'),
   descricao: z.string().optional(),
-  valor: z.number().positive('Valor deve ser positivo'),
+  custom_value: z.boolean().default(false),  // ADICIONAR
+  valor: z.number().positive('Valor deve ser positivo').nullable(),  // MODIFICAR: permitir null
   moeda: z.string().default('BRL'),
-  ciclo: z.enum(['mensal', 'trimestral', 'semestral', 'anual']).optional(),
+  ciclo: z.enum(['mensal', 'trimestral', 'semestral', 'anual']).nullable().optional(),  // MODIFICAR: nullable
   ativo: z.boolean().default(true),
   category_id: z.string().uuid('ID da categoria inválido'),
   tipo: z.enum(['receita', 'despesa']).default('receita')
+}).refine((data) => {
+  // ADICIONAR: Validação customizada
+  // Se custom_value = false, valor deve ser positivo
+  if (!data.custom_value && (!data.valor || data.valor <= 0)) {
+    return false
+  }
+  // Se custom_value = true, valor deve ser null
+  if (data.custom_value && data.valor !== null) {
+    return false
+  }
+  return true
+}, {
+  message: 'Valor inválido: para valor customizado use null, para valor fixo use valor positivo',
+  path: ['valor']
 })
 
 export async function GET(request: NextRequest) {
