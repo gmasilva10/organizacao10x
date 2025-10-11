@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { ListPageSkeleton } from "@/components/ui/skeleton"
 import { 
   Search, 
   Plus, 
@@ -224,34 +225,7 @@ export default function StudentsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="space-y-6" role="status" aria-live="polite" aria-label="Carregando lista de alunos">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Alunos</h1>
-            <p className="text-muted-foreground">Carregando...</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse" aria-hidden="true">
-              <CardHeader>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="h-3 bg-gray-200 rounded"></div>
-                  <div className="h-3 bg-gray-200 rounded"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <span className="sr-only">Carregando lista de alunos, por favor aguarde...</span>
-      </div>
-    )
+    return <ListPageSkeleton />
   }
 
   return (

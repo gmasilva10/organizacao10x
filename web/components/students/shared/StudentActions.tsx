@@ -34,6 +34,7 @@ import MessageComposer from "../../relationship/MessageComposer"
 import WhatsAppContactModal from "../modals/WhatsAppContactModal"
 import WhatsAppCreateGroupModal from "../modals/WhatsAppCreateGroupModal"
 import { DeleteStudentModal } from "../modals/DeleteStudentModal"
+import { InactivateStudentModal } from "../modals/InactivateStudentModal"
 
 interface StudentActionsProps {
   studentId: string
@@ -64,6 +65,7 @@ export default function StudentActions({
   const [messageComposerOpen, setMessageComposerOpen] = useState(false)
   const [arquivosModalOpen, setArquivosModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [inactivateModalOpen, setInactivateModalOpen] = useState(false)
   const [whatsappContactModalOpen, setWhatsappContactModalOpen] = useState(false)
   const [whatsappCreateGroupOpen, setWhatsappCreateGroupOpen] = useState(false)
 
@@ -252,6 +254,14 @@ export default function StudentActions({
           icon={<Mail className="h-5 w-5 text-blue-600" />}
         />
 
+        <InactivateStudentModal
+          open={inactivateModalOpen}
+          onClose={() => setInactivateModalOpen(false)}
+          studentId={studentId}
+          studentName={studentName}
+          onSuccess={() => onActionComplete?.('inactivate')}
+        />
+
         <DeleteStudentModal
           open={deleteModalOpen}
           onClose={() => setDeleteModalOpen(false)}
@@ -379,6 +389,13 @@ export default function StudentActions({
             </DropdownMenu>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
+              onClick={() => handleAction(() => setInactivateModalOpen(true))}
+              className="text-orange-600 focus:text-orange-600"
+            >
+              <UserCheck className="h-4 w-4 mr-2 text-orange-600" />
+              Inativar Aluno
+            </DropdownMenuItem>
+            <DropdownMenuItem 
               onClick={() => handleAction(() => setDeleteModalOpen(true))}
               className="text-destructive focus:text-destructive"
             >
@@ -449,6 +466,14 @@ export default function StudentActions({
         title="Enviar E-mail"
         description="Funcionalidade de e-mail em desenvolvimento."
         icon={<Mail className="h-5 w-5 text-blue-600" />}
+      />
+
+      <InactivateStudentModal
+        open={inactivateModalOpen}
+        onClose={() => setInactivateModalOpen(false)}
+        studentId={studentId}
+        studentName={studentName}
+        onSuccess={() => onActionComplete?.('inactivate')}
       />
 
       <DeleteStudentModal

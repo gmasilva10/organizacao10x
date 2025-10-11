@@ -19,9 +19,10 @@ export const studentIdentificationSchema = z.object({
   
   email: z
     .string()
-    .email('Email inválido')
+    .min(1, 'E-mail é obrigatório')
+    .email('Digite um e-mail válido (ex: nome@exemplo.com)')
     .toLowerCase()
-    .max(100, 'Email deve ter no máximo 100 caracteres'),
+    .max(100, 'E-mail deve ter no máximo 100 caracteres'),
   
   phone: z
     .string()

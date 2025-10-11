@@ -27,6 +27,7 @@ import {
 } from "lucide-react"
 import { showSuccessToast, showErrorToast } from "@/lib/toast-utils"
 import { processImageForUpload, validateImageRequirements, formatFileSize } from "@/utils/image-processing"
+import { studentIdentificationSchema, studentAddressSchema, formatZodErrors, validateField } from "@/lib/validators/student-schema"
 import ProfessionalSearchModal from "./ProfessionalSearchModal"
 
 type StudentCreatePayload = {
@@ -71,6 +72,7 @@ export function StudentCreateModal({
 }) {
   const [activeTab, setActiveTab] = useState("dados-basicos")
   const [loading, setLoading] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   // Dados Básicos
 	const [name, setName] = useState("")
@@ -307,10 +309,124 @@ export function StudentCreateModal({
     }
   }
 
+  // Funções de validação Zod
+  const validateBasicData = () => {
+    try {
+      studentIdentificationSchema.parse({
+        name, 
+        email, 
+        phone, 
+        status, 
+        birth_date: birthDate, 
+        gender, 
+        marital_status: maritalStatus,
+        nationality, 
+        birth_place: birthPlace, 
+        onboard_opt: onboardOpt
+      })
+      setValidationErrors({})
+      return true
+    } catch (error: any) {
+      const errors = formatZodErrors(error)
+      setValidationErrors(errors)
+      return false
+    }
+  }
+
+  const validateAddressData = () => {
+    if (!addressData.zip_code && !addressData.street) return true // Endereço opcional
+    try {
+      studentAddressSchema.parse(addressData)
+      setValidationErrors({})
+      return true
+    } catch (error: any) {
+      const errors = formatZodErrors(error)
+      setValidationErrors(errors)
+      return false
+    }
+  }
+
+  // Handlers com validação em tempo real
+  const handleNameChange = (value: string) => {
+    setName(value)
+    const fieldError = validateField(studentIdentificationSchema, 'name', value)
+    if (fieldError) {
+      setValidationErrors(prev => ({ ...prev, name: fieldError }))
+    } else {
+      setValidationErrors(prev => { 
+        const { name, ...rest } = prev
+        return rest 
+      })
+    }
+  }
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value)
+    const fieldError = validateField(studentIdentificationSchema, 'email', value)
+    if (fieldError) {
+      setValidationErrors(prev => ({ ...prev, email: fieldError }))
+    } else {
+      setValidationErrors(prev => { 
+        const { email, ...rest } = prev
+        return rest 
+      })
+    }
+  }
+
+  const handlePhoneChange = (value: string) => {
+    setPhone(value)
+    const fieldError = validateField(studentIdentificationSchema, 'phone', value)
+    if (fieldError) {
+      setValidationErrors(prev => ({ ...prev, phone: fieldError }))
+    } else {
+      setValidationErrors(prev => { 
+        const { phone, ...rest } = prev
+        return rest 
+      })
+    }
+  }
+
+  // Handlers para validação de endereço
+  const handleZipCodeChange = (value: string) => {
+    setAddressData({ ...addressData, zip_code: value })
+    const fieldError = validateField(studentAddressSchema, 'zip_code', value)
+    if (fieldError) {
+      setValidationErrors(prev => ({ ...prev, 'address.zip_code': fieldError }))
+    } else {
+      setValidationErrors(prev => { 
+        const { 'address.zip_code': _, ...rest } = prev
+        return rest 
+      })
+    }
+  }
+
+  const handleStreetChange = (value: string) => {
+    setAddressData({ ...addressData, street: value })
+    const fieldError = validateField(studentAddressSchema, 'street', value)
+    if (fieldError) {
+      setValidationErrors(prev => ({ ...prev, 'address.street': fieldError }))
+    } else {
+      setValidationErrors(prev => { 
+        const { 'address.street': _, ...rest } = prev
+        return rest 
+      })
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault()
-    if (!name || !validEmail(email)) {
-      showErrorToast('Nome e e-mail válido são obrigatórios')
+    
+    // Validar dados básicos com Zod
+    if (!validateBasicData()) {
+      showErrorToast('Por favor, corrija os erros antes de salvar')
+      setActiveTab("dados-basicos") // Voltar para aba com erro
+      return
+    }
+
+    // Validar dados de endereço se preenchidos
+    if (!validateAddressData()) {
+      showErrorToast('Por favor, corrija os erros de endereço antes de salvar')
+      setActiveTab("endereco") // Voltar para aba de endereço
       return
     }
 
@@ -486,12 +602,18 @@ export function StudentCreateModal({
                         <Input
                           id="name"
                           value={name}
-                          onChange={(e) => setName(e.target.value)}
+                          onChange={(e) => handleNameChange(e.target.value)}
                           placeholder="Ex: João Silva"
                           className="pl-10"
                           required
+                          disabled={loading}
+                          aria-invalid={!!validationErrors.name}
+                          aria-describedby={validationErrors.name ? "name-error" : undefined}
                         />
                       </div>
+                      {validationErrors.name && (
+                        <p id="name-error" className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+                      )}
                     </div>
 
                     <div>
@@ -504,14 +626,17 @@ export function StudentCreateModal({
                           id="email"
                           type="email"
                           value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          onChange={(e) => handleEmailChange(e.target.value)}
                           placeholder="Ex: joao@email.com"
                           className="pl-10"
                           required
+                          disabled={loading}
+                          aria-invalid={!!validationErrors.email}
+                          aria-describedby={validationErrors.email ? "email-error" : undefined}
                         />
                       </div>
-                      {email && !validEmail(email) && (
-                        <p className="mt-1 text-xs text-red-600">E-mail inválido</p>
+                      {validationErrors.email && (
+                        <p id="email-error" className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
                       )}
                     </div>
                   </div>
@@ -526,11 +651,17 @@ export function StudentCreateModal({
                         id="phone"
                         inputMode="tel"
                         value={phone}
-                        onChange={(e) => setPhone(formatPhone(e.target.value))}
+                        onChange={(e) => handlePhoneChange(formatPhone(e.target.value))}
                         placeholder="(11) 91234-5678"
                         className="pl-10"
+                        disabled={loading}
+                        aria-invalid={!!validationErrors.phone}
+                        aria-describedby={validationErrors.phone ? "phone-error" : undefined}
                       />
                     </div>
+                    {validationErrors.phone && (
+                      <p id="phone-error" className="mt-1 text-sm text-red-600">{validationErrors.phone}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -759,9 +890,11 @@ export function StudentCreateModal({
                         <Input
                           id="zip_code"
                           value={addressData.zip_code}
-                          onChange={(e) => setAddressData({ ...addressData, zip_code: formatZipCode(e.target.value) })}
+                          onChange={(e) => handleZipCodeChange(formatZipCode(e.target.value))}
                           placeholder="00000-000"
                           maxLength={9}
+                          aria-invalid={!!validationErrors['address.zip_code']}
+                          aria-describedby={validationErrors['address.zip_code'] ? "zip_code-error" : undefined}
                         />
                         <Button
                           type="button"
@@ -772,6 +905,9 @@ export function StudentCreateModal({
                           Buscar
                         </Button>
                       </div>
+                      {validationErrors['address.zip_code'] && (
+                        <p id="zip_code-error" className="mt-1 text-sm text-red-600">{validationErrors['address.zip_code']}</p>
+                      )}
                     </div>
 
                     <div className="md:col-span-2">
@@ -781,9 +917,14 @@ export function StudentCreateModal({
                       <Input
                         id="street"
                         value={addressData.street}
-                        onChange={(e) => setAddressData({ ...addressData, street: e.target.value })}
+                        onChange={(e) => handleStreetChange(e.target.value)}
                         placeholder="Ex: Rua das Flores"
+                        aria-invalid={!!validationErrors['address.street']}
+                        aria-describedby={validationErrors['address.street'] ? "street-error" : undefined}
                       />
+                      {validationErrors['address.street'] && (
+                        <p id="street-error" className="mt-1 text-sm text-red-600">{validationErrors['address.street']}</p>
+                      )}
                     </div>
                   </div>
 

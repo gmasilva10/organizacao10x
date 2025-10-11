@@ -1,17 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { AlertTriangle, Loader2 } from "lucide-react"
-import { showStudentError, showSuccessToast } from "@/lib/toast-utils"
+import { AlertTriangle } from "lucide-react"
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
+import { showStudentError, showStudentDeleted } from "@/lib/toast-utils"
 
 interface DeleteStudentModalProps {
   open: boolean
@@ -28,11 +19,7 @@ export function DeleteStudentModal({
   studentName,
   onSuccess
 }: DeleteStudentModalProps) {
-  const [deleting, setDeleting] = useState(false)
-
   const handleDelete = async () => {
-    setDeleting(true)
-    
     try {
       const response = await fetch(`/api/students/${studentId}`, {
         method: 'DELETE',
@@ -44,87 +31,33 @@ export function DeleteStudentModal({
         throw new Error(data.message || 'Erro ao excluir aluno')
       }
 
-      showSuccessToast(`Aluno "${studentName}" excluído com sucesso!`)
+      showStudentDeleted()
       onSuccess?.()
-      onClose()
     } catch (error: any) {
       console.error('Erro ao excluir aluno:', error)
-      showStudentError(error.message || 'Erro ao excluir aluno')
-    } finally {
-      setDeleting(false)
+      showStudentError(`excluir aluno: ${error.message || 'Erro desconhecido'}`)
+      throw error // Re-throw para que o ConfirmDialog mostre o estado de erro
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
-              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-            </div>
-            <div>
-              <DialogTitle>Excluir Aluno</DialogTitle>
-              <DialogDescription>
-                Esta ação não pode ser desfeita
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-
-        <div className="space-y-4 py-4">
-          <div className="rounded-lg bg-muted p-4 space-y-2">
-            <p className="text-sm font-medium">
-              Tem certeza que deseja excluir o aluno:
-            </p>
-            <p className="text-sm font-semibold text-foreground">
-              {studentName}
-            </p>
-          </div>
-
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p className="font-medium">⚠️ Consequências da exclusão:</p>
-            <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>Todos os dados do aluno serão removidos</li>
-              <li>Ocorrências relacionadas serão mantidas</li>
-              <li>Histórico de relacionamento será mantido</li>
-              <li>Esta ação é permanente</li>
-            </ul>
-          </div>
-        </div>
-
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={deleting}
-          >
-            Cancelar
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
-            aria-label={`Excluir aluno ${studentName}`}
-          >
-            {deleting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Excluindo...
-              </>
-            ) : (
-              <>
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                Excluir
-              </>
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <ConfirmDialog
+      open={open}
+      onClose={onClose}
+      onConfirm={handleDelete}
+      title="Excluir Aluno"
+      description="Esta ação não pode ser desfeita"
+      confirmLabel="Excluir"
+      confirmVariant="destructive"
+      icon={<AlertTriangle className="h-5 w-5" />}
+      entityName={studentName}
+      consequences={[
+        'Todos os dados do aluno serão removidos',
+        'Ocorrências relacionadas serão mantidas',
+        'Histórico de relacionamento será mantido',
+        'Esta ação é permanente'
+      ]}
+    />
   )
 }
 

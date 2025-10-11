@@ -294,9 +294,82 @@ AUTH / SESS O (App Router)
 - Padrão_Botões.md: Guidelines de botões e cards
 - Padrão_Filtros.md: Guidelines de filtros e drawer
 
+[MÓDULO DE ALUNOS - Padrões v1.0]
+
+Validações Zod
+- Zod obrigatório em todos os formulários
+- Schemas em web/lib/validators/student-schema.ts
+- studentIdentificationSchema: nome, email, telefone, status, data nascimento
+- studentAddressSchema: CEP, rua, número, cidade, estado
+- Validação em tempo real para campos críticos (nome, email, telefone)
+- Mensagens inline abaixo do campo com erro
+- formatZodErrors() para converter erros Zod para objeto
+- aria-invalid={!!error} e aria-describedby="field-error" nos inputs
+
+Modais de Confirmação
+- ConfirmDialog genérico em web/components/ui/ConfirmDialog.tsx
+- Sempre para ações destrutivas (delete, inativar)
+- Props: open, onClose, onConfirm, title, description, confirmLabel, confirmVariant
+- Lista de consequências obrigatória (consequences array)
+- Loading state durante operação com Loader2
+- Toast após sucesso/erro usando showStudentDeleted/showStudentInactivated
+- Icon personalizado (AlertTriangle para exclusão, UserCheck para inativação)
+
+Skeleton Loaders
+- Skeleton component em web/components/ui/skeleton.tsx
+- StudentCardSkeleton para cards de listagem
+- FormSkeleton para formulários
+- EditPageSkeleton para páginas de edição
+- ListPageSkeleton para páginas de listagem
+- Aparecer instantaneamente (não esperar 300ms)
+- Aria-live="polite" para screen readers
+- role="status" em containers de skeleton
+
+Loading States
+- disabled={loading} em botões e inputs
+- Loader2 icon + texto descritivo ("Salvando...", "Criando...")
+- aria-busy={loading} para acessibilidade
+- Prevenir double-submit
+- Estados específicos: saving, loading, deleting, uploading
+
+Cache Invalidation
+- queryClient.invalidateQueries após mutações
+- Invalidar ['students', 'list'] e ['students']
+- exact: false para pegar todas as variações
+- Log de debug após invalidação
+- Callback onActionComplete para atualizar dados pai
+
+Upload de Fotos
+- processImageForUpload() para redimensionar (800x800px)
+- validateImageRequirements() para tamanho (< 2MB)
+- Formatos: JPG, PNG, WEBP
+- Preview com dimensões e tamanho processado
+- Estados: uploading, preview, dimensions, processedSize
+
+Busca de CEP
+- ViaCEP API para busca automática
+- formatZipCode() para máscara (00000-000)
+- Preenchimento automático de endereço
+- Validação de CEP válido
+
+Responsáveis
+- ProfessionalSearchModal para busca
+- Suporte a responsável principal e apoio
+- Roles: ['principal'], ['apoio'], ['especifico']
+- Validação de pelo menos um responsável principal
+
+Sincronização Kanban
+- Automática quando status='onboarding' e onboard_opt='enviar'
+- POST /api/kanban/resync com student_id e org_id
+- Fallback org_id do body para chamadas internas
+- Logs detalhados de debug
+
 ### Próximas Implementações
 - Paginação real (50 alunos/página)
 - Virtual scrolling para listas grandes
-- Busca por CEP com preenchimento automático
-- Testes E2E automatizados (Playwright)
-- Aria-labels completos e navegação por teclado otimizada
+- Histórico de alterações
+- Exportação de dados
+- Importação em lote
+- Relatórios avançados
+- Notificações push
+- API GraphQL

@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import StudentEditTabsV6 from "@/components/students/StudentEditTabsV6"
 import CompactHeader from "@/components/ui/CompactHeader"
+import { EditPageSkeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import Link from "next/link"
 import BackButton from "@/components/ui/BackButton"
@@ -259,40 +260,7 @@ export default function EditStudentPage() {
   }
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        {/* Header Ultra Compacto - Loading */}
-        <div className="flex items-center justify-between py-1">
-          <div className="flex items-center gap-3">
-            <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <Link href="/app" className="hover:text-foreground">Dashboard</Link>
-              <span>/</span>
-              <Link href="/app/students" className="hover:text-foreground">Alunos</Link>
-              <span>/</span>
-              <span className="text-foreground font-medium">Editar</span>
-            </nav>
-            <div className="h-4 w-px bg-border"></div>
-            <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled>Cancelar</Button>
-            <Button size="sm" disabled>Salvar</Button>
-          </div>
-        </div>
-        <Card>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
-                  <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
+    return <EditPageSkeleton />
   }
 
   if (error) {
