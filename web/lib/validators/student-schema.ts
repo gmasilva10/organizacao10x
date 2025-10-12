@@ -164,8 +164,9 @@ export function validateField(
     return null
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const fieldError = error.errors.find((err) => err.path.includes(fieldName))
-      return fieldError?.message || 'Erro de validação'
+      // Pegar o primeiro erro (geralmente é o mais relevante)
+      const firstError = error.errors[0]
+      return firstError?.message || 'Erro de validação'
     }
     return 'Erro de validação'
   }
