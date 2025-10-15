@@ -382,7 +382,7 @@ async function processPurchaseApproved(
   const paymentMethod = paymentMethodMapping[data.purchase.payment.type] || 'other'
   
   // Criar vínculo na tabela student_services
-  const { error: serviceError } = await supabase
+  const { data: newService, error: serviceError } = await supabase
     .from('student_services')
     .insert({
       org_id: orgId,
@@ -399,10 +399,84 @@ async function processPurchaseApproved(
       start_date: new Date(data.purchase.approved_date).toISOString().split('T')[0],
       is_active: mapping.auto_activate
     })
+    .select('id')
+    .single()
   
   if (serviceError) {
     console.error(`[PURCHASE_APPROVED] Error creating student_service: ${serviceError.message}`)
     throw serviceError
+  }
+
+  // NOVO: Criar transação financeira (receita)
+  const serviceId = newService?.id
+  const purchaseAmount = parseFloat(data.purchase.price.value || 0)
+  
+  console.log(`[PURCHASE_APPROVED] Creating financial transaction: R$ ${purchaseAmount}`)
+  
+  const { error: transactionError } = await supabase
+    .from('financial_transactions')
+    .insert({
+      org_id: orgId,
+      student_id: studentId,
+      service_id: serviceId,
+      type: 'receita',
+      category: 'plano',
+      amount: purchaseAmount,
+      description: `Compra do plano ${mapping.plan.nome} via Hotmart`,
+      payment_method: 'hotmart',
+      status: 'pago',
+      paid_at: new Date(data.purchase.approved_date).toISOString(),
+      external_transaction_id: hotmartTransactionId,
+      external_source: 'hotmart',
+      metadata: {
+        hotmart_product_id: data.product.id,
+        hotmart_product_name: data.product.name,
+        hotmart_order_ref: data.purchase.order_ref,
+        buyer_name: data.buyer.name,
+        buyer_email: data.buyer.email,
+        payment_type: data.purchase.payment.type,
+        installments: data.purchase.payment.installments_number
+      }
+    })
+
+  if (transactionError) {
+    console.error(`[PURCHASE_APPROVED] Error creating financial transaction: ${transactionError.message}`)
+    // Não falhar o webhook por erro financeiro, apenas logar
+  } else {
+    console.log(`[PURCHASE_APPROVED] Financial transaction created successfully`)
+  }
+
+  // NOVO: Calcular next_renewal_date baseado no ciclo do plano
+  if (newService?.id && billingCycle !== 'one_off') {
+    const startDate = new Date(data.purchase.approved_date)
+    let nextRenewalDate: Date | null = null
+    
+    switch (billingCycle) {
+      case 'monthly':
+        nextRenewalDate = new Date(startDate.setMonth(startDate.getMonth() + 1))
+        break
+      case 'quarterly':
+        nextRenewalDate = new Date(startDate.setMonth(startDate.getMonth() + 3))
+        break
+      case 'semiannual':
+        nextRenewalDate = new Date(startDate.setMonth(startDate.getMonth() + 6))
+        break
+      case 'annual':
+        nextRenewalDate = new Date(startDate.setFullYear(startDate.getFullYear() + 1))
+        break
+    }
+
+    if (nextRenewalDate) {
+      await supabase
+        .from('student_services')
+        .update({
+          next_renewal_date: nextRenewalDate.toISOString().split('T')[0],
+          renewal_status: 'ativo'
+        })
+        .eq('id', newService.id)
+      
+      console.log(`[PURCHASE_APPROVED] Next renewal date set: ${nextRenewalDate.toISOString().split('T')[0]}`)
+    }
   }
   
   // 5. DISPARAR ONBOARDING (se configurado)
@@ -462,6 +536,59 @@ async function processPurchaseRefunded(
       .from('hotmart_transactions')
       .update({ student_id: student.id })
       .eq('id', transactionId)
+
+    // NOVO: Criar transação financeira de despesa (reembolso)
+    const refundAmount = parseFloat(data.purchase?.price?.value || 0)
+    
+    if (refundAmount > 0) {
+      console.log(`[PURCHASE_REFUNDED] Creating refund transaction: R$ ${refundAmount}`)
+      
+      const hotmartTransactionId = data.purchase?.transaction || transactionId
+      
+      const { error: refundError } = await supabase
+        .from('financial_transactions')
+        .insert({
+          org_id: orgId,
+          student_id: student.id,
+          type: 'despesa',
+          category: 'reembolso',
+          amount: refundAmount,
+          description: `Reembolso - ${data.product?.name || 'Produto Hotmart'}`,
+          payment_method: 'hotmart',
+          status: 'pago',
+          paid_at: new Date().toISOString(),
+          external_transaction_id: hotmartTransactionId,
+          external_source: 'hotmart',
+          metadata: {
+            hotmart_product_id: data.product?.id,
+            hotmart_product_name: data.product?.name,
+            hotmart_order_ref: data.purchase?.order_ref,
+            buyer_name: data.buyer?.name,
+            buyer_email: data.buyer?.email,
+            refund_reason: data.refund_reason || 'Não especificado'
+          }
+        })
+
+      if (refundError) {
+        console.error(`[PURCHASE_REFUNDED] Error creating refund transaction: ${refundError.message}`)
+      } else {
+        console.log(`[PURCHASE_REFUNDED] Refund transaction created successfully`)
+      }
+    }
+
+    // NOVO: Cancelar renovação dos contratos ativos
+    await supabase
+      .from('student_services')
+      .update({
+        renewal_status: 'cancelado',
+        status: 'ended',
+        updated_at: new Date().toISOString()
+      })
+      .eq('student_id', student.id)
+      .eq('org_id', orgId)
+      .eq('status', 'active')
+
+    console.log(`[PURCHASE_REFUNDED] Student services cancelled for ${student.id}`)
   }
   
   // TODO: Notificar admin sobre o reembolso

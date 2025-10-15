@@ -17,8 +17,13 @@ export function Hero() {
   const isDark = theme === "dark"
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    // Forçar re-render após hidratação completa
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
+  }, [])
 
+  // Fallback seguro para SSR
   const logoSrc = mounted ? (isDark ? "/logo_branca.png" : "/logo_preta.png") : "/logo_preta.png"
   const logoOpacity = 0.9
   const logoExitOpacity = 0

@@ -20,7 +20,7 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 import { motion, LayoutGroup } from "framer-motion"
 import { useTheme } from "@/lib/use-theme"
-import { useState, Suspense } from "react"
+import { useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { useToast } from "@/components/ui/toast"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -84,9 +84,9 @@ function LoginDrawerContent() {
             }
             toast.success("Login realizado com sucesso.")
             setOpen(false)
-            // Aguardar propagação de cookies e forçar reload completo
-            await new Promise(resolve => setTimeout(resolve, 300))
-            window.location.href = "/app"
+            
+            // Navegar para página de loading antes do dashboard
+            router.push("/loading")
         } catch {
             toast.error("Erro ao autenticar. Tente novamente.")
         }
@@ -180,9 +180,5 @@ function LoginDrawerContent() {
 }
 
 export function LoginDrawer() {
-    return (
-        <Suspense fallback={<div>Carregando...</div>}>
-            <LoginDrawerContent />
-        </Suspense>
-    )
+    return <LoginDrawerContent />
 }

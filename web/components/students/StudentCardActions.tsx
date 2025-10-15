@@ -29,6 +29,7 @@ const StudentCardActions = memo(function StudentCardActions({ studentId, student
                 href={`/app/students/${studentId}/edit`}
                 onMouseEnter={onHover}
                 onFocus={onHover}
+                aria-label={`Editar aluno ${studentName}`}
               >
                 <Edit className="h-3 w-3" />
               </Link>

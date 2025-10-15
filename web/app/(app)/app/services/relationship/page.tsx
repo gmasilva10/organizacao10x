@@ -38,10 +38,11 @@ import {
 import { toast } from 'sonner'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { RELATIONSHIP_VARIABLES, VARIABLE_CATEGORIES, getVariablesByCategory } from '@/lib/relationship-variables'
+import { TemplateFormModal } from '@/components/relationship/TemplateFormModal'
 
 interface Template {
   id: string
-  code: string
+  code: string // Gerado automaticamente no backend
   title: string
   anchor: string
   touchpoint: string
@@ -50,11 +51,13 @@ interface Template {
   message_v1: string
   message_v2?: string
   active: boolean
-  priority: number
+  temporal_offset_days?: number | null
+  temporal_anchor_field?: string | null
   audience_filter: any
   variables: string[]
   created_at: string
   updated_at: string
+  org_id: string
 }
 
 const ANCHOR_OPTIONS = [
@@ -84,23 +87,8 @@ export default function RelationshipServicesPage() {
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<Template | null>(null)
-  const [showForm, setShowForm] = useState(false)
-  const [showVariables, setShowVariables] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<string>('pessoal')
-  const [formData, setFormData] = useState<Partial<Template>>({
-    code: '',
-    title: '',
-    anchor: '',
-    touchpoint: '',
-    suggested_offset: '',
-    channel_default: 'whatsapp',
-    message_v1: '',
-    message_v2: '',
-    active: true,
-    priority: 0,
-    audience_filter: {},
-    variables: []
-  })
+  const [modalOpen, setModalOpen] = useState(false)
+  const [seedingTemplates, setSeedingTemplates] = useState(false)
 
   // Buscar templates
   const fetchTemplates = async () => {
@@ -127,60 +115,25 @@ export default function RelationshipServicesPage() {
     fetchTemplates()
   }, [])
 
-  // Salvar template
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    try {
-      const url = editing ? `/api/relationship/templates/${editing.id}` : '/api/relationship/templates'
-      const method = editing ? 'PATCH' : 'POST'
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-      
-      if (response.ok) {
-        toast.success(editing ? 'Template atualizado!' : 'Template criado!')
-        setShowForm(false)
-        setEditing(null)
-        setFormData({
-          code: '',
-          title: '',
-          anchor: '',
-          touchpoint: '',
-          suggested_offset: '',
-          channel_default: 'whatsapp',
-          message_v1: '',
-          message_v2: '',
-          active: true,
-          priority: 0,
-          audience_filter: {},
-          variables: []
-        })
-        fetchTemplates()
-      } else {
-        toast.error('Erro ao salvar template')
-      }
-    } catch (error) {
-      console.error('Erro ao salvar template:', error)
-      toast.error('Erro ao salvar template')
-    }
-  }
-
   // Editar template
   const handleEdit = (template: Template) => {
     setEditing(template)
-    setFormData(template)
-    setShowForm(true)
+    setModalOpen(true)
   }
 
-  // Inserir variável no texto
-  const insertVariable = (variable: string) => {
-    const currentValue = formData.message_v1 || ''
-    const newValue = currentValue + variable
-    setFormData(prev => ({ ...prev, message_v1: newValue }))
+  // Success callback do modal
+  const handleModalSuccess = () => {
+    toast.success(editing ? 'Template atualizado!' : 'Template criado!')
+    setEditing(null)
+    fetchTemplates()
+  }
+
+  // Close callback do modal
+  const handleModalClose = (open: boolean) => {
+    if (!open) {
+      setEditing(null)
+    }
+    setModalOpen(open)
   }
 
   // Excluir template
@@ -207,21 +160,30 @@ export default function RelationshipServicesPage() {
   // Novo template
   const handleNew = () => {
     setEditing(null)
-    setFormData({
-      code: '',
-      title: '',
-      anchor: '',
-      touchpoint: '',
-      suggested_offset: '',
-      channel_default: 'whatsapp',
-      message_v1: '',
-      message_v2: '',
-      active: true,
-      priority: 0,
-      audience_filter: {},
-      variables: []
-    })
-    setShowForm(true)
+    setModalOpen(true)
+  }
+
+  // Popular templates padrão
+  const handleSeedTemplates = async () => {
+    try {
+      setSeedingTemplates(true)
+      const response = await fetch('/api/relationship/seed-templates', {
+        method: 'POST'
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        toast.success(`${data.inserted} templates padrão criados!`)
+        fetchTemplates()
+      } else {
+        toast.error('Erro ao popular templates')
+      }
+    } catch (error) {
+      console.error('Erro ao popular templates:', error)
+      toast.error('Erro ao popular templates')
+    } finally {
+      setSeedingTemplates(false)
+    }
   }
 
   return (
@@ -234,10 +196,21 @@ export default function RelationshipServicesPage() {
             Configure templates de mensagens e parametrização para o fluxo de relacionamento.
           </p>
         </div>
-        <Button onClick={handleNew} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Novo Template
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleSeedTemplates} 
+            variant="outline"
+            disabled={seedingTemplates}
+            className="flex items-center gap-2"
+          >
+            <Heart className="h-4 w-4" />
+            {seedingTemplates ? 'Populando...' : 'Templates Padrão'}
+          </Button>
+          <Button onClick={handleNew} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Novo Template
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -250,7 +223,8 @@ export default function RelationshipServicesPage() {
 
         {/* Templates */}
         <TabsContent value="templates" className="space-y-6">
-          {showForm && (
+          {/* Formulário inline removido - agora usa modal premium */}
+          {false && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -260,25 +234,17 @@ export default function RelationshipServicesPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSave} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium">Código</label>
-                      <Input
-                        value={formData.code || ''}
-                        onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                        placeholder="Ex: MSG1"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Título</label>
-                      <Input
-                        value={formData.title || ''}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        placeholder="Ex: Logo Após a Venda"
-                        required
-                      />
-                    </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Título *</label>
+                    <Input
+                      value={formData.title || ''}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Ex: Boas-vindas após Fechamento"
+                      required
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      O código será gerado automaticamente (ex: 0001, 0002, etc)
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -319,14 +285,23 @@ export default function RelationshipServicesPage() {
                       </Select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Prioridade</label>
+                      <label className="text-sm font-medium">Tempo (dias)</label>
                       <Input
                         type="number"
-                        value={formData.priority || 0}
-                        onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })}
-                        min="0"
-                        max="100"
+                        value={formData.temporal_offset_days || ''}
+                        onChange={(e) => setFormData({ ...formData, temporal_offset_days: e.target.value ? parseInt(e.target.value) : null })}
+                        placeholder="Ex: 8 (para 8 dias depois)"
+                        min="-365"
+                        max="365"
                       />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Deixe vazio para envio imediato. Positivo = depois, negativo = antes
+                      </p>
+                      {formData.temporal_offset_days !== null && formData.anchor && (
+                        <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-700">
+                          <strong>📅 Esta mensagem será enviada {formData.temporal_offset_days > 0 ? `${formData.temporal_offset_days} dias após` : formData.temporal_offset_days < 0 ? `${Math.abs(formData.temporal_offset_days)} dias antes de` : 'no momento do'} {ANCHOR_OPTIONS.find(a => a.value === formData.anchor)?.label || formData.anchor}</strong>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -351,6 +326,15 @@ export default function RelationshipServicesPage() {
                       required
                     />
                   </div>
+
+                  {/* Preview da Mensagem */}
+                  {formData.message_v1 && formData.message_v1.trim() !== '' && (
+                    <MessagePreview 
+                      template={formData.message_v1}
+                      anchor={formData.anchor}
+                      temporalOffset={formData.temporal_offset_days}
+                    />
+                  )}
 
                   {/* Seletor de Variáveis */}
                   {showVariables && (
@@ -498,7 +482,12 @@ export default function RelationshipServicesPage() {
                             <strong>Canal:</strong> {CHANNEL_OPTIONS.find(c => c.value === template.channel_default)?.label || template.channel_default}
                           </p>
                           <p className="text-sm text-gray-600 mb-2">
-                            <strong>Prioridade:</strong> {template.priority}
+                            <strong>Tempo:</strong> {
+                              template.temporal_offset_days === null ? 'Imediato' :
+                              template.temporal_offset_days === 0 ? 'No momento do evento' :
+                              template.temporal_offset_days > 0 ? `${template.temporal_offset_days} dias após` :
+                              `${Math.abs(template.temporal_offset_days)} dias antes`
+                            }
                           </p>
                           <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded">
                             <strong>Mensagem:</strong> {template.message_v1}
@@ -626,6 +615,14 @@ export default function RelationshipServicesPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modal Premium de Template */}
+      <TemplateFormModal
+        open={modalOpen}
+        onOpenChange={handleModalClose}
+        onSuccess={handleModalSuccess}
+        template={editing}
+      />
     </div>
   )
 }

@@ -1,71 +1,113 @@
-import { NextRequest, NextResponse } from "next/server"
-import { createClient } from '@/utils/supabase/server'
-import { withOccurrencesRBAC } from '@/server/withOccurrencesRBAC'
-import { RELATIONSHIP_TEMPLATE_SEEDS } from '@/lib/relationship/template-seeds'
+/**
+ * Seed Templates - Endpoint para popular templates padrão
+ * 
+ * POST /api/relationship/seed-templates
+ * Popula o banco com templates prontos para uso
+ */
 
-// Forçar execução dinâmica para evitar problemas de renderização estática
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+import { NextRequest, NextResponse } from 'next/server'
+import { DEFAULT_TEMPLATES } from '@/lib/relationship/default-templates'
+import { createClient } from '@supabase/supabase-js'
+import { resolveRequestContext } from '@/server/context'
 
+const supabaseUrl = process.env.SUPABASE_URL!
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export async function POST(request: NextRequest) {
-  return withOccurrencesRBAC(request, 'occurrences.write', async (request, { user, membership, org_id }) => {
-    try {
-      const supabase = await createClient()
-      
-      // Verificar se já existem templates para este tenant
-      const { data: existingTemplates, error: checkError } = await supabase
-        .from('relationship_templates')
-        .select('id')
-        .eq('org_id', org_id)
-        .limit(1)
-      
-      if (checkError) {
-        console.error('Erro ao verificar templates existentes:', checkError)
-        return NextResponse.json({ error: 'Erro ao verificar templates' }, { status: 500 })
-      }
-      
-      if (existingTemplates && existingTemplates.length > 0) {
-        return NextResponse.json({ 
-          message: 'Templates já existem para este tenant',
-          count: existingTemplates.length
-        })
-      }
-      
-      // Aplicar seeds no modelo MVP (title/type/content)
-      const templatesToInsert = RELATIONSHIP_TEMPLATE_SEEDS.map(template => ({
-        org_id,
-        title: `${template.code} - ${template.touchpoint}`,
-        type: 'whatsapp',
-        content: JSON.stringify({ ...template, active: template.active ?? true }),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+  const startTime = Date.now()
+  
+  try {
+    const ctx = await resolveRequestContext(request)
+    if (!ctx) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    }
+    
+    // Apenas admins podem popular templates
+    if (ctx.role !== 'admin') {
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    }
+    
+    const orgId = ctx.org_id
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    
+    // Verificar se já existem templates
+    const { data: existingTemplates } = await supabase
+      .from('relationship_templates_v2')
+      .select('code')
+      .eq('org_id', orgId)
+    
+    const existingCodes = new Set((existingTemplates || []).map((t: any) => t.code))
+    
+    // Filtrar apenas templates que ainda não existem
+    const templatesToInsert = DEFAULT_TEMPLATES
+      .filter(t => !existingCodes.has(t.code))
+      .map(t => ({
+        ...t,
+        org_id: orgId
       }))
-      
-      const { data: insertedTemplates, error: insertError } = await supabase
-        .from('relationship_templates')
-        .insert(templatesToInsert)
-        .select('id, title')
-      
-      if (insertError) {
-        console.error('Erro ao inserir templates:', insertError)
-        return NextResponse.json({ error: 'Erro ao inserir templates' }, { status: 500 })
-      }
-      
+    
+    if (templatesToInsert.length === 0) {
       return NextResponse.json({
-        message: 'Templates aplicados com sucesso',
-        count: insertedTemplates?.length || 0,
-        templates: insertedTemplates
+        success: true,
+        message: 'Todos os templates padrão já existem',
+        inserted: 0,
+        skipped: DEFAULT_TEMPLATES.length,
+        duration_ms: Date.now() - startTime
       })
-      
-    } catch (error) {
-      console.error('Erro na API /relationship/seed-templates:', error)
-      return NextResponse.json({ 
-        error: 'Erro interno do servidor',
-        details: (error as any)?.message || String(error) 
+    }
+    
+    // Inserir templates em lote
+    const { data, error } = await supabase
+      .from('relationship_templates_v2')
+      .insert(templatesToInsert)
+      .select()
+    
+    if (error) {
+      console.error('Erro ao inserir templates:', error)
+      return NextResponse.json({
+        success: false,
+        error: 'insert_failed',
+        details: error.message,
+        duration_ms: Date.now() - startTime
       }, { status: 500 })
     }
-  })
+    
+    const duration = Date.now() - startTime
+    
+    return NextResponse.json({
+      success: true,
+      message: `${templatesToInsert.length} templates padrão inseridos com sucesso`,
+      inserted: templatesToInsert.length,
+      skipped: existingCodes.size,
+      templates: data,
+      duration_ms: duration
+    })
+    
+  } catch (error) {
+    console.error('Erro ao popular templates:', error)
+    return NextResponse.json({
+      success: false,
+      error: 'internal_error',
+      details: (error as any)?.message || String(error),
+      duration_ms: Date.now() - startTime
+    }, { status: 500 })
+  }
 }
 
+/**
+ * GET - Lista templates padrão disponíveis (sem inserir)
+ */
+export async function GET(request: NextRequest) {
+  try {
+    return NextResponse.json({
+      templates: DEFAULT_TEMPLATES,
+      count: DEFAULT_TEMPLATES.length
+    })
+    
+  } catch (error) {
+    return NextResponse.json({
+      error: 'internal_error',
+      details: (error as any)?.message || String(error)
+    }, { status: 500 })
+  }
+}

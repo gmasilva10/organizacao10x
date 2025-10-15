@@ -1,0 +1,5 @@
+"Identifique a causa raiz do problema antes de propor uma solução, listando possíveis origens da falha."
+"Proporcione uma análise abrangente do problema, considerando diferentes ângulos e possíveis causas."
+"Compare diferentes abordagens para resolver o problema, destacando prós e contras de cada uma."
+"Sugira logs e pontos de depuração estratégicos para ajudar na identificação do problema."
+"Identifique potenciais gargalos ou problemas de desempenho no código atual."

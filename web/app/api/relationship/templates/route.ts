@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
 import { logEvent } from "@/server/events"
+import { generateNextTemplateCode } from "@/lib/relationship/code-generator"
 
 function canRead(role: string) { return ['admin','manager','trainer','seller','support'].includes(role) }
 function canWrite(role: string) { return ['admin','manager','trainer'].includes(role) }
@@ -12,41 +13,10 @@ export async function GET(request: Request) {
   const orgId = ctx.org_id
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const readV2 = process.env.REL_TEMPLATES_V2_READ === '1'
-  if (readV2) {
-    const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${orgId}&order=priority.asc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
-    const itemsV2 = await respV2.json().catch(()=>[])
-    return NextResponse.json({ items: itemsV2 })
-  }
-  const resp = await fetch(`${url}/rest/v1/relationship_templates?org_id=eq.${orgId}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
-  const items = await resp.json().catch(()=>[])
-  
-  // Processar items para extrair dados do content JSON
-  const processedItems = items.map((item: any) => {
-    try {
-      const contentData = JSON.parse(item.content || '{}')
-      return {
-        id: item.id,
-        org_id: item.org_id,
-        created_at: item.created_at,
-        updated_at: item.updated_at,
-        ...contentData // Spread dos dados do content
-      }
-    } catch (e) {
-      // Se não conseguir parsear, retornar dados básicos
-      return {
-        id: item.id,
-        org_id: item.org_id,
-        title: item.title,
-        type: item.type,
-        content: item.content,
-        created_at: item.created_at,
-        updated_at: item.updated_at
-      }
-    }
-  })
-  
-  return NextResponse.json({ items: processedItems })
+  // Always use V2 templates now
+  const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${orgId}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+  const itemsV2 = await respV2.json().catch(()=>[])
+  return NextResponse.json({ items: itemsV2 })
 }
 
 export async function POST(request: Request) {
@@ -55,8 +25,8 @@ export async function POST(request: Request) {
   if (!canWrite(ctx.role)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   const orgId = ctx.org_id
   const userId = ctx.userId
+  
   type Body = { 
-    code?: string; 
     title?: string; 
     anchor?: string; 
     touchpoint?: string; 
@@ -65,61 +35,64 @@ export async function POST(request: Request) {
     message_v1?: string; 
     message_v2?: string; 
     active?: boolean; 
-    priority?: number; 
+    temporal_offset_days?: number | null; 
+    temporal_anchor_field?: string | null; 
     audience_filter?: any; 
     variables?: any[] 
   }
   const body: Body = await request.json().catch(()=>({}))
   
-  // Mapear para a estrutura da tabela relationship_templates
-  const templateData = {
-    code: String(body.code||''),
-    title: String(body.title||''),
-    anchor: String(body.anchor||''),
-    touchpoint: String(body.touchpoint||''),
-    suggested_offset: String(body.suggested_offset||''),
-    channel_default: String(body.channel_default||'whatsapp'),
-    message_v1: String(body.message_v1||''),
-    message_v2: String(body.message_v2||''),
-    active: Boolean(body.active),
-    priority: Number(body.priority||0),
-    audience_filter: body.audience_filter || {},
-    variables: body.variables || []
-  }
+  // Gerar código sequencial automaticamente (4 dígitos)
+  const code = await generateNextTemplateCode(orgId)
   
-  const rowMVP = { 
-    org_id: orgId, 
-    title: String(body.title||''), 
-    type: 'whatsapp',
-    content: JSON.stringify(templateData)
-  }
-  const url = process.env.SUPABASE_URL!
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  const respMVP = await fetch(`${url}/rest/v1/relationship_templates`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'return=representation' }, body: JSON.stringify(rowMVP) })
-  if (!respMVP.ok) return NextResponse.json({ error: 'insert_failed_mvp' }, { status: 500 })
-  const dataMVP = await respMVP.json().catch(()=>[])
-  
-  // Dual-write v2 (best-effort)
+  // Usar apenas V2 - sem dual-write
   const rowV2 = {
     org_id: orgId,
-    code: templateData.code,
-    anchor: templateData.anchor,
-    touchpoint: templateData.touchpoint,
-    suggested_offset: templateData.suggested_offset,
-    channel_default: templateData.channel_default,
-    message_v1: templateData.message_v1,
-    message_v2: templateData.message_v2 || null,
-    active: templateData.active,
-    priority: templateData.priority,
-    audience_filter: templateData.audience_filter,
-    variables: templateData.variables
+    code: code, // Gerado automaticamente
+    anchor: String(body.anchor || ''),
+    touchpoint: String(body.touchpoint || ''),
+    suggested_offset: String(body.suggested_offset || '+0d'),
+    channel_default: String(body.channel_default || 'whatsapp'),
+    message_v1: String(body.message_v1 || ''),
+    message_v2: body.message_v2 ? String(body.message_v2) : null,
+    active: Boolean(body.active),
+    temporal_offset_days: body.temporal_offset_days ?? null,
+    temporal_anchor_field: body.temporal_anchor_field ?? null,
+    audience_filter: body.audience_filter || {},
+    variables: Array.isArray(body.variables) ? body.variables : []
   }
-  try {
-    await fetch(`${url}/rest/v1/relationship_templates_v2`, { method: 'POST', headers: { apikey: key!, Authorization: `Bearer ${key}`!, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates,return=representation' }, body: JSON.stringify(rowV2) })
-  } catch {}
+  
+  const url = process.env.SUPABASE_URL!
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+  
+  const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2`, { 
+    method: 'POST', 
+    headers: { 
+      apikey: key!, 
+      Authorization: `Bearer ${key}`!, 
+      'Content-Type':'application/json', 
+      Prefer:'return=representation' 
+    }, 
+    body: JSON.stringify(rowV2) 
+  })
+  
+  if (!respV2.ok) {
+    const errorText = await respV2.text()
+    console.error('Failed to create template V2:', errorText)
+    return NextResponse.json({ error: 'insert_failed', details: errorText }, { status: 500 })
+  }
+  
+  const dataV2 = await respV2.json().catch(()=>[])
+  const newTemplate = Array.isArray(dataV2) ? dataV2[0] : dataV2
 
-  await logEvent({ orgId: orgId, userId: userId, eventType: 'feature.used', payload: { feature: 'relationship.template.created', id: dataMVP?.[0]?.id } })
-  return NextResponse.json({ ok: true, id: dataMVP?.[0]?.id || null })
+  await logEvent({ 
+    orgId: orgId, 
+    userId: userId, 
+    eventType: 'feature.used', 
+    payload: { feature: 'relationship.template.created', id: newTemplate?.id } 
+  })
+  
+  return NextResponse.json({ ok: true, id: newTemplate?.id || null, template: newTemplate })
 }
 
 

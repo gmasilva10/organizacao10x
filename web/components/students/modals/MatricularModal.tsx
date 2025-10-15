@@ -57,10 +57,68 @@ export default function MatricularModal({
     setLoading(true)
     
     try {
-      // Simular API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      console.log('📝 [MATRICULA] Iniciando matrícula do aluno:', studentName)
       
-      showSuccessToast(`Aluno ${studentName} matriculado com sucesso!`)
+      // Buscar informações do plano selecionado
+      const selectedPlan = plans.find(p => p.id === formData.plan)
+      if (!selectedPlan) {
+        throw new Error('Plano não encontrado')
+      }
+
+      // Extrair valor numérico (remover "R$ " e converter vírgula para ponto)
+      const valueStr = formData.value.replace(/[^\d,]/g, '').replace(',', '.')
+      const valueNumber = parseFloat(valueStr)
+      
+      if (isNaN(valueNumber) || valueNumber <= 0) {
+        showErrorToast('Valor inválido. Use o formato: R$ 99,90')
+        return
+      }
+
+      // Determinar billing_cycle baseado na duração do plano
+      let billingCycle = 'monthly'
+      if (selectedPlan.duration.includes('3 meses')) {
+        billingCycle = 'quarterly'
+      } else if (selectedPlan.duration.includes('6 meses')) {
+        billingCycle = 'semiannual'
+      } else if (selectedPlan.duration.includes('12 meses')) {
+        billingCycle = 'annual'
+      }
+
+      // Payload da matrícula
+      const payload = {
+        student_id: studentId,
+        plan_name: selectedPlan.name,
+        price_cents: Math.round(valueNumber * 100), // Converter para centavos
+        billing_cycle: billingCycle,
+        start_date: formData.startDate,
+        end_date: formData.endDate || null,
+        observations: formData.observations || null,
+        payment_method: 'manual' // Matrícula manual
+      }
+
+      console.log('📝 [MATRICULA] Payload:', payload)
+
+      // Chamar API de matrícula
+      const response = await fetch('/api/students/matricular', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Erro ao matricular aluno')
+      }
+
+      const result = await response.json()
+      console.log('✅ [MATRICULA] Sucesso:', result)
+
+      // Notificar toda a aplicação para atualizar dashboards/listas em tempo real
+      try {
+        window.dispatchEvent(new CustomEvent('financial:updated', { detail: { reason: 'student_enrolled', studentId } }))
+      } catch {}
+
+      showSuccessToast(`Aluno ${studentName} matriculado com sucesso! Lançamento financeiro criado automaticamente.`)
       onClose()
       
       // Reset form
@@ -73,8 +131,8 @@ export default function MatricularModal({
       })
       
     } catch (error) {
-      console.error('Erro ao matricular aluno:', error)
-      showErrorToast('Erro ao matricular aluno')
+      console.error('❌ [MATRICULA] Erro:', error)
+      showErrorToast(error instanceof Error ? error.message : 'Erro ao matricular aluno')
     } finally {
       setLoading(false)
     }

@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer"
 import dynamic from "next/dynamic"
 
 const About = dynamic(() => import("@/components/About").then(m => m.About), {
-	ssr: true,
+	ssr: false, // Mudança: Desabilitar SSR para evitar problemas de hidratação
 	loading: () => <div className="container py-16 md:py-24 text-center text-muted-foreground">Carregando…</div>,
 })
 

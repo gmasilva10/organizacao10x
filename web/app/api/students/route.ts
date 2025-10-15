@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { resolveRequestContext } from "@/utils/context/request-context"
+import { withCache, CacheConfigs } from "@/lib/cache/middleware"
+import { getCache, setCache } from "@/lib/cache/redis"
+import { withRateLimit, RateLimitMiddlewareConfigs } from "@/lib/rate-limit/middleware"
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now()

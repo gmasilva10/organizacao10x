@@ -111,24 +111,8 @@ export async function GET(
         }
       }
     }
-    // órfãs: existem em card_tasks mas não em service_onboarding_tasks (ex.: legado ou tasks globais)
-    for (const ct of rawCardTasks || []) {
-      if (!byId[ct.task_id]) {
-        byId[ct.task_id] = {
-          id: ct.id || `ct_${ct.task_id}`,
-          task_id: ct.task_id,
-          status: ct.is_completed ? 'completed' : 'pending',
-          completed_at: ct.completed_at || null,
-          task: {
-            id: ct.task_id,
-            title: 'Tarefa',
-            description: null,
-            is_required: false,
-            order_index: 9999
-          }
-        }
-      }
-    }
+    // Removido: instâncias órfãs de card_tasks não pertencentes ao estágio atual
+    // Motivo: evitava somatório indevido de tarefas entre colunas ao mover cards
     const tasks = Object.values(byId).sort((a:any,b:any)=> (a.task?.order_index||0) - (b.task?.order_index||0))
 
     const ms = Date.now() - t0

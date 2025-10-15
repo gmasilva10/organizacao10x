@@ -16,6 +16,7 @@ export const EVENT_REGISTRY = {
     description: 'Aluno que fechou venda/contrato',
     queryBase: 'SELECT id, name, email, phone, created_at as anchor_date FROM students WHERE status = \'active\' AND created_at::date = $1',
     anchorField: 'created_at',
+    temporalField: 'created_at', // Campo usado para cálculo temporal
     suggestedOffset: '+0d',
     variables: ['Nome', 'PrimeiroNome', 'DataVenda']
   },
@@ -26,6 +27,7 @@ export const EVENT_REGISTRY = {
     description: 'Aluno com primeiro treino agendado',
     queryBase: 'SELECT id, name, email, phone, first_workout_date as anchor_date FROM students WHERE first_workout_date IS NOT NULL AND first_workout_date::date = $1',
     anchorField: 'first_workout_date',
+    temporalField: 'first_workout_date', // Campo usado para cálculo temporal
     suggestedOffset: '-1d',
     variables: ['Nome', 'PrimeiroNome', 'DataTreino', 'LinkAnamnese']
   },
@@ -37,6 +39,7 @@ export const EVENT_REGISTRY = {
     description: 'Follow-up semanal para alunos ativos',
     queryBase: 'SELECT id, name, email, phone, last_workout_date as anchor_date FROM students WHERE status = \'active\' AND last_workout_date IS NOT NULL',
     anchorField: 'last_workout_date',
+    temporalField: 'last_workout_date', // Campo usado para cálculo temporal
     suggestedOffset: '+7d',
     variables: ['Nome', 'PrimeiroNome', 'DataUltimoTreino']
   },
@@ -45,8 +48,9 @@ export const EVENT_REGISTRY = {
     code: 'monthly_review',
     name: 'Revisão Mensal',
     description: 'Revisão de progresso mensal',
-    queryBase: 'SELECT id, name, email, phone, created_at as anchor_date FROM students WHERE status = \'active\' AND EXTRACT(DAY FROM created_at) = EXTRACT(DAY FROM CURRENT_DATE)',
-    anchorField: 'created_at',
+    queryBase: 'SELECT id, name, email, phone, first_workout_date as anchor_date FROM students WHERE status = \'active\' AND first_workout_date IS NOT NULL AND EXTRACT(DAY FROM first_workout_date) = EXTRACT(DAY FROM CURRENT_DATE)',
+    anchorField: 'first_workout_date',
+    temporalField: 'first_workout_date', // Campo usado para cálculo temporal
     suggestedOffset: '+30d',
     variables: ['Nome', 'PrimeiroNome', 'DataInicio', 'MesesAtivo']
   },
@@ -58,6 +62,7 @@ export const EVENT_REGISTRY = {
     description: 'Aniversário do aluno',
     queryBase: 'SELECT id, name, email, phone, birth_date as anchor_date FROM students WHERE birth_date IS NOT NULL AND EXTRACT(MONTH FROM birth_date) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(DAY FROM birth_date) = EXTRACT(DAY FROM CURRENT_DATE)',
     anchorField: 'birth_date',
+    temporalField: 'birth_date', // Campo usado para cálculo temporal
     suggestedOffset: '+0d',
     variables: ['Nome', 'PrimeiroNome', 'Idade', 'DataNascimento']
   },
@@ -68,6 +73,7 @@ export const EVENT_REGISTRY = {
     description: 'Alunos próximos do vencimento do contrato',
     queryBase: 'SELECT id, name, email, phone, contract_end_date as anchor_date FROM students WHERE status = \'active\' AND contract_end_date IS NOT NULL AND contract_end_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL \'7 days\'',
     anchorField: 'contract_end_date',
+    temporalField: 'next_renewal_date', // Campo usado para cálculo temporal (mapeado para next_renewal_date)
     suggestedOffset: '-7d',
     variables: ['Nome', 'PrimeiroNome', 'DataVencimento', 'DiasRestantes']
   },
@@ -79,6 +85,7 @@ export const EVENT_REGISTRY = {
     description: 'Follow-up baseado em ocorrência com lembrete',
     queryBase: 'SELECT s.id, s.name, s.email, s.phone, o.reminder_at as anchor_date FROM students s JOIN student_occurrences o ON s.id = o.student_id WHERE o.reminder_at IS NOT NULL AND o.reminder_at::date = $1',
     anchorField: 'reminder_at',
+    temporalField: 'created_at', // Campo usado para cálculo temporal (baseado na data da ocorrência)
     suggestedOffset: '+0d',
     variables: ['Nome', 'PrimeiroNome', 'TipoOcorrencia', 'DescricaoOcorrencia', 'DataOcorrencia']
   },
@@ -90,6 +97,7 @@ export const EVENT_REGISTRY = {
     description: 'Tarefa criada manualmente pelo usuário',
     queryBase: '', // Sem query base - exclusivo para tarefas manuais
     anchorField: 'created_at',
+    temporalField: 'created_at', // Campo usado para cálculo temporal
     suggestedOffset: '+0d',
     variables: ['Nome', 'PrimeiroNome']
   }
@@ -121,6 +129,7 @@ export function getAvailableAnchors() {
     name: anchor.name,
     description: anchor.description,
     suggestedOffset: anchor.suggestedOffset,
+    temporalField: anchor.temporalField,
     variables: anchor.variables
   }))
 }

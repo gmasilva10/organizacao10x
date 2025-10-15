@@ -160,13 +160,22 @@ export function validateField(
   value: any
 ): string | null {
   try {
-    schema.parse({ [fieldName]: value })
+    // Validar apenas o campo específico, não o schema completo
+    const fieldSchema = (schema as any).shape?.[fieldName]
+    if (!fieldSchema) {
+      console.warn(`Campo ${fieldName} não encontrado no schema`)
+      return null
+    }
+    
+    fieldSchema.parse(value)
     return null
   } catch (error) {
     if (error instanceof z.ZodError) {
-      // Pegar o primeiro erro (geralmente é o mais relevante)
-      const firstError = error.errors[0]
-      return firstError?.message || 'Erro de validação'
+      // Verificar se error.errors existe e tem elementos
+      if (error.errors && Array.isArray(error.errors) && error.errors.length > 0) {
+        const firstError = error.errors[0]
+        return firstError?.message || 'Erro de validação'
+      }
     }
     return 'Erro de validação'
   }

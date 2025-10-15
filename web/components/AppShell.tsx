@@ -18,7 +18,8 @@ import {
   Badge as BadgeIcon,
   MessageCircle,
   ChevronDown,
-  ClipboardList
+  ClipboardList,
+  DollarSign
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -91,6 +92,12 @@ const menuGroups: MenuGroup[] = [
         title: "Relacionamento",
         href: "/app/relationship",
         icon: MessageCircle
+      },
+      {
+        id: "financial",
+        title: "Financeiro",
+        href: "/app/financial",
+        icon: DollarSign
       },
       {
         id: "occurrences-management",

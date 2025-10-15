@@ -38,6 +38,7 @@ import { studentIdentificationSchema, studentAddressSchema, formatZodErrors } fr
 import StudentActions from "./shared/StudentActions"
 import RelationshipTimeline from "../relationship/RelationshipTimeline"
 import ProfessionalSearchModal from "./ProfessionalSearchModal"
+import FinancialTab from "./FinancialTab"
 
 type Student = {
   id: string
@@ -47,6 +48,8 @@ type Student = {
   status: 'onboarding' | 'active' | 'paused' | 'inactive'
   created_at: string
   birth_date?: string
+  first_workout_date?: string
+  last_workout_date?: string
   gender?: 'masculino' | 'feminino' | 'outro'
   marital_status?: 'solteiro' | 'casado' | 'divorciado' | 'viuvo'
   nationality?: string
@@ -98,6 +101,8 @@ export default function StudentEditTabsV6({
     phone: student.phone,
     status: student.status,
     birth_date: student.birth_date || '',
+    first_workout_date: student.first_workout_date || '',
+    last_workout_date: student.last_workout_date || '',
     gender: student.gender || '',
     marital_status: student.marital_status || '',
     nationality: student.nationality || '',
@@ -585,6 +590,7 @@ export default function StudentEditTabsV6({
             <TabsTrigger value="identificacao">Identificação</TabsTrigger>
             <TabsTrigger value="endereco">Endereço</TabsTrigger>
             <TabsTrigger value="responsaveis">Responsáveis</TabsTrigger>
+            <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
           </TabsList>
 
           {/* Identificação */}
@@ -673,6 +679,26 @@ export default function StudentEditTabsV6({
                           type="date"
                           value={formData.birth_date}
                           onChange={(e) => setFormData({...formData, birth_date: e.target.value})}
+                          className="h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="first_workout_date" className="text-sm font-medium">Primeiro Treino</Label>
+                        <Input
+                          id="first_workout_date"
+                          type="date"
+                          value={formData.first_workout_date}
+                          onChange={(e) => setFormData({...formData, first_workout_date: e.target.value})}
+                          className="h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="last_workout_date" className="text-sm font-medium">Último Treino</Label>
+                        <Input
+                          id="last_workout_date"
+                          type="date"
+                          value={formData.last_workout_date}
+                          onChange={(e) => setFormData({...formData, last_workout_date: e.target.value})}
                           className="h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                         />
                       </div>
@@ -1167,6 +1193,11 @@ export default function StudentEditTabsV6({
 
               </>
             )}
+          </TabsContent>
+
+          {/* Financeiro */}
+          <TabsContent value="financeiro" className="pt-6">
+            <FinancialTab studentId={studentId} studentName={name} />
           </TabsContent>
 
         </Tabs>

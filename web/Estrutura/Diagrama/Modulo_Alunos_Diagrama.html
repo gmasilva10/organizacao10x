@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama do Módulo de Alunos - Organização10x</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 20px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #0288d1;
+            border-bottom: 3px solid #0288d1;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .info {
+            background: #e1f5ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0288d1;
+        }
+        
+        .instructions {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f57c00;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #f57c00;
+        }
+        
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        button {
+            background: #0288d1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #0277bd;
+        }
+        
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 3px;
+            border: 2px solid #333;
+        }
+        
+        .color-page { background: #e1f5ff; border-color: #0288d1; }
+        .color-component { background: #fff3e0; border-color: #f57c00; }
+        .color-hook { background: #f3e5f5; border-color: #7b1fa2; }
+        .color-api { background: #e8f5e9; border-color: #388e3c; }
+        .color-db { background: #fce4ec; border-color: #c2185b; }
+        .color-util { background: #fff9c4; border-color: #f9a825; }
+        .color-modal { background: #e0f2f1; border-color: #00796b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Diagrama Arquitetural - Módulo de Alunos</h1>
+        
+        <div class="info">
+            <strong>Projeto:</strong> Organização10x<br>
+            <strong>Módulo:</strong> Gestão de Alunos<br>
+            <strong>Data:</strong> <span id="current-date"></span>
+        </div>
+        
+        <div class="instructions no-print">
+            <h3>🖨️ Como Salvar em PDF:</h3>
+            <ol>
+                <li><strong>Chrome/Edge:</strong> Pressione Ctrl+P → Destino: "Salvar como PDF" → Salvar</li>
+                <li><strong>Firefox:</strong> Pressione Ctrl+P → Impressora: "Microsoft Print to PDF" → Salvar</li>
+                <li><strong>Alternativa:</strong> Clique no botão "Imprimir" abaixo</li>
+            </ol>
+            <button onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+            <button onclick="downloadSVG()">💾 Baixar como SVG</button>
+        </div>
+        
+        <div class="legend no-print">
+            <div class="legend-item">
+                <div class="legend-color color-page"></div>
+                <span>Páginas/Interface</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-component"></div>
+                <span>Componentes</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-hook"></div>
+                <span>Hooks React Query</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-api"></div>
+                <span>API Routes</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-db"></div>
+                <span>Banco de Dados</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-util"></div>
+                <span>Utilitários</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-modal"></div>
+                <span>Modais</span>
+            </div>
+        </div>
+
+        <div class="mermaid">
+graph TB
+    subgraph "INTERFACE DO USUÁRIO"
+        A[Página de Listagem<br/>/app/students]
+        B[Página de Edição<br/>/app/students/id/edit]
+        C[Modal de Criação<br/>StudentCreateModal]
+        D[Drawer de Filtros<br/>StudentsFilterDrawer]
+    end
+
+    subgraph "COMPONENTES DE VISUALIZAÇÃO"
+        E[StudentCardActions<br/>Ações em Card]
+        F[StudentTableActions<br/>Ações em Tabela]
+        G[StudentActions<br/>Ações Compartilhadas]
+    end
+
+    subgraph "ABAS DE EDIÇÃO - StudentEditTabsV6"
+        H1[Identificação<br/>IdentificacaoTab]
+        H2[Endereço<br/>EnderecoTab]
+        H3[Responsáveis<br/>ResponsaveisTab]
+        H4[Ocorrências<br/>OcorrenciasTab]
+        H5[Anamnese<br/>AnamneseTab]
+        H6[Diretriz<br/>DiretrizTab]
+        H7[Processos<br/>ProcessosTab]
+        H8[Anexos<br/>AnexosTab]
+    end
+
+    subgraph "MODAIS E DIÁLOGOS"
+        I1[DeleteStudentModal<br/>Exclusão]
+        I2[OnboardingModal<br/>Onboarding]
+        I3[AnamneseInviteModal<br/>Convite Anamnese]
+        I4[MatricularModal<br/>Matrícula]
+        I5[WhatsAppContactModal<br/>Contato WhatsApp]
+        I6[WhatsAppCreateGroupModal<br/>Grupo WhatsApp]
+        I7[ProfessionalSearchModal<br/>Busca Profissional]
+        I8[StudentOccurrenceModal<br/>Nova Ocorrência]
+    end
+
+    subgraph "HOOKS REACT QUERY"
+        J1[useStudents<br/>Listagem com Filtros]
+        J2[useStudent<br/>Detalhes do Aluno]
+        J3[useStudentOccurrences<br/>Ocorrências]
+        J4[useStudentAnamnese<br/>Anamnese]
+        J5[useStudentDiretriz<br/>Diretriz]
+        J6[useSaveStudent<br/>Salvar Mutação]
+        J7[usePrefetchStudent<br/>Pré-carregamento]
+    end
+
+    subgraph "API ROUTES - Backend"
+        K1[GET /api/students<br/>Listar Alunos]
+        K2[POST /api/students<br/>Criar Aluno]
+        K3[GET /api/students/id<br/>Buscar Detalhes]
+        K4[PATCH /api/students/id<br/>Atualizar Aluno]
+        K5[DELETE /api/students/id<br/>Excluir Soft Delete]
+        K6[GET /api/students/id/occurrences<br/>Listar Ocorrências]
+        K7[GET /api/students/id/anamnese<br/>Listar Anamneses]
+        K8[GET /api/students/id/diretriz<br/>Obter Diretriz]
+        K9[GET /api/students/id/responsibles<br/>Listar Responsáveis]
+        K10[POST /api/students/id/responsibles<br/>Adicionar Responsável]
+        K11[POST /api/upload/photo<br/>Upload de Foto]
+    end
+
+    subgraph "BANCO DE DADOS - Supabase"
+        L1[(Tabela students<br/>Dados Principais)]
+        L2[(Tabela student_occurrences<br/>Ocorrências)]
+        L3[(Tabela student_anamnese<br/>Anamneses)]
+        L4[(Tabela student_responsibles<br/>Responsáveis)]
+        L5[(Tabela professionals<br/>Profissionais)]
+        L6[(Storage<br/>Fotos de Alunos)]
+    end
+
+    subgraph "UTILITÁRIOS E VALIDAÇÃO"
+        M1[studentIdentificationSchema<br/>Validação Zod]
+        M2[studentAddressSchema<br/>Validação Endereço]
+        M3[toast-utils<br/>Notificações]
+        M4[query-client<br/>Cache React Query]
+        M5[image-processing<br/>Processamento Imagem]
+        M6[perfClient<br/>Métricas Performance]
+    end
+
+    %% Fluxo Principal de Listagem
+    A -->|Usa| J1
+    J1 -->|Chama| K1
+    K1 -->|Consulta| L1
+    
+    %% Fluxo de Criação
+    A -->|Abre| C
+    C -->|Submete| K2
+    K2 -->|Insere| L1
+    K2 -->|Invalida Cache| J1
+    
+    %% Fluxo de Edição
+    A -->|Navega| B
+    B -->|Renderiza| H1
+    B -->|Renderiza| H2
+    B -->|Renderiza| H3
+    B -->|Renderiza| H4
+    B -->|Renderiza| H5
+    B -->|Renderiza| H6
+    
+    %% Carregamento de Dados
+    B -->|Usa| J2
+    J2 -->|Chama| K3
+    K3 -->|Consulta| L1
+    
+    %% Abas e Submódulos
+    H4 -->|Usa| J3
+    J3 -->|Chama| K6
+    K6 -->|Consulta| L2
+    
+    H5 -->|Usa| J4
+    J4 -->|Chama| K7
+    K7 -->|Consulta| L3
+    
+    H6 -->|Usa| J5
+    J5 -->|Chama| K8
+    K8 -->|Consulta| L1
+    
+    %% Responsáveis
+    H3 -->|Busca| I7
+    H3 -->|Usa| K9
+    H3 -->|Adiciona| K10
+    K9 -->|Consulta| L4
+    K10 -->|Insere| L4
+    L4 -->|Relaciona| L5
+    
+    %% Ações e Modais
+    A -->|Filtrar| D
+    A -->|Exibe| E
+    A -->|Exibe| F
+    E -->|Abre| I1
+    E -->|Abre| I2
+    E -->|Abre| I5
+    
+    B -->|Usa| G
+    G -->|Abre| I1
+    G -->|Abre| I3
+    G -->|Abre| I8
+    
+    %% Salvamento e Atualização
+    B -->|Salva| J6
+    J6 -->|Chama| K4
+    K4 -->|Atualiza| L1
+    K4 -->|Invalida Cache| J2
+    
+    %% Upload de Foto
+    H1 -->|Upload| M5
+    M5 -->|Valida e Processa| K11
+    K11 -->|Armazena| L6
+    K11 -->|Retorna URL| H1
+    
+    %% Exclusão
+    I1 -->|Confirma| K5
+    K5 -->|Soft Delete| L1
+    K5 -->|Invalida Cache| J1
+    
+    %% Validação
+    B -->|Valida| M1
+    B -->|Valida| M2
+    
+    %% Notificações
+    J1 -.->|Erros/Sucesso| M3
+    J2 -.->|Erros/Sucesso| M3
+    J6 -.->|Erros/Sucesso| M3
+    
+    %% Performance
+    J1 -.->|Métricas| M6
+    J2 -.->|Métricas| M6
+    
+    %% Cache e Prefetch
+    A -->|Hover| J7
+    J7 -.->|Pré-carrega| M4
+    
+    %% Estilos
+    classDef pageClass fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    classDef componentClass fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef hookClass fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef apiClass fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    classDef dbClass fill:#fce4ec,stroke:#c2185b,stroke-width:3px
+    classDef utilClass fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    classDef modalClass fill:#e0f2f1,stroke:#00796b,stroke-width:2px
+    
+    class A,B,C,D pageClass
+    class E,F,G,H1,H2,H3,H4,H5,H6,H7,H8 componentClass
+    class J1,J2,J3,J4,J5,J6,J7 hookClass
+    class K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,K11 apiClass
+    class L1,L2,L3,L4,L5,L6 dbClass
+    class M1,M2,M3,M4,M5,M6 utilClass
+    class I1,I2,I3,I4,I5,I6,I7,I8 modalClass
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+            <h2>📋 Resumo da Arquitetura</h2>
+            <ul>
+                <li><strong>Total de Componentes:</strong> 54 arquivos no módulo de students</li>
+                <li><strong>Padrão de Arquitetura:</strong> React + Next.js 14 (App Router)</li>
+                <li><strong>Gerenciamento de Estado:</strong> React Query (TanStack Query)</li>
+                <li><strong>Validação:</strong> Zod Schemas</li>
+                <li><strong>Banco de Dados:</strong> Supabase (PostgreSQL)</li>
+                <li><strong>Performance:</strong> Métricas TTFB, Prefetch, Cache otimizado</li>
+                <li><strong>Segurança:</strong> RLS (Row Level Security), Soft Delete, RBAC</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar Mermaid
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        // Exibir data atual
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Função para baixar SVG
+        function downloadSVG() {
+            const svg = document.querySelector('.mermaid svg');
+            if (svg) {
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(svg);
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Modulo_Alunos_Diagrama.svg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+    </script>
+</body>
+</html>
+

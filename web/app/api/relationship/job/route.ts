@@ -11,6 +11,16 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { 
+  calculateTemporalSchedule, 
+  extractAnchorDate, 
+  shouldCreateTaskForStudent,
+  getAnchorFieldForAnchor,
+  generateTemporalDescription,
+  type StudentData as TemporalStudentData,
+  type TemporalConfig
+} from '@/lib/relationship/temporal-processor'
+import { renderMessage as renderMessageWithVariables, type RenderContext } from '@/lib/relationship/variable-renderer'
 
 const supabaseUrl = process.env.SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -53,6 +63,8 @@ interface TemplateData {
   audience_filter: any
   variables: string[]
   active: boolean
+  temporal_offset_days?: number | null
+  temporal_anchor_field?: string | null
 }
 
 interface TaskStats {
@@ -117,23 +129,21 @@ function calculateScheduledDate(anchorDate: string, offset: string): Date {
 }
 
 /**
- * Renderizar mensagem com variaveis
+ * Renderizar mensagem com variáveis (wrapper para o novo sistema)
  */
-function renderMessage(template: string, student: StudentData): string {
-  let message = template
+async function renderMessage(template: string, student: StudentData): Promise<string> {
+  const context: RenderContext = {
+    student: {
+      id: student.id,
+      name: student.name,
+      email: student.email,
+      phone: student.phone,
+      created_at: student.anchor_date,
+      org_id: student.org_id
+    }
+  }
   
-  // Substituir variaveis basicas
-  message = message.replace(/\[Nome do Cliente\]/g, student.name)
-  message = message.replace(/\[Nome\]/g, student.name)
-  message = message.replace(/\[PrimeiroNome\]/g, student.name.split(' ')[0])
-  message = message.replace(/\[DataVenda\]/g, new Date(student.anchor_date).toLocaleDateString('pt-BR'))
-  message = message.replace(/\[DataTreino\]/g, new Date(student.anchor_date).toLocaleDateString('pt-BR'))
-  message = message.replace(/\[DataUltimoTreino\]/g, new Date(student.anchor_date).toLocaleDateString('pt-BR'))
-  message = message.replace(/\[DataInicio\]/g, new Date(student.anchor_date).toLocaleDateString('pt-BR'))
-  message = message.replace(/\[DataNascimento\]/g, student.anchor_date ? new Date(student.anchor_date).toLocaleDateString('pt-BR') : '')
-  message = message.replace(/\[Idade\]/g, student.anchor_date ? Math.floor((Date.now() - new Date(student.anchor_date).getTime()) / (365.25 * 24 * 60 * 60 * 1000)).toString() : '')
-  
-  return message
+  return await renderMessageWithVariables(template, context)
 }
 
 /**
@@ -246,51 +256,149 @@ async function fetchStudentsForAnchor(anchor: EventCode, orgId: string): Promise
         .filter(Boolean) as StudentData[]
     }
 
-    // first_workout, weekly_followup, monthly_review, renewal_window
-    // Campos podem nao existir ainda; retornar vazio
+    // first_workout - alunos com primeiro treino agendado para hoje
+    if (anchor === 'first_workout') {
+      const { data, error} = await supabase
+        .from('students')
+        .select('id, name, email, phone, first_workout_date, org_id')
+        .eq('org_id', orgId)
+        .not('first_workout_date', 'is', null)
+        .gte('first_workout_date', startOfDayISO())
+        .lte('first_workout_date', endOfDayISO())
+      if (error) return []
+      return (data || []).map((s: any) => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        phone: s.phone,
+        anchor_date: s.first_workout_date,
+        org_id: s.org_id,
+      }))
+    }
+
+    // weekly_followup - alunos ativos para acompanhamento semanal
+    if (anchor === 'weekly_followup') {
+      const { data, error } = await supabase
+        .from('students')
+        .select('id, name, email, phone, last_workout_date, org_id')
+        .eq('org_id', orgId)
+        .eq('status', 'active')
+        .not('last_workout_date', 'is', null)
+      if (error) return []
+      // Filtrar alunos que tiveram último treino há 7 dias
+      const sevenDaysAgo = new Date()
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+      const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0]
+      
+      return (data || [])
+        .filter((s: any) => {
+          if (!s.last_workout_date) return false
+          const lastWorkout = new Date(s.last_workout_date).toISOString().split('T')[0]
+          return lastWorkout === sevenDaysAgoStr
+        })
+        .map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          email: s.email,
+          phone: s.phone,
+          anchor_date: s.last_workout_date,
+          org_id: s.org_id,
+        }))
+    }
+
+    // monthly_review - alunos ativos para revisão mensal (aniversário do primeiro treino)
+    if (anchor === 'monthly_review') {
+      const { data, error } = await supabase
+        .from('students')
+        .select('id, name, email, phone, first_workout_date, org_id')
+        .eq('org_id', orgId)
+        .eq('status', 'active')
+      if (error) return []
+      
+      const today = new Date()
+      const currentDay = today.getDate()
+      
+      return (data || [])
+        .filter((s: any) => {
+          if (!s.first_workout_date) return false
+          const first = new Date(s.first_workout_date)
+          return first.getDate() === currentDay
+        })
+        .map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          email: s.email,
+          phone: s.phone,
+          anchor_date: s.first_workout_date,
+          org_id: s.org_id,
+        }))
+    }
+
+    // renewal_window - alunos com renovação próxima (próximos 7 dias)
+    if (anchor === 'renewal_window') {
+      const today = new Date()
+      const in7Days = new Date(today)
+      in7Days.setDate(in7Days.getDate() + 7)
+      
+      const { data, error } = await supabase
+        .from('student_services')
+        .select('student_id, next_renewal_date, org_id, students(id, name, email, phone, org_id)')
+        .eq('org_id', orgId)
+        .eq('status', 'active')
+        .eq('renewal_status', 'ativo')
+        .not('next_renewal_date', 'is', null)
+        .gte('next_renewal_date', startOfDayISO())
+        .lte('next_renewal_date', in7Days.toISOString())
+      
+      if (error) return []
+      
+      return (data || [])
+        .filter((s: any) => s.students)
+        .map((s: any) => ({
+          id: s.students.id,
+          name: s.students.name,
+          email: s.students.email,
+          phone: s.students.phone,
+          anchor_date: s.next_renewal_date,
+          org_id: s.students.org_id,
+        }))
+    }
+
+    // Âncora não implementada
     return []
   } catch {
     return []
   }
 }
 
-// Carregar templates ativos da tabela MVP (JSON em content)
+// Carregar templates ativos da tabela V2
 async function fetchActiveTemplates(orgId: string): Promise<TemplateData[]> {
   const { data, error } = await supabase
-    .from('relationship_templates')
-    .select('id, org_id, content')
+    .from('relationship_templates_v2')
+    .select('*')
     .eq('org_id', orgId)
+    .eq('active', true)
+  
   if (error || !data) return []
 
-  const templates: TemplateData[] = []
-  for (const row of data) {
-    try {
-      const parsed = JSON.parse((row as any).content || '{}')
-      if (!parsed || parsed.active !== true) continue
-      const anchor = parsed.anchor as EventCode
-      const code = String(parsed.code || '')
-      if (!code || !anchor) continue
-      templates.push({
-        id: (row as any).id,
-        code,
-        anchor,
-        suggested_offset: String(parsed.suggested_offset || '+0d'),
-        channel_default: String(parsed.channel_default || 'whatsapp'),
-        message_v1: String(parsed.message_v1 || ''),
-        message_v2: parsed.message_v2 ? String(parsed.message_v2) : undefined,
-        audience_filter: parsed.audience_filter || {},
-        variables: Array.isArray(parsed.variables) ? parsed.variables : [],
-        active: true,
-      })
-    } catch {
-      // ignora linhas invalidas
-    }
-  }
-  return templates
+  return data.map((row: any) => ({
+    id: row.id,
+    code: row.code,
+    anchor: row.anchor as EventCode,
+    suggested_offset: row.suggested_offset || '+0d',
+    channel_default: row.channel_default || 'whatsapp',
+    message_v1: row.message_v1 || '',
+    message_v2: row.message_v2 || undefined,
+    audience_filter: row.audience_filter || {},
+    variables: Array.isArray(row.variables) ? row.variables : [],
+    active: row.active,
+    temporal_offset_days: row.temporal_offset_days,
+    temporal_anchor_field: row.temporal_anchor_field
+  }))
 }
 
 /**
- * Processar uma ancora especifica
+ * Processar uma ancora especifica com lógica temporal
  */
 async function processAnchor(
   anchor: EventCode,
@@ -310,12 +418,6 @@ async function processAnchor(
   try {
     // Buscar alunos para esta ancora
     const students = await fetchStudentsForAnchor(anchor, orgId)
-    const studentsError = null as any
-
-    if (studentsError) {
-      errors.push(`Erro ao buscar alunos para ancora ${anchor}: ${studentsError.message}`)
-      return { created, updated, skipped, errors }
-    }
 
     if (!students || students.length === 0) {
       return { created, updated, skipped, errors }
@@ -335,8 +437,56 @@ async function processAnchor(
             continue
           }
 
-          // Calcular data agendada
-          const scheduledDate = calculateScheduledDate(student.anchor_date, template.suggested_offset)
+          // NOVA LÓGICA TEMPORAL
+          // Determinar campo de âncora temporal
+          const temporalAnchorField = template.temporal_anchor_field || getAnchorFieldForAnchor(anchor)
+          
+          // Criar configuração temporal
+          const temporalConfig: TemporalConfig = {
+            offsetDays: template.temporal_offset_days,
+            anchorField: temporalAnchorField,
+            anchorDate: null
+          }
+
+          // Verificar se deve criar tarefa baseado no offset temporal
+          const shouldCreate = shouldCreateTaskForStudent(
+            {
+              id: student.id,
+              first_workout_date: student.anchor_date, // Mapear conforme necessário
+              last_workout_date: student.anchor_date,
+              birth_date: student.anchor_date,
+              start_date: student.anchor_date,
+              end_date: student.anchor_date,
+              next_renewal_date: student.anchor_date,
+              created_at: student.anchor_date
+            },
+            temporalConfig
+          )
+
+          if (!shouldCreate) {
+            skipped++
+            continue
+          }
+
+          // Calcular data agendada usando lógica temporal
+          let scheduledDate: Date
+          if (template.temporal_offset_days !== null && temporalAnchorField) {
+            const anchorDate = extractAnchorDate({
+              id: student.id,
+              first_workout_date: student.anchor_date,
+              last_workout_date: student.anchor_date,
+              birth_date: student.anchor_date,
+              start_date: student.anchor_date,
+              end_date: student.anchor_date,
+              next_renewal_date: student.anchor_date,
+              created_at: student.anchor_date
+            }, temporalAnchorField)
+            
+            scheduledDate = calculateTemporalSchedule(anchorDate, template.temporal_offset_days) || new Date()
+          } else {
+            // Fallback para lógica antiga
+            scheduledDate = calculateScheduledDate(student.anchor_date, template.suggested_offset)
+          }
           
           // Verificar se ja existe tarefa para este aluno/template/data
           const { data: existingTask } = await supabase
@@ -351,7 +501,7 @@ async function processAnchor(
 
           if (existingTask) {
             // Atualizar tarefa existente
-            const renderedMessage = renderMessage(template.message_v1, student)
+            const renderedMessage = await renderMessage(template.message_v1, student)
             
             const { error: updateError } = await supabase
               .from('relationship_tasks')
@@ -374,7 +524,7 @@ async function processAnchor(
             }
           } else {
             // Criar nova tarefa
-            const renderedMessage = renderMessage(template.message_v1, student)
+            const renderedMessage = await renderMessage(template.message_v1, student)
             
             const { error: insertError } = await supabase
               .from('relationship_tasks')

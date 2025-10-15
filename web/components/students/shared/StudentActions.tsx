@@ -108,7 +108,7 @@ export default function StudentActions({
           {/* Anexos */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" aria-label={`Anexos de ${studentName}`}>
                 <Paperclip className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
@@ -145,7 +145,7 @@ export default function StudentActions({
           {/* Processos */}
           <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" aria-label={`Processos de ${studentName}`}>
                 <Settings className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>

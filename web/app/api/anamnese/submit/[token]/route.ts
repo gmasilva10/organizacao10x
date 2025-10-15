@@ -177,57 +177,69 @@ export async function POST(
       }
     }
 
-    // Criar ocorrência no aluno (temporariamente desativado até ajustar owner_user_id)
-    /*try {
-      console.log(`🔄 [ANAMNESE SUBMIT] Criando ocorrência...`)
+    // Criar ocorrência no módulo de ocorrências
+    try {
+      console.log(`🔄 [ANAMNESE SUBMIT] Criando ocorrência de anamnese...`)
       
-      // Buscar grupo e tipo de ocorrência apropriados
-      const { data: occurrenceGroup } = await admin
-        .from('occurrence_groups')
-        .select('id')
-        .eq('name', 'Saúde')
-        .eq('org_id', 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7') // Tenant fixo por enquanto
+      // Buscar professional responsável pelo aluno
+      const { data: responsible } = await admin
+        .from('student_responsibles')
+        .select('professional_id, professionals(user_id)')
+        .eq('student_id', invite.student_id)
+        .limit(1)
         .maybeSingle()
 
-      const { data: occurrenceType } = await admin
-        .from('occurrence_types')
-        .select('id')
-        .eq('name', 'Anamnese Respondida')
-        .eq('group_id', occurrenceGroup?.id)
-        .eq('org_id', 'fb381d42-9cf8-41d9-b0ab-fdb706a85ae7') // Tenant fixo por enquanto
-        .maybeSingle()
+      const ownerUserId = responsible?.professionals?.user_id
 
-      if (occurrenceGroup && occurrenceType) {
-        const { error: ocorrenciaError } = await admin
-          .from('student_occurrences')
-          .insert({
-            student_id: invite.student_id,
-            org_id: invite.org_id,
-            group_id: occurrenceGroup.id,
-            type_id: occurrenceType.id,
-            occurred_at: new Date().toISOString().split('T')[0],
-            notes: `O aluno ${studentName} respondeu à anamnese via formulário público. Todas as respostas foram salvas e o PDF foi gerado automaticamente.`,
-            owner_user_id: invite.student_id, // Usar student_id como fallback
-            status: 'DONE',
-            priority: 'medium',
-            resolved_at: new Date().toISOString(),
-            resolved_by: invite.student_id,
-            resolution_outcome: 'resolved',
-            resolution_notes: 'Anamnese respondida e processada automaticamente'
-          })
+      if (ownerUserId) {
+        // Buscar grupo "Saúde"
+        const { data: healthGroup } = await admin
+          .from('occurrence_groups')
+          .select('id')
+          .eq('name', 'Saúde')
+          .eq('org_id', invite.org_id)
+          .maybeSingle()
 
-        if (ocorrenciaError) {
-          console.error('Erro ao criar ocorrência:', ocorrenciaError)
+        // Buscar tipo "Anamnese Respondida"
+        const { data: occType } = await admin
+          .from('occurrence_types')
+          .select('id')
+          .ilike('name', '%anamnese%')
+          .eq('org_id', invite.org_id)
+          .limit(1)
+          .maybeSingle()
+
+        if (healthGroup && occType) {
+          // Criar ocorrência
+          const { error: occError } = await admin
+            .from('student_occurrences')
+            .insert({
+              student_id: invite.student_id,
+              group_id: healthGroup.id,
+              type_id: occType.id,
+              occurred_at: new Date().toISOString().split('T')[0],
+              notes: `Anamnese ${version?.code || ''} respondida com sucesso. PDF disponível em: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/p/anamnese/${token}`,
+              owner_user_id: ownerUserId,
+              status: 'DONE',
+              priority: 'medium',
+              org_id: invite.org_id
+            })
+
+          if (occError) {
+            console.error('Erro ao criar ocorrência:', occError)
+          } else {
+            console.log(`✅ [ANAMNESE SUBMIT] Ocorrência criada com sucesso`)
+          }
         } else {
-          console.log(`✅ [ANAMNESE SUBMIT] Ocorrência criada com sucesso`)
+          console.log(`⚠️ [ANAMNESE SUBMIT] Grupo/tipo de ocorrência não encontrado`)
         }
       } else {
-        console.log(`⚠️ [ANAMNESE SUBMIT] Grupo ou tipo de ocorrência não encontrado, pulando criação`)
+        console.log(`⚠️ [ANAMNESE SUBMIT] Professional responsável não encontrado`)
       }
-    } catch (ocorrenciaError) {
-      console.error('Erro ao criar ocorrência:', ocorrenciaError)
+    } catch (occurrenceError) {
+      console.error('Erro ao criar ocorrência:', occurrenceError)
       // Não falhar a submissão por erro de ocorrência
-    }*/
+    }
 
     console.log(`✅ [ANAMNESE SUBMIT] Anamnese submetida com sucesso`)
 

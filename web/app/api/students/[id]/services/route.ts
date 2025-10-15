@@ -57,17 +57,7 @@ export async function GET(
   try {
     const { data: services, error } = await supabase
       .from('student_services')
-      .select(`
-        *,
-        plans:name (
-          nome,
-          descricao,
-          valor,
-          moeda,
-          ciclo,
-          duracao_em_ciclos
-        )
-      `)
+      .select('*')
       .eq('student_id', params.id)
       .eq('org_id', ctx.org_id)
       .order('created_at', { ascending: false })
