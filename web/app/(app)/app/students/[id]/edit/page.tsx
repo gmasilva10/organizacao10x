@@ -141,7 +141,7 @@ export default function EditStudentPage() {
       }
       
       const response = await fetch(`/api/students/${studentId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -170,7 +170,7 @@ export default function EditStudentPage() {
       setSaving(true)
       
       const response = await fetch(`/api/students/${studentId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },

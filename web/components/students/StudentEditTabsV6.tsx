@@ -281,8 +281,21 @@ export default function StudentEditTabsV6({
 
   const validateForm = () => {
     try {
+      // Preparar dados para validação: transformar strings vazias em undefined
+      const dataToValidate = {
+        ...formData,
+        // Campos opcionais: transformar string vazia em undefined
+        gender: formData.gender === '' ? undefined : formData.gender,
+        marital_status: formData.marital_status === '' ? undefined : formData.marital_status,
+        nationality: formData.nationality === '' ? undefined : formData.nationality,
+        birth_place: formData.birth_place === '' ? undefined : formData.birth_place,
+        birth_date: formData.birth_date === '' ? undefined : formData.birth_date,
+        first_workout_date: formData.first_workout_date === '' ? undefined : formData.first_workout_date,
+        last_workout_date: formData.last_workout_date === '' ? undefined : formData.last_workout_date,
+      }
+      
       // Validar dados de identificação com Zod
-      studentIdentificationSchema.parse(formData)
+      studentIdentificationSchema.parse(dataToValidate)
       
       // Limpar erros se validação passar
       setValidationErrors({})
@@ -291,6 +304,10 @@ export default function StudentEditTabsV6({
       // Formatar erros do Zod
       const errors = formatZodErrors(error)
       setValidationErrors(errors)
+      
+      // Log detalhado para debug
+      console.error('🔍 Erro de validação Zod:', errors)
+      
       return false
     }
   }
@@ -310,7 +327,30 @@ export default function StudentEditTabsV6({
 
   const handleSave = async () => {
     if (!validateForm()) {
-      showErrorToast('Por favor, corrija os erros antes de salvar')
+      // Verificar se há erros de validação específicos
+      const errorFields = Object.keys(validationErrors)
+      if (errorFields.length > 0) {
+        const firstField = errorFields[0]
+        const errorMessage = validationErrors[firstField]
+        console.error('❌ Erro de validação:', { field: firstField, message: errorMessage })
+        
+        // Mensagem mais específica
+        const fieldLabels: Record<string, string> = {
+          name: 'Nome Completo',
+          email: 'Email',
+          phone: 'Telefone',
+          status: 'Status',
+          gender: 'Sexo',
+          marital_status: 'Estado Civil',
+          nationality: 'Nacionalidade',
+          birth_place: 'Naturalidade'
+        }
+        
+        const fieldLabel = fieldLabels[firstField] || firstField
+        showErrorToast(`${fieldLabel}: ${errorMessage}`)
+      } else {
+        showErrorToast('Por favor, corrija os erros antes de salvar')
+      }
       return
     }
     
@@ -514,6 +554,17 @@ export default function StudentEditTabsV6({
               studentId={studentId} 
               studentName={student.name} 
               studentPhone={student.phone}
+              studentData={{
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                status: formData.status,
+                birth_date: formData.birth_date,
+                gender: formData.gender,
+                marital_status: formData.marital_status,
+                nationality: formData.nationality,
+                birth_place: formData.birth_place
+              }}
               variant="edit"
               openModal={openModal}
               onActionComplete={(actionType?: string) => {
@@ -1197,7 +1248,7 @@ export default function StudentEditTabsV6({
 
           {/* Financeiro */}
           <TabsContent value="financeiro" className="pt-6">
-            <FinancialTab studentId={studentId} studentName={name} />
+            <FinancialTab studentId={studentId} studentName={formData.name} />
           </TabsContent>
 
         </Tabs>
