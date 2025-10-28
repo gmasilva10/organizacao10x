@@ -33,6 +33,7 @@ artifacts/
 test-results/
 playwright-report/
 .playwright/
+.playwright-mcp/
 
 # Local tmp from testsprite harness
 testsprite_tests/tmp/
