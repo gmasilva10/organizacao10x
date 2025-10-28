@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { X, Edit, Move, User, CheckCircle2, MessageSquare, Paperclip, Clock, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { KanbanChecklist } from './KanbanChecklist'
 import { KanbanLogDrawer } from './KanbanLogDrawer'
@@ -245,6 +245,9 @@ export function KanbanCardEditor({
         throw new Error(errorData.error || 'Erro ao encerrar onboarding')
       }
 
+      const result = await response.json()
+      console.log('✅ [DEBUG] Resposta da API:', result)
+
       // Chamar callback do parent
       await onComplete(card.id)
       
@@ -260,7 +263,32 @@ export function KanbanCardEditor({
     }
   }
 
-  const isLastColumn = column.stageCode === 'entrega_treino' || column.title.toLowerCase().includes('entrega')
+  const isLastColumn = column.stageCode === 'entrega_treino' || 
+                      column.title.toLowerCase().includes('entrega') ||
+                      column.title.toLowerCase().includes('delivery') ||
+                      column.title.toLowerCase().includes('final')
+  
+  // DEBUG: Log para identificar problema do botão
+  console.log('🔍 [DEBUG] KanbanCardEditor - Botão Encerrar:', {
+    cardId: card.id,
+    columnTitle: column.title,
+    stageCode: column.stageCode,
+    isLastColumn,
+    canAdvance,
+    columnFullData: column,
+    conditions: {
+      stageCodeMatch: column.stageCode === 'entrega_treino',
+      titleContainsEntrega: column.title.toLowerCase().includes('entrega'),
+      titleContainsDelivery: column.title.toLowerCase().includes('delivery'),
+      titleContainsFinal: column.title.toLowerCase().includes('final')
+    },
+    allConditions: [
+      column.stageCode === 'entrega_treino',
+      column.title.toLowerCase().includes('entrega'),
+      column.title.toLowerCase().includes('delivery'),
+      column.title.toLowerCase().includes('final')
+    ]
+  })
 
   return (
     <>
@@ -290,6 +318,9 @@ export function KanbanCardEditor({
                 <X className="h-4 w-4" />
               </Button>
             </DialogTitle>
+            <DialogDescription>
+              Gerencie o processo de onboarding do aluno {card.title}
+            </DialogDescription>
           </DialogHeader>
 
           {/* Tabs */}
@@ -615,7 +646,8 @@ export function KanbanCardEditor({
                   onClick={() => setCompleteConfirmOpen(true)}
                   disabled={!canAdvance}
                   variant="destructive"
-                  className="gap-2"
+                  className="gap-2 bg-red-600 hover:bg-red-700 text-white font-medium"
+                  data-testid="encerrar-onboarding-button"
                 >
                   <CheckCircle2 className="h-4 w-4" />
                   Encerrar

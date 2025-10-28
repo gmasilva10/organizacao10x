@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { FileText, Plus, ExternalLink, Download } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/components/ui/toast"
 import { Badge } from "@/components/ui/badge"
 
 interface AnamneseTabProps {
@@ -26,7 +26,7 @@ export default function AnamneseTab({ studentId, studentName, onError }: Anamnes
   const [loading, setLoading] = useState(false)
   const [loadingList, setLoadingList] = useState(true)
   const [versions, setVersions] = useState<AnamneseVersion[]>([])
-  const { toast } = useToast()
+  const { success, error: showError } = useToast()
 
   // Carregar lista de anamneses ao montar
   useEffect(() => {
@@ -71,11 +71,7 @@ export default function AnamneseTab({ studentId, studentName, onError }: Anamnes
 
       console.log('✅ [ANAMNESE TAB] Anamnese criada com sucesso:', data)
 
-      toast({
-        title: "Anamnese criada com sucesso!",
-        description: `Código: ${data.code}. Link público gerado.`,
-        variant: "default"
-      })
+      success(`Anamnese criada com sucesso! Código: ${data.code}. Link público gerado.`)
 
       // Recarregar lista de anamneses
       await loadVersions()
@@ -83,11 +79,7 @@ export default function AnamneseTab({ studentId, studentName, onError }: Anamnes
     } catch (error) {
       console.error('❌ [ANAMNESE TAB] Erro ao criar anamnese:', error)
       
-      toast({
-        title: "Erro ao criar anamnese",
-        description: error instanceof Error ? error.message : "Erro desconhecido",
-        variant: "destructive"
-      })
+      showError(error instanceof Error ? error.message : "Erro desconhecido")
       
       if (onError) {
         onError(error as Error)
@@ -199,18 +191,10 @@ export default function AnamneseTab({ studentId, studentName, onError }: Anamnes
                           const pdfResponse = await fetch(`/api/anamnese/version/${version.id}/pdf`)
                           if (pdfResponse.ok) {
                             const pdfData = await pdfResponse.json()
-                            toast({
-                              title: "PDF gerado",
-                              description: "Funcionalidade em desenvolvimento",
-                              variant: "default"
-                            })
+                            success("PDF gerado - Funcionalidade em desenvolvimento")
                           }
                         } catch (err) {
-                          toast({
-                            title: "Erro ao gerar PDF",
-                            description: "Tente novamente",
-                            variant: "destructive"
-                          })
+                          showError("Erro ao gerar PDF - Tente novamente")
                         }
                       }}
                     >

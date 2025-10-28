@@ -8,7 +8,7 @@
 'use client'
 
 import React from 'react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,6 +35,9 @@ export function FilterDrawer({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="fixed right-0 top-0 h-full w-80 max-w-sm transform transition-transform duration-300 ease-in-out data-[state=open]:translate-x-0 data-[state=closed]:translate-x-full border-l">
+        <DialogDescription className="sr-only">
+          Painel de filtros para {title}
+        </DialogDescription>
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">

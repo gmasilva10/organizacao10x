@@ -1,12 +1,12 @@
 -- Backfill de relationship_templates (MVP JSON) -> relationship_templates_v2
--- Idempotente por (tenant_id, code)
+-- Idempotente por (org_id, code)
 
 INSERT INTO public.relationship_templates_v2 (
-  tenant_id, code, anchor, touchpoint, suggested_offset, channel_default,
+  org_id, code, anchor, touchpoint, suggested_offset, channel_default,
   message_v1, message_v2, active, priority, audience_filter, variables
 )
 SELECT
-  t.tenant_id,
+  t.org_id,
   (t.content ->> 'code') AS code,
   (t.content ->> 'anchor') AS anchor,
   COALESCE((t.content ->> 'touchpoint'),'') AS touchpoint,
@@ -19,12 +19,12 @@ SELECT
   COALESCE(t.content -> 'audience_filter', '{}'::jsonb) AS audience_filter,
   COALESCE(t.content -> 'variables', '[]'::jsonb) AS variables
 FROM (
-  SELECT id, tenant_id, content::jsonb AS content
+  SELECT id, org_id, content::jsonb AS content
   FROM public.relationship_templates
 ) t
 WHERE (t.content ->> 'code') IS NOT NULL
   AND NOT EXISTS (
     SELECT 1 FROM public.relationship_templates_v2 v
-    WHERE v.tenant_id = t.tenant_id AND v.code = (t.content ->> 'code')
+    WHERE v.org_id = t.org_id AND v.code = (t.content ->> 'code')
   );
 

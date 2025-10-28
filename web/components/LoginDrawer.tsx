@@ -59,11 +59,18 @@ function LoginDrawerContent() {
                 toast.error("Credenciais inválidas. Tente novamente.")
                 return
             }
-            // Garante tokens atualizados pós-login
-            const { data: sessionData } = await supabase.auth.getSession()
-            const accessToken = sessionData?.session?.access_token
-            const refreshToken = sessionData?.session?.refresh_token
+            // Usar dados diretamente do signInWithPassword
+            const accessToken = data?.session?.access_token
+            const refreshToken = data?.session?.refresh_token
+            
+            console.log("🔍 [LOGIN DEBUG] Verificando tokens:", {
+                hasAccessToken: !!accessToken,
+                hasRefreshToken: !!refreshToken,
+                sessionData: data?.session ? '✅ Presente' : '❌ Ausente'
+            })
+            
             if (!accessToken || !refreshToken) {
+                console.error("❌ [LOGIN DEBUG] Tokens não encontrados após login")
                 toast.error("Falha ao obter sessão após login. Tente novamente.")
                 return
             }
@@ -85,8 +92,8 @@ function LoginDrawerContent() {
             toast.success("Login realizado com sucesso.")
             setOpen(false)
             
-            // Navegar para página de loading antes do dashboard
-            router.push("/loading")
+            // Redirecionar diretamente para o dashboard sem manter histórico do login
+            router.replace("/app")
         } catch {
             toast.error("Erro ao autenticar. Tente novamente.")
         }

@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -179,6 +179,9 @@ export function GuidelinesViewModal({ open, onClose, guideline }: GuidelinesView
             <Eye className="h-5 w-5" />
             {guideline.title}
           </DialogTitle>
+          <DialogDescription>
+            Visualize os detalhes e preview desta diretriz de treino.
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={(value: "summary" | "preview") => setActiveTab(value as 'summary' | 'preview')} className="px-6">

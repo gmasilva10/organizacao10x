@@ -189,7 +189,7 @@ export async function POST(
         .limit(1)
         .maybeSingle()
 
-      const ownerUserId = responsible?.professionals?.user_id
+      const ownerUserId = responsible?.professionals?.[0]?.user_id
 
       if (ownerUserId) {
         // Buscar grupo "Saúde"
@@ -218,7 +218,7 @@ export async function POST(
               group_id: healthGroup.id,
               type_id: occType.id,
               occurred_at: new Date().toISOString().split('T')[0],
-              notes: `Anamnese ${version?.code || ''} respondida com sucesso. PDF disponível em: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/p/anamnese/${token}`,
+              notes: `Anamnese respondida com sucesso. PDF disponível em: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/p/anamnese/${token}`,
               owner_user_id: ownerUserId,
               status: 'DONE',
               priority: 'medium',

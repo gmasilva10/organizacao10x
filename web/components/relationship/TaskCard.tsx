@@ -31,6 +31,8 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { PostponeTaskModal } from './PostponeTaskModal'
+import { DraggableTask } from './DraggableTask'
 
 interface Task {
   id: string
@@ -67,6 +69,7 @@ interface TaskCardProps {
   onOpenWhatsApp: (phone: string, message: string) => void
   onUpdateStatus: (taskId: string, status: string) => void
   onSnoozeTask: (taskId: string, days: number) => void
+  onPostponeTask: (taskId: string, newDate: Date) => Promise<void>
   onDeleteTask: (taskId: string) => void
 }
 
@@ -84,20 +87,23 @@ const STATUS_COLORS = {
   deleted: 'bg-red-500'
 }
 
-export default function TaskCard({ 
-  task, 
-  onCopyMessage, 
-  onOpenWhatsApp, 
-  onUpdateStatus, 
+export default function TaskCard({
+  task,
+  onCopyMessage,
+  onOpenWhatsApp,
+  onUpdateStatus,
   onSnoozeTask,
+  onPostponeTask,
   onDeleteTask
 }: TaskCardProps) {
+  const [postponeModalOpen, setPostponeModalOpen] = React.useState(false)
   const channelIcon = CHANNEL_ICONS[task.channel as keyof typeof CHANNEL_ICONS] || '📱'
   const statusColor = STATUS_COLORS[task.status as keyof typeof STATUS_COLORS] || 'bg-gray-500'
   
   return (
-    <Card className="w-full hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500">
-      <CardContent className="p-3">
+    <DraggableTask id={task.id}>
+      <Card className="w-full hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500">
+        <CardContent className="p-3">
         {/* Header ultra compacto */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -138,17 +144,9 @@ export default function TaskCard({
               
               <DropdownMenuSeparator />
               
-              <DropdownMenuItem onClick={() => onSnoozeTask(task.id, 1)}>
+              <DropdownMenuItem onClick={() => setPostponeModalOpen(true)}>
                 <Clock className="h-3 w-3 mr-2" />
-                Adiar 1 dia
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onSnoozeTask(task.id, 3)}>
-                <Clock className="h-3 w-3 mr-2" />
-                Adiar 3 dias
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onSnoozeTask(task.id, 7)}>
-                <Clock className="h-3 w-3 mr-2" />
-                Adiar 7 dias
+                Adiar
               </DropdownMenuItem>
               
               <DropdownMenuSeparator />
@@ -204,6 +202,17 @@ export default function TaskCard({
           </Badge>
         </div>
       </CardContent>
-    </Card>
+      
+      {/* Modal de Adiamento */}
+      <PostponeTaskModal
+        open={postponeModalOpen}
+        onOpenChange={setPostponeModalOpen}
+        taskId={task.id}
+        taskTitle={task.payload.student_name}
+        currentDate={new Date(task.scheduled_for)}
+        onPostpone={onPostponeTask}
+      />
+      </Card>
+    </DraggableTask>
   )
 }

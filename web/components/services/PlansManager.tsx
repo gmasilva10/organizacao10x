@@ -547,7 +547,7 @@ export default function PlansManager() {
                <Switch
                  id="custom_value"
                  checked={formData.custom_value}
-                 onCheckedChange={(checked) => {
+                  onCheckedChange={(checked: boolean) => {
                    setFormData(prev => ({ 
                      ...prev, 
                      custom_value: checked,
@@ -768,7 +768,7 @@ export default function PlansManager() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Ciclo:</span>
-                        <span className="font-medium">{getCycleLabel(selectedPlan.ciclo)}</span>
+                        <span className="font-medium">{getCycleLabel(selectedPlan.ciclo || '')}</span>
                       </div>
                     </>
                   )}

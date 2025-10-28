@@ -6,14 +6,14 @@ CREATE TABLE IF NOT EXISTS students (
   phone VARCHAR(20),
   status VARCHAR(20) NOT NULL DEFAULT 'onboarding' CHECK (status IN ('onboarding', 'active', 'paused', 'inactive')),
   trainer_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   created_by UUID NOT NULL REFERENCES auth.users(id)
 );
 
 -- Índices para performance
-CREATE INDEX IF NOT EXISTS idx_students_tenant_id ON students(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_students_org_id ON students(org_id);
 CREATE INDEX IF NOT EXISTS idx_students_trainer_id ON students(trainer_id);
 CREATE INDEX IF NOT EXISTS idx_students_status ON students(status);
 CREATE INDEX IF NOT EXISTS idx_students_created_at ON students(created_at DESC);
@@ -25,8 +25,8 @@ ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view students of their tenant" 
   ON students FOR SELECT
   USING (
-    tenant_id IN (
-      SELECT tenant_id FROM memberships 
+    org_id IN (
+      SELECT org_id FROM memberships 
       WHERE user_id = auth.uid() AND role IN ('admin', 'trainer', 'nutritionist')
     )
   );
@@ -34,8 +34,8 @@ CREATE POLICY "Users can view students of their tenant"
 CREATE POLICY "Users can create students in their tenant" 
   ON students FOR INSERT
   WITH CHECK (
-    tenant_id IN (
-      SELECT tenant_id FROM memberships 
+    org_id IN (
+      SELECT org_id FROM memberships 
       WHERE user_id = auth.uid() AND role IN ('admin', 'trainer', 'nutritionist')
     )
   );
@@ -43,8 +43,8 @@ CREATE POLICY "Users can create students in their tenant"
 CREATE POLICY "Users can update students of their tenant" 
   ON students FOR UPDATE
   USING (
-    tenant_id IN (
-      SELECT tenant_id FROM memberships 
+    org_id IN (
+      SELECT org_id FROM memberships 
       WHERE user_id = auth.uid() AND role IN ('admin', 'trainer', 'nutritionist')
     )
   );
@@ -52,8 +52,8 @@ CREATE POLICY "Users can update students of their tenant"
 CREATE POLICY "Users can delete students of their tenant" 
   ON students FOR DELETE
   USING (
-    tenant_id IN (
-      SELECT tenant_id FROM memberships 
+    org_id IN (
+      SELECT org_id FROM memberships 
       WHERE user_id = auth.uid() AND role IN ('admin', 'trainer', 'nutritionist')
     )
   );

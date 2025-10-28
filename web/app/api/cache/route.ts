@@ -146,7 +146,7 @@ export async function DELETE(request: NextRequest) {
     
     if (pattern) {
       // Limpar cache por padrão
-      const invalidated = await invalidateCachePattern(pattern, { prefix })
+      const invalidated = await invalidateCachePattern(pattern, { prefix: prefix || undefined })
       return NextResponse.json({
         success: true,
         message: 'Cache limpo com sucesso',

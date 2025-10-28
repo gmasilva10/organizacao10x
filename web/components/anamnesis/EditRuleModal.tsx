@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -189,7 +189,9 @@ export function EditRuleModal({ isOpen, onClose, onSuccess, rule, versionId }: E
       <DialogContent className="max-w-5xl max-h-[95vh] overflow-visible p-0">
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle className="text-2xl font-bold text-gray-900">Editar Regra de Diretriz de Treino</DialogTitle>
-          <p className="text-sm text-gray-600 mt-2">Modifique as condições e parâmetros de treino para esta regra</p>
+          <DialogDescription className="text-sm text-gray-600 mt-2">
+            Modifique as condições e parâmetros de treino para esta regra
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-8 overflow-y-auto max-h-[calc(95vh-180px)] px-6">

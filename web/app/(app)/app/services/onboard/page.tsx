@@ -1032,7 +1032,7 @@ function NewTemplateForm({ column, onSave, onCancel }: { column: Column; onSave:
 
 function EditColumnForm({ column, onSave, onCancel }: { column: Column; onSave: (data: { title: string; color?: string }) => void; onCancel: () => void }) {
   const [title, setTitle] = useState(column.title)
-  const [color, setColor] = useState<string>(column.color || '')
+  const [color, setColor] = useState<string>((column as any).color || '')
 
   return (
     <div className="space-y-6">

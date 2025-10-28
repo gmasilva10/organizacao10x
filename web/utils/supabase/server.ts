@@ -31,11 +31,19 @@ export async function createClient() {
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options?: any) {
-          // cookies() em App Router retorna um store mutÃ¡vel sÃ­ncrono
-          cookieStore.set(name, value, options)
+          try {
+            // cookies() em App Router retorna um store mutÃ¡vel sÃ­ncrono
+            cookieStore.set(name, value, options)
+          } catch {
+            // Cookies são read-only em alguns contextos (layouts, etc)
+          }
         },
         remove(name: string, options?: any) {
-          cookieStore.set(name, "", { ...options, maxAge: 0 })
+          try {
+            cookieStore.set(name, "", { ...options, maxAge: 0 })
+          } catch {
+            // Cookies são read-only em alguns contextos
+          }
         },
       },
       cookieOptions: {

@@ -1,16 +1,38 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/server/context"
+import { getCache, setCache } from '@/lib/cache/redis'
+import { withRateLimit, RateLimitMiddlewareConfigs } from '@/lib/rate-limit/middleware'
+// import { withCompression, CompressionConfigs } from '@/lib/compression/middleware'
 
-export async function GET(request: Request) {
+export const dynamic = 'force-dynamic'
+
+async function getKanbanBoardHandler(request: Request) {
   const ctx = await resolveRequestContext(request)
   if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
+
+  const { searchParams } = new URL(request.url)
+  const trainerId = (searchParams.get('trainerId') || '').trim()
+
+  // Verificar cache primeiro
+  const cacheKey = `kanban-board:${ctx.org_id}:${trainerId}`
+  const cachedData = await getCache(cacheKey, {
+    ttl: 30, // 30 segundos para board
+    prefix: 'kanban'
+  })
+
+  if (cachedData) {
+    console.log('✅ [kanban-board] Cache HIT')
+    return NextResponse.json(cachedData, {
+      headers: { 
+        'X-Cache': 'HIT',
+        'Cache-Control': 'public, max-age=30, stale-while-revalidate=60'
+      }
+    })
+  }
 
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return NextResponse.json({ error: "service_unavailable" }, { status: 503 })
-
-  const { searchParams } = new URL(request.url)
-  const trainerId = (searchParams.get('trainerId') || '').trim()
 
   // Removido resync automático; será feito via endpoint dedicado
 
@@ -74,18 +96,21 @@ export async function GET(request: Request) {
   = []
   {
     // Busca robusta incluindo org_id; tenta incluir meta quando existir
-    let cardsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,created_at,meta&order=position.asc`, {
+    // Filtrar cards completos (status = 'completed') para não aparecer no board
+    let cardsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,created_at,meta,status&order=position.asc`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (!cardsResp.ok) {
       // Fallback sem meta
-      cardsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,created_at&order=position.asc`, {
+      cardsResp = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,created_at,status&order=position.asc`, {
         headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
       })
     }
     if (cardsResp.ok) {
-      const cardsRaw: Array<{ id: string; student_id: string; stage_id: string; position: number; created_at?: string | null; meta?: any }> = await cardsResp.json().catch(()=>[])
-      cards = cardsRaw.map(r => ({ id: r.id, student_id: r.student_id, column_id: r.stage_id, sort: r.position, created_at: r.created_at || undefined, completed_at: null, _meta: (r as any).meta }))
+      const cardsRaw: Array<{ id: string; student_id: string; stage_id: string; position: number; created_at?: string | null; meta?: any; status?: string }> = await cardsResp.json().catch(()=>[])
+      // Filtrar cards com status 'completed' para não aparecer no board ativo
+      const activeCards = cardsRaw.filter(r => r.status !== 'completed')
+      cards = activeCards.map(r => ({ id: r.id, student_id: r.student_id, column_id: r.stage_id, sort: r.position, created_at: r.created_at || undefined, completed_at: null, _meta: (r as any).meta }))
     } else {
       const t = await cardsResp.text().catch(()=>"")
       // Fallback para modelo antigo
@@ -109,12 +134,14 @@ export async function GET(request: Request) {
 
   // Salvaguarda: se não retornou nenhum card mas existem itens na tabela para a org, tenta uma segunda leitura simples
   if (cards.length === 0) {
-    const probe = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position&order=position.asc`, {
+    const probe = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,status&order=position.asc`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (probe.ok) {
-      const rows: Array<{ id:string; student_id:string; stage_id:string; position:number }>= await probe.json().catch(()=>[])
-      cards = rows.map(r => ({ id: r.id, student_id: r.student_id, column_id: r.stage_id, sort: r.position, created_at: undefined, completed_at: null }))
+      const rows: Array<{ id:string; student_id:string; stage_id:string; position:number; status?: string }>= await probe.json().catch(()=>[])
+      // Filtrar cards completos também na salvaguarda
+      const activeRows = rows.filter(r => r.status !== 'completed')
+      cards = activeRows.map(r => ({ id: r.id, student_id: r.student_id, column_id: r.stage_id, sort: r.position, created_at: undefined, completed_at: null }))
     }
   }
 
@@ -123,12 +150,14 @@ export async function GET(request: Request) {
     try {
       await fetch(new URL('/api/kanban/resync', request.url).toString(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store' })
     } catch {}
-    const retry = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position&order=position.asc`, {
+    const retry = await fetch(`${url}/rest/v1/kanban_items?org_id=eq.${ctx.org_id}&select=id,student_id,stage_id,position,status&order=position.asc`, {
       headers: { apikey: key!, Authorization: `Bearer ${key}`! }, cache: 'no-store'
     })
     if (retry.ok) {
-      const rows2: Array<{ id:string; student_id:string; stage_id:string; position:number }>= await retry.json().catch(()=>[])
-      cards = rows2.map(r => ({ id: r.id, student_id: r.student_id, column_id: r.stage_id, sort: r.position, created_at: undefined, completed_at: null }))
+      const rows2: Array<{ id:string; student_id:string; stage_id:string; position:number; status?: string }>= await retry.json().catch(()=>[])
+      // Filtrar cards completos também na segunda salvaguarda
+      const activeRows2 = rows2.filter(r => r.status !== 'completed')
+      cards = activeRows2.map(r => ({ id: r.id, student_id: r.student_id, column_id: r.stage_id, sort: r.position, created_at: undefined, completed_at: null }))
     }
   }
 
@@ -169,15 +198,40 @@ export async function GET(request: Request) {
     student_name: studentsMap[c.student_id]?.name,
     student_phone: studentsMap[c.student_id]?.phone
   }))
+  
+  const result = { columns, cards: enriched }
+  
+  // Armazenar no cache
+  await setCache(cacheKey, result, {
+    ttl: 30, // 30 segundos
+    prefix: 'kanban'
+  })
+  
   const ms = Date.now() - t0
-  return NextResponse.json({ columns, cards: enriched }, { 
+  console.log('✅ [kanban-board] Cache MISS - dados armazenados')
+  return NextResponse.json(result, { 
     headers: { 
       'X-Query-Time': String(ms), 
       'X-Row-Count': String(enriched.length),
+      'X-Cache': 'MISS',
       'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' 
     } 
   })
 }
 
+// Aplicar rate limiting e compressão na exportação
+const rateLimitedHandler = withRateLimit(getKanbanBoardHandler, {
+  ...RateLimitMiddlewareConfigs.API,
+  getUserId: async (request) => {
+    const ctx = await resolveRequestContext(request)
+    return ctx?.userId || null
+  },
+  getOrgId: async (request) => {
+    const ctx = await resolveRequestContext(request)
+    return ctx?.org_id || null
+  }
+})
 
+export const GET = rateLimitedHandler
+// export const GET = withCompression(rateLimitedHandler, CompressionConfigs.API_LARGE)
 

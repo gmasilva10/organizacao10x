@@ -158,7 +158,7 @@ export function useCache<T>(
 
   // Função para mutar dados (otimistic update)
   const mutate = useCallback((newData: T | ((prev: T | null) => T)) => {
-    const updatedData = typeof newData === 'function' ? newData(state.data) : newData
+    const updatedData = typeof newData === 'function' ? (newData as (prev: T | null) => T)(state.data) : newData
     
     setState(prev => ({
       ...prev,

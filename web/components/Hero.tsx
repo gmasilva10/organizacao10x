@@ -35,9 +35,12 @@ export function Hero() {
       <div className="pointer-events-none absolute left-[-120px] top-1/2 -translate-y-1/2 h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle_at_center,theme(colors.primary)/0.15,transparent_60%)]" />
       {/* Globo pontilhado: grande, mais transparente e ao fundo à esquerda (sem alterações estruturais) */}
       <motion.div
-        initial={{ scale: 1 }}
-        animate={{ scale: open ? 1 : 1.02 }}
-        transition={{ duration: 6, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+        initial={{ scale: 1, opacity: 0 }}
+        animate={{ scale: open ? 1 : 1.02, opacity: 1 }}
+        transition={{ 
+          scale: { duration: 6, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" },
+          opacity: { duration: 0.5, delay: 0.1 }
+        }}
         className="pointer-events-none absolute left-[-160px] top-1/2 -translate-y-[48%] relative w-[60vw] md:w-[56vw] lg:w-[52vw]"
       >
         <DottedGlobe paused={open} className="max-w-[60vw] md:max-w-[56vw] lg:max-w-[52vw] opacity-35" />
@@ -69,10 +72,15 @@ export function Hero() {
 
       <div className="container relative z-10 px-6">
         <div className="flex flex-col items-center space-y-4 text-center md:items-start md:text-left">
-					<div className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm">
+					<motion.div 
+						initial={{ opacity: 0, y: -10 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5 }}
+						className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm"
+					>
 						<GlobeIcon className="mr-1 h-3 w-3" />
 						Plataforma para Personal Trainers
-					</div>
+					</motion.div>
 
 					<motion.h1
 						initial={{ opacity: 0, y: 20 }}

@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
+import { validateProcessExecution, formatProcessErrors, formatProcessWarnings } from "@/lib/validators/student-processes-schema"
+import { showErrorToast, showWarningToast } from "@/lib/toast-utils"
 import { 
   Settings, 
   ChevronDown,
@@ -22,7 +24,8 @@ import {
   UserCheck,
   Paperclip,
   UserPlus,
-  Users
+  Users,
+  LayoutGrid
 } from "lucide-react"
 import { StudentOccurrenceModal } from "../StudentOccurrenceModal"
 import StudentRelationshipModal from "../StudentRelationshipModal"
@@ -40,6 +43,7 @@ interface StudentActionsProps {
   studentId: string
   studentName: string
   studentPhone?: string // Telefone do aluno
+  studentData?: any // Dados completos do aluno para validação
   variant?: 'card' | 'edit' // Variante para card ou página de edição
   onActionComplete?: (actionType?: string) => void // Callback para atualizar dados após ação
   openModal?: 'gerar-anamnese' | null // Modal específico para abrir
@@ -49,6 +53,7 @@ export default function StudentActions({
   studentId, 
   studentName, 
   studentPhone,
+  studentData,
   variant = 'card',
   onActionComplete,
   openModal = null
@@ -75,6 +80,38 @@ export default function StudentActions({
       setGerarAnamneseModalOpen(true)
     }
   }, [openModal])
+
+  // Função para validar e executar ação
+  const handleValidatedAction = (processType: string, action: () => void) => {
+    console.log('🔍 [DEBUG] handleValidatedAction chamado para:', processType)
+    
+    // Se não há dados do aluno, executar ação diretamente (modo compatibilidade)
+    if (!studentData) {
+      console.log('🔍 [DEBUG] Sem dados do aluno, executando ação diretamente')
+      setOpen(false)
+      action()
+      return
+    }
+
+    // Validar processo
+    const validation = validateProcessExecution(processType as any, studentData)
+    
+    if (!validation.isValid) {
+      console.log('❌ [DEBUG] Validação falhou:', validation.errors)
+      showErrorToast(formatProcessErrors(validation.errors))
+      return
+    }
+
+    // Mostrar avisos se houver
+    if (validation.warnings.length > 0) {
+      console.log('⚠️ [DEBUG] Avisos encontrados:', validation.warnings)
+      showWarningToast(formatProcessWarnings(validation.warnings))
+    }
+
+    console.log('✅ [DEBUG] Validação passou, executando ação')
+    setOpen(false)
+    action()
+  }
 
   const handleAction = (action: () => void) => {
     console.log('🔍 [DEBUG] handleAction chamado')
@@ -150,45 +187,45 @@ export default function StudentActions({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => handleAction(() => setMatricularModalOpen(true))}>
-                <GraduationCap className="h-4 w-4 mr-2 text-purple-600" />
-                Matricular Aluno
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAction(() => setOnboardingModalOpen(true))}>
-                <UserCheck className="h-4 w-4 mr-2 text-blue-600" />
-                Enviar Onboarding
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleAction(() => setGerarAnamneseModalOpen(true))}>
-                <FileText className="h-4 w-4 mr-2 text-blue-600" />
-                Gerar Anamnese
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAction(() => setGerarDiretrizModalOpen(true))}>
-                <Target className="h-4 w-4 mr-2 text-green-600" />
-                Gerar Diretriz
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleAction(() => setOccurrenceModalOpen(true))}>
-                <AlertTriangle className="h-4 w-4 mr-2 text-red-600" />
-                Nova Ocorrência
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleAction(() => setMessageComposerOpen(true))}>
-                <MessageSquare className="h-4 w-4 mr-2 text-green-600" />
-                Enviar Mensagem
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAction(() => setEmailModalOpen(true))}>
-                <Mail className="h-4 w-4 mr-2 text-blue-600" />
-                Enviar E-mail
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => handleAction(() => setDeleteModalOpen(true))}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2 text-red-600" />
-                Excluir Aluno
-              </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleValidatedAction('matricular', () => setMatricularModalOpen(true))}>
+              <GraduationCap className="h-4 w-4 mr-2 text-purple-600" />
+              Matricular Aluno
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleValidatedAction('onboarding', () => setOnboardingModalOpen(true))}>
+              <UserCheck className="h-4 w-4 mr-2 text-blue-600" />
+              Enviar Onboarding
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleValidatedAction('anamnese', () => setGerarAnamneseModalOpen(true))}>
+              <FileText className="h-4 w-4 mr-2 text-blue-600" />
+              Gerar Anamnese
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleValidatedAction('diretriz', () => setGerarDiretrizModalOpen(true))}>
+              <Target className="h-4 w-4 mr-2 text-green-600" />
+              Gerar Diretriz
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleValidatedAction('ocorrencia', () => setOccurrenceModalOpen(true))}>
+              <AlertTriangle className="h-4 w-4 mr-2 text-red-600" />
+              Nova Ocorrência
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleValidatedAction('mensagem', () => setMessageComposerOpen(true))}>
+              <MessageSquare className="h-4 w-4 mr-2 text-green-600" />
+              Enviar Mensagem
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleValidatedAction('email', () => setEmailModalOpen(true))}>
+              <Mail className="h-4 w-4 mr-2 text-blue-600" />
+              Enviar E-mail
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              onClick={() => handleValidatedAction('excluir', () => setDeleteModalOpen(true))}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="h-4 w-4 mr-2 text-red-600" />
+              Excluir Aluno
+            </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -287,6 +324,11 @@ export default function StudentActions({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => handleAction(() => window.location.href = `/app/students/${studentId}/anexos/onboarding`)}>
+              <LayoutGrid className="h-4 w-4 mr-2 text-blue-600" />
+              Onboarding
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleAction(() => setOccurrenceModalOpen(true))}>
               <AlertTriangle className="h-4 w-4 mr-2 text-red-600" />
               Ocorrências
@@ -326,42 +368,39 @@ export default function StudentActions({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem onClick={() => handleAction(() => setMatricularModalOpen(true))}>
+            <DropdownMenuItem onClick={() => handleValidatedAction('matricular', () => setMatricularModalOpen(true))}>
               <GraduationCap className="h-4 w-4 mr-2 text-purple-600" />
               Matricular Aluno
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction(() => setOnboardingModalOpen(true))}>
+            <DropdownMenuItem onClick={() => handleValidatedAction('onboarding', () => setOnboardingModalOpen(true))}>
               <UserCheck className="h-4 w-4 mr-2 text-blue-600" />
               Enviar Onboarding
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => {
+            <DropdownMenuItem onClick={() => handleValidatedAction('anamnese', () => {
               console.log('🔍 [DEBUG] Clicou em Gerar Anamnese, abrindo modal...')
               console.log('🔍 [DEBUG] gerarAnamneseModalOpen antes:', gerarAnamneseModalOpen)
-              handleAction(() => {
-                console.log('🔍 [DEBUG] setGerarAnamneseModalOpen(true) sendo chamado')
-                setGerarAnamneseModalOpen(true)
-                console.log('🔍 [DEBUG] setGerarAnamneseModalOpen(true) executado')
-              })
-            }}>
+              setGerarAnamneseModalOpen(true)
+              console.log('🔍 [DEBUG] setGerarAnamneseModalOpen(true) executado')
+            })}>
               <FileText className="h-4 w-4 mr-2 text-blue-600" />
               Gerar Anamnese
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction(() => setGerarDiretrizModalOpen(true))}>
+            <DropdownMenuItem onClick={() => handleValidatedAction('diretriz', () => setGerarDiretrizModalOpen(true))}>
               <Target className="h-4 w-4 mr-2 text-green-600" />
               Gerar Diretriz
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleAction(() => setOccurrenceModalOpen(true))}>
+            <DropdownMenuItem onClick={() => handleValidatedAction('ocorrencia', () => setOccurrenceModalOpen(true))}>
               <AlertTriangle className="h-4 w-4 mr-2 text-red-600" />
               Nova Ocorrência
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleAction(() => setMessageComposerOpen(true))}>
+            <DropdownMenuItem onClick={() => handleValidatedAction('mensagem', () => setMessageComposerOpen(true))}>
               <MessageSquare className="h-4 w-4 mr-2 text-green-600" />
               Enviar Mensagem
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction(() => setEmailModalOpen(true))}>
+            <DropdownMenuItem onClick={() => handleValidatedAction('email', () => setEmailModalOpen(true))}>
               <Mail className="h-4 w-4 mr-2 text-blue-600" />
               Enviar E-mail
             </DropdownMenuItem>
@@ -374,13 +413,13 @@ export default function StudentActions({
                 </DropdownMenuItem>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="right" align="start" className="w-48">
-                <DropdownMenuItem onClick={() => handleAction(() => setWhatsappContactModalOpen(true))}>
+                <DropdownMenuItem onClick={() => handleValidatedAction('whatsapp', () => setWhatsappContactModalOpen(true))}>
                   <UserPlus className="h-4 w-4 mr-2 text-green-600" />
                   Criar contato
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   console.log('🔍 WhatsApp Create Group clicked!')
-                  handleAction(() => setWhatsappCreateGroupOpen(true))
+                  handleValidatedAction('whatsapp', () => setWhatsappCreateGroupOpen(true))
                 }}>
                   <Users className="h-4 w-4 mr-2 text-green-600" />
                   Criar grupo
@@ -389,14 +428,14 @@ export default function StudentActions({
             </DropdownMenu>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
-              onClick={() => handleAction(() => setInactivateModalOpen(true))}
+              onClick={() => handleValidatedAction('inativar', () => setInactivateModalOpen(true))}
               className="text-orange-600 focus:text-orange-600"
             >
               <UserCheck className="h-4 w-4 mr-2 text-orange-600" />
               Inativar Aluno
             </DropdownMenuItem>
             <DropdownMenuItem 
-              onClick={() => handleAction(() => setDeleteModalOpen(true))}
+              onClick={() => handleValidatedAction('excluir', () => setDeleteModalOpen(true))}
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="h-4 w-4 mr-2 text-red-600" />

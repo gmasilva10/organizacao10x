@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { resolveRequestContext } from "@/utils/context/request-context"
 import { createClient } from "@/utils/supabase/server"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const ctx = await resolveRequestContext(request)

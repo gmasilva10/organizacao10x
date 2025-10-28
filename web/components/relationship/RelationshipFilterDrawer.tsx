@@ -7,15 +7,16 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Filter, X, RefreshCw, Search, Calendar as CalendarIcon, Eye, EyeOff } from 'lucide-react'
-import { RelationshipFilters } from '@/hooks/useRelationshipFilters'
+import { RelationshipFilters, RelationshipFiltersUI } from '@/hooks/useRelationshipFilters'
+import { useTemplates } from '@/hooks/useTemplates'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 
 interface RelationshipFilterDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  filters: RelationshipFilters
-  onFiltersChange: (filters: Partial<RelationshipFilters>) => void
+  filters: RelationshipFiltersUI // Filtros formatados para UI
+  onFiltersChange: (filters: Partial<RelationshipFiltersUI>) => void // Função para UI
   onClear: () => void
   onApply: () => void
 }
@@ -43,19 +44,7 @@ const CHANNEL_OPTIONS = [
   { value: 'manual', label: 'Manual' }
 ]
 
-const TEMPLATE_OPTIONS = [
-  { value: 'all', label: 'Todos os Templates' },
-  { value: 'MSG1', label: 'MSG1 - Logo Após a Venda' },
-  { value: 'MSG2', label: 'MSG2 - Dia Anterior ao Primeiro Treino' },
-  { value: 'MSG3', label: 'MSG3 - Após o Primeiro Treino' },
-  { value: 'MSG4', label: 'MSG4 - Final da Primeira Semana' },
-  { value: 'MSG5', label: 'MSG5 - Acompanhamento Semanal' },
-  { value: 'MSG6', label: 'MSG6 - Início do Mês Seguinte' },
-  { value: 'MSG7', label: 'MSG7 - Acompanhamento Mensal' },
-  { value: 'MSG8', label: 'MSG8 - Datas Especiais' },
-  { value: 'MSG9', label: 'MSG9 - Acompanhamento Trimestral' },
-  { value: 'MSG10', label: 'MSG10 - Oferecimento de Novos Serviços' }
-]
+// Templates serão carregados dinamicamente via useTemplates hook
 
 const COLUMN_OPTIONS = [
   { value: 'overdue', label: 'Atrasadas', icon: '🔴' },
@@ -73,6 +62,17 @@ export default function RelationshipFilterDrawer({
   onClear,
   onApply
 }: RelationshipFilterDrawerProps) {
+  // Carregar templates dinamicamente
+  const { templates, loading: templatesLoading, error: templatesError } = useTemplates()
+
+  // Gerar opções de templates dinamicamente
+  const templateOptions = [
+    { value: 'all', label: 'Todos os Templates' },
+    ...templates.map(template => ({
+      value: template.code,
+      label: `${template.code} - ${template.title}`
+    }))
+  ]
 
   const getActiveFiltersCount = () => {
     return Object.entries(filters).filter(([key, value]) => 
@@ -181,16 +181,33 @@ export default function RelationshipFilterDrawer({
             <Select
               value={filters.template_code}
               onValueChange={(value: string) => onFiltersChange({ template_code: value })}
+              disabled={templatesLoading}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Todos os Templates" />
+                <SelectValue placeholder={
+                  templatesLoading 
+                    ? "Carregando templates..." 
+                    : templatesError 
+                      ? "Erro ao carregar templates" 
+                      : "Todos os Templates"
+                } />
               </SelectTrigger>
               <SelectContent>
-                {TEMPLATE_OPTIONS.map(option => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                {templatesLoading ? (
+                  <SelectItem value="loading" disabled>
+                    Carregando templates...
                   </SelectItem>
-                ))}
+                ) : templatesError ? (
+                  <SelectItem value="error" disabled>
+                    Erro ao carregar templates
+                  </SelectItem>
+                ) : (
+                  templateOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>

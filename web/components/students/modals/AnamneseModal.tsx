@@ -1,6 +1,6 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 import StudentAnamnesisList from "../StudentAnamnesisList"
@@ -25,6 +25,9 @@ export default function AnamneseModal({
           <DialogTitle className="text-xl font-semibold">
             Anamnese do Aluno
           </DialogTitle>
+          <DialogDescription>
+            Visualize e gerencie as anamneses do aluno {studentName}.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto">

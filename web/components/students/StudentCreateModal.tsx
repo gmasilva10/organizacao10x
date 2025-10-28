@@ -27,7 +27,7 @@ import {
 } from "lucide-react"
 import { showSuccessToast, showErrorToast } from "@/lib/toast-utils"
 import { processImageForUpload, validateImageRequirements, formatFileSize } from "@/utils/image-processing"
-import { studentIdentificationSchema, studentAddressSchema, formatZodErrors, validateField } from "@/lib/validators/student-schema"
+import { studentIdentificationSchema, studentAddressSchema, formatZodErrors, validateField, validateCompleteStudentData, generateUserFriendlyErrors } from "@/lib/validators/student-schema"
 import ProfessionalSearchModal from "./ProfessionalSearchModal"
 
 type StudentCreatePayload = {
@@ -73,6 +73,8 @@ export function StudentCreateModal({
   const [activeTab, setActiveTab] = useState("dados-basicos")
   const [loading, setLoading] = useState(false)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [fieldTouched, setFieldTouched] = useState<Record<string, boolean>>({})
+  const [showDetailedErrors, setShowDetailedErrors] = useState(false)
 
   // Dados Básicos
 	const [name, setName] = useState("")
@@ -349,40 +351,55 @@ export function StudentCreateModal({
   // Handlers com validação em tempo real
   const handleNameChange = (value: string) => {
     setName(value)
-    const fieldError = validateField(studentIdentificationSchema, 'name', value)
-    if (fieldError) {
-      setValidationErrors(prev => ({ ...prev, name: fieldError }))
-    } else {
-      setValidationErrors(prev => { 
-        const { name, ...rest } = prev
-        return rest 
-      })
+    setFieldTouched(prev => ({ ...prev, name: true }))
+    
+    // Validar apenas se o campo foi tocado
+    if (fieldTouched.name || value.length > 0) {
+      const fieldError = validateField(studentIdentificationSchema, 'name', value)
+      if (fieldError) {
+        setValidationErrors(prev => ({ ...prev, name: fieldError }))
+      } else {
+        setValidationErrors(prev => { 
+          const { name, ...rest } = prev
+          return rest 
+        })
+      }
     }
   }
 
   const handleEmailChange = (value: string) => {
     setEmail(value)
-    const fieldError = validateField(studentIdentificationSchema, 'email', value)
-    if (fieldError) {
-      setValidationErrors(prev => ({ ...prev, email: fieldError }))
-    } else {
-      setValidationErrors(prev => { 
-        const { email, ...rest } = prev
-        return rest 
-      })
+    setFieldTouched(prev => ({ ...prev, email: true }))
+    
+    // Validar apenas se o campo foi tocado
+    if (fieldTouched.email || value.length > 0) {
+      const fieldError = validateField(studentIdentificationSchema, 'email', value)
+      if (fieldError) {
+        setValidationErrors(prev => ({ ...prev, email: fieldError }))
+      } else {
+        setValidationErrors(prev => { 
+          const { email, ...rest } = prev
+          return rest 
+        })
+      }
     }
   }
 
   const handlePhoneChange = (value: string) => {
     setPhone(value)
-    const fieldError = validateField(studentIdentificationSchema, 'phone', value)
-    if (fieldError) {
-      setValidationErrors(prev => ({ ...prev, phone: fieldError }))
-    } else {
-      setValidationErrors(prev => { 
-        const { phone, ...rest } = prev
-        return rest 
-      })
+    setFieldTouched(prev => ({ ...prev, phone: true }))
+    
+    // Validar apenas se o campo foi tocado
+    if (fieldTouched.phone || value.length > 0) {
+      const fieldError = validateField(studentIdentificationSchema, 'phone', value)
+      if (fieldError) {
+        setValidationErrors(prev => ({ ...prev, phone: fieldError }))
+      } else {
+        setValidationErrors(prev => { 
+          const { phone, ...rest } = prev
+          return rest 
+        })
+      }
     }
   }
 
@@ -416,17 +433,45 @@ export function StudentCreateModal({
   async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault()
     
-    // Validar dados básicos com Zod
-    if (!validateBasicData()) {
-      showErrorToast('Por favor, corrija os erros antes de salvar')
-      setActiveTab("dados-basicos") // Voltar para aba com erro
-      return
+    // Marcar todos os campos como tocados para mostrar todos os erros
+    const allFields = ['name', 'email', 'phone', 'birth_date', 'gender', 'marital_status', 'nationality', 'birth_place']
+    const touchedFields = allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {})
+    setFieldTouched(touchedFields)
+    
+    // Validar dados completos com validação aprimorada
+    const studentData = {
+      name,
+      email,
+      phone: sanitizePhoneToDigits(phone) || undefined,
+      status,
+      birth_date: birthDate || undefined,
+      gender: gender || undefined,
+      marital_status: maritalStatus || undefined,
+      nationality: nationality || undefined,
+      birth_place: birthPlace || undefined,
+      onboard_opt: onboardOpt,
+      address: (addressData.zip_code || addressData.street || addressData.city) ? addressData : undefined
     }
-
-    // Validar dados de endereço se preenchidos
-    if (!validateAddressData()) {
-      showErrorToast('Por favor, corrija os erros de endereço antes de salvar')
-      setActiveTab("endereco") // Voltar para aba de endereço
+    
+    const validationResult = validateCompleteStudentData(studentData)
+    
+    if (!validationResult.isValid) {
+      setValidationErrors(validationResult.errors)
+      setShowDetailedErrors(true)
+      
+      // Mostrar erros específicos
+      const errorMessages = generateUserFriendlyErrors(validationResult)
+      showErrorToast(errorMessages.join('\n'))
+      
+      // Navegar para a primeira aba com erro
+      if (validationResult.errors.name || validationResult.errors.email || validationResult.errors.phone) {
+        setActiveTab("dados-basicos")
+      } else if (validationResult.errors.birth_date || validationResult.errors.gender || validationResult.errors.marital_status) {
+        setActiveTab("info-pessoais")
+      } else if (Object.keys(validationResult.errors).some(key => key.startsWith('address.'))) {
+        setActiveTab("endereco")
+      }
+      
       return
     }
 
@@ -533,6 +578,9 @@ export function StudentCreateModal({
         especificos: []
       })
       setActiveTab("dados-basicos")
+      setValidationErrors({})
+      setFieldTouched({})
+      setShowDetailedErrors(false)
       
 			onClose()
     } catch (error) {
@@ -604,15 +652,29 @@ export function StudentCreateModal({
                           value={name}
                           onChange={(e) => handleNameChange(e.target.value)}
                           placeholder="Ex: João Silva"
-                          className="pl-10"
+                          className={`pl-10 ${validationErrors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : fieldTouched.name && !validationErrors.name ? 'border-green-500 focus:border-green-500 focus:ring-green-500' : ''}`}
                           required
                           disabled={loading}
                           aria-invalid={!!validationErrors.name}
                           aria-describedby={validationErrors.name ? "name-error" : undefined}
                         />
+                        {fieldTouched.name && !validationErrors.name && name && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                              <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       {validationErrors.name && (
-                        <p id="name-error" className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+                        <p id="name-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          {validationErrors.name}
+                        </p>
                       )}
                     </div>
 
@@ -628,15 +690,29 @@ export function StudentCreateModal({
                           value={email}
                           onChange={(e) => handleEmailChange(e.target.value)}
                           placeholder="Ex: joao@email.com"
-                          className="pl-10"
+                          className={`pl-10 ${validationErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : fieldTouched.email && !validationErrors.email ? 'border-green-500 focus:border-green-500 focus:ring-green-500' : ''}`}
                           required
                           disabled={loading}
                           aria-invalid={!!validationErrors.email}
                           aria-describedby={validationErrors.email ? "email-error" : undefined}
                         />
+                        {fieldTouched.email && !validationErrors.email && email && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                              <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       {validationErrors.email && (
-                        <p id="email-error" className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+                        <p id="email-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          {validationErrors.email}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -708,6 +784,27 @@ export function StudentCreateModal({
                 </div>
               </div>
 
+              {/* Resumo de Erros */}
+              {showDetailedErrors && Object.keys(validationErrors).length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <h3 className="flex items-center gap-2 text-sm font-medium text-red-800 mb-2">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    Erros encontrados
+                  </h3>
+                  <div className="text-sm text-red-700 space-y-1">
+                    {Object.entries(validationErrors).map(([field, error]) => (
+                      <p key={field} className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                        <span className="font-medium">{field}:</span>
+                        <span>{error}</span>
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Informações Contextuais */}
               <div>
                 <h3 className="flex items-center gap-2 text-sm font-medium mb-3">
@@ -716,6 +813,7 @@ export function StudentCreateModal({
                 <div className="text-sm text-muted-foreground space-y-1">
                   <p>Os campos marcados com (*) são obrigatórios.</p>
                   <p>Você pode preencher as demais informações nas próximas abas.</p>
+                  <p>Os campos são validados em tempo real conforme você digita.</p>
                 </div>
               </div>
                 </div>
@@ -985,7 +1083,7 @@ export function StudentCreateModal({
                       </Label>
                       <Select 
                         value={addressData.state} 
-                        onValueChange={(v) => setAddressData({ ...addressData, state: v })}
+                        onValueChange={(v: string) => setAddressData({ ...addressData, state: v })}
                       >
                         <SelectTrigger id="state">
                           <SelectValue placeholder="UF" />
@@ -1234,8 +1332,9 @@ export function StudentCreateModal({
         {/* Modal de busca de profissionais */}
         <ProfessionalSearchModal
           open={searchModalOpen}
-          onClose={() => setSearchModalOpen(false)}
+          onOpenChange={setSearchModalOpen}
           onSelect={handleSelectProfessional}
+          title="Selecionar Personal Trainer"
         />
       </DialogContent>
     </Dialog>

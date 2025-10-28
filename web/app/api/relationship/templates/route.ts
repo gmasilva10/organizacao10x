@@ -13,10 +13,18 @@ export async function GET(request: Request) {
   const orgId = ctx.org_id
   const url = process.env.SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+  
   // Always use V2 templates now
-  const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${orgId}&order=created_at.desc`, { headers: { apikey: key!, Authorization: `Bearer ${key}`! } })
+  const respV2 = await fetch(`${url}/rest/v1/relationship_templates_v2?org_id=eq.${orgId}&order=created_at.desc`, { 
+    headers: { apikey: key!, Authorization: `Bearer ${key}`! } 
+  })
+  
   const itemsV2 = await respV2.json().catch(()=>[])
-  return NextResponse.json({ items: itemsV2 })
+  
+  // Retornar items com título real (não mais mapear touchpoint)
+  const mappedItems = itemsV2
+  
+  return NextResponse.json({ items: mappedItems })
 }
 
 export async function POST(request: Request) {
@@ -49,6 +57,7 @@ export async function POST(request: Request) {
   const rowV2 = {
     org_id: orgId,
     code: code, // Gerado automaticamente
+    title: String(body.title || ''), // Campo título obrigatório
     anchor: String(body.anchor || ''),
     touchpoint: String(body.touchpoint || ''),
     suggested_offset: String(body.suggested_offset || '+0d'),

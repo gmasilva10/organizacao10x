@@ -192,7 +192,7 @@ export function TransactionModal({
               <Label htmlFor="type">Tipo *</Label>
               <Select 
                 value={formData.type} 
-                onValueChange={(value) => setFormData({ ...formData, type: value })}
+                onValueChange={(value: string) => setFormData({ ...formData, type: value })}
               >
                 <SelectTrigger id="type">
                   <SelectValue placeholder="Selecione o tipo" />
@@ -208,7 +208,7 @@ export function TransactionModal({
               <Label htmlFor="category">Categoria *</Label>
               <Select 
                 value={formData.category} 
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
+                onValueChange={(value: string) => setFormData({ ...formData, category: value })}
               >
                 <SelectTrigger id="category">
                   <SelectValue placeholder="Selecione a categoria" />
@@ -268,7 +268,7 @@ export function TransactionModal({
               <Label htmlFor="payment_method">Forma de Pagamento</Label>
               <Select 
                 value={formData.payment_method} 
-                onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
+                onValueChange={(value: string) => setFormData({ ...formData, payment_method: value })}
               >
                 <SelectTrigger id="payment_method">
                   <SelectValue placeholder="Selecione" />
@@ -303,7 +303,7 @@ export function TransactionModal({
               <Label htmlFor="status">Status</Label>
               <Select 
                 value={formData.status} 
-                onValueChange={(value) => setFormData({ ...formData, status: value })}
+                onValueChange={(value: string) => setFormData({ ...formData, status: value })}
               >
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Selecione" />

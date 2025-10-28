@@ -81,13 +81,13 @@ const StudentsFilterDrawer = memo(function StudentsFilterDrawer({
           <Label className="text-sm font-medium">Status</Label>
           <Select
             value={filters.status}
-            onValueChange={(value) => handleFiltersChange('status', value)}
+            onValueChange={(value: string) => handleFiltersChange('status', value)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione o status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos os Status</SelectItem>
+              <SelectItem value="all">Todos os Status</SelectItem>
               <SelectItem value="active">Ativo</SelectItem>
               <SelectItem value="paused">Pausado</SelectItem>
               <SelectItem value="archived">Arquivado</SelectItem>
@@ -100,13 +100,13 @@ const StudentsFilterDrawer = memo(function StudentsFilterDrawer({
           <Label className="text-sm font-medium">Treinador</Label>
           <Select
             value={filters.trainerId}
-            onValueChange={(value) => handleFiltersChange('trainerId', value)}
+            onValueChange={(value: string) => handleFiltersChange('trainerId', value)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione o treinador" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos os Treinadores</SelectItem>
+              <SelectItem value="all">Todos os Treinadores</SelectItem>
               {trainerOptions.map((trainer) => (
                 <SelectItem key={trainer.value} value={trainer.value}>
                   {trainer.label}

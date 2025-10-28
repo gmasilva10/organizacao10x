@@ -2,14 +2,24 @@
  * Variable Renderer - Sistema de Renderização de Variáveis Dinâmicas
  * 
  * Substitui variáveis em templates de mensagens com dados reais do aluno,
- * planos, e contexto temporal.
+ * planos, e contexto temporal usando o novo sistema de contextos.
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { 
+  VariableContext, 
+  VariableContextBuilder, 
+  ContextUtils, 
+  EventCode,
+  StudentData,
+  OrganizationData,
+  TrainerData
+} from './variable-context'
 
 const supabaseUrl = process.env.SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY!
 
+// Manter interface legada para compatibilidade
 export interface StudentContext {
   id: string
   name: string
@@ -149,7 +159,39 @@ function calculateMonthsActive(createdAt: string): number {
 }
 
 /**
- * Renderiza mensagem substituindo todas as variáveis
+ * Renderiza mensagem usando o novo sistema de contextos
+ */
+export async function renderMessageWithVariables(
+  template: string,
+  context: VariableContext,
+  anchor?: EventCode
+): Promise<string> {
+  let message = template
+
+  // Extrair variáveis do template
+  const regex = /\[([^\]]+)\]/g
+  const matches = Array.from(template.matchAll(regex))
+  
+  for (const match of matches) {
+    const variableName = match[1]
+    const fullVariable = match[0]
+    
+    // Validar se a variável está disponível para a âncora (se especificada)
+    if (anchor && !ContextUtils.isVariableAvailableForAnchor(anchor, variableName)) {
+      console.warn(`Variável ${variableName} não está disponível para a âncora ${anchor}`)
+      continue
+    }
+    
+    // Extrair valor da variável do contexto
+    const value = ContextUtils.extractVariableValue(context, variableName)
+    message = message.replace(fullVariable, value)
+  }
+  
+  return message
+}
+
+/**
+ * Renderiza mensagem substituindo todas as variáveis (método legado)
  */
 export async function renderMessage(
   template: string,
@@ -171,6 +213,8 @@ export async function renderMessage(
   message = message.replace(/\[DataNascimento\]/g, formatDateBR(student.birth_date))
   message = message.replace(/\[Idade\]/g, calculateAge(student.birth_date).toString())
   message = message.replace(/\[MesesAtivo\]/g, calculateMonthsActive(student.created_at).toString())
+  message = message.replace(/\[DataAtual\]/g, formatDateBR(new Date().toISOString()))
+  message = message.replace(/\[HoraAtual\]/g, new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
   
   // Variáveis de Treino
   message = message.replace(/\[DataTreino\]/g, formatDateBR(student.first_workout_date))
@@ -179,6 +223,7 @@ export async function renderMessage(
   // Variáveis de Plano/Serviço
   if (service) {
     message = message.replace(/\[NomePlano\]/g, service.name || '')
+    message = message.replace(/\[PlanoAtual\]/g, service.name || '')
     message = message.replace(/\[ValorPlano\]/g, formatCurrency(service.price_cents))
     message = message.replace(/\[DataVencimento\]/g, formatDateBR(service.end_date || service.next_renewal_date))
     message = message.replace(/\[DiasRestantes\]/g, calculateDaysRemaining(service.end_date || service.next_renewal_date).toString())
@@ -221,6 +266,11 @@ export async function renderMessage(
   message = message.replace(/\[LinkAnamnese\]/g, generateAnamneseLink(student.id))
   message = message.replace(/\[LinkPagamento\]/g, generatePaymentLink(student.id))
   
+  // Variáveis do Personal Trainer
+  message = message.replace(/\[NomePersonal\]/g, 'Carlos Personal')
+  message = message.replace(/\[TelefonePersonal\]/g, '(11) 88888-8888')
+  message = message.replace(/\[EmailPersonal\]/g, 'carlos@academia.com')
+  
   // Variáveis de Ocorrência
   if (occurrence) {
     message = message.replace(/\[TipoOcorrencia\]/g, occurrence.type || '')
@@ -253,6 +303,9 @@ export function renderMessageSync(
   message = message.replace(/\[Nome do Cliente\]/g, student.name)
   message = message.replace(/\[Nome\]/g, student.name)
   message = message.replace(/\[PrimeiroNome\]/g, student.name.split(' ')[0])
+  message = message.replace(/\[Sobrenome\]/g, student.name.split(' ').slice(1).join(' ') || '')
+  message = message.replace(/\[Email\]/g, student.email || '')
+  message = message.replace(/\[Telefone\]/g, student.phone || '')
   
   // Variáveis Temporais
   message = message.replace(/\[SaudacaoTemporal\]/g, getTemporalGreeting())
@@ -261,6 +314,8 @@ export function renderMessageSync(
   message = message.replace(/\[DataNascimento\]/g, formatDateBR(student.birth_date))
   message = message.replace(/\[Idade\]/g, calculateAge(student.birth_date).toString())
   message = message.replace(/\[MesesAtivo\]/g, calculateMonthsActive(student.created_at).toString())
+  message = message.replace(/\[DataAtual\]/g, formatDateBR(new Date().toISOString()))
+  message = message.replace(/\[HoraAtual\]/g, new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
   
   // Variáveis de Treino
   message = message.replace(/\[DataTreino\]/g, formatDateBR(student.first_workout_date))
@@ -269,6 +324,7 @@ export function renderMessageSync(
   // Variáveis de Plano/Serviço
   if (service) {
     message = message.replace(/\[NomePlano\]/g, service.name || '')
+    message = message.replace(/\[PlanoAtual\]/g, service.name || '')
     message = message.replace(/\[ValorPlano\]/g, formatCurrency(service.price_cents))
     message = message.replace(/\[DataVencimento\]/g, formatDateBR(service.end_date || service.next_renewal_date))
     message = message.replace(/\[DiasRestantes\]/g, calculateDaysRemaining(service.end_date || service.next_renewal_date).toString())
@@ -282,6 +338,11 @@ export function renderMessageSync(
   // Variáveis de Links
   message = message.replace(/\[LinkAnamnese\]/g, generateAnamneseLink(student.id))
   message = message.replace(/\[LinkPagamento\]/g, generatePaymentLink(student.id))
+  
+  // Variáveis do Personal Trainer
+  message = message.replace(/\[NomePersonal\]/g, 'Carlos Personal')
+  message = message.replace(/\[TelefonePersonal\]/g, '(11) 88888-8888')
+  message = message.replace(/\[EmailPersonal\]/g, 'carlos@academia.com')
   
   // Variáveis de Ocorrência
   if (occurrence) {
@@ -316,48 +377,42 @@ export function extractVariables(template: string): string[] {
 }
 
 /**
- * Valida se todas as variáveis em um template são válidas
+ * Valida se todas as variáveis em um template são válidas para uma âncora específica
  */
-export function validateTemplateVariables(template: string): {
+export function validateTemplateVariables(template: string, anchor?: EventCode): {
   valid: boolean
   unknownVariables: string[]
+  unavailableForAnchor: string[]
 } {
-  const KNOWN_VARIABLES = [
-    '[Nome do Aluno]',
-    '[Nome do Cliente]',
-    '[Nome]',
-    '[PrimeiroNome]',
-    '[SaudacaoTemporal]',
-    '[DataVenda]',
-    '[DataInicio]',
-    '[DataNascimento]',
-    '[Idade]',
-    '[MesesAtivo]',
-    '[DataTreino]',
-    '[DataUltimoTreino]',
-    '[NomePlano]',
-    '[ValorPlano]',
-    '[DataVencimento]',
-    '[DiasRestantes]',
-    '[LinkAnamnese]',
-    '[LinkPagamento]',
-    '[TipoOcorrencia]',
-    '[DescricaoOcorrencia]',
-    '[DataOcorrencia]',
-    '[ProgressoSemanal]'
-  ]
-  
   const usedVariables = extractVariables(template)
-  const unknownVariables = usedVariables.filter(v => !KNOWN_VARIABLES.includes(v))
+  const unknownVariables: string[] = []
+  const unavailableForAnchor: string[] = []
+  
+  for (const variable of usedVariables) {
+    const variableName = variable.replace(/[\[\]]/g, '')
+    
+    // Verificar se é uma variável conhecida globalmente
+    const isKnown = AVAILABLE_VARIABLES.some(v => v.key === variable)
+    if (!isKnown) {
+      unknownVariables.push(variable)
+      continue
+    }
+    
+    // Se âncora especificada, verificar se está disponível para ela
+    if (anchor && !ContextUtils.isVariableAvailableForAnchor(anchor, variableName)) {
+      unavailableForAnchor.push(variable)
+    }
+  }
   
   return {
-    valid: unknownVariables.length === 0,
-    unknownVariables
+    valid: unknownVariables.length === 0 && unavailableForAnchor.length === 0,
+    unknownVariables,
+    unavailableForAnchor
   }
 }
 
 /**
- * Busca contexto completo do aluno para renderização
+ * Busca contexto completo do aluno para renderização (método legado)
  */
 export async function fetchStudentContext(
   studentId: string,
@@ -402,9 +457,149 @@ export async function fetchStudentContext(
 }
 
 /**
+ * Busca contexto completo usando o novo sistema de contextos
+ */
+export async function fetchVariableContext(
+  studentId: string,
+  orgId: string,
+  anchorData?: { anchor_date: string; anchor_type: string; additional_data?: Record<string, any> }
+): Promise<VariableContext | null> {
+  try {
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    
+    // Buscar dados do aluno
+    const { data: student, error: studentError } = await supabase
+      .from('students')
+      .select('id, name, email, phone, birth_date, created_at, first_workout_date, last_workout_date, org_id, status, trainer_id')
+      .eq('id', studentId)
+      .eq('org_id', orgId)
+      .single()
+    
+    if (studentError || !student) {
+      console.error('Erro ao buscar aluno:', studentError)
+      return null
+    }
+    
+    // Buscar dados da organização
+    const { data: org, error: orgError } = await supabase
+      .from('organizations')
+      .select('id, name, logo_url, primary_color, timezone, settings')
+      .eq('id', orgId)
+      .single()
+    
+    if (orgError) {
+      console.warn('Erro ao buscar organização:', orgError)
+    }
+    
+    // Buscar dados do trainer (se especificado)
+    let trainer: TrainerData | undefined
+    if (student.trainer_id) {
+      const { data: trainerData, error: trainerError } = await supabase
+        .from('users')
+        .select('id, name, email, phone, specialties')
+        .eq('id', student.trainer_id)
+        .single()
+      
+      if (!trainerError && trainerData) {
+        trainer = {
+          id: trainerData.id,
+          name: trainerData.name,
+          email: trainerData.email,
+          phone: trainerData.phone,
+          specialties: trainerData.specialties || []
+        }
+      }
+    }
+    
+    // Construir contexto usando o builder
+    const contextBuilder = new VariableContextBuilder()
+      .withStudent(student as StudentData)
+    
+    if (org) {
+      contextBuilder.withOrganization(org as OrganizationData)
+    }
+    
+    if (trainer) {
+      contextBuilder.withTrainer(trainer)
+    }
+    
+    if (anchorData) {
+      contextBuilder.withAnchor(anchorData)
+    }
+    
+    return contextBuilder.build()
+  } catch (error) {
+    console.error('Erro ao buscar contexto de variáveis:', error)
+    return null
+  }
+}
+
+/**
  * Renderiza preview de mensagem para o frontend (com dados de exemplo)
  */
-export function renderPreview(template: string): string {
+export function renderPreview(template: string, anchor?: EventCode): string {
+  const exampleContext: VariableContext = {
+    student: {
+      id: 'example-id',
+      name: 'João Silva',
+      email: 'joao@example.com',
+      phone: '(11) 99999-9999',
+      birth_date: '1990-05-15',
+      created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 dias atrás
+      first_workout_date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(), // 8 dias atrás
+      last_workout_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 dias atrás
+      org_id: 'example-org',
+      status: 'active'
+    },
+    organization: {
+      id: 'example-org',
+      name: 'Academia Centro',
+      logo_url: undefined,
+      primary_color: '#3B82F6',
+      timezone: 'America/Sao_Paulo'
+    },
+    trainer: {
+      id: 'trainer-1',
+      name: 'Carlos Personal',
+      email: 'carlos@academia.com',
+      phone: '(11) 88888-8888',
+      specialties: ['Musculação', 'Funcional']
+    },
+    anchor: {
+      anchor_date: new Date().toISOString(),
+      anchor_type: anchor || 'first_workout',
+      additional_data: {}
+    },
+    custom: {}
+  }
+  
+  let message = template
+
+  // Extrair variáveis do template
+  const regex = /\[([^\]]+)\]/g
+  const matches = Array.from(template.matchAll(regex))
+  
+  for (const match of matches) {
+    const variableName = match[1]
+    const fullVariable = match[0]
+    
+    // Validar se a variável está disponível para a âncora (se especificada)
+    if (anchor && !ContextUtils.isVariableAvailableForAnchor(anchor, variableName)) {
+      continue
+    }
+    
+    // Extrair valor da variável do contexto
+    const value = ContextUtils.extractVariableValue(exampleContext, variableName)
+    message = message.replace(fullVariable, value)
+  }
+  
+  return message
+}
+
+/**
+ * Renderiza preview usando sistema legado (para compatibilidade)
+ */
+export function renderPreviewLegacy(template: string): string {
   const exampleContext: RenderContext = {
     student: {
       id: 'example-id',
@@ -434,7 +629,7 @@ export function renderPreview(template: string): string {
 }
 
 /**
- * Lista todas as variáveis disponíveis com descrições
+ * Lista todas as variáveis disponíveis com descrições (sistema legado)
  */
 export const AVAILABLE_VARIABLES = [
   // Pessoais
@@ -471,7 +666,7 @@ export const AVAILABLE_VARIABLES = [
 ] as const
 
 /**
- * Agrupa variáveis por categoria
+ * Agrupa variáveis por categoria (sistema legado)
  */
 export function getVariablesByCategory(category: string) {
   return AVAILABLE_VARIABLES.filter(v => v.category === category)
@@ -485,3 +680,6 @@ export const VARIABLE_CATEGORIES = {
   links: { name: 'Links', icon: 'Link' },
   ocorrencia: { name: 'Ocorrência', icon: 'AlertCircle' }
 } as const
+
+// Re-exportar do sistema de contextos para compatibilidade
+export { ANCHOR_VARIABLES, ContextUtils } from './variable-context'

@@ -35,9 +35,7 @@ export const studentIdentificationSchema = z.object({
       message: 'Telefone inválido (use formato: (XX) XXXXX-XXXX)'
     }),
   
-  status: z.enum(['onboarding', 'active', 'paused', 'inactive'], {
-    errorMap: () => ({ message: 'Status inválido' })
-  }),
+  status: z.enum(['onboarding', 'active', 'paused', 'inactive']),
   
   birth_date: z
     .string()
@@ -56,15 +54,11 @@ export const studentIdentificationSchema = z.object({
     }),
   
   gender: z
-    .enum(['masculino', 'feminino', 'outro'], {
-      errorMap: () => ({ message: 'Gênero inválido' })
-    })
+    .enum(['masculino', 'feminino', 'outro'])
     .optional(),
   
   marital_status: z
-    .enum(['solteiro', 'casado', 'divorciado', 'viuvo'], {
-      errorMap: () => ({ message: 'Estado civil inválido' })
-    })
+    .enum(['solteiro', 'casado', 'divorciado', 'viuvo'])
     .optional(),
   
   nationality: z
@@ -78,9 +72,7 @@ export const studentIdentificationSchema = z.object({
     .optional(),
   
   onboard_opt: z
-    .enum(['nao_enviar', 'enviar', 'enviado'], {
-      errorMap: () => ({ message: 'Opção de onboarding inválida' })
-    })
+    .enum(['nao_enviar', 'enviar', 'enviado'])
     .optional(),
 })
 
@@ -144,8 +136,8 @@ export type StudentUpdateData = z.infer<typeof studentUpdateSchema>
 // Função helper para formatar erros Zod
 export function formatZodErrors(error: z.ZodError): Record<string, string> {
   const formatted: Record<string, string> = {}
-  if (error && error.errors && Array.isArray(error.errors)) {
-    error.errors.forEach((err) => {
+  if (error && Array.isArray(error.issues)) {
+    error.issues.forEach((err) => {
       const path = err.path.join('.')
       formatted[path] = err.message
     })
@@ -172,12 +164,121 @@ export function validateField(
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Verificar se error.errors existe e tem elementos
-      if (error.errors && Array.isArray(error.errors) && error.errors.length > 0) {
-        const firstError = error.errors[0]
+      if (Array.isArray(error.issues) && error.issues.length > 0) {
+        const firstError = error.issues[0]
         return firstError?.message || 'Erro de validação'
       }
     }
     return 'Erro de validação'
   }
+}
+
+// Função para validar dados completos com mensagens específicas
+export function validateCompleteStudentData(data: any): {
+  isValid: boolean
+  errors: Record<string, string>
+  fieldErrors: string[]
+  generalErrors: string[]
+} {
+  const errors: Record<string, string> = {}
+  const fieldErrors: string[] = []
+  const generalErrors: string[] = []
+
+  try {
+    // Validar dados básicos
+    studentIdentificationSchema.parse(data)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      error.issues.forEach((issue) => {
+        const fieldPath = issue.path.join('.')
+        const message = issue.message
+        
+        errors[fieldPath] = message
+        fieldErrors.push(`${fieldPath}: ${message}`)
+      })
+    }
+  }
+
+  // Validações adicionais específicas
+  if (data.email && data.email.includes('@')) {
+    // Verificar se email já existe (simulação - em produção seria uma chamada à API)
+    const commonEmails = ['admin@test.com', 'test@example.com']
+    if (commonEmails.includes(data.email.toLowerCase())) {
+      errors.email = 'Este e-mail já está em uso'
+      fieldErrors.push('email: Este e-mail já está em uso')
+    }
+  }
+
+  // Validar telefone se fornecido
+  if (data.phone) {
+    const phoneDigits = data.phone.replace(/\D/g, '')
+    if (phoneDigits.length < 10) {
+      errors.phone = 'Telefone deve ter pelo menos 10 dígitos'
+      fieldErrors.push('phone: Telefone deve ter pelo menos 10 dígitos')
+    }
+  }
+
+  // Validar data de nascimento se fornecida
+  if (data.birth_date) {
+    const birthDate = new Date(data.birth_date)
+    const today = new Date()
+    const age = today.getFullYear() - birthDate.getFullYear()
+    
+    if (age < 0) {
+      errors.birth_date = 'Data de nascimento não pode ser no futuro'
+      fieldErrors.push('birth_date: Data de nascimento não pode ser no futuro')
+    } else if (age > 120) {
+      errors.birth_date = 'Data de nascimento inválida'
+      fieldErrors.push('birth_date: Data de nascimento inválida')
+    }
+  }
+
+  // Validar endereço se fornecido
+  if (data.address) {
+    try {
+      studentAddressSchema.parse(data.address)
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        error.issues.forEach((issue) => {
+          const fieldPath = `address.${issue.path.join('.')}`
+          const message = issue.message
+          
+          errors[fieldPath] = message
+          fieldErrors.push(`${fieldPath}: ${message}`)
+        })
+      }
+    }
+  }
+
+  const isValid = Object.keys(errors).length === 0
+
+  return {
+    isValid,
+    errors,
+    fieldErrors,
+    generalErrors
+  }
+}
+
+// Função para gerar mensagens de erro amigáveis
+export function generateUserFriendlyErrors(validationResult: ReturnType<typeof validateCompleteStudentData>): string[] {
+  const messages: string[] = []
+  
+  if (validationResult.fieldErrors.length > 0) {
+    messages.push('Por favor, corrija os seguintes campos:')
+    validationResult.fieldErrors.forEach(error => {
+      messages.push(`• ${error}`)
+    })
+  }
+  
+  if (validationResult.generalErrors.length > 0) {
+    messages.push('')
+    messages.push('Outros problemas encontrados:')
+    validationResult.generalErrors.forEach(error => {
+      messages.push(`• ${error}`)
+    })
+  }
+  
+  return messages
 }
 

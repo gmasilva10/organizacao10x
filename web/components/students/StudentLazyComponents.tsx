@@ -11,7 +11,7 @@ export const StudentRelationshipModalLazy = dynamic(
 )
 
 export const StudentOccurrenceModalLazy = dynamic(
-  () => import('./StudentOccurrenceModal'),
+  () => import('./StudentOccurrenceModal').then(mod => ({ default: mod.StudentOccurrenceModal })),
   {
     loading: () => <Skeleton className="h-[500px] w-full" />,
     ssr: false
@@ -19,7 +19,7 @@ export const StudentOccurrenceModalLazy = dynamic(
 )
 
 export const AnamneseInviteModalLazy = dynamic(
-  () => import('./modals/AnamneseInviteModal'),
+  () => import('./modals/AnamneseInviteModal').then(mod => ({ default: mod.AnamneseInviteModal })),
   {
     loading: () => <Skeleton className="h-[400px] w-full" />,
     ssr: false

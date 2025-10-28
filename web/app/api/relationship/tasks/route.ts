@@ -390,3 +390,124 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  const startTime = Date.now()
+  
+  try {
+    // Resolver contexto de autenticacao
+    const ctx = await resolveRequestContext(request)
+    
+    if (!ctx || !ctx.org_id) {
+      return NextResponse.json(
+        { error: "unauthorized", message: "Tenant nao resolvido no contexto da requisicao." },
+        { status: 401 }
+      )
+    }
+
+    const body = await request.json()
+    const { task_id, status, notes, postpone_days } = body
+
+    // Validacoes obrigatorias
+    if (!task_id) {
+      return NextResponse.json(
+        { error: "task_id é obrigatório" },
+        { status: 400 }
+      )
+    }
+
+    // Criar cliente Supabase
+    const supabase = await createClientAdmin()
+
+    // Buscar a tarefa atual
+    const { data: currentTask, error: fetchError } = await supabase
+      .from('relationship_tasks')
+      .select('*')
+      .eq('id', task_id)
+      .eq('org_id', ctx.org_id)
+      .single()
+
+    if (fetchError || !currentTask) {
+      return NextResponse.json(
+        { error: "Tarefa não encontrada" },
+        { status: 404 }
+      )
+    }
+
+    // Preparar dados para atualização
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    }
+
+    // Atualizar status se fornecido
+    if (status) {
+      updateData.status = status
+    }
+
+    // Adicionar notas se fornecidas
+    if (notes) {
+      updateData.notes = notes
+    }
+
+    // Adiar tarefa se postpone_days for fornecido
+    if (postpone_days && typeof postpone_days === 'number') {
+      const currentDate = new Date(currentTask.scheduled_for)
+      const newDate = new Date(currentDate.getTime() + (postpone_days * 24 * 60 * 60 * 1000))
+      updateData.scheduled_for = newDate.toISOString()
+    }
+
+    // Atualizar tarefa
+    const { data: updatedTask, error: updateError } = await supabase
+      .from('relationship_tasks')
+      .update(updateData)
+      .eq('id', task_id)
+      .eq('org_id', ctx.org_id)
+      .select(`
+        *,
+        student:students(name, phone, email)
+      `)
+      .single()
+
+    if (updateError) {
+      console.error('Erro ao atualizar tarefa:', updateError)
+      return NextResponse.json(
+        { error: "Erro ao atualizar tarefa", details: updateError.message },
+        { status: 500 }
+      )
+    }
+
+    // Log de auditoria
+    await supabase
+      .from('relationship_logs')
+      .insert({
+        student_id: currentTask.student_id,
+        task_id: task_id,
+        action: status === 'skipped' ? 'skipped' : (postpone_days ? 'postponed' : 'updated'),
+        channel: 'manual',
+        meta: {
+          previous_status: currentTask.status,
+          new_status: status || currentTask.status,
+          previous_scheduled_for: currentTask.scheduled_for,
+          new_scheduled_for: updateData.scheduled_for || currentTask.scheduled_for,
+          postpone_days: postpone_days || null,
+          notes: notes || null,
+          updated_by: 'dev-user-id' // TODO: usar userId real
+        }
+      })
+
+    return NextResponse.json({
+      success: true,
+      task: updatedTask,
+      performance: {
+        total_time_ms: Date.now() - startTime
+      }
+    })
+
+  } catch (error) {
+    console.error("Erro na API de atualização de tarefa:", error)
+    return NextResponse.json(
+      { error: "Erro interno do servidor", details: (error as any)?.message },
+      { status: 500 }
+    )
+  }
+}

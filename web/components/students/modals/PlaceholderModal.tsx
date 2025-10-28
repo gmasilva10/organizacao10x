@@ -1,6 +1,6 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { X, Construction } from "lucide-react"
 
@@ -27,6 +27,9 @@ export default function PlaceholderModal({
             {icon}
             {title}
           </DialogTitle>
+          <DialogDescription>
+            {description}
+          </DialogDescription>
         </DialogHeader>
         
         <div className="py-8">

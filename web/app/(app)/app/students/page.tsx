@@ -77,8 +77,8 @@ export default function StudentsPage() {
   } = useStudents({
     page: currentPage,
     q: debouncedSearchTerm || filters.q,
-    status: filters.status,
-    trainer_id: filters.trainerId
+    status: filters.status === 'all' ? '' : filters.status,
+    trainer_id: filters.trainerId === 'all' ? '' : filters.trainerId
   })
   
   // Prefetch para detalhe do aluno
@@ -121,6 +121,15 @@ export default function StudentsPage() {
     setFilters({ q: '', status: '', trainerId: '' })
     setSearchTerm('')
     setCurrentPage(1) // Resetar para primeira página ao limpar filtros
+  }
+
+  // Função para normalizar filtros (converter "all" para string vazia)
+  const normalizeFilters = (filters: { q: string; status: string; trainerId: string }) => {
+    return {
+      q: filters.q,
+      status: filters.status === 'all' ? '' : filters.status,
+      trainerId: filters.trainerId === 'all' ? '' : filters.trainerId
+    }
   }
 
   const handleApplyFilters = () => {

@@ -100,16 +100,29 @@ export default function OnboardingPage() {
     const res = await fetch(url.toString(), { cache: 'no-store' })
     const data: { columns?: Array<{ id: string; title: string }>; cards?: Array<{ id: string; student_id: string; column_id: string; completed_at?: string | null; student_status?: 'onboarding'|'active'|'paused' }> } = await res.json().catch(()=>({}))
     // Não deduplicar por título; cada coluna é distinta por id
-    const cols: Column[] = (data.columns || []).map((c) => ({
-      id: c.id,
-      title: c.title,
-      cards: [],
-      sort: (c as any).sort || 0,
-      // Colunas fixas travadas por título, independente da posição
-      locked: (c as any).is_fixed === true || ["Novo Aluno", "Entrega do Treino"].includes(String(c.title)),
-      stageCode: (c as any).stage_code,
-      color: (c as any).color || null
-    }))
+    const cols: Column[] = (data.columns || []).map((c) => {
+      const col = {
+        id: c.id,
+        title: c.title,
+        cards: [],
+        sort: (c as any).sort || 0,
+        // Colunas fixas travadas por título, independente da posição
+        locked: (c as any).is_fixed === true || ["Novo Aluno", "Entrega do Treino"].includes(String(c.title)),
+        stageCode: (c as any).stage_code,
+        color: (c as any).color || null
+      }
+      
+      // DEBUG: Log para verificar stage_code
+      console.log('🔍 [DEBUG] Onboarding - Coluna carregada:', {
+        id: col.id,
+        title: col.title,
+        stageCode: col.stageCode,
+        rawStageCode: (c as any).stage_code,
+        rawData: c
+      })
+      
+      return col
+    })
     // Identifica a coluna de conclusão por título, não pela última posição
     const doneColId = cols.find(c => String(c.title).toLowerCase().includes('entrega do treino'))?.id
     const mapByCol = new Map<string, Card[]>()
@@ -368,7 +381,7 @@ export default function OnboardingPage() {
                 className="pl-10"
               />
             </div>
-            <Select value={filters.status} onValueChange={(v) => updateFilters({ status: v })}>
+            <Select value={filters.status} onValueChange={(v: string) => updateFilters({ status: v })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Todos os status" />
               </SelectTrigger>

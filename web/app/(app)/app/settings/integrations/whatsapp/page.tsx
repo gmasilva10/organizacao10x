@@ -1,416 +1,369 @@
-"use client"
+'use client'
 
-/**
- * GATE 10.9 - WhatsApp Integration Page
- * Configuração da integração com WhatsApp (Z-API)
- * MULTI-TENANT: Cada organização configura sua própria instância Z-API
- */
-
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import React, { useState, useEffect } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
 import { 
-  ArrowLeft,
-  CheckCircle2,
-  XCircle,
-  Copy,
-  ExternalLink,
-  Eye,
-  EyeOff,
+  Smartphone, 
+  Globe, 
+  Settings, 
+  CheckCircle, 
+  XCircle, 
   AlertCircle,
-  RefreshCw,
-  MessageSquare
+  Info,
+  TestTube
 } from 'lucide-react'
-import Link from 'next/link'
-import Image from 'next/image'
 import { toast } from 'sonner'
+import { whatsappService } from '@/lib/integrations/whatsapp/service'
+import { WhatsAppMethod } from '@/lib/integrations/whatsapp/types'
 
-export default function WhatsAppIntegrationPage() {
-  const [connected, setConnected] = useState(false)
+export default function WhatsAppSettingsPage() {
+  const [availableMethods, setAvailableMethods] = useState<WhatsAppMethod[]>([])
+  const [preferredMethod, setPreferredMethod] = useState<WhatsAppMethod>('desktop')
+  const [isDesktopAvailable, setIsDesktopAvailable] = useState(false)
+  const [isWebAvailable, setIsWebAvailable] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [testing, setTesting] = useState(false)
-  const [showToken, setShowToken] = useState(false)
-  const [showClientToken, setShowClientToken] = useState(false)
-  
-  const [instanceId, setInstanceId] = useState('')
-  const [token, setToken] = useState('')
-  const [clientToken, setClientToken] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
 
-  const handleTestConnection = async () => {
-    if (!instanceId || !token || !clientToken) {
-      toast.error('Preencha todos os campos')
+  useEffect(() => {
+    loadSettings()
+  }, [])
+
+  const loadSettings = async () => {
+    setLoading(true)
+    try {
+      // Verificar métodos disponíveis
+      const methods = await whatsappService.getAvailableMethods()
+      setAvailableMethods(methods)
+      
+      // Verificar disponibilidade individual
+      const desktopAvailable = await whatsappService.isDesktopAvailable()
+      const webAvailable = await whatsappService.isWebAvailable()
+      
+      setIsDesktopAvailable(desktopAvailable)
+      setIsWebAvailable(webAvailable)
+      
+      // Obter método preferido atual
+      const config = whatsappService.getConfig()
+      setPreferredMethod(config.preferredMethod)
+      
+    } catch (error) {
+      console.error('Erro ao carregar configurações:', error)
+      toast.error('Erro ao carregar configurações do WhatsApp')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleMethodChange = (method: WhatsAppMethod) => {
+    if (!availableMethods.includes(method)) {
+      toast.error(`Método ${method} não está disponível`)
       return
     }
-
-    setTesting(true)
     
+    setPreferredMethod(method)
+    whatsappService.updateConfig({ preferredMethod: method })
+    
+    const methodName = getMethodName(method)
+    toast.success(`Método preferido alterado para ${methodName}`)
+  }
+
+  const handleTestConnection = async (method: WhatsAppMethod) => {
+    setTesting(true)
     try {
-      // TODO: Implementar API de teste de conexão
-      // const response = await fetch('/api/integrations/whatsapp/test', { ... })
+      const testContact = {
+        phone: '5511999999999', // Número de teste
+        name: 'Teste'
+      }
       
-      // Simulação
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      const testMessage = {
+        text: 'Teste de conexão - Personal Global',
+        contact: testContact
+      }
       
-      setConnected(true)
-      setPhoneNumber('+55 11 98765-4321') // Simulação
-      toast.success('WhatsApp conectado!', {
-        description: 'Instância ativa e pronta para uso'
-      })
-    } catch (error: any) {
-      toast.error('Erro ao testar conexão', {
-        description: error.message
+      let result
+      if (method === 'desktop') {
+        result = await whatsappService.sendMessage(testMessage)
+      } else {
+        result = await whatsappService.sendMessage(testMessage)
+      }
+      
+      if (result.success) {
+        const methodName = getMethodName(method)
+        toast.success(`Teste bem-sucedido!`, {
+          description: `${methodName} está funcionando corretamente`
+        })
+      } else {
+        throw new Error(result.error || 'Erro no teste')
+      }
+      
+    } catch (error) {
+      const methodName = getMethodName(method)
+      toast.error(`Erro no teste do ${methodName}`, {
+        description: error instanceof Error ? error.message : 'Erro desconhecido'
       })
     } finally {
       setTesting(false)
     }
   }
 
-  const handleConnect = async () => {
-    if (!instanceId || !token || !clientToken) {
-      toast.error('Preencha todos os campos')
-      return
+  const getMethodName = (method: WhatsAppMethod): string => {
+    switch (method) {
+      case 'desktop':
+        return 'WhatsApp Desktop'
+      case 'web':
+        return 'WhatsApp Web'
+      case 'api':
+        return 'WhatsApp API'
+      default:
+        return 'WhatsApp'
     }
-
-    // TODO: Implementar API de salvamento
-    // const response = await fetch('/api/integrations/whatsapp/connect', { ... })
-    
-    toast.success('Credenciais salvas!', {
-      description: 'Teste a conexão para validar'
-    })
   }
 
-  const handleDisconnect = () => {
-    setConnected(false)
-    setInstanceId('')
-    setToken('')
-    setClientToken('')
-    setPhoneNumber('')
-    toast.success('WhatsApp desconectado')
+  const getMethodIcon = (method: WhatsAppMethod) => {
+    switch (method) {
+      case 'desktop':
+        return <Smartphone className="h-5 w-5" />
+      case 'web':
+        return <Globe className="h-5 w-5" />
+      case 'api':
+        return <Settings className="h-5 w-5" />
+      default:
+        return <Settings className="h-5 w-5" />
+    }
+  }
+
+  const getMethodDescription = (method: WhatsAppMethod): string => {
+    switch (method) {
+      case 'desktop':
+        return 'Abre o aplicativo WhatsApp Desktop instalado no seu computador. Mais rápido e eficiente.'
+      case 'web':
+        return 'Abre o WhatsApp Web no navegador. Funciona em qualquer dispositivo.'
+      case 'api':
+        return 'Usa a API oficial do WhatsApp Business. Requer configuração avançada.'
+      default:
+        return 'Método de integração com WhatsApp'
+    }
+  }
+
+  const getStatusIcon = (available: boolean) => {
+    return available ? (
+      <CheckCircle className="h-4 w-4 text-green-500" />
+    ) : (
+      <XCircle className="h-4 w-4 text-red-500" />
+    )
+  }
+
+  const getStatusBadge = (available: boolean) => {
+    return available ? (
+      <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+        Disponível
+      </Badge>
+    ) : (
+      <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+        Indisponível
+      </Badge>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="container py-6">
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Configurações do WhatsApp</h1>
+            <p className="text-muted-foreground mt-2">
+              Configure como o sistema deve abrir o WhatsApp para envio de mensagens.
+            </p>
+          </div>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Carregando configurações...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-6 container py-6">
-      {/* Header com Voltar */}
-      <div className="flex items-center gap-4">
-        <Link href="/app/settings">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <div className="bg-white w-16 h-16 rounded-lg flex items-center justify-center overflow-hidden shadow-sm">
-              <Image 
-                src="/integrations/whatsapp-logo.jpg" 
-                alt="WhatsApp logo"
-                width={64}
-                height={64}
-                className="object-contain"
-              />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">WhatsApp Business</h1>
-              <p className="text-muted-foreground">
-                Conecte seu número WhatsApp via Z-API
-              </p>
-            </div>
-          </div>
+    <div className="container py-6">
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Configurações do WhatsApp</h1>
+          <p className="text-muted-foreground mt-2">
+            Configure como o sistema deve abrir o WhatsApp para envio de mensagens.
+          </p>
         </div>
-        <Badge 
-          variant={connected ? 'default' : 'outline'}
-          className="h-8"
-        >
-          {connected ? (
-            <><CheckCircle2 className="h-3 w-3 mr-1" /> Conectado</>
-          ) : (
-            <><XCircle className="h-3 w-3 mr-1" /> Desconectado</>
-          )}
-        </Badge>
-      </div>
 
-      {/* Informação Importante - Multi-Tenant */}
-      <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-          <div className="flex-1 text-sm">
-            <p className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
-              📱 Seu Próprio Número WhatsApp
-            </p>
-            <p className="text-blue-800 dark:text-blue-200">
-              Esta é a instância Z-API da <strong>sua organização</strong>. 
-              Você usará seu próprio número WhatsApp Business para enviar mensagens aos seus alunos.
-              Cada academia/empresa tem sua própria configuração isolada.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Card de Configuração */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Credenciais Z-API</CardTitle>
-          <CardDescription>
-            Configure sua instância Z-API para envio automático de mensagens WhatsApp.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Instance ID */}
-          <div className="space-y-2">
-            <Label htmlFor="instance-id">Instance ID</Label>
-            <Input 
-              id="instance-id" 
-              placeholder="SUA_INSTANCIA_ZAPI"
-              value={instanceId}
-              onChange={(e) => setInstanceId(e.target.value)}
-              disabled={connected}
-            />
-            <p className="text-xs text-muted-foreground">
-              Exemplo: <code>3C07F6C2D748</code>
-            </p>
-          </div>
-
-          {/* Token */}
-          <div className="space-y-2">
-            <Label htmlFor="token">Token</Label>
-            <div className="flex gap-2">
-              <Input 
-                id="token" 
-                type={showToken ? 'text' : 'password'}
-                placeholder="seu-token-zapi"
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                disabled={connected}
-                className="flex-1"
-              />
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => setShowToken(!showToken)}
-              >
-                {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
-
-          {/* Client Token */}
-          <div className="space-y-2">
-            <Label htmlFor="client-token">Client Token</Label>
-            <div className="flex gap-2">
-              <Input 
-                id="client-token" 
-                type={showClientToken ? 'text' : 'password'}
-                placeholder="seu-client-token"
-                value={clientToken}
-                onChange={(e) => setClientToken(e.target.value)}
-                disabled={connected}
-                className="flex-1"
-              />
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => setShowClientToken(!showClientToken)}
-              >
-                {showClientToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
-
-          {/* Número conectado (quando ativo) */}
-          {connected && phoneNumber && (
-            <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-900 dark:text-green-100">
-                  Número conectado: <strong>{phoneNumber}</strong>
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Ações */}
-          <div className="flex gap-2 pt-2">
-            {!connected ? (
-              <>
-                <Button 
-                  onClick={handleTestConnection} 
-                  className="flex-1"
-                  disabled={testing}
-                >
-                  {testing ? (
-                    <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Testando...</>
-                  ) : (
-                    <><CheckCircle2 className="h-4 w-4 mr-2" /> Testar Conexão</>
-                  )}
-                </Button>
-                <Button 
-                  onClick={handleConnect} 
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Salvar Credenciais
-                </Button>
-              </>
-            ) : (
-              <Button 
-                onClick={handleDisconnect} 
-                variant="destructive" 
-                className="flex-1"
-              >
-                Desconectar
-              </Button>
-            )}
-            <Button 
-              variant="outline"
-              asChild
-            >
-              <a 
-                href="https://api.z-api.io" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Obter Credenciais
-              </a>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Como Obter as Credenciais */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Como Obter as Credenciais</CardTitle>
-          <CardDescription>
-            Passo a passo para configurar sua instância Z-API
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                1
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">Crie uma conta na Z-API</p>
-                <p className="text-sm text-muted-foreground">
-                  Acesse <a href="https://api.z-api.io" target="_blank" className="text-primary hover:underline">api.z-api.io</a> e crie sua conta
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                2
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">Crie uma nova instância</p>
-                <p className="text-sm text-muted-foreground">
-                  No painel Z-API, clique em "Criar Instância" e escolha um plano
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                3
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">Conecte seu WhatsApp</p>
-                <p className="text-sm text-muted-foreground">
-                  Escaneie o QR Code com seu WhatsApp Business
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                4
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">Copie as credenciais</p>
-                <p className="text-sm text-muted-foreground">
-                  No dashboard, copie: Instance ID, Token e Client Token
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                5
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">Configure aqui no sistema</p>
-                <p className="text-sm text-muted-foreground">
-                  Cole as credenciais nos campos acima e teste a conexão
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Funcionalidades (quando conectado) */}
-      {connected && (
+        {/* Status Geral */}
         <Card>
           <CardHeader>
-            <CardTitle>Funcionalidades Disponíveis</CardTitle>
-            <CardDescription>
-              O que você poderá fazer com o WhatsApp conectado
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Status da Integração
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="flex items-center gap-2 p-3 border rounded-lg">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Envio automático de mensagens</span>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  {getStatusIcon(isDesktopAvailable)}
+                  <div>
+                    <p className="font-medium">WhatsApp Desktop</p>
+                    <p className="text-sm text-muted-foreground">Aplicativo nativo</p>
+                  </div>
+                </div>
+                {getStatusBadge(isDesktopAvailable)}
               </div>
-              <div className="flex items-center gap-2 p-3 border rounded-lg">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Lembretes de treino</span>
-              </div>
-              <div className="flex items-center gap-2 p-3 border rounded-lg">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Follow-up de alunos</span>
-              </div>
-              <div className="flex items-center gap-2 p-3 border rounded-lg">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Aniversários</span>
-              </div>
-              <div className="flex items-center gap-2 p-3 border rounded-lg">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Renovações de planos</span>
-              </div>
-              <div className="flex items-center gap-2 p-3 border rounded-lg">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Ocorrências com lembrete</span>
+              
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  {getStatusIcon(isWebAvailable)}
+                  <div>
+                    <p className="font-medium">WhatsApp Web</p>
+                    <p className="text-sm text-muted-foreground">Navegador web</p>
+                  </div>
+                </div>
+                {getStatusBadge(isWebAvailable)}
               </div>
             </div>
           </CardContent>
         </Card>
-      )}
 
-      {/* Custos e Limites */}
-      <Card>
-        <CardHeader>
-          <CardTitle>💰 Custos e Limites</CardTitle>
-          <CardDescription>
-            Informações sobre preços Z-API (consulte o site oficial)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>• <strong>Plano Básico:</strong> ~R$ 49/mês - até 3.000 mensagens</p>
-            <p>• <strong>Plano Pro:</strong> ~R$ 99/mês - até 10.000 mensagens</p>
-            <p>• <strong>Plano Premium:</strong> ~R$ 199/mês - mensagens ilimitadas</p>
-            <p className="mt-3 text-xs">
-              ⚠️ Os preços são estimados e podem variar. Consulte o site oficial da Z-API para valores atualizados.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Método Preferido */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Método Preferido</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              {(['desktop', 'web'] as WhatsAppMethod[]).map((method) => {
+                const isAvailable = availableMethods.includes(method)
+                const isSelected = preferredMethod === method
+                
+                return (
+                  <div
+                    key={method}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                      isSelected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                    } ${!isAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() => isAvailable && handleMethodChange(method)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {getMethodIcon(method)}
+                        <div>
+                          <p className="font-medium">{getMethodName(method)}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {getMethodDescription(method)}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        {isSelected && (
+                          <Badge variant="default">Selecionado</Badge>
+                        )}
+                        {getStatusBadge(isAvailable)}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Testes */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TestTube className="h-5 w-5" />
+              Testes de Conexão
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {availableMethods.map((method) => (
+                <div key={method} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {getMethodIcon(method)}
+                    <div>
+                      <p className="font-medium">{getMethodName(method)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Teste a conexão com este método
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleTestConnection(method)}
+                    disabled={testing}
+                  >
+                    {testing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                        Testando...
+                      </>
+                    ) : (
+                      <>
+                        <TestTube className="h-4 w-4 mr-2" />
+                        Testar
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Informações */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5" />
+              Informações Importantes
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-blue-900 dark:text-blue-100">
+                    WhatsApp Desktop
+                  </p>
+                  <p className="text-sm text-blue-700 dark:text-blue-200">
+                    Para usar o WhatsApp Desktop, você precisa ter o aplicativo instalado e configurado no seu computador.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-green-900 dark:text-green-100">
+                    Fallback Automático
+                  </p>
+                  <p className="text-sm text-green-700 dark:text-green-200">
+                    Se o método preferido não estiver disponível, o sistema automaticamente usará o WhatsApp Web.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

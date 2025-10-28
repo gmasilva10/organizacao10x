@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -137,6 +137,9 @@ export default function ProfessionalSearchModal({
             <User className="h-5 w-5" />
             {title}
           </DialogTitle>
+          <DialogDescription>
+            Busque e selecione um profissional para associar ao aluno.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 space-y-4">

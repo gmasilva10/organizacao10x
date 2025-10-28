@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
+
+export const dynamic = 'force-dynamic'
 import { resolveRequestContext } from "@/utils/context/request-context"
 
 export async function GET(request: NextRequest) {

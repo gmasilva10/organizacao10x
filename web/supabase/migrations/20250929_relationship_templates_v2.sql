@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS public.relationship_templates_v2 (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id uuid NOT NULL,
+  org_id uuid NOT NULL,
   code text NOT NULL,
   anchor text NOT NULL CHECK (anchor IN (
     'sale_close','first_workout','weekly_followup','monthly_review','birthday','renewal_window','occurrence_followup','manual'
@@ -19,11 +19,11 @@ CREATE TABLE IF NOT EXISTS public.relationship_templates_v2 (
   variables jsonb NOT NULL DEFAULT '[]',
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (tenant_id, code)
+  UNIQUE (org_id, code)
 );
 
 -- Índices auxiliares
-CREATE INDEX IF NOT EXISTS idx_rt_v2_tenant ON public.relationship_templates_v2(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_rt_v2_org ON public.relationship_templates_v2(org_id);
 CREATE INDEX IF NOT EXISTS idx_rt_v2_active ON public.relationship_templates_v2(active);
 CREATE INDEX IF NOT EXISTS idx_rt_v2_anchor ON public.relationship_templates_v2(anchor);
 CREATE INDEX IF NOT EXISTS idx_rt_v2_priority ON public.relationship_templates_v2(priority);
@@ -51,7 +51,7 @@ BEGIN
   ) THEN
     CREATE POLICY rt_v2_select_policy ON public.relationship_templates_v2
       FOR SELECT USING (
-        tenant_id IN (SELECT tenant_id FROM memberships WHERE user_id = auth.uid())
+        org_id IN (SELECT org_id FROM memberships WHERE user_id = auth.uid())
       );
   END IF;
   IF NOT EXISTS (
@@ -59,7 +59,7 @@ BEGIN
   ) THEN
     CREATE POLICY rt_v2_insert_policy ON public.relationship_templates_v2
       FOR INSERT WITH CHECK (
-        tenant_id IN (SELECT tenant_id FROM memberships WHERE user_id = auth.uid())
+        org_id IN (SELECT org_id FROM memberships WHERE user_id = auth.uid())
       );
   END IF;
   IF NOT EXISTS (
@@ -67,7 +67,7 @@ BEGIN
   ) THEN
     CREATE POLICY rt_v2_update_policy ON public.relationship_templates_v2
       FOR UPDATE USING (
-        tenant_id IN (SELECT tenant_id FROM memberships WHERE user_id = auth.uid())
+        org_id IN (SELECT org_id FROM memberships WHERE user_id = auth.uid())
       );
   END IF;
   IF NOT EXISTS (
@@ -75,7 +75,7 @@ BEGIN
   ) THEN
     CREATE POLICY rt_v2_delete_policy ON public.relationship_templates_v2
       FOR DELETE USING (
-        tenant_id IN (SELECT tenant_id FROM memberships WHERE user_id = auth.uid())
+        org_id IN (SELECT org_id FROM memberships WHERE user_id = auth.uid())
       );
   END IF;
 END $$;

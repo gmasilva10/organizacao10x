@@ -35,7 +35,7 @@ import {
   X,
   Loader2
 } from 'lucide-react'
-import { MessagePreview } from './MessagePreview'
+import { MessagePreviewBubble, usePreviewData } from './MessagePreviewBubble'
 import { getAllVariables } from '@/lib/relationship-variables'
 
 interface Template {
@@ -145,8 +145,10 @@ export function TemplateFormModal({ open, onOpenChange, onSuccess, template }: T
   }
 
   const insertVariable = (variable: string) => {
+    // Garantir que a variável esteja no padrão de colchetes
+    const formattedVariable = variable.startsWith('[') ? variable : `[${variable}]`
     const currentValue = formData.message_v1 || ''
-    setFormData(prev => ({ ...prev, message_v1: currentValue + variable }))
+    setFormData(prev => ({ ...prev, message_v1: currentValue + formattedVariable }))
   }
 
   const selectedAnchor = ANCHOR_OPTIONS.find(a => a.value === formData.anchor)
@@ -197,7 +199,7 @@ export function TemplateFormModal({ open, onOpenChange, onSuccess, template }: T
                   </Label>
                   <Select
                     value={formData.anchor || ''}
-                    onValueChange={(value) => setFormData({ ...formData, anchor: value })}
+                    onValueChange={(value: string) => setFormData({ ...formData, anchor: value })}
                   >
                     <SelectTrigger id="anchor">
                       <SelectValue placeholder="Selecione o momento de envio" />
@@ -226,7 +228,7 @@ export function TemplateFormModal({ open, onOpenChange, onSuccess, template }: T
                   </Label>
                   <Select
                     value={formData.channel_default || 'whatsapp'}
-                    onValueChange={(value) => setFormData({ ...formData, channel_default: value })}
+                    onValueChange={(value: string) => setFormData({ ...formData, channel_default: value })}
                   >
                     <SelectTrigger id="channel">
                       <SelectValue />
@@ -288,10 +290,10 @@ export function TemplateFormModal({ open, onOpenChange, onSuccess, template }: T
                   {formData.temporal_offset_days !== null && formData.anchor && (
                     <div className="p-3 bg-blue-50 rounded-md text-sm text-blue-700">
                       <strong>📅 Esta mensagem será enviada{' '}
-                        {formData.temporal_offset_days > 0 
-                          ? `${formData.temporal_offset_days} dia${formData.temporal_offset_days > 1 ? 's' : ''} após` 
-                          : formData.temporal_offset_days < 0 
-                          ? `${Math.abs(formData.temporal_offset_days)} dia${Math.abs(formData.temporal_offset_days) > 1 ? 's' : ''} antes de` 
+                        {(formData.temporal_offset_days ?? 0) > 0
+                          ? `${formData.temporal_offset_days} dia${(formData.temporal_offset_days ?? 0) > 1 ? 's' : ''} após`
+                          : (formData.temporal_offset_days ?? 0) < 0
+                          ? `${Math.abs(formData.temporal_offset_days ?? 0)} dia${Math.abs(formData.temporal_offset_days ?? 0) > 1 ? 's' : ''} antes de`
                           : 'no momento do'
                         } {selectedAnchor?.label || formData.anchor}
                       </strong>
@@ -359,13 +361,35 @@ export function TemplateFormModal({ open, onOpenChange, onSuccess, template }: T
                 </div>
               )}
 
-              {/* Preview da Mensagem */}
+              {/* Preview da Mensagem - Estilo Chat */}
               {formData.message_v1 && formData.message_v1.trim() !== '' && (
-                <MessagePreview
-                  template={formData.message_v1}
-                  anchor={formData.anchor}
-                  temporalOffset={hasTemporalOffset ? formData.temporal_offset_days : null}
-                />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <MessageSquare className="h-4 w-4" />
+                    Preview da Mensagem
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-4 border">
+                    <MessagePreviewBubble
+                      message={formData.message_v1
+                        .replace(/\[PrimeiroNome\]/g, 'João')
+                        .replace(/\[SaudacaoTemporal\]/g, 'Bom dia')
+                        .replace(/\[NomePersonal\]/g, 'Carlos Personal')
+                        .replace(/\[DataTreino\]/g, '15/10/2025')
+                        .replace(/\[DataVencimento\]/g, '30/11/2025')
+                        .replace(/\[ValorPlano\]/g, 'R$ 150,00')
+                      }
+                      senderName="Personal Trainer"
+                      showAvatar={true}
+                    />
+                    <div className="mt-3 text-xs text-muted-foreground">
+                      📅 Será enviada {hasTemporalOffset && formData.temporal_offset_days 
+                        ? (formData.temporal_offset_days > 0 
+                            ? `em ${formData.temporal_offset_days} dias` 
+                            : `há ${Math.abs(formData.temporal_offset_days)} dias`)
+                        : 'imediatamente'} no momento do {selectedAnchor?.label?.toLowerCase() || 'evento'}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -381,7 +405,7 @@ export function TemplateFormModal({ open, onOpenChange, onSuccess, template }: T
                 <Switch
                   id="active"
                   checked={formData.active || false}
-                  onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+                  onCheckedChange={(checked: boolean) => setFormData({ ...formData, active: checked })}
                 />
                 <Label htmlFor="active">
                   Template ativo (mensagens serão geradas automaticamente)

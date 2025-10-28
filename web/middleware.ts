@@ -1,56 +1,33 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
+import { logger } from "@/lib/logger"
 
 export async function middleware(request: NextRequest) {
+  logger.debug('🔍 [MIDDLEWARE] Processando requisição:', request.url)
+  
+  // Middleware simplificado para debug da tela branca
   const response = await updateSession(request)
-
-  // Redirect landing pós-login para /app
+  
+  // Apenas redirecionamentos essenciais
   try {
     const url = new URL(request.url)
+    
     // Redirect legado: /students -> /app/students
     if (url.pathname === "/students" || url.pathname.startsWith("/students/")) {
       const redirectTo = url.pathname.replace("/students", "/app/students") + url.search
       return NextResponse.redirect(new URL(redirectTo, request.url), { status: 301 })
     }
-    const env = process.env.NEXT_PUBLIC_ENV || process.env.NODE_ENV
-    // Congelamento de produção: bloquear apenas login público, não sync
-    if (env === 'production' && url.pathname === '/api/auth/signin') {
-      return NextResponse.json({ code: 'MAINTENANCE', message: 'Login temporariamente indisponível' }, { status: 503 })
-    }
-    const isRoot = url.pathname === "/"
-    const hasAuth = request.cookies.get("sb-access-token") || request.cookies.get("sb:token")
-    if (isRoot && hasAuth) {
-      return NextResponse.redirect(new URL("/app/dashboard", request.url))
-    }
-
-    // OrgGate básico via cookie para rotas protegidas
-    const protectedPaths = [
-      "/app/students",
-      "/app/services",
-      "/app/onboarding",
-      "/app/onboarding/history",
-      "/app/finance",
-      "/app/settings",
-      "/app/team",
-    ]
-    const path = url.pathname
-    const needsOrg = protectedPaths.some((p) => path === p || path.startsWith(p + "/"))
-    const hasActiveOrg = Boolean(request.cookies.get("pg.active_org")?.value)
-    if (needsOrg && !hasActiveOrg) {
-      // Server-first: tenta resolver organização atual
-      const origin = url.origin
-      const resp = await fetch(`${origin}/api/auth/resolve-org`, { headers: { cookie: request.headers.get('cookie') || '' }, cache: 'no-store' })
-      const data = await resp.json().catch(() => ({ orgId: null })) as { orgId: string | null }
-      if (data?.orgId) {
-        const next = NextResponse.next()
-        try { next.cookies.set("pg.active_org", data.orgId, { path: "/", sameSite: "lax", httpOnly: true }) } catch {}
-        return next
-      }
-      
-      // Redirecionar para seleção de organização se não houver org ativa
-      return NextResponse.redirect(new URL('/app/team?selectOrg=true', request.url))
-    }
-  } catch {}
+    
+    // Desabilitar redirecionamento automático para debug
+    // const isRoot = url.pathname === "/"
+    // const hasAuth = request.cookies.get("sb-access-token") || request.cookies.get("sb:token")
+    // if (isRoot && hasAuth) {
+    //   return NextResponse.redirect(new URL("/app", request.url))
+    // }
+    
+  } catch (error) {
+    logger.error('❌ [MIDDLEWARE] Erro:', error)
+  }
 
   return response
 }

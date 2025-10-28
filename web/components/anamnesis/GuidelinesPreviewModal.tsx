@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -168,6 +168,9 @@ export function GuidelinesPreviewModal({ isOpen, onClose, version }: GuidelinesP
             <Target className="h-5 w-5" />
             Preview de Diretrizes - Versão {version.version}
           </DialogTitle>
+          <DialogDescription>
+            Teste e visualize como as diretrizes serão aplicadas com dados de exemplo.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

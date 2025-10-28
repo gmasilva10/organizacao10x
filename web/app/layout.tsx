@@ -9,6 +9,7 @@ import { Toaster } from "sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { ClientTelemetryInit } from "@/components/ClientTelemetryInit"
 import QueryProvider from "@/components/providers/QueryProvider"
+import CSSPreloader from "@/components/CSSPreloader"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -56,6 +57,8 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+	// Layout renderizado - log removido para produção
+	
 	return (
 		<html lang="pt-BR" suppressHydrationWarning>
       <head>
@@ -65,14 +68,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icon.png" />
         <meta name="theme-color" content="#0F172A" />
+        {/* CSS crítico inline para evitar FOUC */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            body { margin: 0; font-family: Inter, sans-serif; }
+            .dark { background-color: #0F172A; color: white; }
+            .light { background-color: white; color: #0F172A; }
+          `
+        }} />
+        <noscript>
+          <link rel="stylesheet" href="/_next/static/css/app/layout.css" />
+        </noscript>
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ThemeProvider initialTheme={undefined}>
+        <ThemeProvider initialTheme="light">
           <QueryProvider>
             <TooltipProvider>
               <ToastProvider>
                 <LoginUIProvider>
                   <ClientTelemetryInit />
+                  <CSSPreloader />
                   {children}
                   <Toaster richColors position="top-right" />
                 </LoginUIProvider>

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useCallback } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Move, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
@@ -240,7 +240,7 @@ export function ImageCropModal({
     // Converter para File
     cropCanvas.toBlob((blob) => {
       if (blob) {
-        const croppedFile = new File([blob], imageFile.name, {
+        const croppedFile = new File([blob], imageFile?.name || 'cropped-image.jpg', {
           type: 'image/jpeg',
           lastModified: Date.now()
         })
@@ -290,6 +290,9 @@ export function ImageCropModal({
             <Move className="h-5 w-5" />
             Ajustar Imagem
           </DialogTitle>
+          <DialogDescription>
+            Redimensione, rotacione e ajuste a imagem antes de salvar.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -329,7 +332,7 @@ export function ImageCropModal({
               </label>
               <Slider
                 value={[scale]}
-                onValueChange={([value]) => setScale(value)}
+                onValueChange={([value]: number[]) => setScale(value)}
                 min={0.1}
                 max={3}
                 step={0.1}
@@ -348,7 +351,7 @@ export function ImageCropModal({
               </label>
               <Slider
                 value={[rotation]}
-                onValueChange={([value]) => setRotation(value)}
+                onValueChange={([value]: number[]) => setRotation(value)}
                 min={-180}
                 max={180}
                 step={5}

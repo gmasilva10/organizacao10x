@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
@@ -97,8 +97,11 @@ export function GuidelinesVersioningModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Gerenciar VersÃ£o {version.version}
+            Gerenciar Versão {version.version}
           </DialogTitle>
+          <DialogDescription>
+            Gerencie o status e configurações desta versão da diretriz.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

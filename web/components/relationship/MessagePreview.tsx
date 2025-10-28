@@ -9,7 +9,7 @@
 import React, { useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MessageSquare, Eye } from 'lucide-react'
-import { renderPreview } from '@/lib/relationship/variable-renderer'
+import { renderPreviewLegacy } from '@/lib/relationship/variable-renderer'
 
 interface MessagePreviewProps {
   template: string
@@ -24,7 +24,7 @@ export function MessagePreview({ template, anchor, temporalOffset }: MessagePrev
       return ''
     }
     
-    return renderPreview(template)
+    return renderPreviewLegacy(template)
   }, [template])
 
   // Gerar descrição do agendamento

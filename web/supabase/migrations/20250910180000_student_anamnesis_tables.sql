@@ -5,18 +5,18 @@ CREATE TABLE IF NOT EXISTS student_anamnesis_versions (
   version_n INTEGER NOT NULL,
   answers_json JSONB NOT NULL DEFAULT '{}',
   template_version_id UUID NOT NULL REFERENCES anamnesis_templates(id),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   created_by UUID NOT NULL REFERENCES auth.users(id),
   
   -- Constraints
-  UNIQUE(student_id, version_n, tenant_id),
+  UNIQUE(student_id, version_n, org_id),
   CHECK(version_n > 0)
 );
 
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_student_anamnesis_versions_student_id 
-  ON student_anamnesis_versions(student_id, tenant_id);
+  ON student_anamnesis_versions(student_id, org_id);
 
 CREATE INDEX IF NOT EXISTS idx_student_anamnesis_versions_created_at 
   ON student_anamnesis_versions(created_at DESC);
@@ -27,10 +27,10 @@ CREATE TABLE IF NOT EXISTS student_anamnesis_latest (
   version_id UUID NOT NULL REFERENCES student_anamnesis_versions(id) ON DELETE CASCADE,
   answers_json JSONB NOT NULL DEFAULT '{}',
   active_tags TEXT[] NOT NULL DEFAULT '{}',
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  PRIMARY KEY(student_id, tenant_id)
+  PRIMARY KEY(student_id, org_id)
 );
 
 -- RLS
@@ -41,8 +41,8 @@ ALTER TABLE student_anamnesis_latest ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view anamnesis versions of their tenant students" 
   ON student_anamnesis_versions FOR SELECT
   USING (
-    tenant_id IN (
-      SELECT tenant_id FROM memberships 
+    org_id IN (
+      SELECT org_id FROM memberships 
       WHERE user_id = auth.uid() AND role IN ('admin', 'trainer', 'nutritionist')
     )
   );
@@ -50,8 +50,8 @@ CREATE POLICY "Users can view anamnesis versions of their tenant students"
 CREATE POLICY "Users can create anamnesis versions for their tenant students" 
   ON student_anamnesis_versions FOR INSERT
   WITH CHECK (
-    tenant_id IN (
-      SELECT tenant_id FROM memberships 
+    org_id IN (
+      SELECT org_id FROM memberships 
       WHERE user_id = auth.uid() AND role IN ('admin', 'trainer', 'nutritionist')
     )
   );
@@ -60,8 +60,8 @@ CREATE POLICY "Users can create anamnesis versions for their tenant students"
 CREATE POLICY "Users can view latest anamnesis of their tenant students" 
   ON student_anamnesis_latest FOR SELECT
   USING (
-    tenant_id IN (
-      SELECT tenant_id FROM memberships 
+    org_id IN (
+      SELECT org_id FROM memberships 
       WHERE user_id = auth.uid() AND role IN ('admin', 'trainer', 'nutritionist')
     )
   );
@@ -69,8 +69,8 @@ CREATE POLICY "Users can view latest anamnesis of their tenant students"
 CREATE POLICY "Users can update latest anamnesis of their tenant students" 
   ON student_anamnesis_latest FOR ALL
   USING (
-    tenant_id IN (
-      SELECT tenant_id FROM memberships 
+    org_id IN (
+      SELECT org_id FROM memberships 
       WHERE user_id = auth.uid() AND role IN ('admin', 'trainer', 'nutritionist')
     )
   );
@@ -84,7 +84,7 @@ BEGIN
     version_id, 
     answers_json, 
     active_tags, 
-    tenant_id, 
+    org_id, 
     updated_at
   )
   VALUES (
@@ -92,10 +92,10 @@ BEGIN
     NEW.id, 
     NEW.answers_json, 
     '{}', -- Será preenchido pela aplicação
-    NEW.tenant_id, 
+    NEW.org_id, 
     NOW()
   )
-  ON CONFLICT (student_id, tenant_id) 
+  ON CONFLICT (student_id, org_id) 
   DO UPDATE SET
     version_id = NEW.id,
     answers_json = NEW.answers_json,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { resolveRequestContext } from "@/utils/context/request-context"
 import { getCache, setCache } from "@/lib/cache/redis"
+import { withCompression, CompressionConfigs } from "@/lib/compression/middleware"
 
 async function getMetricsHandler(request: NextRequest): Promise<NextResponse> {
   const startTime = Date.now()
@@ -133,6 +134,4 @@ async function getMetricsHandler(request: NextRequest): Promise<NextResponse> {
  * ANTES: export const GET = withCache(getMetricsHandler, CacheConfigs.METRICS)
  * AGORA: export async function GET(request) { return getMetricsHandler(request) }
  */
-export async function GET(request: NextRequest) {
-  return getMetricsHandler(request)
-}
+export const GET = withCompression(getMetricsHandler, CompressionConfigs.METRICS)

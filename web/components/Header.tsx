@@ -96,7 +96,7 @@ export function Header() {
 					)}
 				</nav>
 
-				<div className="hidden md:flex items-center gap-3">
+				<div className="hidden md:flex items-center gap-3" suppressHydrationWarning>
 					<ThemeToggle />
 					<Button asChild size="sm" variant="ghost" className="rounded-full">
 						<Link href="/login">Entrar</Link>

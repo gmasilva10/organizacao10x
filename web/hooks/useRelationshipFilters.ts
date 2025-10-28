@@ -13,6 +13,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useDebounce } from './useDebounce'
 import { getTodayInterval } from '@/lib/date-utils'
+import { formatDateForInput, parseDateFromInput } from '@/lib/date-formatters'
 
 export interface RelationshipFilters {
   status: string
@@ -27,8 +28,38 @@ export interface RelationshipFilters {
   visible_columns: string[] // Novo campo para filtro de colunas
 }
 
-// Função para obter filtros padrão (hoje)
+// Interface para filtros no UI (com datas formatadas para input[type="date"])
+export interface RelationshipFiltersUI {
+  status: string
+  anchor: string
+  template_code: string
+  channel: string
+  date_from: string // Formato YYYY-MM-DD para input[type="date"]
+  date_to: string   // Formato YYYY-MM-DD para input[type="date"]
+  created_from: string // Formato YYYY-MM-DD para input[type="date"]
+  created_to: string   // Formato YYYY-MM-DD para input[type="date"]
+  q: string
+  visible_columns: string[]
+}
+
+// Função para obter filtros padrão (vazios - sem filtros aplicados)
 const getDefaultFilters = (): RelationshipFilters => {
+  return {
+    status: 'all',
+    anchor: 'all',
+    template_code: 'all',
+    channel: 'all',
+    date_from: '',        // VAZIO - sem filtro de data
+    date_to: '',          // VAZIO - sem filtro de data
+    created_from: '',
+    created_to: '',
+    q: '',
+    visible_columns: ['overdue', 'due_today', 'pending_future', 'sent', 'postponed_skipped'] // Todas as colunas visíveis por padrão
+  }
+}
+
+// Função para obter filtros de "hoje" (filtro explícito)
+const getTodayFilters = (): RelationshipFilters => {
   const today = getTodayInterval()
   return {
     status: 'all',
@@ -40,11 +71,32 @@ const getDefaultFilters = (): RelationshipFilters => {
     created_from: '',
     created_to: '',
     q: '',
-    visible_columns: ['overdue', 'due_today', 'pending_future', 'sent', 'postponed_skipped'] // Todas as colunas visíveis por padrão
+    visible_columns: ['overdue', 'due_today', 'pending_future', 'sent', 'postponed_skipped']
   }
 }
 
 const STORAGE_KEY = 'relationship_filters'
+
+// Funções de conversão entre formatos de data
+const convertFiltersToUI = (filters: RelationshipFilters): RelationshipFiltersUI => {
+  return {
+    ...filters,
+    date_from: formatDateForInput(filters.date_from),
+    date_to: formatDateForInput(filters.date_to),
+    created_from: formatDateForInput(filters.created_from),
+    created_to: formatDateForInput(filters.created_to)
+  }
+}
+
+const convertFiltersFromUI = (uiFilters: RelationshipFiltersUI): RelationshipFilters => {
+  return {
+    ...uiFilters,
+    date_from: parseDateFromInput(uiFilters.date_from),
+    date_to: parseDateFromInput(uiFilters.date_to),
+    created_from: parseDateFromInput(uiFilters.created_from),
+    created_to: parseDateFromInput(uiFilters.created_to)
+  }
+}
 
 export function useRelationshipFilters() {
   const [filters, setFilters] = useState<RelationshipFilters>(getDefaultFilters())
@@ -54,7 +106,7 @@ export function useRelationshipFilters() {
   const debouncedQ = useDebounce(filters.q, 500)
 
   // Carregar filtros do localStorage na inicialização
-  // Se não houver filtros salvos, usar filtro padrão "hoje"
+  // Se não houver filtros salvos, usar filtros vazios (sem filtros aplicados)
   useEffect(() => {
     // Verificar se estamos no cliente
     if (typeof window === 'undefined') return
@@ -66,14 +118,14 @@ export function useRelationshipFilters() {
         setFilters(parsedFilters)
         setDebouncedFilters(parsedFilters)
       } else {
-        // Sem filtros salvos - usar padrão "hoje"
+        // Sem filtros salvos - usar filtros vazios (sem filtros aplicados)
         const defaultFilters = getDefaultFilters()
         setFilters(defaultFilters)
         setDebouncedFilters(defaultFilters)
       }
     } catch (error) {
       console.warn('Erro ao carregar filtros do localStorage:', error)
-      // Em caso de erro, usar padrão "hoje"
+      // Em caso de erro, usar filtros vazios
       const defaultFilters = getDefaultFilters()
       setFilters(defaultFilters)
       setDebouncedFilters(defaultFilters)
@@ -100,7 +152,7 @@ export function useRelationshipFilters() {
     }))
   }, [debouncedQ])
 
-  // Atualizar filtros
+  // Atualizar filtros (formato interno - ISO UTC)
   const updateFilters = useCallback((newFilters: Partial<RelationshipFilters>) => {
     setFilters(prev => {
       const updated = { ...prev, ...newFilters }
@@ -115,6 +167,27 @@ export function useRelationshipFilters() {
     })
   }, [])
 
+  // Atualizar filtros do UI (formato YYYY-MM-DD) - converte para formato interno
+  const updateFiltersUI = useCallback((newFilters: Partial<RelationshipFiltersUI>) => {
+    // Converter campos de data do formato UI para formato interno
+    const convertedFilters: Partial<RelationshipFilters> = { ...newFilters }
+    
+    if (newFilters.date_from !== undefined) {
+      convertedFilters.date_from = parseDateFromInput(newFilters.date_from)
+    }
+    if (newFilters.date_to !== undefined) {
+      convertedFilters.date_to = parseDateFromInput(newFilters.date_to)
+    }
+    if (newFilters.created_from !== undefined) {
+      convertedFilters.created_from = parseDateFromInput(newFilters.created_from)
+    }
+    if (newFilters.created_to !== undefined) {
+      convertedFilters.created_to = parseDateFromInput(newFilters.created_to)
+    }
+    
+    updateFilters(convertedFilters)
+  }, [updateFilters])
+
   // Resetar filtros (volta para "hoje")
   const resetFilters = useCallback(() => {
     const defaultFilters = getDefaultFilters()
@@ -124,15 +197,10 @@ export function useRelationshipFilters() {
 
   // Atalho para filtrar apenas hoje
   const setToday = useCallback(() => {
-    const today = getTodayInterval()
-    const todayFilters = {
-      ...filters,
-      date_from: today.date_from,
-      date_to: today.date_to
-    }
+    const todayFilters = getTodayFilters()
     setFilters(todayFilters)
     setDebouncedFilters(todayFilters)
-  }, [filters])
+  }, [])
 
   // Verificar se há filtros ativos
   const hasActiveFilters = useCallback(() => {
@@ -141,6 +209,43 @@ export function useRelationshipFilters() {
     ) || filters.q.trim() !== ''
   }, [filters])
 
+  // Forçar aplicação dos filtros (para o botão "Aplicar Filtros")
+  const applyFilters = useCallback(() => {
+    setDebouncedFilters(filters)
+  }, [filters])
+
+  // Mapeamento de status visuais para status reais do banco
+  const mapStatusToApi = (status: string): { status: string | null; dateFilter?: { from?: string; to?: string } } => {
+    switch (status) {
+      case 'overdue':
+        return { 
+          status: 'pending',
+          dateFilter: { to: new Date().toISOString() } // Apenas tarefas agendadas para antes de agora
+        }
+      case 'due_today':
+        return { 
+          status: 'pending',
+          dateFilter: { 
+            from: new Date(new Date().setHours(0, 0, 0, 0)).toISOString(),
+            to: new Date(new Date().setHours(23, 59, 59, 999)).toISOString()
+          }
+        }
+      case 'pending_future':
+        return { 
+          status: 'pending',
+          dateFilter: { from: new Date().toISOString() } // Apenas tarefas agendadas para depois de agora
+        }
+      case 'sent':
+        return { status: 'sent' }
+      case 'postponed_skipped':
+        return { status: 'postponed' }
+      case 'all':
+        return { status: null } // Não filtrar por status
+      default:
+        return { status }
+    }
+  }
+
   // Obter filtros para API (remover campos vazios e mapear nomes para a API)
   const getApiFilters = useCallback(() => {
     const apiFilters: Record<string, string> = {}
@@ -148,7 +253,22 @@ export function useRelationshipFilters() {
     const entries = Object.entries(debouncedFilters)
     for (const [key, value] of entries) {
       if (!value || (typeof value === 'string' && value.trim() === '') || value === 'all') continue
-      if (key === 'date_from') {
+      
+      if (key === 'status') {
+        const mappedStatus = mapStatusToApi(value as string)
+        if (mappedStatus.status) {
+          apiFilters['status'] = mappedStatus.status
+        }
+        // Aplicar filtros de data específicos para cada status
+        if (mappedStatus.dateFilter) {
+          if (mappedStatus.dateFilter.from) {
+            apiFilters['scheduled_from'] = mappedStatus.dateFilter.from
+          }
+          if (mappedStatus.dateFilter.to) {
+            apiFilters['scheduled_to'] = mappedStatus.dateFilter.to
+          }
+        }
+      } else if (key === 'date_from') {
         apiFilters['scheduled_from'] = value as string
       } else if (key === 'date_to') {
         apiFilters['scheduled_to'] = value as string
@@ -164,20 +284,19 @@ export function useRelationshipFilters() {
     return apiFilters
   }, [debouncedFilters])
 
-  // Contar filtros ativos (não conta filtros padrão)
+  // Contar filtros ativos (apenas filtros explicitamente configurados)
   const getActiveFiltersCount = useCallback(() => {
-    const defaultFilters = getDefaultFilters()
     let count = 0
     
-    // Contar filtros não-padrão
+    // Contar apenas filtros explicitamente configurados
     if (filters.q.trim() !== '') count++
-    if (filters.anchor !== defaultFilters.anchor) count++
-    if (filters.template_code !== defaultFilters.template_code) count++
-    if (filters.channel !== defaultFilters.channel) count++
-    if (filters.created_from !== defaultFilters.created_from) count++
-    if (filters.created_to !== defaultFilters.created_to) count++
-    if (filters.date_from !== defaultFilters.date_from) count++
-    if (filters.date_to !== defaultFilters.date_to) count++
+    if (filters.anchor !== 'all') count++
+    if (filters.template_code !== 'all') count++
+    if (filters.channel !== 'all') count++
+    if (filters.created_from !== '') count++
+    if (filters.created_to !== '') count++
+    if (filters.date_from !== '') count++
+    if (filters.date_to !== '') count++
     
     // Contar colunas ocultas (se não são todas visíveis)
     const allColumns = ['overdue', 'due_today', 'pending_future', 'sent', 'postponed_skipped']
@@ -186,14 +305,20 @@ export function useRelationshipFilters() {
     return count
   }, [filters])
 
+  // Filtros formatados para UI (com datas no formato YYYY-MM-DD)
+  const filtersUI = convertFiltersToUI(filters)
+
   return {
     filters,
+    filtersUI, // Filtros formatados para UI
     debouncedFilters,
     updateFilters,
+    updateFiltersUI, // Função para atualizar filtros do UI
     resetFilters,
     setToday,
     hasActiveFilters,
     getApiFilters,
-    getActiveFiltersCount
+    getActiveFiltersCount,
+    applyFilters
   }
 }

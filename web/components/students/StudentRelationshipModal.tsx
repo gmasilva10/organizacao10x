@@ -11,7 +11,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { MessageSquare, Plus } from 'lucide-react'
 import RelationshipTimeline from '../relationship/RelationshipTimeline'
@@ -61,9 +61,9 @@ export default function StudentRelationshipModal({
                   <DialogTitle className="text-xl font-semibold">
                     Relacionamento do Aluno
                   </DialogTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {studentName}
-                  </p>
+                  <DialogDescription className="text-sm text-muted-foreground mt-1">
+                    {studentName} - Visualize o histórico de comunicação e crie novas mensagens.
+                  </DialogDescription>
                 </div>
               </div>
               <Button 

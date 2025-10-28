@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,6 +19,9 @@ import utc from 'dayjs/plugin/utc'
 import { toast } from 'sonner'
 import { RELATIONSHIP_VARIABLES, VARIABLE_CATEGORIES, getVariablesByCategory } from '@/lib/relationship-variables'
 import { CLASSIFICATION_TAGS } from '@/lib/relationship-anchors'
+import { whatsappService } from '@/lib/integrations/whatsapp/service'
+import { WhatsAppContact, WhatsAppMessage } from '@/lib/integrations/whatsapp/types'
+import { MessagePreviewBubble } from './MessagePreviewBubble'
 
 // Configurar dayjs com timezone
 dayjs.extend(utc)
@@ -665,13 +668,31 @@ export default function MessageComposer({
         final: finalMessage
       })
       
-      // Criar URL do WhatsApp Web
-      const whatsappUrl = `https://web.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(finalMessage)}`
+      // Usar novo serviço WhatsApp (Desktop primeiro, fallback para Web)
+      const contact: WhatsAppContact = {
+        phone: formattedPhone,
+        name: student.name || initialStudentName || 'Aluno'
+      }
       
-      console.log('🔍 DEBUG URL:', whatsappUrl)
+      const whatsappMessage: WhatsAppMessage = {
+        text: finalMessage,
+        contact
+      }
       
-      // Abrir WhatsApp Web
-      window.open(whatsappUrl, '_blank')
+      console.log('🔍 DEBUG WhatsApp Service:', {
+        contact,
+        message: finalMessage.substring(0, 50) + '...'
+      })
+      
+      // Tentar enviar via WhatsApp Desktop primeiro, fallback para Web
+      const result = await whatsappService.sendMessage(whatsappMessage)
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao abrir WhatsApp')
+      }
+      
+      const methodName = result.method === 'desktop' ? 'WhatsApp Desktop' : 'WhatsApp Web'
+      console.log(`✅ WhatsApp aberto via ${methodName}`)
       
       // Copiar mensagem para área de transferência
       await navigator.clipboard.writeText(finalMessage)
@@ -696,7 +717,10 @@ export default function MessageComposer({
       
       if (response.ok && data.success) {
         const studentName = initialStudentName || 'Aluno'
-        toast.success(`Mensagem preparada para ${studentName} no WhatsApp.`)
+        const methodName = result.method === 'desktop' ? 'WhatsApp Desktop' : 'WhatsApp Web'
+        toast.success(`Mensagem preparada para ${studentName}`, {
+          description: `Abrindo ${methodName}...`
+        })
         onSuccess?.()
         onOpenChange(false)
       } else {
@@ -721,6 +745,12 @@ export default function MessageComposer({
             <MessageSquare className="h-5 w-5" />
             {formData.sendNow ? 'Enviar Mensagem' : 'Criar Tarefa'}
           </DialogTitle>
+          <DialogDescription>
+            {formData.sendNow 
+              ? 'Envie uma mensagem personalizada para seus alunos usando variáveis dinâmicas.'
+              : 'Crie uma tarefa de relacionamento para ser executada automaticamente no futuro.'
+            }
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-120px)] pr-2">
@@ -1109,16 +1139,23 @@ export default function MessageComposer({
                   const previewText = renderMessagePreview(formData.message, student, context)
                   
                   return (
-                    <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <div className="text-xs text-blue-600 font-medium mb-1">Prévia da mensagem:</div>
-                      <div className="text-sm text-blue-800">
-                        {previewText}
+                    <div className="mt-4 space-y-3">
+                      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                        <Eye className="h-4 w-4" />
+                        Preview da Mensagem
                       </div>
-                      {previewText === formData.message && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          ℹ️ Nenhuma variável encontrada na mensagem
-                        </div>
-                      )}
+                      <div className="bg-muted/30 rounded-lg p-4 border">
+                        <MessagePreviewBubble
+                          message={previewText}
+                          senderName="Personal Trainer"
+                          showAvatar={true}
+                        />
+                        {previewText === formData.message && (
+                          <div className="mt-3 text-xs text-muted-foreground">
+                            ℹ️ Nenhuma variável encontrada na mensagem
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )
                 })()}
@@ -1270,7 +1307,7 @@ export default function MessageComposer({
               {/* Aviso discreto sobre WhatsApp */}
               {formData.channel === 'whatsapp' && formData.sendNow && (
                 <div className="text-xs text-gray-500 mt-2">
-                  Ao enviar, o WhatsApp Web será aberto automaticamente.
+                  Ao enviar, o WhatsApp Desktop será aberto automaticamente (ou Web como fallback).
                 </div>
               )}
             </CardContent>

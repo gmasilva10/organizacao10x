@@ -19,7 +19,8 @@ import {
   MessageCircle,
   ChevronDown,
   ClipboardList,
-  DollarSign
+  DollarSign,
+  BarChart3
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -116,6 +117,12 @@ const menuGroups: MenuGroup[] = [
         title: "Equipe", 
         href: "/app/team",
         icon: Shield
+      },
+      {
+        id: "metrics",
+        title: "Métricas",
+        href: "/app/metrics",
+        icon: BarChart3
       },
       {
         id: "settings",

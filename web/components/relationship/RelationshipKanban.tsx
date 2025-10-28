@@ -22,20 +22,30 @@ import {
   User,
   MoreHorizontal,
   AlertCircle,
-  Inbox
+  Inbox,
+  Trash2
 } from 'lucide-react'
 import TaskCard from './TaskCard'
 import MessageComposer from './MessageComposer'
 import RelationshipFilterDrawer from './RelationshipFilterDrawer'
+import RelationshipCalendar from './RelationshipCalendar'
 import { toast } from 'sonner'
+import { whatsappService } from '@/lib/integrations/whatsapp/service'
+import { WhatsAppContact, WhatsAppMessage } from '@/lib/integrations/whatsapp/types'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { useRelationshipFilters } from '@/hooks/useRelationshipFilters'
+import { useKanbanDragAndDrop } from '@/hooks/useDragAndDrop'
+import { DroppableColumn } from './DroppableColumn'
+import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core'
+import { CompactFilters } from './CompactFilters'
+import { ViewToggle } from './ViewToggle'
 import { isPast, isToday, isFuture } from '@/lib/date-utils'
 import { safeQueryString } from '@/lib/query-utils'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter, DrawerDescription } from '@/components/ui/drawer'
 import { Label } from '@/components/ui/label'
 import { StandardizedCalendar } from '@/components/ui/standardized-calendar'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 // Mapeamento de âncoras para exibição
 const ANCHOR_LABELS = {
@@ -125,22 +135,26 @@ const columnStyleById: Record<string, { header: string; card: string }> = {
 const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanProps>(({ onTaskUpdate }, ref) => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
-  const [pagination, setPagination] = useState({ page: 1, page_size: 20, total: 0, total_pages: 0 })
+  const [pagination, setPagination] = useState({ page: 1, page_size: 100, total: 0, total_pages: 0 })
   const [showComposer, setShowComposer] = useState(false)
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
   const [expandedColumns, setExpandedColumns] = useState<Record<string, boolean>>({})
-  const mountedRef = useRef(true)
+  const [currentView, setCurrentView] = useState<'kanban' | 'calendar'>('kanban')
+  const mountedRef = useRef(false)
 
   // Hook de filtros com proteção SSR
   const {
     filters,
+    filtersUI, // Filtros formatados para UI
     debouncedFilters,
     updateFilters,
+    updateFiltersUI, // Função para atualizar filtros do UI
     resetFilters,
     setToday,
     hasActiveFilters,
     getApiFilters,
-    getActiveFiltersCount
+    getActiveFiltersCount,
+    applyFilters
   } = useRelationshipFilters()
 
   // Buscar tarefas com useCallback estável
@@ -171,9 +185,11 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       })
 
       const url = `/api/relationship/tasks?${params}`
-      if (process.env.NEXT_PUBLIC_DEBUG_REL === '1') {
-        console.debug('[REL] fetching', url)
-      }
+      
+      // Debug temporário para investigar filtros
+      console.log('🔍 [REL] Filtros atuais:', debouncedFilters)
+      console.log('🔍 [REL] Filtros para API:', apiFilters)
+      console.log('🔍 [REL] URL:', url)
       const response = await fetch(url, {
         cache: 'no-cache',
         headers: { 'Cache-Control': 'no-cache' },
@@ -205,6 +221,37 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       if (mountedRef.current) setLoading(false)
     }
   }, [pagination.page, pagination.page_size, debouncedFilters, getApiFilters])
+
+  // Função para mover tarefa entre colunas
+  const handleTaskMove = useCallback(async (taskId: string, newStatus: string) => {
+    try {
+      const response = await fetch(`/api/relationship/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar status da tarefa')
+      }
+
+      // Atualizar a lista de tarefas
+      await fetchTasks()
+      
+      toast.success('Tarefa movida com sucesso!')
+    } catch (error) {
+      console.error('Erro ao mover tarefa:', error)
+      toast.error('Erro ao mover tarefa')
+    }
+  }, [fetchTasks])
+
+  // Hook de drag & drop
+  const { dragState, handleDragStart, handleDragOver, handleDragEnd, handleDragCancel } = useKanbanDragAndDrop(
+    tasks,
+    handleTaskMove
+  )
 
   // Determinar colunas visíveis com try/catch
   const visibleColumns = useMemo(() => {
@@ -320,11 +367,35 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
     toast.success('Mensagem copiada para a área de transferência')
   }
 
-  // Abrir WhatsApp Web
-  const openWhatsApp = (phone: string, message: string) => {
-    const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`
-    window.open(whatsappUrl, '_blank')
+  // Abrir WhatsApp (Desktop primeiro, fallback para Web)
+  const openWhatsApp = async (phone: string, message: string, studentName?: string) => {
+    try {
+      const contact: WhatsAppContact = {
+        phone,
+        name: studentName
+      }
+      
+      const whatsappMessage: WhatsAppMessage = {
+        text: message,
+        contact
+      }
+      
+      const result = await whatsappService.sendMessage(whatsappMessage)
+      
+      if (result.success) {
+        const methodName = result.method === 'desktop' ? 'WhatsApp Desktop' : 'WhatsApp Web'
+        toast.success(`Abrindo ${methodName}...`, {
+          description: `Mensagem preparada para ${studentName || 'aluno'}`
+        })
+      } else {
+        throw new Error(result.error || 'Erro ao abrir WhatsApp')
+      }
+    } catch (error) {
+      console.error('Erro ao abrir WhatsApp:', error)
+      toast.error('Erro ao abrir WhatsApp', {
+        description: error instanceof Error ? error.message : 'Erro desconhecido'
+      })
+    }
   }
 
   // Snooze tarefa (adiar)
@@ -346,6 +417,32 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       }
       
       toast.success(`Tarefa adiada por ${days} dia(s)`)
+      fetchTasks()
+      if (onTaskUpdate) onTaskUpdate()
+    } catch (error) {
+      console.error('Erro ao adiar tarefa:', error)
+      toast.error('Erro ao adiar tarefa')
+    }
+  }
+
+  const postponeTask = async (taskId: string, newDate: Date) => {
+    try {
+      const response = await fetch(`/api/relationship/tasks`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task_id: taskId,
+          scheduled_for: newDate.toISOString()
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao adiar tarefa')
+      }
+      
+      toast.success(`Tarefa reagendada para ${format(newDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`)
       fetchTasks()
       if (onTaskUpdate) onTaskUpdate()
     } catch (error) {
@@ -426,73 +523,132 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
 
   // Buscar tarefas quando filtros mudarem
   useEffect(() => {
-    if (mountedRef.current) {
-      fetchTasks()
-    }
-  }, [fetchTasks])
 
-  // Cleanup
+    // Abort previous in-flight request when filters change quickly
+    const controller = new AbortController()
+    const signal = controller.signal
+    ;(fetchTasks as any)._controller?.abort()
+    ;(fetchTasks as any)._controller = controller
+
+    setLoading(true)
+    const t0 = performance.now()
+    // Safety guard: ensure loading cannot hang forever
+    const guard = setTimeout(() => {
+      if (mountedRef.current) {
+        console.warn('[REL] fetch guard timeout - forcing loading=false')
+        setLoading(false)
+      }
+    }, 8000)
+    
+    const executeFetch = async () => {
+      try {
+        const apiFilters = getApiFilters()
+        const params = safeQueryString({
+          page: pagination.page,
+          limit: pagination.page_size,
+          ...apiFilters
+        })
+
+        const url = `/api/relationship/tasks?${params}`
+        
+        const response = await fetch(url, {
+          cache: 'no-cache',
+          headers: { 'Cache-Control': 'no-cache' },
+          signal
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          const errMsg = data?.error || `HTTP ${response.status}`
+          throw new Error(errMsg)
+        }
+
+        if (process.env.NEXT_PUBLIC_DEBUG_REL === '1') {
+          console.debug('[REL] fetch ok', { rows: data.tasks?.length || 0, ms: Math.round(performance.now() - t0) })
+        }
+
+        setTasks(Array.isArray(data.tasks) ? data.tasks : [])
+        setPagination(data.pagination || { page: 1, page_size: 100, total: 0, total_pages: 0 })
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('[REL] fetch aborted')
+          return
+        }
+        console.error('[REL] fetch error:', error)
+        toast.error('Erro ao carregar tarefas')
+      } finally {
+        clearTimeout(guard)
+        if (mountedRef.current) {
+          setLoading(false)
+        }
+      }
+    }
+
+    executeFetch()
+  }, [debouncedFilters])
+
+  // Setup mountedRef
   useEffect(() => {
+    mountedRef.current = true
     return () => {
       mountedRef.current = false
     }
   }, [])
 
+  // Calcular contadores de tarefas por status
+  const taskCounts = useMemo(() => {
+    return {
+      overdue: getTasksByColumn('overdue').length,
+      due_today: getTasksByColumn('due_today').length,
+      pending_future: getTasksByColumn('pending_future').length,
+      sent: getTasksByColumn('sent').length,
+      postponed_skipped: getTasksByColumn('postponed_skipped').length,
+    }
+  }, [tasks])
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="flex flex-wrap items-center gap-2">
-            <Select value={filters.status} onValueChange={(v: string) => updateFilters({ status: v })}>
-              <SelectTrigger className="h-10 w-44">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os status</SelectItem>
-                <SelectItem value="pending">Pendente</SelectItem>
-                <SelectItem value="sent">Enviada</SelectItem>
-                <SelectItem value="skipped">Pulada</SelectItem>
-                <SelectItem value="postponed">Adiada</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button 
-              variant="outline" 
-              onClick={() => setToday()}
-              aria-label="Filtrar tarefas para hoje"
-            >
-              <Calendar className="mr-2 h-4 w-4" /> Hoje
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setFilterDrawerOpen(true)}
-              aria-label={`Abrir filtros avançados${getActiveFiltersCount() > 0 ? ` - ${getActiveFiltersCount()} filtro${getActiveFiltersCount() !== 1 ? 's' : ''} ativo${getActiveFiltersCount() !== 1 ? 's' : ''}` : ''}`}
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              Filtros
-              {getActiveFiltersCount() > 0 && (
-                <Badge className="ml-2 bg-blue-100 text-blue-700" aria-hidden="true">{getActiveFiltersCount()}</Badge>
-              )}
-            </Button>
-          <Button 
-            variant="outline" 
-            onClick={resetFilters}
-            aria-label="Limpar todos os filtros"
-          >
-            <X className="mr-2 h-4 w-4" /> Limpar
-          </Button>
-          <Button 
-            variant="default" 
-            onClick={fetchTasks}
-            aria-label="Atualizar lista de tarefas"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" /> Atualizar
-          </Button>
-          <Button 
-            onClick={() => setShowComposer(true)}
-            aria-label="Criar nova mensagem"
-          >
-            <MessageSquare className="mr-2 h-4 w-4" /> Nova Mensagem
-          </Button>
+      {/* Cabeçalho Compacto */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-2xl font-bold">Relacionamento</h1>
+          <p className="text-sm text-muted-foreground">Gerencie tarefas e comunicações com seus alunos</p>
         </div>
+        <ViewToggle
+          currentView={currentView}
+          onViewChange={setCurrentView}
+        />
+      </div>
+
+      {/* Filtros Ultra-Compactos */}
+      <div className="flex items-center justify-between mb-4">
+        <CompactFilters
+          filters={filters}
+          taskCounts={taskCounts}
+          onFilterChange={updateFilters}
+          onSearchChange={(query) => updateFilters({ q: query })}
+          onClearFilters={resetFilters}
+          onRefresh={fetchTasks}
+          onNewMessage={() => setShowComposer(true)}
+          onAdvancedFilters={() => setFilterDrawerOpen(true)}
+          onSetToday={setToday}
+          loading={loading}
+          activeFiltersCount={getActiveFiltersCount()}
+        />
+        
+        {/* Botão Limpar na tela principal */}
+        {hasActiveFilters && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={resetFilters}
+            className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Limpar Filtros
+          </Button>
+        )}
       </div>
 
       {loading ? (
@@ -500,6 +656,8 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           <RefreshCw className="h-8 w-8 animate-spin text-primary" />
           <span className="ml-2 text-lg">Carregando tarefas...</span>
         </div>
+      ) : currentView === 'calendar' ? (
+        <RelationshipCalendar />
       ) : (
         <div className="flex flex-col space-y-2">
           {/* Cabeçalhos Ultra Finos (como Paint) */}
@@ -508,10 +666,25 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
               <div key={`header-${column.id}`} className={`flex-shrink-0 w-72 border rounded-md ${columnStyleById[column.id]?.header || 'bg-muted/40'}`}>
                 <div className="py-1 px-3">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <column.icon className={`h-3 w-3 ${column.color}`} />
-                      <span className="text-xs font-medium text-gray-900">{column.title}</span>
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-2 cursor-help">
+                            <column.icon className={`h-3 w-3 ${column.color}`} />
+                            <span className="text-xs font-medium text-gray-900">{column.title}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            {column.id === 'overdue' && 'Tarefas que passaram da data agendada e ainda não foram enviadas'}
+                            {column.id === 'due_today' && 'Tarefas agendadas para hoje que ainda não foram enviadas'}
+                            {column.id === 'pending_future' && 'Tarefas agendadas para datas futuras'}
+                            {column.id === 'sent' && 'Tarefas que já foram enviadas com sucesso'}
+                            {column.id === 'postponed_skipped' && 'Tarefas que foram adiadas ou puladas'}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <Badge variant="secondary" className="bg-white text-gray-700 border text-xs px-1 py-0 h-5">
                       {getTasksByColumn(column.id).length}
                     </Badge>
@@ -522,9 +695,17 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
           </div>
 
           {/* Colunas de Conteúdo */}
-          <div className="flex space-x-3">
-            {visibleColumns.map(column => (
-              <Card key={`content-${column.id}`} className="flex-shrink-0 w-72 bg-white">
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+          >
+            <div className="flex space-x-3">
+              {visibleColumns.map(column => (
+                <DroppableColumn key={`content-${column.id}`} id={column.id}>
+                  <Card className="flex-shrink-0 w-72 bg-white">
                 <CardContent className="p-4">
                   {getTasksByColumn(column.id).length === 0 ? (
                     <div className="text-center text-muted-foreground py-6">
@@ -555,6 +736,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                           onCopyMessage={copyMessage}
                           onOpenWhatsApp={openWhatsApp}
                           onSnoozeTask={snoozeTask}
+                          onPostponeTask={postponeTask}
                           onDeleteTask={deleteTask}
                         />
                             ))}
@@ -571,9 +753,25 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                     </div>
                   )}
                 </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </Card>
+                </DroppableColumn>
+              ))}
+            </div>
+          </DndContext>
+          
+          {/* Drag Overlay */}
+          <DragOverlay>
+            {dragState.activeItem ? (
+              <div className="opacity-90 rotate-3 scale-105">
+                <TaskCard
+                  task={dragState.activeItem.data}
+                  onCopyMessage={() => {}}
+                  onWhatsAppSend={() => {}}
+                  onPostponeTask={() => {}}
+                />
+              </div>
+            ) : null}
+          </DragOverlay>
         </div>
       )}
 
@@ -589,13 +787,10 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
       <RelationshipFilterDrawer
         open={filterDrawerOpen}
         onOpenChange={setFilterDrawerOpen}
-        filters={filters}
-        onFiltersChange={updateFilters}
+        filters={filtersUI}
+        onFiltersChange={updateFiltersUI}
         onClear={resetFilters}
-        onApply={() => {
-          // O fetchTasks já é chamado automaticamente quando os filtros mudam
-          // através do useEffect que monitora debouncedFilters
-        }}
+        onApply={applyFilters}
       />
     </div>
   )

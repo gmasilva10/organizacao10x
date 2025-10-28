@@ -17,7 +17,8 @@ export function ClientTelemetryInit() {
     
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
-      clientTelemetry.forceFlush()
+      // Evita chamadas de rede durante navegações de teste
+      try { clientTelemetry.forceFlush() } catch {}
     }
   }, [])
 

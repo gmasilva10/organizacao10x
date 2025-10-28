@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { resolveRequestContext } from "@/utils/context/request-context"
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/students/summary — retorna contagens por status respeitando RBAC (trainer vê apenas seus alunos)
 export async function GET(request: Request) {
   const ctx = await resolveRequestContext(request)

@@ -121,8 +121,8 @@ CREATE POLICY "relationship_templates_delete_policy" ON relationship_templates
 CREATE POLICY "relationship_tasks_select_policy" ON relationship_tasks
     FOR SELECT USING (
         student_id IN (
-            SELECT id FROM students WHERE tenant_id = (
-                SELECT tenant_id FROM profiles WHERE user_id = auth.uid()
+            SELECT id FROM students WHERE org_id = (
+                SELECT org_id FROM profiles WHERE user_id = auth.uid()
             )
         )
     );
@@ -130,8 +130,8 @@ CREATE POLICY "relationship_tasks_select_policy" ON relationship_tasks
 CREATE POLICY "relationship_tasks_insert_policy" ON relationship_tasks
     FOR INSERT WITH CHECK (
         student_id IN (
-            SELECT id FROM students WHERE tenant_id = (
-                SELECT tenant_id FROM profiles WHERE user_id = auth.uid()
+            SELECT id FROM students WHERE org_id = (
+                SELECT org_id FROM profiles WHERE user_id = auth.uid()
             )
         )
     );
@@ -139,8 +139,8 @@ CREATE POLICY "relationship_tasks_insert_policy" ON relationship_tasks
 CREATE POLICY "relationship_tasks_update_policy" ON relationship_tasks
     FOR UPDATE USING (
         student_id IN (
-            SELECT id FROM students WHERE tenant_id = (
-                SELECT tenant_id FROM profiles WHERE user_id = auth.uid()
+            SELECT id FROM students WHERE org_id = (
+                SELECT org_id FROM profiles WHERE user_id = auth.uid()
             )
         )
     );
@@ -148,8 +148,8 @@ CREATE POLICY "relationship_tasks_update_policy" ON relationship_tasks
 CREATE POLICY "relationship_tasks_delete_policy" ON relationship_tasks
     FOR DELETE USING (
         student_id IN (
-            SELECT id FROM students WHERE tenant_id = (
-                SELECT tenant_id FROM profiles WHERE user_id = auth.uid()
+            SELECT id FROM students WHERE org_id = (
+                SELECT org_id FROM profiles WHERE user_id = auth.uid()
             )
         )
     );
@@ -158,8 +158,8 @@ CREATE POLICY "relationship_tasks_delete_policy" ON relationship_tasks
 CREATE POLICY "relationship_logs_select_policy" ON relationship_logs
     FOR SELECT USING (
         student_id IN (
-            SELECT id FROM students WHERE tenant_id = (
-                SELECT tenant_id FROM profiles WHERE user_id = auth.uid()
+            SELECT id FROM students WHERE org_id = (
+                SELECT org_id FROM profiles WHERE user_id = auth.uid()
             )
         )
     );
@@ -167,8 +167,8 @@ CREATE POLICY "relationship_logs_select_policy" ON relationship_logs
 CREATE POLICY "relationship_logs_insert_policy" ON relationship_logs
     FOR INSERT WITH CHECK (
         student_id IN (
-            SELECT id FROM students WHERE tenant_id = (
-                SELECT tenant_id FROM profiles WHERE user_id = auth.uid()
+            SELECT id FROM students WHERE org_id = (
+                SELECT org_id FROM profiles WHERE user_id = auth.uid()
             )
         )
     );
@@ -176,8 +176,8 @@ CREATE POLICY "relationship_logs_insert_policy" ON relationship_logs
 CREATE POLICY "relationship_logs_update_policy" ON relationship_logs
     FOR UPDATE USING (
         student_id IN (
-            SELECT id FROM students WHERE tenant_id = (
-                SELECT tenant_id FROM profiles WHERE user_id = auth.uid()
+            SELECT id FROM students WHERE org_id = (
+                SELECT org_id FROM profiles WHERE user_id = auth.uid()
             )
         )
     );
@@ -185,8 +185,8 @@ CREATE POLICY "relationship_logs_update_policy" ON relationship_logs
 CREATE POLICY "relationship_logs_delete_policy" ON relationship_logs
     FOR DELETE USING (
         student_id IN (
-            SELECT id FROM students WHERE tenant_id = (
-                SELECT tenant_id FROM profiles WHERE user_id = auth.uid()
+            SELECT id FROM students WHERE org_id = (
+                SELECT org_id FROM profiles WHERE user_id = auth.uid()
             )
         )
     );

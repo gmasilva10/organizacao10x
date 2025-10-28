@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -159,6 +159,9 @@ export function OccurrenceCloseModal({ open, onClose, occurrenceId, onSuccess }:
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Encerrar Ocorrência #{occurrenceId}</DialogTitle>
+          <DialogDescription>
+            Preencha os detalhes do encerramento desta ocorrência.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

@@ -3,8 +3,9 @@ import { resolveRequestContext } from "@/utils/context/request-context"
 import { withCache, CacheConfigs } from "@/lib/cache/middleware"
 import { getCache, setCache } from "@/lib/cache/redis"
 import { withRateLimit, RateLimitMiddlewareConfigs } from "@/lib/rate-limit/middleware"
+// import { withCompression, CompressionConfigs } from "@/lib/compression/middleware"
 
-export async function GET(request: NextRequest) {
+async function getStudentsHandler(request: NextRequest) {
   const startTime = Date.now()
   
   try {
@@ -52,6 +53,28 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const search = searchParams.get('q') || ''
     const status = searchParams.get('status') || ''
+
+    // Verificar cache primeiro
+    const cacheKey = `students:${ctx?.org_id || 'dev'}:${page}:${limit}:${search}:${status}`
+    const cachedData = await getCache(cacheKey, {
+      ttl: 120, // 2 minutos para lista de estudantes
+      prefix: 'students'
+    })
+
+    if (cachedData) {
+      console.log('✅ [students] Cache HIT')
+      const queryTime = Date.now() - startTime
+      return NextResponse.json(cachedData, {
+        headers: { 
+          'X-Cache': 'HIT',
+          'X-Query-Time': queryTime.toString(),
+          'X-Request-ID': requestId,
+          'X-Environment': env,
+          'X-Commit': commit,
+          'Cache-Control': 'public, max-age=120, stale-while-revalidate=240'
+        }
+      })
+    }
 
     // Construir filtros (org_id apenas)
     const filters: string[] = []
@@ -152,7 +175,7 @@ export async function GET(request: NextRequest) {
     const queryTime = Date.now() - startTime
     console.log(`✅ API Students - ${enrichedStudents.length} estudantes encontrados em ${queryTime}ms`)
 
-    return NextResponse.json({
+    const result = {
       success: true,
       students: enrichedStudents,
       data: enrichedStudents,
@@ -161,12 +184,23 @@ export async function GET(request: NextRequest) {
       page,
       pageSize: limit,
       queryTime
-    }, {
+    }
+
+    // Armazenar no cache
+    await setCache(cacheKey, result, {
+      ttl: 120, // 2 minutos
+      prefix: 'students'
+    })
+
+    console.log('✅ [students] Cache MISS - dados armazenados')
+    return NextResponse.json(result, {
       headers: { 
         'X-Query-Time': queryTime.toString(),
         'X-Request-ID': requestId,
         'X-Environment': env,
-        'X-Commit': commit
+        'X-Commit': commit,
+        'X-Cache': 'MISS',
+        'Cache-Control': 'public, max-age=120, stale-while-revalidate=240'
       }
     })
 
@@ -365,3 +399,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'internal_error', message: e?.message || 'Erro interno' }, { status: 500, headers: { 'X-Query-Time': String(t) } })
   }
 }
+
+// Aplicar rate limiting e compressão nas exportações
+const rateLimitedHandler = withRateLimit(getStudentsHandler, {
+  ...RateLimitMiddlewareConfigs.API,
+  getUserId: async (request) => {
+    const ctx = await resolveRequestContext(request)
+    return ctx?.userId || null
+  },
+  getOrgId: async (request) => {
+    const ctx = await resolveRequestContext(request)
+    return ctx?.org_id || null
+  }
+})
+
+export const GET = rateLimitedHandler
+// export const GET = withCompression(rateLimitedHandler, CompressionConfigs.API_LARGE)

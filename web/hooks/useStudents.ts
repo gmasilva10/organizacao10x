@@ -30,11 +30,14 @@ interface StudentsFilters {
   page?: number
   q?: string
   status?: string
+  trainer_id?: string
 }
 
 // Hook para listar alunos
 export function useStudents(filters: StudentsFilters = {}) {
   const queryClient = useQueryClient()
+  
+  // Debug removido - problema resolvido
   
   return useQuery({
     queryKey: queryKeys.students.list(filters),
@@ -47,7 +50,9 @@ export function useStudents(filters: StudentsFilters = {}) {
       if (filters.q) params.append('q', filters.q)
       if (filters.status) params.append('status', filters.status)
       
-      const response = await fetch(`/api/students?${params.toString()}`, {
+      const url = `/api/students?${params.toString()}`
+      
+      const response = await fetch(url, {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-store' }
       })
@@ -63,7 +68,7 @@ export function useStudents(filters: StudentsFilters = {}) {
       
       // Mapear dados da API para o formato esperado
       return {
-        students: data.items || data.students || [],
+        students: data.students || data.items || [],
         total: data.total || 0,
         page: data.page || 1,
         page_size: data.pageSize || 20,

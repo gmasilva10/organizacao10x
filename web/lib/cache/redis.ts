@@ -1,4 +1,5 @@
 import { createClient, RedisClientType } from 'redis'
+import { logger } from '../logger'
 
 // Configuração do Redis
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379'
@@ -41,7 +42,7 @@ function createRedisClient(): RedisClientType {
     console.log('🔄 Redis Client Reconnecting...')
   })
 
-  return client
+  return client as any
 }
 
 // Função para obter cliente Redis
@@ -49,7 +50,7 @@ export async function getRedisClient(): Promise<RedisClientType | null> {
   try {
     // Verificar se Redis está disponível
     if (!process.env.REDIS_URL && process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ Redis não configurado, usando cache em memória')
+      logger.debug('⚠️ Redis não configurado, usando cache em memória')
       return null
     }
 
@@ -65,8 +66,8 @@ export async function getRedisClient(): Promise<RedisClientType | null> {
     
     return redisClient
   } catch (error) {
-    console.error('❌ Erro ao conectar Redis:', error)
-    console.warn('⚠️ Redis não disponível, usando cache em memória')
+    logger.error('❌ Erro ao conectar Redis:', error)
+    logger.warn('⚠️ Redis não disponível, usando cache em memória')
     return null
   }
 }
@@ -79,7 +80,7 @@ export async function closeRedisClient(): Promise<void> {
       redisClient = null
     }
   } catch (error) {
-    console.error('❌ Erro ao fechar Redis:', error)
+    logger.error('❌ Erro ao fechar Redis:', error)
   }
 }
 
@@ -168,7 +169,7 @@ function serialize(data: any): string {
   try {
     return JSON.stringify(data)
   } catch (error) {
-    console.error('❌ Erro ao serializar dados:', error)
+    logger.error('❌ Erro ao serializar dados:', error)
     cacheStats.errors++
     throw error
   }
@@ -179,7 +180,7 @@ function deserialize<T>(data: string): T {
   try {
     return JSON.parse(data)
   } catch (error) {
-    console.error('❌ Erro ao deserializar dados:', error)
+    logger.error('❌ Erro ao deserializar dados:', error)
     cacheStats.errors++
     throw error
   }
@@ -217,7 +218,7 @@ export async function getCache<T>(
     cacheStats.misses++
     return null
   } catch (error) {
-    console.error('❌ Erro ao obter cache:', error)
+    logger.error('❌ Erro ao obter cache:', error)
     cacheStats.errors++
     cacheStats.misses++
     return null
@@ -252,7 +253,7 @@ export async function setCache<T>(
     cacheStats.sets++
     return true
   } catch (error) {
-    console.error('❌ Erro ao definir cache:', error)
+    logger.error('❌ Erro ao definir cache:', error)
     cacheStats.errors++
     
     // Em caso de erro, tentar cache em memória
@@ -263,7 +264,7 @@ export async function setCache<T>(
       cacheStats.sets++
       return true
     } catch (memoryError) {
-      console.error('❌ Erro ao definir cache em memória:', memoryError)
+      logger.error('❌ Erro ao definir cache em memória:', memoryError)
       return false
     }
   }
@@ -277,7 +278,7 @@ export async function deleteCache(
   try {
     const client = await getRedisClient()
     if (!client) {
-      console.warn('⚠️ Redis não disponível, cache não deletado')
+      logger.warn('⚠️ Redis não disponível, cache não deletado')
       return false
     }
 
@@ -287,7 +288,7 @@ export async function deleteCache(
     cacheStats.deletes++
     return result > 0
   } catch (error) {
-    console.error('❌ Erro ao deletar cache:', error)
+    logger.error('❌ Erro ao deletar cache:', error)
     cacheStats.errors++
     return false
   }
@@ -301,7 +302,7 @@ export async function invalidateCachePattern(
   try {
     const client = await getRedisClient()
     if (!client) {
-      console.warn('⚠️ Redis não disponível, cache não invalidado')
+      logger.warn('⚠️ Redis não disponível, cache não invalidado')
       return 0
     }
 
@@ -316,7 +317,7 @@ export async function invalidateCachePattern(
     cacheStats.deletes += result
     return result
   } catch (error) {
-    console.error('❌ Erro ao invalidar cache por padrão:', error)
+    logger.error('❌ Erro ao invalidar cache por padrão:', error)
     cacheStats.errors++
     return 0
   }
@@ -337,7 +338,7 @@ export async function existsCache(
     const result = await client.exists(cacheKey)
     return result === 1
   } catch (error) {
-    console.error('❌ Erro ao verificar existência no cache:', error)
+    logger.error('❌ Erro ao verificar existência no cache:', error)
     cacheStats.errors++
     return false
   }
@@ -357,7 +358,7 @@ export async function getCacheTTL(
     const cacheKey = generateCacheKey(key, options.prefix)
     return await client.ttl(cacheKey)
   } catch (error) {
-    console.error('❌ Erro ao obter TTL do cache:', error)
+    logger.error('❌ Erro ao obter TTL do cache:', error)
     cacheStats.errors++
     return -1
   }
@@ -372,10 +373,10 @@ export async function clearAllCache(): Promise<boolean> {
     }
 
     await client.flushDb()
-    console.log('🗑️ Todo o cache Redis foi limpo')
+    logger.info('🗑️ Todo o cache Redis foi limpo')
     return true
   } catch (error) {
-    console.error('❌ Erro ao limpar cache:', error)
+    logger.error('❌ Erro ao limpar cache:', error)
     cacheStats.errors++
     return false
   }
@@ -417,7 +418,7 @@ export async function getRedisInfo(): Promise<any> {
       info: info
     }
   } catch (error) {
-    console.error('❌ Erro ao obter informações do Redis:', error)
+    logger.error('❌ Erro ao obter informações do Redis:', error)
     return null
   }
 }

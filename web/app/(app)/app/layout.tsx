@@ -2,6 +2,7 @@ import { AppShell } from '@/components/AppShell'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
+import { logger } from '@/lib/logger'
 
 export default async function AppLayout({
   children,
@@ -13,16 +14,16 @@ export default async function AppLayout({
   const isE2E = !!cookieStore.get('e2e')?.value
   
   try {
-    const { data: { session }, error } = await supabase.auth.getSession()
+    const { data: { user }, error } = await supabase.auth.getUser()
     
     if (!isE2E) {
-      if (error || !session) {
+      if (error || !user) {
+        logger.debug('🔍 [APP LAYOUT] Redirecionando para home - erro de usuário:', { error: error?.message, hasUser: !!user })
         redirect('/')
       }
     }
 
     // Buscar informações do usuário + membership/role + perfil (avatar)
-    const user = session?.user
     let role: string | undefined
     let name: string | undefined
     let avatar_url: string | null | undefined
@@ -65,7 +66,7 @@ export default async function AppLayout({
       </AppShell>
     )
   } catch (error) {
-    console.error('Auth error in app layout:', error)
+    logger.error('Auth error in app layout:', error)
     redirect('/')
   }
 }

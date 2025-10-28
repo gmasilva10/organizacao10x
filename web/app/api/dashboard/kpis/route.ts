@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
+
+export const dynamic = 'force-dynamic'
 import { resolveRequestContext } from "@/utils/context/request-context"
 import { withCache, CacheConfigs } from "@/lib/cache/middleware"
 import { getCache, setCache } from "@/lib/cache/redis"

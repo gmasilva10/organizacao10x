@@ -426,7 +426,7 @@ async function processPurchaseApproved(
       payment_method: 'hotmart',
       status: 'pago',
       paid_at: new Date(data.purchase.approved_date).toISOString(),
-      external_transaction_id: hotmartTransactionId,
+      external_transaction_id: data.purchase?.transaction || transactionId,
       external_source: 'hotmart',
       metadata: {
         hotmart_product_id: data.product.id,

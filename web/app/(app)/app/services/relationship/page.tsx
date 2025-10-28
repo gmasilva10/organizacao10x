@@ -33,11 +33,12 @@ import {
   Mail,
   Phone,
   User,
-  Dumbbell
+  Dumbbell,
+  Anchor
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { RELATIONSHIP_VARIABLES, VARIABLE_CATEGORIES, getVariablesByCategory } from '@/lib/relationship-variables'
+import { ANCHOR_VARIABLES, ContextUtils } from '@/lib/relationship/variable-context'
 import { TemplateFormModal } from '@/components/relationship/TemplateFormModal'
 
 interface Template {
@@ -63,8 +64,7 @@ interface Template {
 const ANCHOR_OPTIONS = [
   { value: 'sale_close', label: 'Fechamento da Venda' },
   { value: 'first_workout', label: 'Primeiro Treino' },
-  { value: 'weekly_followup', label: 'Acompanhamento Semanal' },
-  { value: 'monthly_review', label: 'Revisão Mensal' },
+  { value: 'training_followup', label: 'Acompanhamento de Treino' },
   { value: 'birthday', label: 'Aniversário' },
   { value: 'renewal_window', label: 'Janela de Renovação' },
   { value: 'occurrence_followup', label: 'Follow-up de Ocorrência' }
@@ -223,219 +223,6 @@ export default function RelationshipServicesPage() {
 
         {/* Templates */}
         <TabsContent value="templates" className="space-y-6">
-          {/* Formulário inline removido - agora usa modal premium */}
-          {false && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  {editing ? 'Editar Template' : 'Novo Template'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSave} className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Título *</label>
-                    <Input
-                      value={formData.title || ''}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="Ex: Boas-vindas após Fechamento"
-                      required
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      O código será gerado automaticamente (ex: 0001, 0002, etc)
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-sm font-medium">Âncora</label>
-                      <Select
-                        value={formData.anchor || ''}
-                        onValueChange={(value: string) => setFormData({ ...formData, anchor: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a âncora" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ANCHOR_OPTIONS.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Canal Padrão</label>
-                      <Select
-                        value={formData.channel_default || ''}
-                        onValueChange={(value: string) => setFormData({ ...formData, channel_default: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o canal" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CHANNEL_OPTIONS.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Tempo (dias)</label>
-                      <Input
-                        type="number"
-                        value={formData.temporal_offset_days || ''}
-                        onChange={(e) => setFormData({ ...formData, temporal_offset_days: e.target.value ? parseInt(e.target.value) : null })}
-                        placeholder="Ex: 8 (para 8 dias depois)"
-                        min="-365"
-                        max="365"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Deixe vazio para envio imediato. Positivo = depois, negativo = antes
-                      </p>
-                      {formData.temporal_offset_days !== null && formData.anchor && (
-                        <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-700">
-                          <strong>📅 Esta mensagem será enviada {formData.temporal_offset_days > 0 ? `${formData.temporal_offset_days} dias após` : formData.temporal_offset_days < 0 ? `${Math.abs(formData.temporal_offset_days)} dias antes de` : 'no momento do'} {ANCHOR_OPTIONS.find(a => a.value === formData.anchor)?.label || formData.anchor}</strong>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium">Mensagem</label>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowVariables(!showVariables)}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Inserir Variáveis
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={formData.message_v1 || ''}
-                      onChange={(e) => setFormData({ ...formData, message_v1: e.target.value })}
-                      placeholder="Digite sua mensagem personalizada..."
-                      rows={4}
-                      required
-                    />
-                  </div>
-
-                  {/* Preview da Mensagem */}
-                  {formData.message_v1 && formData.message_v1.trim() !== '' && (
-                    <MessagePreview 
-                      template={formData.message_v1}
-                      anchor={formData.anchor}
-                      temporalOffset={formData.temporal_offset_days}
-                    />
-                  )}
-
-                  {/* Seletor de Variáveis */}
-                  {showVariables && (
-                    <Card className="border-2 border-blue-200">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <MessageSquare className="h-4 w-4" />
-                          Variáveis Disponíveis
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {/* Categorias */}
-                        <div className="flex flex-wrap gap-2">
-                          {Object.entries(VARIABLE_CATEGORIES).map(([key, category]) => {
-                            const isSelected = selectedCategory === key
-                            const IconComponent =
-                              key === 'pessoal' ? User :
-                              key === 'temporal' ? Calendar :
-                              key === 'treino' ? Dumbbell :
-                              Users
-                            return (
-                              <Button
-                                key={key}
-                                type="button"
-                                variant={isSelected ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => setSelectedCategory(key)}
-                                className="transition-all"
-                              >
-                                <IconComponent className="h-4 w-4 mr-2" />
-                                {category.name}
-                              </Button>
-                            )
-                          })}
-                        </div>
-
-                        {/* Variáveis da categoria selecionada */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {getVariablesByCategory(selectedCategory).map((variable) => (
-                            <div key={variable.key} className="flex items-center justify-between p-2 border rounded-lg">
-                              <div className="flex-1">
-                                <div className="font-mono text-sm text-blue-600">{variable.key}</div>
-                                <div className="text-xs text-gray-600">{variable.description}</div>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => insertVariable(variable.key)}
-                              >
-                                Inserir
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Exemplo de uso */}
-                        <div className="p-3 bg-blue-50 rounded-lg">
-                          <div className="text-sm font-medium text-blue-800 mb-1">💡 Como usar:</div>
-                          <div className="text-xs text-blue-700">
-                            Clique em "Inserir" para adicionar a variável na sua mensagem.
-                            Exemplo: "Olá [Nome do Aluno], [Saudação Temporal]!"
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.active || false}
-                        onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                      />
-                      <span className="text-sm">Ativo</span>
-                    </label>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button type="submit" className="flex items-center gap-2">
-                      <Save className="h-4 w-4" />
-                      {editing ? 'Atualizar' : 'Criar'}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setShowForm(false)
-                        setEditing(null)
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                      Cancelar
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Lista de Templates */}
           <Card>
             <CardHeader>
@@ -455,84 +242,86 @@ export default function RelationshipServicesPage() {
                   <MessageSquare className="h-12 w-12 mx-auto text-gray-400 mb-4" />
                   <p className="text-gray-500">Nenhum template encontrado</p>
                   <Button onClick={handleNew} className="mt-4">
+                    <Plus className="h-4 w-4 mr-2" />
                     Criar Primeiro Template
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {templates.map((template) => (
-                    <div key={template.id} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant={template.active ? 'default' : 'secondary'}>
-                              {template.code}
-                            </Badge>
-                            <h3 className="font-semibold">{template.title}</h3>
-                            {template.active && (
-                              <Badge variant="outline" className="text-green-600">
-                                Ativo
+                    <Card key={template.id} className="border-l-4 border-l-blue-500">
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold">{template.title}</h3>
+                              <Badge variant={template.active ? "default" : "secondary"}>
+                                {template.active ? "Ativo" : "Inativo"}
                               </Badge>
-                            )}
+                              <Badge variant="outline">{template.code}</Badge>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                              <div>
+                                <span className="font-medium">Âncora:</span>
+                                <br />
+                                {ANCHOR_OPTIONS.find(a => a.value === template.anchor)?.label || template.anchor}
+                              </div>
+                              <div>
+                                <span className="font-medium">Canal:</span>
+                                <br />
+                                {CHANNEL_OPTIONS.find(c => c.value === template.channel_default)?.label || template.channel_default}
+                              </div>
+                              <div>
+                                <span className="font-medium">Offset:</span>
+                                <br />
+                                {template.temporal_offset_days ? `${template.temporal_offset_days} dias` : 'Imediato'}
+                              </div>
+                              <div>
+                                <span className="font-medium">Criado:</span>
+                                <br />
+                                {new Date(template.created_at).toLocaleDateString()}
+                              </div>
+                            </div>
+                            <div className="mt-3 p-3 bg-gray-50 rounded text-sm">
+                              <span className="font-medium">Mensagem:</span>
+                              <br />
+                              <span className="text-gray-700">{template.message_v1}</span>
+                            </div>
                           </div>
-                          <p className="text-sm text-gray-600 mb-2">
-                            <strong>Âncora:</strong> {ANCHOR_OPTIONS.find(a => a.value === template.anchor)?.label || template.anchor}
-                          </p>
-                          <p className="text-sm text-gray-600 mb-2">
-                            <strong>Canal:</strong> {CHANNEL_OPTIONS.find(c => c.value === template.channel_default)?.label || template.channel_default}
-                          </p>
-                          <p className="text-sm text-gray-600 mb-2">
-                            <strong>Tempo:</strong> {
-                              template.temporal_offset_days === null ? 'Imediato' :
-                              template.temporal_offset_days === 0 ? 'No momento do evento' :
-                              template.temporal_offset_days > 0 ? `${template.temporal_offset_days} dias após` :
-                              `${Math.abs(template.temporal_offset_days)} dias antes`
-                            }
-                          </p>
-                          <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded">
-                            <strong>Mensagem:</strong> {template.message_v1}
+                          <div className="flex gap-2 ml-4">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(template)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Tem certeza que deseja excluir o template "{template.title}"?
+                                    Esta ação não pode ser desfeita.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete(template.id)}>
+                                    Excluir
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         </div>
-                        <div className="flex gap-2 ml-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEdit(template)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Tem certeza que deseja excluir o template "{template.title}"? 
-                                  Esta ação não pode ser desfeita.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDelete(template.id)}
-                                  className="bg-red-600 hover:bg-red-700"
-                                >
-                                  Excluir
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               )}
@@ -545,26 +334,69 @@ export default function RelationshipServicesPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Âncoras de Relacionamento
+                <Anchor className="h-5 w-5" />
+                Configuração de Âncoras
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ANCHOR_OPTIONS.map((anchor) => (
-                  <div key={anchor.value} className="border rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Heart className="h-5 w-5 text-pink-600" />
-                      <h3 className="font-semibold">{anchor.label}</h3>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      <strong>ID:</strong> {anchor.value}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <strong>Descrição:</strong> Momento específico no ciclo do aluno para disparar mensagens
-                    </p>
-                  </div>
-                ))}
+                {ANCHOR_OPTIONS.map((anchor) => {
+                  const anchorVariables = ANCHOR_VARIABLES[anchor.value as keyof typeof ANCHOR_VARIABLES] || []
+                  
+                  // Agrupar variáveis por categoria
+                  const variablesByCategory = anchorVariables.reduce((acc, variable) => {
+                    if (!acc[variable.category]) {
+                      acc[variable.category] = []
+                    }
+                    acc[variable.category].push(variable)
+                    return acc
+                  }, {} as Record<string, typeof anchorVariables>)
+                  
+                  return (
+                    <Card key={anchor.value} className="border-2 border-blue-200">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          {anchor.label}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Variáveis específicas desta âncora */}
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Variáveis Disponíveis</label>
+                          <div className="space-y-2">
+                            {Object.entries(variablesByCategory).map(([category, variables]) => (
+                              <div key={category} className="flex items-center justify-between">
+                                <span className="text-sm capitalize">{category}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {variables.length} variáveis
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Lista de variáveis com exemplos */}
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Exemplos de Variáveis:</label>
+                          <div className="space-y-1">
+                            {anchorVariables.slice(0, 3).map((variable) => (
+                              <div key={variable.name} className="flex items-center justify-between text-xs">
+                                <code className="bg-gray-100 px-1 rounded">[{variable.name}]</code>
+                                <span className="text-gray-500">{variable.example}</span>
+                              </div>
+                            ))}
+                            {anchorVariables.length > 3 && (
+                              <div className="text-xs text-gray-500">
+                                +{anchorVariables.length - 3} outras variáveis...
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
               </div>
             </CardContent>
           </Card>
@@ -581,34 +413,38 @@ export default function RelationshipServicesPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border rounded">
                   <div>
-                    <h3 className="font-semibold">Motor de Relacionamento</h3>
-                    <p className="text-sm text-gray-600">Job diário que gera tarefas de relacionamento</p>
+                    <h3 className="font-medium">Templates Padrão</h3>
+                    <p className="text-sm text-gray-500">Popular sistema com templates pré-configurados</p>
                   </div>
-                  <Badge variant="outline" className="text-green-600">
-                    Ativo
-                  </Badge>
+                  <Button 
+                    onClick={handleSeedTemplates}
+                    disabled={seedingTemplates}
+                    variant="outline"
+                  >
+                    {seedingTemplates ? 'Populando...' : 'Popular Templates'}
+                  </Button>
                 </div>
-                
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+
+                <div className="flex items-center justify-between p-4 border rounded">
                   <div>
-                    <h3 className="font-semibold">Gatilho de Ocorrências</h3>
-                    <p className="text-sm text-gray-600">Cria tarefas automaticamente ao salvar ocorrências com lembrete</p>
+                    <h3 className="font-medium">Integração WhatsApp</h3>
+                    <p className="text-sm text-gray-500">Configure a integração com WhatsApp Business API</p>
                   </div>
-                  <Badge variant="outline" className="text-green-600">
-                    Ativo
-                  </Badge>
+                  <Button variant="outline" disabled>
+                    Configurar
+                  </Button>
                 </div>
-                
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+
+                <div className="flex items-center justify-between p-4 border rounded">
                   <div>
-                    <h3 className="font-semibold">Rate Limiting</h3>
-                    <p className="text-sm text-gray-600">Máximo de tarefas por aluno por dia</p>
+                    <h3 className="font-medium">Integração E-mail</h3>
+                    <p className="text-sm text-gray-500">Configure o serviço de envio de e-mails</p>
                   </div>
-                  <Badge variant="outline">
-                    3 tarefas/dia
-                  </Badge>
+                  <Button variant="outline" disabled>
+                    Configurar
+                  </Button>
                 </div>
               </div>
             </CardContent>

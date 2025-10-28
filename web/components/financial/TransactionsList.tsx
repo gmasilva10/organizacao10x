@@ -52,6 +52,7 @@ interface Transaction {
   paid_at: string | null
   due_date: string | null
   created_at: string
+  student_id: string | null
   students?: {
     id: string
     name: string
@@ -251,7 +252,7 @@ export function TransactionsList() {
 
             <Select 
               value={filters.type} 
-              onValueChange={(value) => setFilters({ ...filters, type: value })}
+              onValueChange={(value: string) => setFilters({ ...filters, type: value })}
             >
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Tipo" />
@@ -265,7 +266,7 @@ export function TransactionsList() {
 
             <Select 
               value={filters.status} 
-              onValueChange={(value) => setFilters({ ...filters, status: value })}
+              onValueChange={(value: string) => setFilters({ ...filters, status: value })}
             >
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Status" />

@@ -16,7 +16,6 @@ Este documento estabelece o padrão visual e comportamental para todos os botõe
 
 ### 1. Botões de Navegação (Cards de Serviços)
 
-**Localização**: `web/app/(app)/app/services/page.tsx`
 
 **Padrão atual**:
 ```tsx

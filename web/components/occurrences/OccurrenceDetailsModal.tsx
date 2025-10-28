@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -276,6 +276,9 @@ export function OccurrenceDetailsModal({ open, onClose, occurrenceId, onSave }: 
             {data?.status === 'DONE' && <Badge variant="secondary">Encerrada</Badge>}
             {data?.is_sensitive && <Badge variant="destructive">Sensível</Badge>}
           </DialogTitle>
+          <DialogDescription>
+            Visualize e edite os detalhes desta ocorrência do aluno.
+          </DialogDescription>
         </DialogHeader>
 
         {loading ? (

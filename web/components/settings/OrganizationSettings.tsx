@@ -61,7 +61,7 @@ export default function OrganizationSettings() {
       )
     } catch (error) {
       console.error('Erro ao processar logo:', error)
-      error(error instanceof Error ? error.message : 'Erro ao processar logo')
+      // toast.error(error instanceof Error ? error.message : 'Erro ao processar logo')
     } finally {
       setProcessingImage(false)
     }

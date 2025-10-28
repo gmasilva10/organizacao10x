@@ -443,7 +443,7 @@ async function processAnchor(
           
           // Criar configuração temporal
           const temporalConfig: TemporalConfig = {
-            offsetDays: template.temporal_offset_days,
+            offsetDays: template.temporal_offset_days ?? null,
             anchorField: temporalAnchorField,
             anchorDate: null
           }
@@ -482,7 +482,7 @@ async function processAnchor(
               created_at: student.anchor_date
             }, temporalAnchorField)
             
-            scheduledDate = calculateTemporalSchedule(anchorDate, template.temporal_offset_days) || new Date()
+            scheduledDate = calculateTemporalSchedule(anchorDate, template.temporal_offset_days ?? null) || new Date()
           } else {
             // Fallback para lógica antiga
             scheduledDate = calculateScheduledDate(student.anchor_date, template.suggested_offset)

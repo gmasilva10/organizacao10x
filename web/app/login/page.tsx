@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, Suspense } from "react"
 import { useLoginUI } from "@/components/LoginUIContext"
 import { LoginDrawer } from "@/components/LoginDrawer"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
-export default function LoginPage() {
+function LoginContent() {
   const { open, setOpen } = useLoginUI()
 
   useEffect(() => {
@@ -31,5 +31,13 @@ export default function LoginPage() {
       {/* O LoginDrawer gerencia seu próprio portal/conteúdo */}
       <LoginDrawer />
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }

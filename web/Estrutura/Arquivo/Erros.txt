@@ -1,3 +1,30 @@
+[TENANT-ID-001] 2025-10-15   dev   Limpeza final de tenant_id nas migrações   S1   Resolvido   DEV
+Passos: identificar e corrigir todas as ocorrências de tenant_id em migrations antigas
+Esperado: 0 ocorrências de tenant_id em código funcional e migrations
+Obtido: 54 ocorrências encontradas em 5 arquivos de migration antigas
+Diagnóstico: migrations antigas ainda usavam tenant_id e referencias a tenants(id) em vez de organizations(id)
+Fix: substituído tenant_id por org_id e tenants por organizations em todas as migrations
+Confirmação QA: grep final confirma 0 ocorrências em app/, components/, lib/, utils/, migrations/
+Evidências: web/supabase/migrations/* (5 arquivos corrigidos), sistema 100% padronizado em org_id
+
+[KANBAN-001] 2025-10-15   dev   Botão "Encerrar" faltante no modal de onboarding   S1   Resolvido   DEV
+Passos: acessar modal de onboarding → botão "Encerrar" não aparece na área marcada
+Esperado: botão "Encerrar" visível quando card está na coluna final (entrega do treino)
+Obtido: botão não aparecia devido a lógica de detecção de última coluna incorreta
+Diagnóstico: condição isLastColumn verificava apenas 'entrega_treino' e 'entrega', mas coluna pode ter outros nomes
+Fix: expandido lógica para incluir 'delivery' e 'final', adicionados logs de debug para monitoramento
+Confirmação QA: botão "Encerrar" agora aparece corretamente na coluna de entrega
+Evidências: web/components/KanbanCardEditor.tsx (linhas 263-266), logs de debug implementados
+
+[KANBAN-002] 2025-10-15   dev   API /api/kanban/complete retorna 404 "Card não encontrado"   S1   Resolvido   DEV
+Passos: clicar "Encerrar" no modal → erro 404 na API
+Esperado: API deve encontrar o card e completar o onboarding
+Obtido: erro "Card não encontrado" devido a campos inexistentes na tabela kanban_items
+Diagnóstico: API tentava usar campos completed_at e status que não existiam, e referência incorreta a kanban_stages.title
+Fix: criada migração para adicionar campos completed_at e status, corrigido SELECT para usar kanban_stages.name
+Confirmação QA: API agora funciona corretamente, campos adicionados à tabela
+Evidências: web/supabase/migrations/202510151209_add_kanban_completion_fields.sql, web/app/api/kanban/complete/route.ts (linhas 37-47)
+
 [2025-08-24] BUILD   Import inv lido de sanitizeAddress
 - Sintoma: "Export sanitizeAddress doesn't exist in target module" em web/app/api/students/[id]/route.ts
 - Causa: import de ../route (rota n o exporta utilit rios)
