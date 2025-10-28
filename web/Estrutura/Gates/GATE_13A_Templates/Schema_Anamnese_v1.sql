@@ -1,4 +1,0 @@
--- Draft: Schema Anamnese V1
--- tabela principal
--- anamneses(id uuid pk, tenant_id uuid, student_id uuid, version text, answers jsonb, red_flags jsonb, risk_level text check (risk_level in ('low','moderate','high')), consent_at timestamptz, created_by uuid, created_at timestamptz default now(), updated_at timestamptz default now());
--- índices sugeridos: (tenant_id, student_id, created_at desc), (tenant_id, created_at desc)
