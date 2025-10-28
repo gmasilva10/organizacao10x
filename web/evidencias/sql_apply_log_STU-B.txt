@@ -1,1 +1,0 @@
-[2025-08-24 16:47] STU-B migration applied to project kkxlztopdmipldncduvj (confirm_cost_id=STU-B-2025-08-24-A1). Result: success=true

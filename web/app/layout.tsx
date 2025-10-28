@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/lib/use-theme"
 import { ToastProvider } from "@/components/ui/toast"
 import { Toaster } from "sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { ClientTelemetryInit } from "@/components/ClientTelemetryInit"
 import QueryProvider from "@/components/providers/QueryProvider"
 import CSSPreloader from "@/components/CSSPreloader"
 
@@ -86,7 +85,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <TooltipProvider>
               <ToastProvider>
                 <LoginUIProvider>
-                  <ClientTelemetryInit />
                   <CSSPreloader />
                   {children}
                   <Toaster richColors position="top-right" />

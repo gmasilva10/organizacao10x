@@ -1,5 +1,0 @@
-{
-  "post_with_address": {"status": 200, "body": {"ok": true, "id": "<id>"}},
-  "patch_with_address_update": {"status": 200, "body": {"ok": true}},
-  "get_includes_address": {"status": 200, "body_sample": {"data":[{"id":"<id>","address":{"zip":"01311000","state":"SP"}}]}}
-}

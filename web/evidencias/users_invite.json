@@ -1,1 +1,0 @@
-{"request":{"email":"trainer.qa@example.com","role":"trainer"},"response":{"status":200,"body":{"ok":true,"user_id":"<uuid>"}}}

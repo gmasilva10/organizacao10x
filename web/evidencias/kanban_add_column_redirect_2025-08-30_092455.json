@@ -1,8 +1,0 @@
-﻿{
-    "date":  "2025-08-30T09:24:55.8863137-03:00",
-    "change":  "Kanban \u0027Nova coluna\u0027 redireciona para Serviços (Onboarding) com newColumn=1",
-    "branch":  "feat/settings-link-user-collaborator",
-    "files":  [
-                  "web/app/app/kanban/page.tsx"
-              ]
-}

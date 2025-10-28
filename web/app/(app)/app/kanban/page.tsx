@@ -450,7 +450,7 @@ export default function KanbanPage() {
     })
   }
 
-  async function handleMoveTelemetry(card: Card, fromId: string, toId: string) {
+  async function handleMoveCard(card: Card, fromId: string, toId: string) {
     // Compat: backend atual exp µe POST em /api/kanban/move com payload cardId/fromColumnId/toColumnId
     const res = await fetch("/api/kanban/move", {
       method: "POST",
@@ -521,8 +521,7 @@ export default function KanbanPage() {
 
     lastMovedIdRef.current = card.id
     // Optimistic UI + persist; em erro, rollback simples: recarregar board
-    handleMoveTelemetry(card, fromCol.id, toCol.id).then(async () => {
-      try { window.dispatchEvent(new CustomEvent('pg:telemetry',{ detail:{ type:'kanban.card.moved', payload:{ studentId: card.studentId, from: fromCol.id, to: toCol.id } } })) } catch {}
+    handleMoveCard(card, fromCol.id, toCol.id).then(async () => {
       // atualizar ordena   £o sequencial no destino
       const target = after.find(c => c.id === toCol.id)
       if (target) {

@@ -1,6 +1,0 @@
-{
-  "create_service_A": {"status": 200, "id": "<svcA>", "is_active": true},
-  "create_service_B": {"status": 200, "id": "<svcB>", "is_active": false},
-  "try_both_active": {"status": 200, "note": "backend mantém 1 ativo via unique parcial"},
-  "discount_xor": {"create_with_both": {"status": 400, "error": "invalid_discount"}}
-}
