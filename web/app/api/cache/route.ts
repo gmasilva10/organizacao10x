@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { 
-  getRedisInfo, 
+  getCacheInfo, 
   clearAllCache, 
   getCacheStats, 
   resetCacheStats,
   invalidateCachePattern 
-} from "@/lib/cache/redis"
+} from "@/lib/cache/simple"
 
 // GET /api/cache - Obter informações do cache
 export async function GET(request: NextRequest) {
@@ -25,33 +25,42 @@ export async function GET(request: NextRequest) {
         })
         
       case 'info':
-        // Obter informações do Redis
-        const info = await getRedisInfo()
+        // Obter informações do cache
+        const info = await getCacheInfo()
         return NextResponse.json({
           success: true,
-          data: info
+          data: {
+            type: 'memory',
+            connected: info.connected,
+            size: info.size
+          }
         })
         
       case 'health':
         // Verificar saúde do cache
-        const health = await getRedisInfo()
+        const health = await getCacheInfo()
         return NextResponse.json({
           success: true,
           data: {
-            connected: health?.connected || false,
-            stats: health?.stats || getCacheStats()
+            type: 'memory',
+            connected: health.connected,
+            size: health.size
           }
         })
         
       default:
         // Retornar todas as informações
-        const allInfo = await getRedisInfo()
+        const allInfo = await getCacheInfo()
         const allStats = getCacheStats()
         
         return NextResponse.json({
           success: true,
           data: {
-            redis: allInfo,
+            cache: {
+              type: 'memory',
+              connected: allInfo.connected,
+              size: allInfo.size
+            },
             stats: allStats,
             timestamp: new Date().toISOString()
           }

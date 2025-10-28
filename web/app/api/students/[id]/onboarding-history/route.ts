@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getCache, setCache } from '@/lib/cache/redis'
+import { getCache, setCache } from '@/lib/cache/simple'
 
 export async function GET(
   request: Request,

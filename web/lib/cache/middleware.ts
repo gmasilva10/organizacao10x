@@ -23,7 +23,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getCache, setCache, deleteCache, invalidateCachePattern } from './redis'
+import { getCache, setCache, deleteCache, invalidateCachePattern } from './simple'
 
 // Tipos para middleware de cache
 export interface CacheMiddlewareOptions {
@@ -195,7 +195,7 @@ export async function invalidateCacheForOrg(
 
 // Função para obter estatísticas de cache
 export async function getCacheMiddlewareStats() {
-  const { getCacheStats } = await import('./redis')
+  const { getCacheStats } = await import('./simple')
   return getCacheStats()
 }
 

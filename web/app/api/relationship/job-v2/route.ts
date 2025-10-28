@@ -19,7 +19,7 @@ import {
   SUPPORTED_ANCHORS 
 } from '@/lib/relationship/anchors/factory'
 import { renderMessageWithVariables } from '@/lib/relationship/variable-renderer'
-import { getCache, setCache } from '@/lib/cache/redis'
+import { getCache, setCache } from '@/lib/cache/simple'
 
 const supabaseUrl = process.env.SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!

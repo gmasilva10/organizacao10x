@@ -1,4 +1,4 @@
-import { getCache, setCache } from '@/lib/cache/redis'
+import { getCache, setCache } from '@/lib/cache/simple'
 
 // Tipos para rate limiting
 export interface RateLimitConfig {
@@ -146,7 +146,7 @@ export async function checkRateLimit(
 // Função para resetar rate limit
 export async function resetRateLimit(identifier: string): Promise<boolean> {
   try {
-    const { deleteCache } = await import('@/lib/cache/redis')
+    const { deleteCache } = await import('@/lib/cache/simple')
     const key = `rate-limit:${identifier}`
     return await deleteCache(key, { prefix: 'rate-limit' })
   } catch (error) {

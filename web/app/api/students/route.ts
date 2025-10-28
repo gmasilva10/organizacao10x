@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { resolveRequestContext } from "@/utils/context/request-context"
 import { withCache, CacheConfigs } from "@/lib/cache/middleware"
-import { getCache, setCache } from "@/lib/cache/redis"
+import { getCache, setCache } from "@/lib/cache/simple"
 import { withRateLimit, RateLimitMiddlewareConfigs } from "@/lib/rate-limit/middleware"
 // import { withCompression, CompressionConfigs } from "@/lib/compression/middleware"
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRedisClient, getCacheStats, getRedisInfo } from '@/lib/cache/redis'
+import { getCacheStats, getCacheInfo, clearAllCache } from '@/lib/cache/simple'
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,21 +8,20 @@ export async function GET(request: NextRequest) {
     // Obter estatísticas do cache
     const stats = getCacheStats()
     
-    // Obter informações do Redis
-    const redisInfo = await getRedisInfo()
+    // Obter informações do cache
+    const cacheInfo = await getCacheInfo()
     
     // Verificar saúde geral
-    const isHealthy = redisInfo?.connected || false
-    const memoryUsage = redisInfo?.stats?.used_memory_human || 'N/A'
-    const connectedClients = redisInfo?.stats?.connected_clients || 0
+    const isHealthy = cacheInfo.connected
+    const memoryUsage = `${cacheInfo.size} items`
     
     const health = {
       status: isHealthy ? 'healthy' : 'unhealthy',
-      redis: {
+      cache: {
+        type: 'memory',
         connected: isHealthy,
         memory_usage: memoryUsage,
-        connected_clients: connectedClients,
-        uptime: redisInfo?.stats?.uptime_in_seconds || 0
+        size: cacheInfo.size
       },
       cache_stats: {
         hits: stats.hits,
@@ -59,7 +58,7 @@ export async function GET(request: NextRequest) {
         error: 'Erro interno ao monitorar cache',
         data: {
           status: 'error',
-          redis: { connected: false },
+          cache: { type: 'memory', connected: true },
           cache_stats: { hits: 0, misses: 0, sets: 0, deletes: 0, errors: 1 },
           timestamp: new Date().toISOString()
         }
@@ -75,11 +74,8 @@ export async function POST(request: NextRequest) {
     const { action } = await request.json().catch(() => ({}))
     
     if (action === 'clear') {
-      const client = await getRedisClient()
-      if (client) {
-        await client.flushAll()
-        console.log('🧹 Cache Redis limpo via API')
-      }
+      await clearAllCache()
+      console.log('🧹 Cache limpo via API')
       
       return NextResponse.json({
         success: true,

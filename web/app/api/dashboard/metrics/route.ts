@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { resolveRequestContext } from "@/utils/context/request-context"
-import { getCache, setCache } from "@/lib/cache/redis"
+import { getCache, setCache } from "@/lib/cache/simple"
 import { withCompression, CompressionConfigs } from "@/lib/compression/middleware"
 
 async function getMetricsHandler(request: NextRequest): Promise<NextResponse> {

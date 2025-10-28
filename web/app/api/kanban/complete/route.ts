@@ -1,4 +1,4 @@
-import { invalidateCachePattern } from '@/lib/cache/redis';
+import { invalidateCachePattern } from '@/lib/cache/simple';
 import { withRateLimit, RateLimitMiddlewareConfigs } from '@/lib/rate-limit/middleware';
 
 async function completeKanbanHandler(request: Request) {

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 export const dynamic = 'force-dynamic'
 import { resolveRequestContext } from "@/utils/context/request-context"
 import { withCache, CacheConfigs } from "@/lib/cache/middleware"
-import { getCache, setCache } from "@/lib/cache/redis"
+import { getCache, setCache } from "@/lib/cache/simple"
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
