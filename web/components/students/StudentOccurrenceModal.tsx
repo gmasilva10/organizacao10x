@@ -479,7 +479,7 @@ export function StudentOccurrenceModal({
                         </SelectTrigger>
                         <SelectContent>
                           {trainers.map((trainer) => (
-                            <SelectItem key={trainer.id} value={trainer.user_id}>
+                            <SelectItem key={trainer.id} value={trainer.id}>
                               {trainer.name}
                             </SelectItem>
                           ))}

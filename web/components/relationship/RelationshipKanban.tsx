@@ -571,7 +571,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
         setTasks(Array.isArray(data.tasks) ? data.tasks : [])
         setPagination(data.pagination || { page: 1, page_size: 100, total: 0, total_pages: 0 })
       } catch (error) {
-        if (error.name === 'AbortError') {
+        if ((error as Error).name === 'AbortError') {
           console.log('[REL] fetch aborted')
           return
         }
@@ -638,7 +638,7 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
         />
         
         {/* Botão Limpar na tela principal */}
-        {hasActiveFilters && (
+        {hasActiveFilters() && (
           <Button
             variant="outline"
             size="sm"
@@ -766,8 +766,11 @@ const RelationshipKanban = forwardRef<RelationshipKanbanRef, RelationshipKanbanP
                 <TaskCard
                   task={dragState.activeItem.data}
                   onCopyMessage={() => {}}
-                  onWhatsAppSend={() => {}}
-                  onPostponeTask={() => {}}
+                  onOpenWhatsApp={() => {}}
+                  onUpdateStatus={async () => {}}
+                  onSnoozeTask={async () => {}}
+                  onDeleteTask={async () => {}}
+                   onPostponeTask={async () => {}}
                 />
               </div>
             ) : null}

@@ -11,7 +11,7 @@ export default function CSSPreloader() {
       link.href = href
       link.media = 'print'
       link.onload = function() {
-        this.media = 'all'
+        (this as HTMLLinkElement).media = 'all'
       }
       document.head.appendChild(link)
     }

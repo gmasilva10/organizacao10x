@@ -15,9 +15,7 @@ export const studentProcessSchema = z.object({
     'whatsapp',
     'inativar',
     'excluir'
-  ], {
-    errorMap: () => ({ message: "Tipo de processo inválido" })
-  }),
+  ]),
   requiredFields: z.array(z.string()).optional(),
   status: z.enum(['onboarding', 'active', 'paused', 'inactive']).optional(),
   permissions: z.array(z.string()).optional()
@@ -34,9 +32,7 @@ export const studentAttachmentSchema = z.object({
     'ocorrencia',
     'relacionamento',
     'arquivo'
-  ], {
-    errorMap: () => ({ message: "Tipo de anexo inválido" })
-  }),
+  ]),
   fileTypes: z.array(z.string()).optional(),
   maxFileSize: z.number().optional(),
   required: z.boolean().optional()

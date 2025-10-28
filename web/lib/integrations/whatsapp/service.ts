@@ -45,8 +45,8 @@ export class WhatsAppService {
    * Verifica se WhatsApp Desktop está disponível
    */
   async isDesktopAvailable(): Promise<boolean> {
-    return WhatsAppDesktopHandler.isAvailable() && 
-           WhatsAppDesktopHandler.isProtocolSupported()
+    return await WhatsAppDesktopHandler.isAvailable() && 
+           await WhatsAppDesktopHandler.isProtocolSupported()
   }
 
   /**
