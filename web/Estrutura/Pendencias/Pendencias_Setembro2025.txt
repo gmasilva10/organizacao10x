@@ -1,9 +1,0 @@
-[2025-09-18] Onboarding/Kanban: ausência de exclusão de colunas.
-Impacto: travamento em testes ponta-a-ponta; poluição com colunas de teste/ inválidas.
-Ação: implementar delete column (UI + API + logs).
-Regras:
-- Expor/validar DELETE /api/onboarding/columns/:id.
-- Não permitir excluir coluna fixa (is_fixed = true) e colunas #1 e #99.
-- Se houver tarefas vinculadas, mover para coluna padrão "Novo Aluno" (default) antes de excluir.
-- Registrar auditoria (user_id, tenant_id, column_id, timestamp).
-Prioridade: Alta (necessário antes de liberar v0.3.4-dev).
