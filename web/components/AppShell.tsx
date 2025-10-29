@@ -186,7 +186,15 @@ export function AppShell({ children, user, activeOrgId }: AppShellProps) {
     try {
       await fetch('/api/auth/signout', { method: 'POST', credentials: 'include', cache: 'no-store' })
     } catch {}
-    router.push('/')
+    try {
+      localStorage.removeItem('pg.nav.collapsed')
+      localStorage.removeItem('pg.active_org')
+    } catch {}
+    if (typeof window !== 'undefined') {
+      window.location.assign('/')
+      return
+    }
+    router.replace('/')
   }
 
   // logoSrc removido (não utilizado)

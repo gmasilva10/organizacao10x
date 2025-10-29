@@ -51,6 +51,16 @@ export const studentIdentificationSchema = z.object({
       return !isNaN(date.getTime())
     }, {
       message: 'Data de nascimento inválida (formato: AAAA-MM-DD)'
+    })
+    .refine((val) => {
+      if (!val) return true
+      const m = /^(\d{4})-\d{2}-\d{2}$/.exec(val)
+      if (!m) return false
+      const year = Number(m[1])
+      const currentYear = new Date().getFullYear()
+      return year >= 1900 && year <= currentYear
+    }, {
+      message: 'Ano da data de nascimento deve estar entre 1900 e o ano atual'
     }),
   
   gender: z

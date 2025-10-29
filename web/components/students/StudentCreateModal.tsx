@@ -100,6 +100,26 @@ export function StudentCreateModal({
   const [maritalStatus, setMaritalStatus] = useState("")
   const [nationality, setNationality] = useState("")
   const [birthPlace, setBirthPlace] = useState("")
+  const currentYear = new Date().getFullYear()
+  const minBirthDate = '1900-01-01'
+  const maxBirthDate = `${currentYear}-12-31`
+
+  function handleBirthDateChange(v: string) {
+    const m = /^(\d{4,})-(\d{2})-(\d{2})$/.exec(v)
+    if (m) {
+      const yearStr = m[1].slice(0, 4)
+      let year = Number(yearStr)
+      const mm = m[2]
+      const dd = m[3]
+      if (Number.isFinite(year)) {
+        if (year < 1900) year = 1900
+        if (year > currentYear) year = currentYear
+        setBirthDate(`${String(year).padStart(4, '0')}-${mm}-${dd}`)
+        return
+      }
+    }
+    setBirthDate(v)
+  }
   
   // Foto
   const [photoData, setPhotoData] = useState({
@@ -837,7 +857,10 @@ export function StudentCreateModal({
                         id="birth_date"
                         type="date"
                         value={birthDate}
-                        onChange={(e) => setBirthDate(e.target.value)}
+                        min={minBirthDate}
+                        max={maxBirthDate}
+                        onChange={(e) => handleBirthDateChange(e.target.value)}
+                        title={`Selecione uma data entre ${minBirthDate} e ${maxBirthDate}`}
                       />
                     </div>
 

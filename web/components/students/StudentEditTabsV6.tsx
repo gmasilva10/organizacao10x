@@ -137,6 +137,26 @@ export default function StudentEditTabsV6({
   })
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const currentYear = new Date().getFullYear()
+  const minBirthDate = '1900-01-01'
+  const maxBirthDate = `${currentYear}-12-31`
+
+  function handleBirthDateChange(v: string) {
+    const m = /^(\d{4,})-(\d{2})-(\d{2})$/.exec(v)
+    if (m) {
+      const yearStr = m[1].slice(0, 4)
+      let year = Number(yearStr)
+      const mm = m[2]
+      const dd = m[3]
+      if (Number.isFinite(year)) {
+        if (year < 1900) year = 1900
+        if (year > currentYear) year = currentYear
+        setFormData({...formData, birth_date: `${String(year).padStart(4, '0')}-${mm}-${dd}`})
+        return
+      }
+    }
+    setFormData({...formData, birth_date: v})
+  }
   
   // Estados para modais de busca
   const [searchModalOpen, setSearchModalOpen] = useState(false)
@@ -729,8 +749,11 @@ export default function StudentEditTabsV6({
                           id="birth_date"
                           type="date"
                           value={formData.birth_date}
-                          onChange={(e) => setFormData({...formData, birth_date: e.target.value})}
+                          min={minBirthDate}
+                          max={maxBirthDate}
+                          onChange={(e) => handleBirthDateChange(e.target.value)}
                           className="h-9 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          title={`Selecione uma data entre ${minBirthDate} e ${maxBirthDate}`}
                         />
                       </div>
                       <div className="space-y-2">

@@ -273,7 +273,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Campos opcionais - Informações Pessoais
-    if (payload.birth_date) body.birth_date = payload.birth_date
+    if (payload.birth_date) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(payload.birth_date))
+      const year = m ? Number(m[1]) : NaN
+      const currentYear = new Date().getFullYear()
+      if (!m || !Number.isFinite(year) || year < 1900 || year > currentYear) {
+        const t = Date.now() - startTime
+        return NextResponse.json(
+          { error: 'invalid_birth_date', message: 'Data de nascimento inválida. Use AAAA-MM-DD entre 1900 e o ano atual.' },
+          { status: 400, headers: { 'X-Query-Time': String(t) } }
+        )
+      }
+      body.birth_date = payload.birth_date
+    }
     if (payload.gender) body.gender = payload.gender
     if (payload.marital_status) body.marital_status = payload.marital_status
     if (payload.nationality) body.nationality = payload.nationality
