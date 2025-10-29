@@ -218,3 +218,10 @@
 [data-slot="drawer-content"] * {
   pointer-events: auto !important;
 }
+
+nav[aria-label="Menu principal"]{
+  @apply bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 max-lg:py-4 max-lg:-translate-y-full max-lg:pointer-events-none max-lg:opacity-0 transition-all duration-300 ease-in-out max-lg:left-0;
+}
+#menu-toggle:checked + nav{
+  @apply translate-y-0 opacity-100 pointer-events-auto;
+}
