@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,8 @@ import {
   Calendar, 
   DollarSign, 
   CheckCircle,
-  Loader2
+  Loader2,
+  AlertCircle
 } from "lucide-react"
 import { showSuccessToast, showErrorToast } from "@/lib/toast-utils"
 
@@ -24,6 +25,14 @@ interface MatricularModalProps {
   studentName: string
 }
 
+interface Plan {
+  id: string
+  nome: string
+  valor: number
+  ciclo: string | null
+  ativo: boolean
+}
+
 export default function MatricularModal({ 
   open, 
   onClose, 
@@ -31,7 +40,11 @@ export default function MatricularModal({
   studentName 
 }: MatricularModalProps) {
   const [loading, setLoading] = useState(false)
+  const [loadingPlans, setLoadingPlans] = useState(false)
+  const [plans, setPlans] = useState<Plan[]>([])
+  const [plansError, setPlansError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
+    enrollmentType: 'nova' as 'nova' | 'renovacao',
     plan: '',
     startDate: '',
     endDate: '',
@@ -39,12 +52,72 @@ export default function MatricularModal({
     observations: ''
   })
 
-  const plans = [
-    { id: '1', name: 'Plano Básico', value: 'R$ 99,90', duration: '1 mês' },
-    { id: '2', name: 'Plano Premium', value: 'R$ 199,90', duration: '3 meses' },
-    { id: '3', name: 'Plano Enterprise', value: 'R$ 399,90', duration: '6 meses' },
-    { id: '4', name: 'Plano Anual', value: 'R$ 799,90', duration: '12 meses' }
-  ]
+  // Buscar planos do banco quando modal abrir
+  useEffect(() => {
+    if (open) {
+      fetchPlans()
+    }
+  }, [open])
+
+  const fetchPlans = async () => {
+    setLoadingPlans(true)
+    setPlansError(null)
+    try {
+      const response = await fetch('/api/plans')
+      if (!response.ok) {
+        throw new Error('Erro ao buscar planos')
+      }
+      const data = await response.json()
+      // Filtrar apenas planos ativos
+      const activePlans = (data.plans || []).filter((p: Plan) => p.ativo === true)
+      setPlans(activePlans)
+      
+      if (activePlans.length === 0) {
+        setPlansError('Nenhum plano ativo encontrado. Cadastre planos em Serviços > Financeiro > Planos de Pagamento.')
+      }
+    } catch (error) {
+      console.error('Erro ao buscar planos:', error)
+      setPlansError('Erro ao carregar planos. Tente novamente.')
+    } finally {
+      setLoadingPlans(false)
+    }
+  }
+
+  // Mapear ciclo do plano para billing_cycle da API
+  const mapCicloToBillingCycle = (ciclo: string | null): string => {
+    if (!ciclo) return 'monthly'
+    
+    const cicloMap: Record<string, string> = {
+      'mensal': 'monthly',
+      'trimestral': 'quarterly',
+      'semestral': 'semiannual',
+      'anual': 'annual'
+    }
+    
+    return cicloMap[ciclo.toLowerCase()] || 'monthly'
+  }
+
+  // Formatar valor para exibição
+  const formatCurrency = (value: number): string => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value)
+  }
+
+  // Obter duração formatada do ciclo
+  const getDurationLabel = (ciclo: string | null): string => {
+    if (!ciclo) return '1 mês'
+    
+    const durationMap: Record<string, string> = {
+      'mensal': '1 mês',
+      'trimestral': '3 meses',
+      'semestral': '6 meses',
+      'anual': '12 meses'
+    }
+    
+    return durationMap[ciclo.toLowerCase()] || '1 mês'
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,20 +147,15 @@ export default function MatricularModal({
         return
       }
 
-      // Determinar billing_cycle baseado na duração do plano
-      let billingCycle = 'monthly'
-      if (selectedPlan.duration.includes('3 meses')) {
-        billingCycle = 'quarterly'
-      } else if (selectedPlan.duration.includes('6 meses')) {
-        billingCycle = 'semiannual'
-      } else if (selectedPlan.duration.includes('12 meses')) {
-        billingCycle = 'annual'
-      }
+      // Mapear ciclo do plano para billing_cycle
+      const billingCycle = mapCicloToBillingCycle(selectedPlan.ciclo)
 
       // Payload da matrícula
       const payload = {
         student_id: studentId,
-        plan_name: selectedPlan.name,
+        plan_id: selectedPlan.id,
+        plan_name: selectedPlan.nome,
+        enrollment_type: formData.enrollmentType,
         price_cents: Math.round(valueNumber * 100), // Converter para centavos
         billing_cycle: billingCycle,
         start_date: formData.startDate,
@@ -123,6 +191,7 @@ export default function MatricularModal({
       
       // Reset form
       setFormData({
+        enrollmentType: 'nova',
         plan: '',
         startDate: '',
         endDate: '',
@@ -144,7 +213,7 @@ export default function MatricularModal({
       setFormData(prev => ({
         ...prev,
         plan: planId,
-        value: selectedPlan.value
+        value: formatCurrency(selectedPlan.valor)
       }))
     }
   }
@@ -163,33 +232,68 @@ export default function MatricularModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Tipo de Matrícula */}
+          <div className="space-y-2">
+            <Label htmlFor="enrollmentType" className="text-sm font-medium">
+              Tipo de Matrícula *
+            </Label>
+            <Select 
+              value={formData.enrollmentType} 
+              onValueChange={(value: 'nova' | 'renovacao') => 
+                setFormData(prev => ({ ...prev, enrollmentType: value }))
+              }
+            >
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="nova">Nova Matrícula</SelectItem>
+                <SelectItem value="renovacao">Renovação</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Plano */}
           <div className="space-y-2">
             <Label htmlFor="plan" className="text-sm font-medium">
               Plano de Treinamento *
             </Label>
-            <Select value={formData.plan} onValueChange={handlePlanChange}>
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="Selecione um plano" />
-              </SelectTrigger>
-              <SelectContent>
-                {plans.map((plan) => (
-                  <SelectItem key={plan.id} value={plan.id}>
-                    <div className="flex items-center justify-between w-full">
-                      <span>{plan.name}</span>
-                      <div className="flex items-center gap-2 ml-4">
-                        <Badge variant="secondary" className="text-xs">
-                          {plan.duration}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {plan.value}
-                        </span>
+            {loadingPlans ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Carregando planos...
+              </div>
+            ) : plansError ? (
+              <div className="flex items-center gap-2 text-sm text-destructive p-3 border border-destructive rounded-md bg-destructive/10">
+                <AlertCircle className="h-4 w-4" />
+                {plansError}
+              </div>
+            ) : (
+              <Select value={formData.plan} onValueChange={handlePlanChange} disabled={plans.length === 0}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Selecione um plano" />
+                </SelectTrigger>
+                <SelectContent>
+                  {plans.map((plan) => (
+                    <SelectItem key={plan.id} value={plan.id}>
+                      <div className="flex items-center justify-between w-full">
+                        <span>{plan.nome}</span>
+                        <div className="flex items-center gap-2 ml-4">
+                          {plan.ciclo && (
+                            <Badge variant="secondary" className="text-xs">
+                              {getDurationLabel(plan.ciclo)}
+                            </Badge>
+                          )}
+                          <span className="text-sm text-muted-foreground">
+                            {formatCurrency(plan.valor)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Data de Início */}

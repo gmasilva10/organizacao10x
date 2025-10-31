@@ -73,6 +73,7 @@ export const ANCHOR_VARIABLES: Record<EventCode, VariableDefinition[]> = {
   sale_close: [
     { name: 'PrimeiroNome', description: 'Primeiro nome do aluno', example: 'João', category: 'personal' },
     { name: 'NomeCompleto', description: 'Nome completo do aluno', example: 'João Silva', category: 'personal' },
+    { name: 'Nome', description: 'Nome do aluno (alias para NomeCompleto)', example: 'João Silva', category: 'personal' },
     { name: 'DataVenda', description: 'Data da venda/contratação', example: '15/01/2025', category: 'temporal' },
     { name: 'DiasDesdeVenda', description: 'Dias desde a venda', example: '3', category: 'temporal' },
     { name: 'SaudacaoTemporal', description: 'Saudação baseada no horário', example: 'Bom dia', category: 'temporal' },
@@ -196,11 +197,13 @@ export class ContextUtils {
       // Personal
       'PrimeiroNome': () => student.name.split(' ')[0] || student.name,
       'NomeCompleto': () => student.name,
+      'Nome': () => student.name, // Alias para NomeCompleto (compatibilidade com templates antigos)
       'Idade': () => student.birth_date ? this.calculateAge(student.birth_date).toString() : '',
       
       // Temporal
       'SaudacaoTemporal': () => this.getTemporalGreeting(),
-      'DataVenda': () => student.created_at ? this.formatDate(student.created_at) : '',
+      'DataVenda': () => anchor?.anchor_date ? this.formatDate(anchor.anchor_date) : (student.created_at ? this.formatDate(student.created_at) : ''),
+      'DiasDesdeVenda': () => anchor?.anchor_date ? this.calculateDaysSince(anchor.anchor_date).toString() : '0',
       'DataPrimeiroTreino': () => student.first_workout_date ? this.formatDate(student.first_workout_date) : '',
       'DataUltimoTreino': () => student.last_workout_date ? this.formatDate(student.last_workout_date) : '',
       'DataInicioTreinos': () => student.first_workout_date ? this.formatDate(student.first_workout_date) : '',
@@ -211,7 +214,7 @@ export class ContextUtils {
       'NomePersonal': () => trainer?.name || 'Personal Trainer',
       
       // Training
-      'DiasSemTreinar': () => student.last_workout_date ? (this as any).calculateDaysSince(student.last_workout_date).toString() : '0',
+      'DiasSemTreinar': () => student.last_workout_date ? this.calculateDaysSince(student.last_workout_date).toString() : '0',
       'MesesTreinando': () => student.first_workout_date ? (this as any).calculateMonthsSince(student.first_workout_date).toString() : '0',
       'FrequenciaTreinos': () => (this as any).calculateTrainingFrequency(student),
       'Objetivos': () => 'Emagrecimento', // Placeholder - pode vir de dados do aluno
@@ -323,5 +326,13 @@ export class ContextUtils {
     const monthDiff = today.getMonth() - targetDate.getMonth()
     
     return yearDiff * 12 + monthDiff
+  }
+
+  private static calculateDaysSince(dateString: string): number {
+    const today = new Date()
+    const targetDate = new Date(dateString)
+    const diffTime = Math.abs(today.getTime() - targetDate.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
   }
 }
