@@ -320,9 +320,7 @@ export async function POST(request: NextRequest) {
         const triggerResponse = await fetch(triggerUrl, {
           method: 'POST',
           headers: { 
-            'Content-Type': 'application/json',
-            // Passar headers de autenticação se necessário
-            ...(ctx?.session && { 'Authorization': `Bearer ${ctx.session}` })
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             student_id: student_id,
